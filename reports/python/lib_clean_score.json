@@ -1,0 +1,1541 @@
+{
+  "project_name": "metrics-kit",
+  "workflow_id": "py_lib_clean",
+  "workflow_run_id": "wf-7ef694c9",
+  "evaluated_at": "2026-10-24T07:36:17.216099+00:00",
+  "language": "python",
+  "target_root": "examples/python/lib_clean",
+  "facts_file": ".pni/cache/py_lib_clean/facts.json",
+  "key_files_inspected": [
+    "pyproject.toml",
+    "uv.lock",
+    "README.md",
+    "SECURITY.md",
+    "LICENSE",
+    ".github/dependabot.yml",
+    ".github/workflows/ci.yml",
+    "src/metrics_kit/__init__.py",
+    "src/metrics_kit/exceptions.py",
+    "src/metrics_kit/models.py",
+    "src/metrics_kit/stats.py",
+    "src/metrics_kit/rules.py",
+    "src/metrics_kit/formatting.py",
+    "tests/test_stats.py",
+    "tests/test_rules.py",
+    "tests/test_formatting.py"
+  ],
+  "overall_score": 95,
+  "grade": "S",
+  "category_scores": {
+    "architecture": 98,
+    "code_quality": 96,
+    "typing": 99,
+    "testing": 93,
+    "dependencies": 95,
+    "security": 94,
+    "documentation": 91
+  },
+  "category_rationales": {
+    "architecture": "公開APIファサード (__init__.py) -> ルール評価・整形 (rules.py / formatting.py) -> 統計コア (stats.py) -> 不変モデル・例外 (models.py / exceptions.py) の4層単方向DAG構造を完全に維持し、循環依存・境界違反ともに0件である。",
+    "code_quality": "全6ファイル・319 LOC で高複雑度関数・引数過多・可変グローバル状態・バグ誘発イディオムがすべて0件であり、GoogleスタイルDocstring・Import衛生ともに100.0%を達成している。NaN/Inf境界ガードのみ改善余地がある。",
+    "typing": "PEP 561 py.typed マーカー同梱に加え、Python 3.11+ StrEnum・Literal・Sequence[float] を用いた厳格な型注釈カバレッジ100.0%（Any・type: ignore ともに0件）を達成している。",
+    "testing": "隔離コンテナのオフライン (--network=none) pytest 実行で全6テストが合格し、実測行カバレッジ96.2% (153/159行)・分岐カバレッジ77.8%を記録している。rules.py (分岐72.2%) と stats.py の境界ケース拡充でさらに向上する。",
+    "dependencies": "PEP 621 pyproject.toml によりランタイム依存を pydantic>=2.7.0 の1件のみに最小化し、dev依存の分離・uv.lock・Dependabot週次更新・SHA固定CIアクションを完備している。",
+    "security": "ライブラリ本体および直接依存 (pydantic) のCVEは0件、ハードコード秘密情報0件、CWE危険シンク0件、最小権限CI (contents: read) を備える。検証用ベースイメージ同梱のシステム pip@25.0.1 (MEDIUM 5件) 更新と uv.lock 推移的ハッシュ完全化のみ推奨される。",
+    "documentation": "全公開クラス・関数のDocstringカバレッジ100.0%（シグネチャ不整合0件）とDiátaxis 4象限構成のREADME.mdを備えるが、README API一覧への sanitize_prometheus_name 追記と開発・テスト手順の明記が望ましい。"
+  },
+  "metrics_snapshot": {
+    "language": "python",
+    "runtime_type_hint": "library",
+    "build_system": "uv",
+    "has_manifest": true,
+    "has_lockfile": true,
+    "has_license": true,
+    "has_security_policy": true,
+    "has_dependency_automation": true,
+    "has_type_marker": true,
+    "dependencies_count": 1,
+    "unpinned_dependencies_count": 0,
+    "source_files_count": 6,
+    "test_files_count": 3,
+    "readme_line_count": 30,
+    "ci_supply_chain_issues_count": 0,
+    "committed_secret_files_count": 0,
+    "container_hygiene_issues_count": 0,
+    "legacy_language_findings_count": 0,
+    "total_files": 6,
+    "total_loc": 319,
+    "total_classes": 8,
+    "total_functions": 13,
+    "import_hygiene_coverage_pct": 100.0,
+    "type_safety_coverage_pct": 100.0,
+    "docstring_coverage_pct": 100.0,
+    "module_test_coverage_pct": 100.0,
+    "unsorted_imports_count": 0,
+    "wildcard_imports_count": 0,
+    "type_safety_issues_count": 0,
+    "weak_type_usages_count": 0,
+    "empty_docstrings_count": 0,
+    "doc_signature_mismatches_count": 0,
+    "complex_functions_count": 0,
+    "excessive_parameters_count": 0,
+    "global_state_usages_count": 0,
+    "bug_risk_idioms_count": 0,
+    "circular_dependencies_count": 0,
+    "unused_dependencies_count": 0,
+    "undeclared_dependencies_count": 0,
+    "test_functions_count": 6,
+    "assertion_free_tests_count": 0,
+    "framework_issues_count": 0,
+    "modernization_hints_count": 0,
+    "missing_io_timeouts_count": 0,
+    "scattered_env_access_count": 0,
+    "unstructured_logging_count": 0,
+    "hardcoded_secrets_count": 0,
+    "ast_dangerous_sinks_count": 0,
+    "api_endpoints_count": 0,
+    "runtime_status": "passed",
+    "harness_build_status": "passed",
+    "tests_status": "passed",
+    "tests_total": 6,
+    "tests_passed": 6,
+    "tests_failed": 0,
+    "measured_line_coverage_pct": 96.2,
+    "measured_branch_coverage_pct": 77.8,
+    "smoke_check_status": "passed",
+    "security_scan_status": "passed",
+    "app_vuln_critical": 0,
+    "app_vuln_high": 0,
+    "app_vuln_total": 6,
+    "os_vuln_high_or_crit": 100,
+    "misconfig_count": 0,
+    "secret_leak_count": 0
+  },
+  "runtime_facts": {
+    "status": "passed",
+    "container_engine": "docker",
+    "engine_available": true,
+    "skip_reason": "",
+    "language": "python",
+    "selected_dockerfile_template": "python/uv.dockerfile",
+    "harness_dockerfile_path": ".pni/dockerfiles/examples/python/lib_clean/Dockerfile",
+    "build_args": {
+      "PYTHON_VERSION": "3.12"
+    },
+    "artifacts_dir": ".pni/cache/py_lib_clean/runtime",
+    "project_dockerfile_build": null,
+    "harness_build": {
+      "attempted": true,
+      "status": "passed",
+      "dockerfile_used": ".pni/dockerfiles/examples/python/lib_clean/Dockerfile",
+      "duration_sec": 5.34,
+      "exit_code": 0,
+      "error_tail": []
+    },
+    "test_execution": {
+      "attempted": true,
+      "status": "passed",
+      "command": "pytest -o junit_family=xunit2 --junitxml=/out/junit.xml",
+      "duration_sec": 3.12,
+      "exit_code": 0,
+      "total_tests": 6,
+      "passed_tests": 6,
+      "failed_tests": 0,
+      "error_tests": 0,
+      "skipped_tests": 0,
+      "failures": [],
+      "log_tail": []
+    },
+    "coverage": {
+      "measured": true,
+      "tool": "pytest-cov",
+      "line_coverage_pct": 96.2,
+      "branch_coverage_pct": 77.8,
+      "covered_lines": 153,
+      "total_statements": 159,
+      "lowest_covered_modules": [
+        {
+          "file_path": "src/metrics_kit/rules.py",
+          "line_coverage_pct": 89.7,
+          "branch_coverage_pct": 72.2,
+          "covered_lines": 35,
+          "total_statements": 39,
+          "missing_lines_preview": [
+            28,
+            91,
+            93,
+            99
+          ]
+        },
+        {
+          "file_path": "src/metrics_kit/stats.py",
+          "line_coverage_pct": 95.6,
+          "branch_coverage_pct": 83.3,
+          "covered_lines": 43,
+          "total_statements": 45,
+          "missing_lines_preview": [
+            66,
+            109
+          ]
+        },
+        {
+          "file_path": "src/metrics_kit/models.py",
+          "line_coverage_pct": 100.0,
+          "branch_coverage_pct": null,
+          "covered_lines": 42,
+          "total_statements": 42,
+          "missing_lines_preview": []
+        },
+        {
+          "file_path": "src/metrics_kit/formatting.py",
+          "line_coverage_pct": 100.0,
+          "branch_coverage_pct": 83.3,
+          "covered_lines": 22,
+          "total_statements": 22,
+          "missing_lines_preview": []
+        },
+        {
+          "file_path": "src/metrics_kit/__init__.py",
+          "line_coverage_pct": 100.0,
+          "branch_coverage_pct": null,
+          "covered_lines": 7,
+          "total_statements": 7,
+          "missing_lines_preview": []
+        },
+        {
+          "file_path": "src/metrics_kit/exceptions.py",
+          "line_coverage_pct": 100.0,
+          "branch_coverage_pct": null,
+          "covered_lines": 4,
+          "total_statements": 4,
+          "missing_lines_preview": []
+        }
+      ]
+    },
+    "smoke_check": {
+      "attempted": true,
+      "archetype": "library",
+      "status": "passed",
+      "command": "python -c import importlib, json, pathlib; importlib.import_module('metrics_kit'); pathlib.Path('/out/smoke.json').write_text(json.dumps({'detail': 'Imported metrics_kit cleanly'}))",
+      "duration_sec": 1.22,
+      "exit_code": 0,
+      "http_status": null,
+      "probed_endpoint": null,
+      "failure_kind": "none",
+      "detail": "Imported metrics_kit cleanly",
+      "log_tail": []
+    }
+  },
+  "security_facts": {
+    "status": "passed",
+    "scanner": "trivy",
+    "container_engine": "docker",
+    "engine_available": true,
+    "skip_reason": "",
+    "trivy_image": "ghcr.io/aquasecurity/trivy:0.69.3",
+    "scanned_filesystem": true,
+    "scanned_resolved_image": true,
+    "resolved_image_source": ".pni/dockerfiles/examples/python/lib_clean/Dockerfile",
+    "artifacts_dir": ".pni/cache/py_lib_clean/security",
+    "vuln_counts": {
+      "critical": 9,
+      "high": 91,
+      "medium": 160,
+      "low": 137,
+      "total": 404
+    },
+    "app_vuln_counts": {
+      "critical": 0,
+      "high": 0,
+      "medium": 5,
+      "low": 1,
+      "total": 6
+    },
+    "os_vuln_counts": {
+      "critical": 9,
+      "high": 91,
+      "medium": 155,
+      "low": 136,
+      "total": 398
+    },
+    "vulnerabilities": [
+      {
+        "vuln_id": "CVE-2026-42010",
+        "pkg_name": "libgnutls30",
+        "pkg_type": "debian",
+        "installed_version": "3.7.9-2+deb12u5",
+        "fixed_version": "3.7.9-2+deb12u7",
+        "severity": "CRITICAL",
+        "title": "gnutls: gnutls: Authentication Bypass via NUL Character in Username",
+        "target": "/out/image.tar (debian 12.13)",
+        "cvss_score": 9.8
+      },
+      {
+        "vuln_id": "CVE-2026-31789",
+        "pkg_name": "libssl3",
+        "pkg_type": "debian",
+        "installed_version": "3.0.18-1~deb12u2",
+        "fixed_version": "3.0.19-1~deb12u2",
+        "severity": "CRITICAL",
+        "title": "openssl: OpenSSL: Heap buffer overflow on 32-bit systems from large X.509 certificate processing",
+        "target": "/out/image.tar (debian 12.13)",
+        "cvss_score": 9.8
+      },
+      {
+        "vuln_id": "CVE-2026-31789",
+        "pkg_name": "openssl",
+        "pkg_type": "debian",
+        "installed_version": "3.0.18-1~deb12u2",
+        "fixed_version": "3.0.19-1~deb12u2",
+        "severity": "CRITICAL",
+        "title": "openssl: OpenSSL: Heap buffer overflow on 32-bit systems from large X.509 certificate processing",
+        "target": "/out/image.tar (debian 12.13)",
+        "cvss_score": 9.8
+      },
+      {
+        "vuln_id": "CVE-2026-8376",
+        "pkg_name": "perl-base",
+        "pkg_type": "debian",
+        "installed_version": "5.36.0-7+deb12u3",
+        "fixed_version": "5.36.0-7+deb12u4",
+        "severity": "CRITICAL",
+        "title": "perl: Perl: Heap buffer overflow when compiling regular expressions on 32-bit builds",
+        "target": "/out/image.tar (debian 12.13)",
+        "cvss_score": 9.8
+      },
+      {
+        "vuln_id": "CVE-2023-45853",
+        "pkg_name": "zlib1g",
+        "pkg_type": "debian",
+        "installed_version": "1:1.2.13.dfsg-1",
+        "fixed_version": "",
+        "severity": "CRITICAL",
+        "title": "zlib: integer overflow and resultant heap-based buffer overflow in zipOpenNewFileInZip4_6",
+        "target": "/out/image.tar (debian 12.13)",
+        "cvss_score": 9.8
+      },
+      {
+        "vuln_id": "CVE-2026-33845",
+        "pkg_name": "libgnutls30",
+        "pkg_type": "debian",
+        "installed_version": "3.7.9-2+deb12u5",
+        "fixed_version": "3.7.9-2+deb12u7",
+        "severity": "CRITICAL",
+        "title": "gnutls: GnuTLS: Denial of Service via DTLS zero-length fragment",
+        "target": "/out/image.tar (debian 12.13)",
+        "cvss_score": 9.1
+      },
+      {
+        "vuln_id": "CVE-2025-7458",
+        "pkg_name": "libsqlite3-0",
+        "pkg_type": "debian",
+        "installed_version": "3.40.1-2+deb12u2",
+        "fixed_version": "",
+        "severity": "CRITICAL",
+        "title": "sqlite: SQLite integer overflow",
+        "target": "/out/image.tar (debian 12.13)",
+        "cvss_score": 9.1
+      },
+      {
+        "vuln_id": "CVE-2026-13221",
+        "pkg_name": "perl-base",
+        "pkg_type": "debian",
+        "installed_version": "5.36.0-7+deb12u3",
+        "fixed_version": "5.36.0-7+deb12u4",
+        "severity": "CRITICAL",
+        "title": "perl: Perl: Incorrect regular expression processing via large regular expressions",
+        "target": "/out/image.tar (debian 12.13)",
+        "cvss_score": 9.1
+      },
+      {
+        "vuln_id": "CVE-2026-42496",
+        "pkg_name": "perl-base",
+        "pkg_type": "debian",
+        "installed_version": "5.36.0-7+deb12u3",
+        "fixed_version": "5.36.0-7+deb12u4",
+        "severity": "CRITICAL",
+        "title": "perl-archive-tar: perl-archive-tar: Path traversal via crafted symlinks allows arbitrary file access",
+        "target": "/out/image.tar (debian 12.13)",
+        "cvss_score": 9.1
+      },
+      {
+        "vuln_id": "CVE-2026-45447",
+        "pkg_name": "libssl3",
+        "pkg_type": "debian",
+        "installed_version": "3.0.18-1~deb12u2",
+        "fixed_version": "3.0.20-1~deb12u2",
+        "severity": "HIGH",
+        "title": "openssl: Heap Use-After-Free in OpenSSL PKCS7_verify()",
+        "target": "/out/image.tar (debian 12.13)",
+        "cvss_score": 8.8
+      },
+      {
+        "vuln_id": "CVE-2026-16742",
+        "pkg_name": "libsystemd0",
+        "pkg_type": "debian",
+        "installed_version": "252.39-1~deb12u1",
+        "fixed_version": "",
+        "severity": "HIGH",
+        "title": "systemd: systemd-homed: Local privilege escalation via missing home-record signature verification",
+        "target": "/out/image.tar (debian 12.13)",
+        "cvss_score": 8.8
+      },
+      {
+        "vuln_id": "CVE-2026-16742",
+        "pkg_name": "libudev1",
+        "pkg_type": "debian",
+        "installed_version": "252.39-1~deb12u1",
+        "fixed_version": "",
+        "severity": "HIGH",
+        "title": "systemd: systemd-homed: Local privilege escalation via missing home-record signature verification",
+        "target": "/out/image.tar (debian 12.13)",
+        "cvss_score": 8.8
+      },
+      {
+        "vuln_id": "CVE-2026-45447",
+        "pkg_name": "openssl",
+        "pkg_type": "debian",
+        "installed_version": "3.0.18-1~deb12u2",
+        "fixed_version": "3.0.20-1~deb12u2",
+        "severity": "HIGH",
+        "title": "openssl: Heap Use-After-Free in OpenSSL PKCS7_verify()",
+        "target": "/out/image.tar (debian 12.13)",
+        "cvss_score": 8.8
+      },
+      {
+        "vuln_id": "CVE-2026-57432",
+        "pkg_name": "perl-base",
+        "pkg_type": "debian",
+        "installed_version": "5.36.0-7+deb12u3",
+        "fixed_version": "5.36.0-7+deb12u4",
+        "severity": "HIGH",
+        "title": "perl: Perl: Information disclosure via integer overflow in pack/unpack operations",
+        "target": "/out/image.tar (debian 12.13)",
+        "cvss_score": 8.4
+      },
+      {
+        "vuln_id": "CVE-2026-86145",
+        "pkg_name": "libpcre2-8-0",
+        "pkg_type": "debian",
+        "installed_version": "10.42-1",
+        "fixed_version": "10.42-1+deb12u1",
+        "severity": "HIGH",
+        "title": "pcre2: PCRE2: Out-of-bounds write allows arbitrary code execution via crafted regular expressions",
+        "target": "/out/image.tar (debian 12.13)",
+        "cvss_score": 8.2
+      },
+      {
+        "vuln_id": "CVE-2026-28387",
+        "pkg_name": "libssl3",
+        "pkg_type": "debian",
+        "installed_version": "3.0.18-1~deb12u2",
+        "fixed_version": "3.0.19-1~deb12u2",
+        "severity": "HIGH",
+        "title": "openssl: OpenSSL: Arbitrary code execution due to use-after-free in DANE TLSA authentication",
+        "target": "/out/image.tar (debian 12.13)",
+        "cvss_score": 8.1
+      },
+      {
+        "vuln_id": "CVE-2026-28387",
+        "pkg_name": "openssl",
+        "pkg_type": "debian",
+        "installed_version": "3.0.18-1~deb12u2",
+        "fixed_version": "3.0.19-1~deb12u2",
+        "severity": "HIGH",
+        "title": "openssl: OpenSSL: Arbitrary code execution due to use-after-free in DANE TLSA authentication",
+        "target": "/out/image.tar (debian 12.13)",
+        "cvss_score": 8.1
+      },
+      {
+        "vuln_id": "CVE-2026-53615",
+        "pkg_name": "bsdutils",
+        "pkg_type": "debian",
+        "installed_version": "1:2.38.1-5+deb12u3",
+        "fixed_version": "",
+        "severity": "HIGH",
+        "title": "util-linux: util-linux: Partition metadata compromise via integer overflow in DOS partition parser",
+        "target": "/out/image.tar (debian 12.13)",
+        "cvss_score": 8.0
+      },
+      {
+        "vuln_id": "CVE-2026-53615",
+        "pkg_name": "libblkid1",
+        "pkg_type": "debian",
+        "installed_version": "2.38.1-5+deb12u3",
+        "fixed_version": "",
+        "severity": "HIGH",
+        "title": "util-linux: util-linux: Partition metadata compromise via integer overflow in DOS partition parser",
+        "target": "/out/image.tar (debian 12.13)",
+        "cvss_score": 8.0
+      },
+      {
+        "vuln_id": "CVE-2026-53615",
+        "pkg_name": "libmount1",
+        "pkg_type": "debian",
+        "installed_version": "2.38.1-5+deb12u3",
+        "fixed_version": "",
+        "severity": "HIGH",
+        "title": "util-linux: util-linux: Partition metadata compromise via integer overflow in DOS partition parser",
+        "target": "/out/image.tar (debian 12.13)",
+        "cvss_score": 8.0
+      },
+      {
+        "vuln_id": "CVE-2026-53615",
+        "pkg_name": "libsmartcols1",
+        "pkg_type": "debian",
+        "installed_version": "2.38.1-5+deb12u3",
+        "fixed_version": "",
+        "severity": "HIGH",
+        "title": "util-linux: util-linux: Partition metadata compromise via integer overflow in DOS partition parser",
+        "target": "/out/image.tar (debian 12.13)",
+        "cvss_score": 8.0
+      },
+      {
+        "vuln_id": "CVE-2026-53615",
+        "pkg_name": "libuuid1",
+        "pkg_type": "debian",
+        "installed_version": "2.38.1-5+deb12u3",
+        "fixed_version": "",
+        "severity": "HIGH",
+        "title": "util-linux: util-linux: Partition metadata compromise via integer overflow in DOS partition parser",
+        "target": "/out/image.tar (debian 12.13)",
+        "cvss_score": 8.0
+      },
+      {
+        "vuln_id": "CVE-2026-53615",
+        "pkg_name": "mount",
+        "pkg_type": "debian",
+        "installed_version": "2.38.1-5+deb12u3",
+        "fixed_version": "",
+        "severity": "HIGH",
+        "title": "util-linux: util-linux: Partition metadata compromise via integer overflow in DOS partition parser",
+        "target": "/out/image.tar (debian 12.13)",
+        "cvss_score": 8.0
+      },
+      {
+        "vuln_id": "CVE-2026-53615",
+        "pkg_name": "util-linux",
+        "pkg_type": "debian",
+        "installed_version": "2.38.1-5+deb12u3",
+        "fixed_version": "",
+        "severity": "HIGH",
+        "title": "util-linux: util-linux: Partition metadata compromise via integer overflow in DOS partition parser",
+        "target": "/out/image.tar (debian 12.13)",
+        "cvss_score": 8.0
+      },
+      {
+        "vuln_id": "CVE-2026-53615",
+        "pkg_name": "util-linux-extra",
+        "pkg_type": "debian",
+        "installed_version": "2.38.1-5+deb12u3",
+        "fixed_version": "",
+        "severity": "HIGH",
+        "title": "util-linux: util-linux: Partition metadata compromise via integer overflow in DOS partition parser",
+        "target": "/out/image.tar (debian 12.13)",
+        "cvss_score": 8.0
+      },
+      {
+        "vuln_id": "CVE-2026-78408",
+        "pkg_name": "bsdutils",
+        "pkg_type": "debian",
+        "installed_version": "1:2.38.1-5+deb12u3",
+        "fixed_version": "",
+        "severity": "HIGH",
+        "title": "util-linux: util-linux: nsenter --join-cgroup leaks root cgroup migration authority",
+        "target": "/out/image.tar (debian 12.13)",
+        "cvss_score": 7.9
+      },
+      {
+        "vuln_id": "CVE-2026-78408",
+        "pkg_name": "libblkid1",
+        "pkg_type": "debian",
+        "installed_version": "2.38.1-5+deb12u3",
+        "fixed_version": "",
+        "severity": "HIGH",
+        "title": "util-linux: util-linux: nsenter --join-cgroup leaks root cgroup migration authority",
+        "target": "/out/image.tar (debian 12.13)",
+        "cvss_score": 7.9
+      },
+      {
+        "vuln_id": "CVE-2026-78408",
+        "pkg_name": "libmount1",
+        "pkg_type": "debian",
+        "installed_version": "2.38.1-5+deb12u3",
+        "fixed_version": "",
+        "severity": "HIGH",
+        "title": "util-linux: util-linux: nsenter --join-cgroup leaks root cgroup migration authority",
+        "target": "/out/image.tar (debian 12.13)",
+        "cvss_score": 7.9
+      },
+      {
+        "vuln_id": "CVE-2026-78408",
+        "pkg_name": "libsmartcols1",
+        "pkg_type": "debian",
+        "installed_version": "2.38.1-5+deb12u3",
+        "fixed_version": "",
+        "severity": "HIGH",
+        "title": "util-linux: util-linux: nsenter --join-cgroup leaks root cgroup migration authority",
+        "target": "/out/image.tar (debian 12.13)",
+        "cvss_score": 7.9
+      },
+      {
+        "vuln_id": "CVE-2026-78408",
+        "pkg_name": "libuuid1",
+        "pkg_type": "debian",
+        "installed_version": "2.38.1-5+deb12u3",
+        "fixed_version": "",
+        "severity": "HIGH",
+        "title": "util-linux: util-linux: nsenter --join-cgroup leaks root cgroup migration authority",
+        "target": "/out/image.tar (debian 12.13)",
+        "cvss_score": 7.9
+      },
+      {
+        "vuln_id": "CVE-2026-78408",
+        "pkg_name": "mount",
+        "pkg_type": "debian",
+        "installed_version": "2.38.1-5+deb12u3",
+        "fixed_version": "",
+        "severity": "HIGH",
+        "title": "util-linux: util-linux: nsenter --join-cgroup leaks root cgroup migration authority",
+        "target": "/out/image.tar (debian 12.13)",
+        "cvss_score": 7.9
+      },
+      {
+        "vuln_id": "CVE-2026-78408",
+        "pkg_name": "util-linux",
+        "pkg_type": "debian",
+        "installed_version": "2.38.1-5+deb12u3",
+        "fixed_version": "",
+        "severity": "HIGH",
+        "title": "util-linux: util-linux: nsenter --join-cgroup leaks root cgroup migration authority",
+        "target": "/out/image.tar (debian 12.13)",
+        "cvss_score": 7.9
+      },
+      {
+        "vuln_id": "CVE-2026-78408",
+        "pkg_name": "util-linux-extra",
+        "pkg_type": "debian",
+        "installed_version": "2.38.1-5+deb12u3",
+        "fixed_version": "",
+        "severity": "HIGH",
+        "title": "util-linux: util-linux: nsenter --join-cgroup leaks root cgroup migration authority",
+        "target": "/out/image.tar (debian 12.13)",
+        "cvss_score": 7.9
+      },
+      {
+        "vuln_id": "CVE-2026-76642",
+        "pkg_name": "bsdutils",
+        "pkg_type": "debian",
+        "installed_version": "1:2.38.1-5+deb12u3",
+        "fixed_version": "",
+        "severity": "HIGH",
+        "title": "util-linux: util-linux: failed external mount helper still runs privileged X-mount post-hooks",
+        "target": "/out/image.tar (debian 12.13)",
+        "cvss_score": 7.8
+      },
+      {
+        "vuln_id": "CVE-2026-78410",
+        "pkg_name": "bsdutils",
+        "pkg_type": "debian",
+        "installed_version": "1:2.38.1-5+deb12u3",
+        "fixed_version": "",
+        "severity": "HIGH",
+        "title": "util-linux: util-linux: restricted bind mounts do not pin the source, allowing X-mount.owner/group/mode redirection",
+        "target": "/out/image.tar (debian 12.13)",
+        "cvss_score": 7.8
+      },
+      {
+        "vuln_id": "CVE-2026-76642",
+        "pkg_name": "libblkid1",
+        "pkg_type": "debian",
+        "installed_version": "2.38.1-5+deb12u3",
+        "fixed_version": "",
+        "severity": "HIGH",
+        "title": "util-linux: util-linux: failed external mount helper still runs privileged X-mount post-hooks",
+        "target": "/out/image.tar (debian 12.13)",
+        "cvss_score": 7.8
+      },
+      {
+        "vuln_id": "CVE-2026-78410",
+        "pkg_name": "libblkid1",
+        "pkg_type": "debian",
+        "installed_version": "2.38.1-5+deb12u3",
+        "fixed_version": "",
+        "severity": "HIGH",
+        "title": "util-linux: util-linux: restricted bind mounts do not pin the source, allowing X-mount.owner/group/mode redirection",
+        "target": "/out/image.tar (debian 12.13)",
+        "cvss_score": 7.8
+      },
+      {
+        "vuln_id": "CVE-2026-76642",
+        "pkg_name": "libmount1",
+        "pkg_type": "debian",
+        "installed_version": "2.38.1-5+deb12u3",
+        "fixed_version": "",
+        "severity": "HIGH",
+        "title": "util-linux: util-linux: failed external mount helper still runs privileged X-mount post-hooks",
+        "target": "/out/image.tar (debian 12.13)",
+        "cvss_score": 7.8
+      },
+      {
+        "vuln_id": "CVE-2026-78410",
+        "pkg_name": "libmount1",
+        "pkg_type": "debian",
+        "installed_version": "2.38.1-5+deb12u3",
+        "fixed_version": "",
+        "severity": "HIGH",
+        "title": "util-linux: util-linux: restricted bind mounts do not pin the source, allowing X-mount.owner/group/mode redirection",
+        "target": "/out/image.tar (debian 12.13)",
+        "cvss_score": 7.8
+      },
+      {
+        "vuln_id": "CVE-2025-69720",
+        "pkg_name": "libncursesw6",
+        "pkg_type": "debian",
+        "installed_version": "6.4-4",
+        "fixed_version": "",
+        "severity": "HIGH",
+        "title": "ncurses: ncurses: Buffer overflow vulnerability may lead to arbitrary code execution.",
+        "target": "/out/image.tar (debian 12.13)",
+        "cvss_score": 7.8
+      }
+    ],
+    "misconfigurations": [],
+    "secrets": []
+  },
+  "module_inventory": [
+    {
+      "file": "examples/python/lib_clean/src/metrics_kit/__init__.py",
+      "loc": 34,
+      "public_types": [],
+      "public_callables": []
+    },
+    {
+      "file": "examples/python/lib_clean/src/metrics_kit/exceptions.py",
+      "loc": 8,
+      "public_types": [
+        "EmptySampleError",
+        "InvalidParameterError",
+        "MetricsKitError"
+      ],
+      "public_callables": []
+    },
+    {
+      "file": "examples/python/lib_clean/src/metrics_kit/formatting.py",
+      "loc": 58,
+      "public_types": [],
+      "public_callables": [
+        "sanitize_prometheus_name",
+        "to_prometheus_lines",
+        "format_markdown_summary"
+      ]
+    },
+    {
+      "file": "examples/python/lib_clean/src/metrics_kit/models.py",
+      "loc": 48,
+      "public_types": [
+        "AlertVerdict",
+        "ComparisonOp",
+        "MetricPoint",
+        "SummaryStats",
+        "ThresholdRule"
+      ],
+      "public_callables": []
+    },
+    {
+      "file": "examples/python/lib_clean/src/metrics_kit/rules.py",
+      "loc": 79,
+      "public_types": [],
+      "public_callables": [
+        "evaluate_rule",
+        "evaluate_ruleset",
+        "detect_zscore_anomalies"
+      ]
+    },
+    {
+      "file": "examples/python/lib_clean/src/metrics_kit/stats.py",
+      "loc": 92,
+      "public_types": [],
+      "public_callables": [
+        "compute_mean",
+        "compute_stddev",
+        "compute_percentile",
+        "compute_ewma",
+        "summarize_series"
+      ]
+    }
+  ],
+  "dangerous_sinks": [],
+  "api_endpoints": [],
+  "architecture_overview": {
+    "pattern": "Unidirectional 4-Layer Pure-Function Library (Facade -> Policy & Formatting -> Statistical Core -> Immutable Models & Exceptions)",
+    "entry_points": [
+      "src/metrics_kit/__init__.py",
+      "src/metrics_kit/stats.py",
+      "src/metrics_kit/rules.py",
+      "src/metrics_kit/formatting.py"
+    ],
+    "modules": [
+      {
+        "path": "src/metrics_kit/__init__.py",
+        "role": "公開APIファサード (__all__ 全19シンボル再エクスポート)",
+        "key_symbols": [
+          "__all__"
+        ],
+        "depends_on": [
+          "src/metrics_kit/exceptions.py",
+          "src/metrics_kit/models.py",
+          "src/metrics_kit/stats.py",
+          "src/metrics_kit/rules.py",
+          "src/metrics_kit/formatting.py"
+        ],
+        "health_note": "公開境界の一元管理・副作用ゼロ"
+      },
+      {
+        "path": "src/metrics_kit/rules.py",
+        "role": "宣言的閾値ポリシー評価およびZスコア異常値検出",
+        "key_symbols": [
+          "evaluate_rule",
+          "evaluate_ruleset",
+          "detect_zscore_anomalies"
+        ],
+        "depends_on": [
+          "src/metrics_kit/exceptions.py",
+          "src/metrics_kit/models.py",
+          "src/metrics_kit/stats.py"
+        ],
+        "health_note": "行カバレッジ89.7% / 分岐72.2%"
+      },
+      {
+        "path": "src/metrics_kit/formatting.py",
+        "role": "Prometheus Exposition ゲージ行および Markdown サマリ表生成",
+        "key_symbols": [
+          "sanitize_prometheus_name",
+          "to_prometheus_lines",
+          "format_markdown_summary"
+        ],
+        "depends_on": [
+          "src/metrics_kit/models.py"
+        ],
+        "health_note": "行カバレッジ100.0%・正規表現サニタイズ実装"
+      },
+      {
+        "path": "src/metrics_kit/stats.py",
+        "role": "算術平均・母標準偏差・線形補間パーセンタイル・EWMA平滑化",
+        "key_symbols": [
+          "compute_mean",
+          "compute_stddev",
+          "compute_percentile",
+          "compute_ewma",
+          "summarize_series"
+        ],
+        "depends_on": [
+          "src/metrics_kit/exceptions.py",
+          "src/metrics_kit/models.py"
+        ],
+        "health_note": "行カバレッジ95.6%・math.fsum高精度集計"
+      },
+      {
+        "path": "src/metrics_kit/models.py",
+        "role": "Pydantic v2 不変テレメトリモデル・閾値ルール定義",
+        "key_symbols": [
+          "ComparisonOp",
+          "MetricPoint",
+          "SummaryStats",
+          "ThresholdRule",
+          "AlertVerdict"
+        ],
+        "depends_on": [],
+        "health_note": "行カバレッジ100.0%・frozen=True, extra='forbid'"
+      },
+      {
+        "path": "src/metrics_kit/exceptions.py",
+        "role": "型付きドメイン例外基底および派生クラス",
+        "key_symbols": [
+          "MetricsKitError",
+          "EmptySampleError",
+          "InvalidParameterError"
+        ],
+        "depends_on": [],
+        "health_note": "行カバレッジ100.0%・純粋例外階層"
+      }
+    ],
+    "dependency_notes": "外部ランタイム依存は pydantic>=2.7.0 のみであり、内部モジュール間は循環依存0件の厳格な単方向DAGを構成している。"
+  },
+  "architecture_record": {
+    "workflow_id": "py_lib_clean",
+    "workflow_run_id": "wf-7ef694c9",
+    "recorded_at": "2026-10-24T07:30:25.826155+00:00",
+    "target_root": "examples/python/lib_clean",
+    "system_profile": {
+      "system_purpose": "時系列テレメトリデータの記述統計集計（平均・標準偏差・線形補間パーセンタイル）、指数加重移動平均（EWMA）平滑化、宣言的閾値アラートルール評価・Zスコア異常値検出、および Prometheus Exposition / Markdown レポート文字列整形を副作用ゼロで提供する軽量型安全 Python ライブラリ。",
+      "domain_context": "可観測性（Observability）・SLO監視・テレメトリ統計処理（インプロセス組み込み用純粋計算ライブラリ）",
+      "runtime_type": "library",
+      "tech_stack": [
+        "Python >=3.11",
+        "Pydantic >=2.7.0 (frozen immutable models)",
+        "uv / uv_build (<0.12)",
+        "pytest >=8.3.0 & pytest-cov >=6.0.0",
+        "Ruff >=0.9.0",
+        "Ty >=0.0.35"
+      ],
+      "external_integrations": [
+        "Prometheus Text Exposition 形式文字列出力 (to_prometheus_lines による純粋インメモリ生成・HTTP通信なし)"
+      ]
+    },
+    "structure_map": {
+      "architecture_pattern": "Unidirectional Layered Pure-Function Library (Facade -> Policy & Formatting -> Statistical Core -> Immutable Domain Models & Exceptions)",
+      "layers": [
+        {
+          "name": "Public API Facade Layer",
+          "responsibility": "パッケージ外部向けの単一エントリポイントとして公開クラス・関数・例外を __all__ で明示再エクスポートする",
+          "paths": [
+            "src/metrics_kit/__init__.py"
+          ],
+          "allowed_dependencies": [
+            "Policy & Formatting Layer",
+            "Statistical Aggregation Layer",
+            "Domain Models Layer",
+            "Foundation Exceptions Layer"
+          ]
+        },
+        {
+          "name": "Policy & Formatting Layer",
+          "responsibility": "宣言的閾値ルール評価・Zスコア異常値検出 (rules.py) および Prometheus Exposition / Markdown レポート文字列整形 (formatting.py) を担う",
+          "paths": [
+            "src/metrics_kit/rules.py",
+            "src/metrics_kit/formatting.py"
+          ],
+          "allowed_dependencies": [
+            "Statistical Aggregation Layer",
+            "Domain Models Layer",
+            "Foundation Exceptions Layer"
+          ]
+        },
+        {
+          "name": "Statistical Aggregation Layer",
+          "responsibility": "算術平均・母標準偏差・線形補間パーセンタイル・EWMA平滑化・時系列サマリ生成を純粋関数で実行する",
+          "paths": [
+            "src/metrics_kit/stats.py"
+          ],
+          "allowed_dependencies": [
+            "Domain Models Layer",
+            "Foundation Exceptions Layer"
+          ]
+        },
+        {
+          "name": "Domain Models & Exceptions Layer",
+          "responsibility": "Pydantic v2 不変データモデル (frozen=True, extra='forbid') と型付きドメイン例外階層を定義する",
+          "paths": [
+            "src/metrics_kit/models.py",
+            "src/metrics_kit/exceptions.py"
+          ],
+          "allowed_dependencies": []
+        }
+      ],
+      "modules": [
+        {
+          "path": "src/metrics_kit/__init__.py",
+          "role": "公開APIファサード (__all__ 全19シンボル再エクスポート)",
+          "key_symbols": [
+            "__all__"
+          ],
+          "depends_on": [
+            "src/metrics_kit/exceptions.py",
+            "src/metrics_kit/models.py",
+            "src/metrics_kit/stats.py",
+            "src/metrics_kit/rules.py",
+            "src/metrics_kit/formatting.py"
+          ],
+          "health_note": "循環依存ゼロ・明確な公開境界"
+        },
+        {
+          "path": "src/metrics_kit/rules.py",
+          "role": "閾値ポリシー単体/一括評価および Zスコア異常値検出",
+          "key_symbols": [
+            "evaluate_rule",
+            "evaluate_ruleset",
+            "detect_zscore_anomalies"
+          ],
+          "depends_on": [
+            "src/metrics_kit/exceptions.py",
+            "src/metrics_kit/models.py",
+            "src/metrics_kit/stats.py"
+          ],
+          "health_note": "メトリクス名不一致ガードとゼロ分散ガードを実装"
+        },
+        {
+          "path": "src/metrics_kit/formatting.py",
+          "role": "Prometheus Exposition ゲージ行出力および Markdown サマリ表生成",
+          "key_symbols": [
+            "sanitize_prometheus_name",
+            "to_prometheus_lines",
+            "format_markdown_summary"
+          ],
+          "depends_on": [
+            "src/metrics_kit/models.py"
+          ],
+          "health_note": "_PROM_NAME_RE による安全な識別子サニタイズ"
+        },
+        {
+          "path": "src/metrics_kit/stats.py",
+          "role": "記述統計集計・線形補間パーセンタイル・EWMA平滑化",
+          "key_symbols": [
+            "compute_mean",
+            "compute_stddev",
+            "compute_percentile",
+            "compute_ewma",
+            "summarize_series"
+          ],
+          "depends_on": [
+            "src/metrics_kit/exceptions.py",
+            "src/metrics_kit/models.py"
+          ],
+          "health_note": "math.fsum を用いた浮動小数点誤差抑制と境界チェック"
+        },
+        {
+          "path": "src/metrics_kit/models.py",
+          "role": "不変テレメトリ観測点・集計結果・閾値ルール・判定結果モデル",
+          "key_symbols": [
+            "ComparisonOp",
+            "MetricPoint",
+            "SummaryStats",
+            "ThresholdRule",
+            "AlertVerdict"
+          ],
+          "depends_on": [],
+          "health_note": "ConfigDict(frozen=True, extra='forbid') による完全不変設計"
+        },
+        {
+          "path": "src/metrics_kit/exceptions.py",
+          "role": "ライブラリ固有の型付きドメイン例外基底・派生クラス",
+          "key_symbols": [
+            "MetricsKitError",
+            "EmptySampleError",
+            "InvalidParameterError"
+          ],
+          "depends_on": [],
+          "health_note": "標準 sys.exit や print を排した純粋例外契約"
+        }
+      ],
+      "boundary_assessment": "全6モジュール間の内部インポートグラフは完全な有向非巡回グラフ（DAG、循環依存0件・レイヤ逆転0件）を形成している。models.py と exceptions.py は内部依存を持たない基底層として独立し、stats.py -> rules.py / formatting.py -> __init__.py へと単方向に責務が積み上げられている。"
+    },
+    "execution_flow_map": {
+      "entry_points": [
+        "src/metrics_kit/__init__.py",
+        "src/metrics_kit/stats.py",
+        "src/metrics_kit/rules.py",
+        "src/metrics_kit/formatting.py"
+      ],
+      "execution_flows": [
+        {
+          "name": "テレメトリ時系列集計とSLO閾値ルール評価・出力フロー",
+          "trigger": "呼び出し側アプリケーションから MetricPoint シーケンスと ThresholdRule を渡して公開APIを呼び出す",
+          "steps": [
+            "1. MetricPoint インスタンス群を Pydantic v2 frozen モデル (models.py) として生成・検証する",
+            "2. summarize_series (stats.py) が空入力・メトリクス名を検証し、compute_mean / compute_percentile / compute_stddev で SummaryStats を不変生成する",
+            "3. evaluate_rule / evaluate_ruleset (rules.py) が SummaryStats の対象フィールド (p95 等) と ThresholdRule.limit を比較し AlertVerdict を返す",
+            "4. to_prometheus_lines または format_markdown_summary (formatting.py) がメトリクス名をサニタイズし Prometheus ゲージ行または Markdown レポート文字列を返す"
+          ],
+          "involved_files": [
+            "src/metrics_kit/__init__.py",
+            "src/metrics_kit/models.py",
+            "src/metrics_kit/stats.py",
+            "src/metrics_kit/rules.py",
+            "src/metrics_kit/formatting.py",
+            "src/metrics_kit/exceptions.py"
+          ]
+        },
+        {
+          "name": "ノイズ平滑化（EWMA）およびZスコア異常値検出フロー",
+          "trigger": "呼び出し側が compute_ewma または detect_zscore_anomalies に時系列サンプルを渡す",
+          "steps": [
+            "1. compute_ewma (stats.py) が alpha 範囲 (0.0, 1.0] と非空性を検証し、指数加重移動平均系列を算出する",
+            "2. detect_zscore_anomalies (rules.py) が z_threshold > 0 を検証し、compute_mean / compute_stddev を用いて |z| > z_threshold の異常 MetricPoint を抽出する"
+          ],
+          "involved_files": [
+            "src/metrics_kit/stats.py",
+            "src/metrics_kit/rules.py",
+            "src/metrics_kit/models.py",
+            "src/metrics_kit/exceptions.py"
+          ]
+        }
+      ],
+      "state_and_storage": [
+        "永続ストレージ・ファイルI/O・ネットワーク通信・可変グローバル状態はいずれも存在しない（完全ステートレス・インメモリ不変Pydanticモデルのみ）"
+      ],
+      "error_and_concurrency_model": "全モデルが ConfigDict(frozen=True, extra='forbid') によりイミュータブルであり、共有可変状態を一切持たないためマルチスレッド/非同期ランタイムから安全に並列呼び出し可能。異常系は sys.exit や標準出力を用いず、MetricsKitError 配下の EmptySampleError / InvalidParameterError を送出する。"
+    }
+  },
+  "audit_dimensions": [
+    {
+      "action_id": "act-09",
+      "audit_id": "python_test_audit",
+      "title": "Evaluate Test Suite Completeness & Structure",
+      "score": 91,
+      "grade": "S",
+      "rules_evaluated": [
+        "python/testing"
+      ],
+      "pass_count": 1,
+      "warn_count": 0,
+      "fail_count": 0,
+      "summary": "テストスイートは test_stats.py・test_rules.py・test_formatting.py の3ファイル・計6テスト関数で構成され、外部I/Oに一切依存しない決定論的な pytest ユニットテストとしてモジュールカバレッジ 100.0% を達成している。一方、単一要素パーセンタイル、空白 metric_name、ComparisonOp.LT、ゼロ分散時や不正閾値時の detect_zscore_anomalies など一部の境界条件分岐が未網羅であり、parametrize テストの拡充余地がある。"
+    },
+    {
+      "action_id": "act-13",
+      "audit_id": "security_vulnerability_audit",
+      "title": "Evaluate Supply-Chain CVEs, Container Misconfigs, Secrets, Dangerous Sinks & API Boundaries",
+      "score": 93,
+      "grade": "S",
+      "rules_evaluated": [
+        "common/security_vulnerability",
+        "common/supply_chain"
+      ],
+      "pass_count": 1,
+      "warn_count": 1,
+      "fail_count": 0,
+      "summary": "Trivy によるファイルシステム (uv.lock) および解決済みコンテナイメージのスキャンと AST SAST 解析の結果、metrics-kit 本体および直接依存パッケージ (pydantic) の脆弱性は 0 件、IaC 設定不備 0 件、秘密情報漏洩 0 件、危険な CWE コードシンク 0 件、HTTP 攻撃面 0 件であることを確認した。コンテナイメージ内の python-pkg 検出 6 件 (CRITICAL=0, HIGH=0, MEDIUM=5, LOW=1) はすべてベースイメージ同梱のシステム pip@25.0.1 (usr/local/lib/python3.12, 修正版 26.2.0) に起因し、OS レイヤの 398 件 (debian 12.13: CRITICAL=9, HIGH=91) とともにライブラリ配布物には含まれない。"
+    },
+    {
+      "action_id": "act-02",
+      "audit_id": "repo_structure_audit",
+      "title": "Evaluate Repository Structure, Supply Chain & Dependencies",
+      "score": 94,
+      "grade": "S",
+      "rules_evaluated": [
+        "common/supply_chain",
+        "common/documentation",
+        "common/git_workflow",
+        "common/security",
+        "python/dependencies"
+      ],
+      "pass_count": 4,
+      "warn_count": 1,
+      "fail_count": 0,
+      "summary": "metrics-kit (v0.4.2) は PEP 621 準拠の pyproject.toml、uv.lock、PEP 561 型マーカー (py.typed)、LICENSE (Apache-2.0)、SECURITY.md、Dependabot 週次更新、最小権限 (contents: read) かつコミット SHA 固定の GitHub Actions CI を完備しており、サプライチェーンと依存関係管理は非常に健全である。一方、README.md に開発・テスト実行手順セクションがなく公開関数 sanitize_prometheus_name の API リファレンス記載が漏れている点、および CI で ty 型検査と --locked 検証が未実行である点に軽微な改善余地がある。"
+    },
+    {
+      "action_id": "act-08",
+      "audit_id": "library_hygiene_audit",
+      "title": "Evaluate Public API Boundaries, Import Purity, SemVer & Diátaxis Docs",
+      "score": 95,
+      "grade": "S",
+      "rules_evaluated": [
+        "common/library_guidelines",
+        "common/documentation",
+        "common/maintainability"
+      ],
+      "pass_count": 2,
+      "warn_count": 1,
+      "fail_count": 0,
+      "summary": "metrics-kit は再利用可能な Python ライブラリ設計規約 (common/library_guidelines) に高い水準で適合している。__init__.py の __all__ による明示的な公開API境界、アンダースコア接頭辞による内部実装の隠蔽、インポート時副作用ゼロ、sys.exit/print 不使用、PEP 561 py.typed 同梱、および pydantic>=2.7.0 の柔軟な下限バージョン指定がすべて徹底されている。ドキュメント面では README.md に公開関数 sanitize_prometheus_name の記載と開発・テスト手順を追加することで完全な整合性に到達する。"
+    },
+    {
+      "action_id": "act-11",
+      "audit_id": "container_runtime_audit",
+      "title": "Evaluate Buildability, Offline Test Results, Measured Coverage & Startup Health",
+      "score": 95,
+      "grade": "S",
+      "rules_evaluated": [
+        "common/runtime_verification",
+        "common/production_readiness"
+      ],
+      "pass_count": 2,
+      "warn_count": 0,
+      "fail_count": 0,
+      "summary": "隔離コンテナ (Python 3.12 / uv.dockerfile) による動的ランタイム検証では、ハーネスビルド成功 (5.34秒)、オフライン (--network=none) pytest 6/6 全件合格 (3.12秒)、実測行カバレッジ 96.2% (153/159 statements)・分岐カバレッジ 77.8%、およびライブラリ import スモークプローブ成功 (1.22秒) を確認した。全4項目 (RV-01〜RV-04) で健全性基準をクリアしており、rules.py (行 89.7% / 分岐 72.2%, 未通過行 28, 91, 93, 99) と stats.py (行 95.6% / 分岐 83.3%, 未通過行 66, 109) の境界テスト追加によりさらなる完璧性を達成できる。"
+    },
+    {
+      "action_id": "act-04",
+      "audit_id": "python_ast_audit",
+      "title": "Interpret Python AST Facts & Evaluate Quality/Typing/Imports/Security",
+      "score": 96,
+      "grade": "S",
+      "rules_evaluated": [
+        "common/architecture",
+        "common/maintainability",
+        "common/security",
+        "common/security_vulnerability",
+        "python/code_quality",
+        "python/typing",
+        "python/modern_stack"
+      ],
+      "pass_count": 7,
+      "warn_count": 0,
+      "fail_count": 0,
+      "summary": "AST静的解析の結果、6ファイル・319 LOC 全体で Import 衛生 100.0%、型安全性カバレッジ 100.0%、Docstring カバレッジ 100.0%、循環依存 0件、危険な CWE シンク 0件、ハードコード秘密情報 0件を達成している。formatting/rules -> stats -> models -> exceptions の単方向レイヤ構造と Pydantic v2 不変モデル設計は非常に模範的である。数値統計ライブラリとしてのさらなる堅牢化として、NaN/Inf 非有限浮動小数点数の境界バリデーション追加 (allow_inf_nan=False / math.isfinite) を推奨する。"
+    }
+  ],
+  "rule_compliance": [
+    {
+      "rule_id": "common/documentation",
+      "status": "warn",
+      "source_action": "act-02",
+      "evidence": "README.md (45 lines, 7 headings across Diataxis quadrants), missing Development/Testing commands section and missing sanitize_prometheus_name in ## API Reference (README.md:37 vs src/metrics_kit/__init__.py:34); docstring_coverage_pct=100.0, doc_signature_mismatches=[], README.md covers 4 Diataxis sections but omits sanitize_prometheus_name in ## API Reference (README.md:37) and lacks Development/Testing commands",
+      "summary": "Diátaxis 4象限の構成は明快だが、開発・テスト手順の記載がなく、公開API sanitize_prometheus_name が README API一覧から漏れている。"
+    },
+    {
+      "rule_id": "common/security_vulnerability",
+      "status": "warn",
+      "source_action": "act-13",
+      "evidence": "dangerous_sinks=[] (0 CWE-89/78/502/94/327/295), hardcoded_secrets=[], api_endpoints=[] (pure in-process library); trivy_fs (uv.lock: metrics-kit@0.4.2, pydantic@2.10.6) = 0 CVEs; resolved container app_vuln_counts={critical:0, high:0, medium:5, low:1, total:6} solely in base-image pip@25.0.1 -> fixed 26.2.0 (CVE-2026-13346, CVE-2026-8643, CVE-2026-6357, CVE-2026-3219, CVE-2025-8869, CVE-2026-1703); os_vuln_counts={critical:9, high:91, medium:155, low:136, total:398} in debian 12.13; misconfigurations=[]; secrets=[]; dangerous_sinks=[]; api_endpoints=[]",
+      "summary": "アプリ直接依存の CRITICAL/HIGH/MEDIUM CVE・秘密情報・危険シンクはすべて 0 件だが、検証用ベースイメージ同梱の pip@25.0.1 に 5 件の MEDIUM CVE (修正版 26.2.0) が検出されたため SEC-01 基準に基づき WARN と記録する。"
+    },
+    {
+      "rule_id": "common/architecture",
+      "status": "pass",
+      "source_action": "act-04",
+      "evidence": "circular_dependencies=[], boundary_violations=[], internal_import_graph strictly acyclic (formatting -> models; rules -> stats, models, exceptions; stats -> models, exceptions; models -> []; exceptions -> [])",
+      "summary": "6モジュール間で完全な非巡回単方向レイヤ構造と純粋関数・不変値オブジェクト境界が維持されている。"
+    },
+    {
+      "rule_id": "common/git_workflow",
+      "status": "pass",
+      "source_action": "act-02",
+      "evidence": ".gitignore covers __pycache__/, .venv/, .pytest_cache/, .ruff_cache/, dist/; .github/workflows/ci.yml gates push & pull_request on main",
+      "summary": ".gitignore と main ブランチ向け PR/Push CI ゲートが適切に構成されている。"
+    },
+    {
+      "rule_id": "common/library_guidelines",
+      "status": "pass",
+      "source_action": "act-08",
+      "evidence": "src/metrics_kit/__init__.py defines explicit __all__ (19 symbols), internal helpers prefixed with `_` (_require_non_empty, _compare_value, _PROM_NAME_RE), py.typed=True, dependencies=['pydantic>=2.7.0'] (flexible >= bound), unstructured_logging=[], scattered_env_access=[]",
+      "summary": "明示的な __all__ 公開境界、副作用ゼロのインポート、型付きドメイン例外、柔軟な SemVer 依存下限、py.typed 同梱をすべて満たしている。"
+    },
+    {
+      "rule_id": "common/maintainability",
+      "status": "pass",
+      "source_action": "act-04",
+      "evidence": "total_loc=319 across 6 files (max 92 LOC in stats.py), complex_functions=[], excessive_parameters=[], global_state_usages=[]; total_loc=319 across 6 cohesive modules, complex_functions=[], excessive_parameters=[], global_state_usages=[]",
+      "summary": "全関数が短く低循環的複雑度に保たれ、可変グローバル状態も一切存在しない。"
+    },
+    {
+      "rule_id": "common/production_readiness",
+      "status": "pass",
+      "source_action": "act-11",
+      "evidence": "runtime_type=library (zero outbound network/DB/subprocess I/O), missing_io_timeouts=[], bug_risk_idioms=[], typed domain exceptions (MetricsKitError -> EmptySampleError, InvalidParameterError) with zero silent catch blocks",
+      "summary": "外部I/Oを持たない純粋インプロセスライブラリとしてタイムアウト漏れや例外握り潰しは一切なく、明確なドメイン例外伝播が実装されている。"
+    },
+    {
+      "rule_id": "common/runtime_verification",
+      "status": "pass",
+      "source_action": "act-11",
+      "evidence": "harness_build=passed (5.34s, exit 0), test_execution=passed (6/6 passed, 0 failed, 3.12s, offline), coverage=96.2% line (153/159) & 77.8% branch (lowest: rules.py 89.7% missing [28,91,93,99], stats.py 95.6% missing [66,109]), smoke_check=passed (Imported metrics_kit cleanly, 1.22s)",
+      "summary": "クリーンコンテナビルド、オフライン単体テスト全件成功、行カバレッジ 96.2% / 分岐 77.8%、import スモーク検証のすべてに合格している。"
+    },
+    {
+      "rule_id": "common/security",
+      "status": "pass",
+      "source_action": "act-02",
+      "evidence": "committed_secret_files=[], ci_supply_chain_issues=[], SECURITY.md private advisory policy, minimal runtime dependency (pydantic>=2.7.0); hardcoded_secrets=[], bug_risk_idioms=[], Pydantic ConfigDict(frozen=True, extra='forbid') in models.py, _PROM_NAME_RE sanitization in formatting.py:10",
+      "summary": "秘密情報ファイルの混入はなく、最小権限CIと脆弱性報告ポリシーが整備されている。"
+    },
+    {
+      "rule_id": "common/supply_chain",
+      "status": "pass",
+      "source_action": "act-02",
+      "evidence": "lockfiles=['uv.lock'], unpinned_dependencies=[], LICENSE=True, SECURITY.md=True, .github/dependabot.yml (uv & github-actions weekly), .github/workflows/ci.yml permissions={contents: read} + SHA-pinned actions (checkout@11bd719..., setup-uv@d960b52...); uv.lock present, unpinned_dependencies=[], .github/workflows/ci.yml permissions={contents: read} & SHA-pinned actions, .github/dependabot.yml weekly updates, SECURITY.md & LICENSE present",
+      "summary": "ロックファイル、SHA固定CIアクション、最小権限トークン、Dependabot、SECURITY.md・LICENSE がすべて揃っている。"
+    },
+    {
+      "rule_id": "python/code_quality",
+      "status": "pass",
+      "source_action": "act-04",
+      "evidence": "docstring_coverage_pct=100.0, missing_docstrings=[], empty_docstrings=[], doc_signature_mismatches=[], PEP 8 naming across all 8 classes and 13 functions",
+      "summary": "全公開モジュール・クラス・関数に Google スタイルの Docstring が付与され、シグネチャ不整合も 0 件である。"
+    },
+    {
+      "rule_id": "python/dependencies",
+      "status": "pass",
+      "source_action": "act-02",
+      "evidence": "pyproject.toml PEP 621 [project] dependencies=['pydantic>=2.7.0'], [dependency-groups].dev=['pytest>=8.3.0','pytest-cov>=6.0.0','ruff>=0.9.0','ty>=0.0.35'], uv.lock present",
+      "summary": "PEP 621 形式でランタイム依存と開発依存が明確に分離され、uv.lock がコミットされている。"
+    },
+    {
+      "rule_id": "python/modern_stack",
+      "status": "pass",
+      "source_action": "act-04",
+      "evidence": "import_hygiene_coverage_pct=100.0, unsorted_imports=[], wildcard_imports=[], unused_dependencies=[], undeclared_dependencies=[], Pydantic v2 ConfigDict & StrEnum & Literal used",
+      "summary": "Python 3.11+ の StrEnum・PEP 585 ジェネリクス・Pydantic v2 ConfigDict を活用し、インポート順序と依存宣言も完全に整合している。"
+    },
+    {
+      "rule_id": "python/testing",
+      "status": "pass",
+      "source_action": "act-09",
+      "evidence": "test_files_count=3 (test_stats.py, test_rules.py, test_formatting.py mirroring core logic modules), test_functions_count=6, module_test_coverage_pct=100.0, assertion_free_tests=[], pytest.approx & pytest.raises used deterministically",
+      "summary": "pytest による決定論的・完全分離テストで主要3ドメインモジュールすべてをカバーし、80%以上のカバレッジ基準を満たしている。"
+    },
+    {
+      "rule_id": "python/typing",
+      "status": "pass",
+      "source_action": "act-04",
+      "evidence": "type_safety_coverage_pct=100.0, type_safety_issues=[], weak_type_usages=[], unscoped_type_ignores=[], py.typed marker present",
+      "summary": "全パラメータ・戻り値に厳密な型ヒントが付与され、Any や type: ignore の使用は 0 件、PEP 561 py.typed も同梱されている。"
+    }
+  ],
+  "module_hotspots": [
+    {
+      "file_path": "examples/python/lib_clean/src/metrics_kit/stats.py",
+      "loc": 92,
+      "risk_score": 0.06,
+      "finding_counts": {},
+      "top_rules": []
+    },
+    {
+      "file_path": "examples/python/lib_clean/src/metrics_kit/rules.py",
+      "loc": 79,
+      "risk_score": 0.06,
+      "finding_counts": {},
+      "top_rules": []
+    },
+    {
+      "file_path": "examples/python/lib_clean/src/metrics_kit/formatting.py",
+      "loc": 58,
+      "risk_score": 0.06,
+      "finding_counts": {},
+      "top_rules": []
+    },
+    {
+      "file_path": "examples/python/lib_clean/src/metrics_kit/models.py",
+      "loc": 48,
+      "risk_score": 0.06,
+      "finding_counts": {},
+      "top_rules": []
+    },
+    {
+      "file_path": "examples/python/lib_clean/src/metrics_kit/__init__.py",
+      "loc": 34,
+      "risk_score": 0.06,
+      "finding_counts": {},
+      "top_rules": []
+    },
+    {
+      "file_path": "examples/python/lib_clean/src/metrics_kit/exceptions.py",
+      "loc": 8,
+      "risk_score": 0.06,
+      "finding_counts": {},
+      "top_rules": []
+    },
+    {
+      "file_path": "README.md",
+      "loc": 0,
+      "risk_score": 0.06,
+      "finding_counts": {
+        "low": 1
+      },
+      "top_rules": [
+        "common/documentation"
+      ]
+    },
+    {
+      "file_path": "src/metrics_kit/models.py",
+      "loc": 0,
+      "risk_score": 0.06,
+      "finding_counts": {
+        "low": 1
+      },
+      "top_rules": [
+        "common/security"
+      ]
+    },
+    {
+      "file_path": "uv.lock",
+      "loc": 0,
+      "risk_score": 0.06,
+      "finding_counts": {
+        "low": 1
+      },
+      "top_rules": [
+        "common/security_vulnerability"
+      ]
+    },
+    {
+      "file_path": ".github/workflows/ci.yml",
+      "loc": 0,
+      "risk_score": 0.02,
+      "finding_counts": {
+        "info": 1
+      },
+      "top_rules": [
+        "common/supply_chain"
+      ]
+    },
+    {
+      "file_path": "tests/test_rules.py",
+      "loc": 0,
+      "risk_score": 0.02,
+      "finding_counts": {
+        "info": 1
+      },
+      "top_rules": [
+        "python/testing"
+      ]
+    }
+  ],
+  "strengths": [
+    "GitHub Actions (ci.yml) で permissions: contents: read とフルコミットSHA固定 (actions/checkout, astral-sh/setup-uv) を徹底し、OpenSSF Scorecard 基準を満たしている。",
+    "ランタイム依存を pydantic>=2.7.0 の1パッケージのみに絞り、開発ツール群を [dependency-groups].dev に分離している。",
+    "LICENSE (Apache-2.0)、SECURITY.md、.github/dependabot.yml (週次更新) が揃い、OSSライブラリとしてのガバナンスが確立されている。",
+    "型安全性カバレッジ 100.0%・Import 衛生 100.0%・Docstring カバレッジ 100.0% を同時に達成し、Any や未スコープ type: ignore が 0 件である。",
+    "全データモデル (MetricPoint, SummaryStats, ThresholdRule, AlertVerdict) に ConfigDict(frozen=True, extra='forbid') を設定し、不変性とスキーマ厳格性を両立している。",
+    "循環依存 0 件の明確な4層アーキテクチャ (Facade -> Domain/Formatting -> Stats -> Models/Exceptions) により高い保守性を備えている。",
+    "公開API境界が src/metrics_kit/__init__.py の __all__ に一元化され、内部補助関数 (_require_non_empty, _compare_value) が適切にカプセル化されている。",
+    "ライブラリコード内に print・ロガー設定上書き・環境変数参照・sys.exit が一切存在せず、呼び出し側アプリケーションに副作用を与えない。",
+    "pyproject.toml で pydantic>=2.7.0 の柔軟な下限指定を採用し、下流アプリケーションとの依存解決競合を回避している。",
+    "stats / rules / formatting の3機能モジュールに対応するミラー構成のテストファイルを備え、アサーション欠如テストが 0 件である。",
+    "pytest.approx による浮動小数点比較と pytest.raises による EmptySampleError / InvalidParameterError 検証が明快に記述されている。",
+    "クリーンな Python 3.12 コンテナ環境でゼロからの依存解決・ビルド (5.34秒) とネットワーク遮断下の pytest 実行 (6/6 成功) が完全に再現可能である。",
+    "実測行カバレッジ 96.2% (153/159 行) を達成し、models.py・formatting.py・__init__.py・exceptions.py の4ファイルで行カバレッジ 100.0% を記録している。",
+    "ライブラリ起動スモークチェックで metrics_kit が副作用や欠落依存なしに 1.22秒でクリーンに import されることを実証済みである。",
+    "uv.lock および /opt/pni-venv 内の metrics-kit・pydantic・pydantic_core に既知の CVE は 0 件であり、ランタイム依存の攻撃面が極小化されている。",
+    "Trivy シークレットスキャンおよび AST SAST スキャンの双方でハードコード秘密情報 0 件・CWE 危険シンク 0 件・IaC 設定不備 0 件を達成している。",
+    "ネットワーク待受や動的コード実行を持たない純粋ライブラリ境界であり、外部入力に対して Pydantic extra='forbid' と Prometheus 名正規表現サニタイズが機能している。",
+    "型注釈カバレッジ100.0%・Import衛生100.0%・Docstringカバレッジ100.0%・循環依存0件を達成し、PEP 561 py.typed を同梱した模範的な型安全ライブラリ設計である。",
+    "全データモデルに Pydantic v2 ConfigDict(frozen=True, extra='forbid') を適用し、純粋関数と型付きドメイン例外 (MetricsKitError) により副作用ゼロを実現している。",
+    "隔離コンテナにおけるクリーンビルド (5.34s)、オフライン pytest 全6件合格 (3.12s)、実測行カバレッジ96.2%、および import スモーク検証 (1.22s) に完全合格している。",
+    "直接依存パッケージのCVE 0件、CWE危険シンク0件、秘密情報0件に加え、GitHub Actionsの最小権限設定 (contents: read)・コミットSHA固定・Dependabot週次更新・SECURITY.mdを完備している。"
+  ],
+  "findings": [
+    {
+      "severity": "low",
+      "category": "code_quality",
+      "rule_id": "common/security",
+      "file_path": "src/metrics_kit/models.py",
+      "line": 26,
+      "symbol": "MetricPoint",
+      "evidence": "models.py:26 sets `ConfigDict(frozen=True, extra='forbid')` without `allow_inf_nan=False`, and stats.py:12 `_require_non_empty` does not check `math.isfinite`, allowing NaN/Inf to corrupt `sorted(values)` or raise raw `ValueError` in `math.fsum`.",
+      "description": "MetricPoint.value や stats 集計関数で NaN / Infinity が拒否されず、非有限値が混入した場合にパーセンタイル順序の破綻や未ラップの ValueError が発生し得る。",
+      "recommendation": "models.py の ConfigDict に `allow_inf_nan=False` を追加し、stats.py の入力検証ヘルパーで `all(math.isfinite(v) for v in values)` を検証して InvalidParameterError を送出する。"
+    },
+    {
+      "severity": "low",
+      "category": "documentation",
+      "rule_id": "common/documentation",
+      "file_path": "README.md",
+      "line": 37,
+      "symbol": "sanitize_prometheus_name",
+      "evidence": "README.md:37 lists `formatting: format_markdown_summary, to_prometheus_lines`, omitting `sanitize_prometheus_name` exported in __init__.py:34; README also lacks Development/Testing section.",
+      "description": "README.md の API Reference から公開関数 sanitize_prometheus_name が漏れており、開発者向けのテスト・Lint・型検査コマンド手順も記載されていない。",
+      "recommendation": "README.md の API Reference に sanitize_prometheus_name を追記し、uv run pytest / ruff / ty の開発検証コマンドセクションを追加する。"
+    },
+    {
+      "severity": "low",
+      "category": "security",
+      "rule_id": "common/security_vulnerability",
+      "file_path": "uv.lock",
+      "line": 13,
+      "symbol": "pydantic",
+      "evidence": "uv.lock pins pydantic=2.10.6 without transitive wheel hashes (pydantic-core, annotated-types, typing-extensions), while container scan resolved pydantic@2.14.1 and flagged base-image pip@25.0.1 MEDIUM CVEs (CVE-2026-13346, CVE-2026-8643 -> pip>=26.2.0).",
+      "description": "uv.lock に推移的依存パッケージ (pydantic-core 等) と SHA-256 ハッシュが記録されておらず、CI/コンテナ検証環境のベースイメージにも旧版 pip@25.0.1 (MEDIUM 5件) と Debian 12.13 OS パッケージ CVE が残存している。",
+      "recommendation": "`uv lock --upgrade` を実行して pydantic_core 等の推移的依存と wheel SHA-256 ハッシュを uv.lock に完全記録し、コンテナ検証環境ではシステム pip の削除または pip>=26.2.0 / 最新 slim イメージへの更新を行う。"
+    },
+    {
+      "severity": "info",
+      "category": "dependencies",
+      "rule_id": "common/supply_chain",
+      "file_path": ".github/workflows/ci.yml",
+      "line": 18,
+      "symbol": "jobs.check.steps",
+      "evidence": ".github/workflows/ci.yml runs `uv run ruff check src tests` and `uv run pytest`, omitting `--locked` flag and `uv run ty check` despite `ty>=0.0.35` in pyproject.toml:24.",
+      "description": "CI ワークフローで dev 依存に定義済みの静的型チェッカー ty および uv --locked によるロックファイル整合性検証が実行されていない。",
+      "recommendation": ".github/workflows/ci.yml のステップに `uv run --locked ty check` および `--locked` フラグを追加し、CI 上で型安全性とロック整合性を強制する。"
+    },
+    {
+      "severity": "info",
+      "category": "testing",
+      "rule_id": "python/testing",
+      "file_path": "tests/test_rules.py",
+      "line": 42,
+      "symbol": "test_detect_zscore_anomalies_and_mismatch_guard",
+      "evidence": "rules.py branches for ComparisonOp.LT (L27), z_threshold <= 0.0 (L90), len(points) < 2 (L92), stddev_val == 0.0 (L98), and stats.py single-item percentile (L65) / blank metric_name (L108) lack dedicated unit test assertions.",
+      "description": "正常系および主要な例外ガードは検証済みだが、ゼロ分散系列や要素数1の系列、ComparisonOp.LT などの一部エッジケース分岐に対する単体テストが不足している。",
+      "recommendation": "pytest.mark.parametrize を用いて全 ComparisonOp 演算子、単一要素パーセンタイル、ゼロ分散・2点未満の Zスコア異常検知、および frozen モデルの書き換え拒否テストを追加する。"
+    }
+  ],
+  "action_plan": [
+    {
+      "priority": "P1",
+      "title": "NaN / Infinity 非有限浮動小数点数に対する境界バリデーション追加",
+      "category": "code_quality",
+      "target_files": [
+        "src/metrics_kit/models.py",
+        "src/metrics_kit/stats.py",
+        "tests/test_stats.py"
+      ],
+      "related_rules": [
+        "common/security",
+        "python/code_quality"
+      ],
+      "action": "Pydantic モデルの ConfigDict に `allow_inf_nan=False` を設定するとともに、`stats.py` の `_require_non_empty` (または数値検証ヘルパー) で `math.isfinite()` を確認し非有限値に対して `InvalidParameterError` を送出する単体テストを追加する。",
+      "expected_impact": "異常テレメトリ値 (NaN/Inf) 混入時にも未処理の ValueError や不正確なパーセンタイル算出を防ぎ、公開APIの例外契約を一貫して保証できる。"
+    },
+    {
+      "priority": "P1",
+      "title": "uv.lock の推移的依存・SHA256ハッシュ完全化と検証ベースイメージ pip/OS 更新",
+      "category": "security",
+      "target_files": [
+        "uv.lock",
+        "pyproject.toml"
+      ],
+      "related_rules": [
+        "common/security_vulnerability",
+        "common/supply_chain",
+        "CVE-2026-13346",
+        "CVE-2026-8643",
+        "CVE-2026-6357"
+      ],
+      "action": "`uv lock --upgrade` で pydantic 2.14+ および推移的依存 (pydantic-core, annotated-types, typing-extensions) の wheel ハッシュを uv.lock に完全ロックし、コンテナ実行時はシステム pip>=26.2.0 更新または不要な pip 除去と Debian セキュリティパッチ適用を行う。",
+      "expected_impact": "決定論的ハッシュ検証によるサプライチェーン耐性が向上し、コンテナスキャン上の MEDIUM CVE (pip 5件) を解消できる。"
+    },
+    {
+      "priority": "P2",
+      "title": "CI パイプラインへの ty 型チェックと --locked 検証の追加",
+      "category": "dependencies",
+      "target_files": [
+        ".github/workflows/ci.yml",
+        "pyproject.toml"
+      ],
+      "related_rules": [
+        "common/supply_chain",
+        "python/dependencies"
+      ],
+      "action": ".github/workflows/ci.yml で `uv run --locked ruff check src tests`、`uv run --locked ty check`、`uv run --locked pytest --cov=metrics_kit` を実行するよう強化する。",
+      "expected_impact": "PR 段階でロックファイルの乖離と静的型エラーを確実に防止できる。"
+    },
+    {
+      "priority": "P2",
+      "title": "README.md への公開API追記と開発・テスト手順セクションの整備",
+      "category": "documentation",
+      "target_files": [
+        "README.md"
+      ],
+      "related_rules": [
+        "common/documentation"
+      ],
+      "action": "README.md の API Reference に sanitize_prometheus_name を追加し、ローカル開発者向けに uv run ruff check / uv run ty check / uv run pytest --cov の実行手順を明記する。",
+      "expected_impact": "Standard Readme 基準を完全に満たし、公開シンボル一覧と実装の一貫性が100%になる。"
+    },
+    {
+      "priority": "P2",
+      "title": "境界条件エッジケース（単一要素・ゼロ分散・全比較演算子）の parametrize テスト拡充",
+      "category": "testing",
+      "target_files": [
+        "tests/test_stats.py",
+        "tests/test_rules.py",
+        "tests/test_formatting.py"
+      ],
+      "related_rules": [
+        "python/testing"
+      ],
+      "action": "test_rules.py に ComparisonOp.LT、z_threshold<=0、点数<2、標準偏差0のケースを、test_stats.py に単一要素 compute_percentile と空白 metric_name のケースを pytest.mark.parametrize で追加する。",
+      "expected_impact": "行・分岐カバレッジを 98%〜100% へ引き上げ、境界条件のリグレッション耐性を強化できる。"
+    }
+  ],
+  "report_hints": [
+    "7軸レーダーチャートでアーキテクチャ(98)・型安全性(99)・コード品質(96)の突出した強みとドキュメント(91)・テスト分岐網羅率(93)の微調整余地を対比する。",
+    "4層アーキテクチャ ClassDiagram に module_hotspots の HeatmapOverlay を重ね、models.py 等の軽微な改善箇所を視覚化する。",
+    "Trivy スキャン結果ではアプリ直接依存 (uv.lock: 0件) とコンテナベースイメージ同梱 pip@25.0.1 (MEDIUM 5件) / Debian 12.13 OS層 (398件) の責務境界を明確に分離して図解する。"
+  ],
+  "summary": "metrics-kit (v0.4.2) は総合スコア 95/100 (Grade S) と極めて高い健全性を示す Python 統計・SLO閾値評価ライブラリである。319 LOC・6モジュールの単方向4層アーキテクチャ全体で型安全性・Import衛生・Docstringカバレッジがいずれも100.0%に達し、隔離コンテナでのオフライン単体テスト全件合格と実測行カバレッジ96.2%を実証した。さらなる完成度向上に向け、NaN/Inf非有限値ガードの追加 (P1)、uv.lock推移的ハッシュ完全化と検証ベースイメージ更新 (P1)、およびCI型検査・境界テスト・README追記 (P2) を推奨する。"
+}

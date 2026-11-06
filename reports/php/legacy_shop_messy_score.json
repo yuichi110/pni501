@@ -1,0 +1,2706 @@
+{
+  "project_name": "legacy_shop_messy",
+  "workflow_id": "php_legacy_shop_messy",
+  "workflow_run_id": "wf-1abc5e13",
+  "evaluated_at": "2026-10-24T15:02:00.000000+00:00",
+  "language": "php",
+  "target_root": "examples/php/legacy_shop_messy",
+  "facts_file": ".pni/cache/php_legacy_shop_messy/facts.json",
+  "key_files_inspected": [
+    "index.php",
+    "product.php",
+    "login.php",
+    "admin_backup.php",
+    "includes/db.php",
+    "includes/helpers.php",
+    "Dockerfile",
+    "README.md"
+  ],
+  "overall_score": 15,
+  "grade": "D",
+  "category_scores": {
+    "architecture": 18,
+    "code_quality": 19,
+    "typing": 12,
+    "testing": 10,
+    "dependencies": 18,
+    "security": 5,
+    "documentation": 24
+  },
+  "category_rationales": {
+    "architecture": "クラス・名前空間が皆無の手続き型素PHPスクリプト群であり、index.php・product.php が HTTP 入力・生 SQL・インライン HTML を単一ファイルに混在させている。さらに includes/db.php と includes/helpers.php が相互 include_once 循環を形成し、includes/ 配下も公開ドキュメントルート直下に露出している。",
+    "code_quality": "import_hygiene_coverage_pct=0.0%・docstring_coverage_pct=0.0% に加え、スーパーグローバル直参照16箇所 + global $LAST_DB_ERR 結合、@mysqli_connect によるエラー握り潰し、product.php:9 の die(mysqli_error) 露出、cURL タイムアウト欠如、?debug= での var_dump() 出力が集中している（PHP 8.3 php -l 構文検査は通過）。",
+    "typing": "type_safety_coverage_pct=0.0%。全6ファイルで declare(strict_types=1); が未宣言で暗黙の型変換（0e マジックハッシュ比較バグを含む）を許しており、定義済みの2関数（get_db_conn, fetch_partner_catalog）も引数型・戻り値型を一切持たず、PHPStan/Psalm も未導入である。",
+    "testing": "自動テストファイル 0 件・テスト関数 0 件で PHPUnit/Pest 設定（phpunit.xml）が存在せず、コンテナ動的検証でも php -l 構文検査と php -S フォールバック起動応答（/up -> 200）のみ通過して実測ライン・ブランチカバレッジは未計測（measured=False）となった。専用の /healthz エンドポイントと Dockerfile HEALTHCHECK も欠如している。",
+    "dependencies": "composer.json / composer.lock が欠如した raw_php 構成であり、Dockerfile は 2022年11月 EOL の php:7.4-apache（Debian 11.5 凍結状態、OS 層 CVE 12,051件）を使用している。LICENSE・SECURITY.md・.gitignore・.dockerignore・CI・Dependabot もすべて未整備である。",
+    "security": "動的 Web ペネトレーションテスト（web_pentest: 19プローブ中 10件 FAIL、CRITICAL 2件・HIGH 4件・MEDIUM 2件・LOW 2件）により、無認証 POST /admin_backup.php での任意 OS コマンド実行（PNI_RCE_CANARY_8842 出力、CWE-78/306）、POST /login.php でのマジックハッシュ '240610708' 管理者認証突破（'Logged in as admin'、CWE-697）、/index.php の LFI トラバーサル露出（CWE-22）と反射型 XSS（CWE-79）、/product.php の promo_html 反射型 XSS（CWE-79）が実 HTTP 通信で完全実証された。さらに SQLi 3箇所（CWE-89）、Cookie unserialize（CWE-502）、TLS 検証無効化（CWE-295）、Stripe 本番秘密鍵・DB パスワード直書き（CWE-798）、root コンテナ（DS-0002）と OS 層 CVE 12,051件（CRITICAL 62 / HIGH 1,940）が複合する壊滅的状態にある。",
+    "documentation": "README.md は見出し1つとコピー手順1文の実質2行のみで、環境変数・DB スキーマ・起動手順・セキュリティ前提・テスト手順が一切記載されておらず、公開関数2件の PHPDoc カバレッジも 0.0% である。"
+  },
+  "metrics_snapshot": {
+    "language": "php",
+    "runtime_type_hint": "web_api",
+    "build_system": "raw_php",
+    "has_manifest": false,
+    "has_lockfile": false,
+    "has_license": false,
+    "has_security_policy": false,
+    "has_dependency_automation": false,
+    "dependencies_count": 0,
+    "unpinned_dependencies_count": 0,
+    "source_files_count": 6,
+    "test_files_count": 0,
+    "readme_line_count": 2,
+    "ci_supply_chain_issues_count": 0,
+    "committed_secret_files_count": 0,
+    "container_hygiene_issues_count": 2,
+    "legacy_language_findings_count": 0,
+    "total_files": 6,
+    "total_loc": 107,
+    "total_classes": 0,
+    "total_functions": 2,
+    "import_hygiene_coverage_pct": 0.0,
+    "type_safety_coverage_pct": 0.0,
+    "docstring_coverage_pct": 0.0,
+    "unsorted_imports_count": 0,
+    "wildcard_imports_count": 0,
+    "type_safety_issues_count": 8,
+    "weak_type_usages_count": 0,
+    "empty_docstrings_count": 0,
+    "doc_signature_mismatches_count": 0,
+    "complex_functions_count": 0,
+    "excessive_parameters_count": 0,
+    "global_state_usages_count": 17,
+    "bug_risk_idioms_count": 3,
+    "circular_dependencies_count": 2,
+    "unused_dependencies_count": 0,
+    "undeclared_dependencies_count": 0,
+    "test_functions_count": 0,
+    "assertion_free_tests_count": 0,
+    "framework_issues_count": 0,
+    "modernization_hints_count": 0,
+    "language_version_mismatches_count": 0,
+    "missing_io_timeouts_count": 1,
+    "scattered_env_access_count": 1,
+    "unstructured_logging_count": 1,
+    "hardcoded_secrets_count": 2,
+    "ast_dangerous_sinks_count": 13,
+    "api_endpoints_count": 4,
+    "runtime_status": "passed",
+    "harness_build_status": "passed",
+    "tests_status": "passed",
+    "tests_total": 0,
+    "tests_passed": 0,
+    "tests_failed": 0,
+    "smoke_check_status": "passed",
+    "security_scan_status": "failed",
+    "app_vuln_critical": 0,
+    "app_vuln_high": 0,
+    "app_vuln_total": 0,
+    "app_vuln_unpinned_range_matches": 0,
+    "os_vuln_high_or_crit": 2002,
+    "misconfig_count": 2,
+    "secret_leak_count": 1,
+    "pentest_status": "failed",
+    "pentest_probes_total": 19,
+    "pentest_probes_passed": 9,
+    "pentest_probes_failed": 10,
+    "pentest_findings_count": 10,
+    "pentest_high_or_crit_count": 6
+  },
+  "runtime_facts": {
+    "status": "passed",
+    "container_engine": "docker",
+    "engine_available": true,
+    "skip_reason": "",
+    "language": "php",
+    "selected_dockerfile_template": "php/raw.dockerfile",
+    "harness_dockerfile_path": ".pni/dockerfiles/examples/php/legacy_shop_messy/Dockerfile",
+    "build_args": {
+      "PHP_VERSION": "8.3"
+    },
+    "artifacts_dir": ".pni/cache/php_legacy_shop_messy/runtime",
+    "project_dockerfile_build": {
+      "attempted": true,
+      "status": "passed",
+      "dockerfile_used": "examples/php/legacy_shop_messy/Dockerfile",
+      "duration_sec": 1.11,
+      "exit_code": 0,
+      "error_tail": []
+    },
+    "harness_build": {
+      "attempted": true,
+      "status": "passed",
+      "dockerfile_used": ".pni/dockerfiles/examples/php/legacy_shop_messy/Dockerfile",
+      "duration_sec": 0.94,
+      "exit_code": 0,
+      "error_tail": []
+    },
+    "test_execution": {
+      "attempted": true,
+      "status": "passed",
+      "command": "sh -c lint_fail=0; for p in $(find . -path '*/vendor' -prune -o \\( -name '*.php' -o -name '*.phtml' \\) -print 2>/dev/null); do   if ! php -l \"$p\" >/tmp/pni_lint_err.txt 2>&1; then     cat /tmp/pni_lint_err.txt >&2; lint_fail=1;   fi; done; if [ \"$lint_fail\" -ne 0 ]; then exit 1; fi; has_tests=0; for td in tests; do   if [ -d \"$td\" ] && [ -n \"$(find \"$td\" -name '*Test.php' -o -name '*_test.php' 2>/dev/null)\" ]; then     has_tests=1;   fi; done; if [ \"$has_tests\" -eq 1 ] && command -v phpunit >/dev/null 2>&1; then   cfg_flag=\"\";   if [ ! -f phpunit.xml ] && [ ! -f phpunit.xml.dist ]; then     printf '%s' '<phpunit><source><include><directory>.</directory></include><exclude><directory>vendor</directory><directory>tests</directory></exclude></source></phpunit>' >/tmp/pni_phpunit.xml;     cfg_flag=\"-c /tmp/pni_phpunit.xml\";   fi;   phpunit $cfg_flag -d pcov.enabled=1 -d pcov.directory=. --log-junit /out/junit.xml --coverage-clover /out/clover.xml tests;   exit $?; fi; echo 'PHP syntax gate (php -l) passed; no PHPUnit tests executed.'; exit 0",
+      "duration_sec": 1.01,
+      "exit_code": 0,
+      "total_tests": 0,
+      "passed_tests": 0,
+      "failed_tests": 0,
+      "error_tests": 0,
+      "skipped_tests": 0,
+      "failures": [],
+      "log_tail": []
+    },
+    "coverage": {
+      "measured": false,
+      "tool": "",
+      "line_coverage_pct": null,
+      "branch_coverage_pct": null,
+      "covered_lines": 0,
+      "total_statements": 0,
+      "lowest_covered_modules": []
+    },
+    "smoke_check": {
+      "attempted": true,
+      "archetype": "web_api",
+      "status": "passed",
+      "command": "bash -c php -S 127.0.0.1:18080 -t . >/out/boot_stdout.log 2>&1 & pid=$!; for _ in $(seq 1 20); do   if ! kill -0 $pid 2>/dev/null; then wait $pid; rc=$?; cat /out/boot_stdout.log >&2; exit $rc; fi;   if php -r '$fp=@fsockopen(\"127.0.0.1\",18080,$e,$s,0.5); if($fp){fclose($fp);exit(0);} exit(1);'; then     php -r '$paths = ['\"'\"'/up'\"'\"', '\"'\"'/healthz'\"'\"', '\"'\"'/health'\"'\"', '\"'\"'/api/health'\"'\"', '\"'\"'/'\"'\"']; $bestCode = null; $bestPath = '\"'\"'/'\"'\"'; foreach ($paths as $p) {   $ctx = stream_context_create(['\"'\"'http'\"'\"' => ['\"'\"'ignore_errors'\"'\"' => true, '\"'\"'timeout'\"'\"' => 2]]);   @file_get_contents('\"'\"'http://127.0.0.1:18080'\"'\"' . $p, false, $ctx);   if (!empty($http_response_header[0]) && preg_match('\"'\"'/HTTP\\/\\S+\\s+(\\d+)/'\"'\"', $http_response_header[0], $m)) {     $code = (int)$m[1]; $bestCode = $code; $bestPath = $p;     if ($code < 400) { break; }   } } if ($bestCode === null || $bestCode >= 500) { exit(1); } file_put_contents('\"'\"'/out/smoke.json'\"'\"', json_encode(['\"'\"'probed_endpoint'\"'\"' => $bestPath, '\"'\"'http_status'\"'\"' => $bestCode, '\"'\"'detail'\"'\"' => '\"'\"'PHP web server responded ('\"'\"' . $bestPath . '\"'\"' -> '\"'\"' . $bestCode . '\"'\"')'\"'\"']));'; rc=$?;     kill -TERM $pid 2>/dev/null || true; wait $pid 2>/dev/null || true;     if [ $rc -ne 0 ]; then cat /out/boot_stdout.log >&2; fi; exit $rc;   fi;   sleep 0.3; done; kill -KILL $pid 2>/dev/null || true; cat /out/boot_stdout.log >&2; exit 124",
+      "duration_sec": 1.06,
+      "exit_code": 0,
+      "http_status": 200,
+      "probed_endpoint": "/up",
+      "failure_kind": "none",
+      "detail": "PHP web server responded (/up -> 200)",
+      "log_tail": []
+    }
+  },
+  "security_facts": {
+    "status": "failed",
+    "scanner": "trivy",
+    "container_engine": "docker",
+    "engine_available": true,
+    "skip_reason": "",
+    "trivy_image": "ghcr.io/aquasecurity/trivy:0.69.3",
+    "scanned_filesystem": true,
+    "scanned_resolved_image": true,
+    "resolved_image_source": "examples/php/legacy_shop_messy/Dockerfile",
+    "artifacts_dir": ".pni/cache/php_legacy_shop_messy/security",
+    "vuln_counts": {
+      "critical": 62,
+      "high": 1940,
+      "medium": 7496,
+      "low": 2296,
+      "total": 12051
+    },
+    "app_vuln_counts": {
+      "critical": 0,
+      "high": 0,
+      "medium": 0,
+      "low": 0,
+      "total": 0
+    },
+    "os_vuln_counts": {
+      "critical": 62,
+      "high": 1940,
+      "medium": 7496,
+      "low": 2296,
+      "total": 12051
+    },
+    "vulnerabilities": [
+      {
+        "vuln_id": "CVE-2023-25690",
+        "pkg_name": "apache2",
+        "pkg_type": "debian",
+        "installed_version": "2.4.54-1~deb11u1",
+        "fixed_version": "2.4.56-1~deb11u1",
+        "severity": "CRITICAL",
+        "title": "httpd: HTTP request splitting with mod_rewrite and mod_proxy",
+        "target": "/out/image.tar (debian 11.5)",
+        "cvss_score": 9.8,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      },
+      {
+        "vuln_id": "CVE-2024-38474",
+        "pkg_name": "apache2",
+        "pkg_type": "debian",
+        "installed_version": "2.4.54-1~deb11u1",
+        "fixed_version": "2.4.61-1~deb11u1",
+        "severity": "CRITICAL",
+        "title": "httpd: Substitution encoding issue in mod_rewrite",
+        "target": "/out/image.tar (debian 11.5)",
+        "cvss_score": 9.8,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      },
+      {
+        "vuln_id": "CVE-2024-38476",
+        "pkg_name": "apache2",
+        "pkg_type": "debian",
+        "installed_version": "2.4.54-1~deb11u1",
+        "fixed_version": "2.4.61-1~deb11u1",
+        "severity": "CRITICAL",
+        "title": "httpd: Security issues via backend applications whose response headers are malicious or exploitable",
+        "target": "/out/image.tar (debian 11.5)",
+        "cvss_score": 9.8,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      },
+      {
+        "vuln_id": "CVE-2023-25690",
+        "pkg_name": "apache2-bin",
+        "pkg_type": "debian",
+        "installed_version": "2.4.54-1~deb11u1",
+        "fixed_version": "2.4.56-1~deb11u1",
+        "severity": "CRITICAL",
+        "title": "httpd: HTTP request splitting with mod_rewrite and mod_proxy",
+        "target": "/out/image.tar (debian 11.5)",
+        "cvss_score": 9.8,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      },
+      {
+        "vuln_id": "CVE-2024-38474",
+        "pkg_name": "apache2-bin",
+        "pkg_type": "debian",
+        "installed_version": "2.4.54-1~deb11u1",
+        "fixed_version": "2.4.61-1~deb11u1",
+        "severity": "CRITICAL",
+        "title": "httpd: Substitution encoding issue in mod_rewrite",
+        "target": "/out/image.tar (debian 11.5)",
+        "cvss_score": 9.8,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      },
+      {
+        "vuln_id": "CVE-2024-38476",
+        "pkg_name": "apache2-bin",
+        "pkg_type": "debian",
+        "installed_version": "2.4.54-1~deb11u1",
+        "fixed_version": "2.4.61-1~deb11u1",
+        "severity": "CRITICAL",
+        "title": "httpd: Security issues via backend applications whose response headers are malicious or exploitable",
+        "target": "/out/image.tar (debian 11.5)",
+        "cvss_score": 9.8,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      },
+      {
+        "vuln_id": "CVE-2023-25690",
+        "pkg_name": "apache2-data",
+        "pkg_type": "debian",
+        "installed_version": "2.4.54-1~deb11u1",
+        "fixed_version": "2.4.56-1~deb11u1",
+        "severity": "CRITICAL",
+        "title": "httpd: HTTP request splitting with mod_rewrite and mod_proxy",
+        "target": "/out/image.tar (debian 11.5)",
+        "cvss_score": 9.8,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      },
+      {
+        "vuln_id": "CVE-2024-38474",
+        "pkg_name": "apache2-data",
+        "pkg_type": "debian",
+        "installed_version": "2.4.54-1~deb11u1",
+        "fixed_version": "2.4.61-1~deb11u1",
+        "severity": "CRITICAL",
+        "title": "httpd: Substitution encoding issue in mod_rewrite",
+        "target": "/out/image.tar (debian 11.5)",
+        "cvss_score": 9.8,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      },
+      {
+        "vuln_id": "CVE-2024-38476",
+        "pkg_name": "apache2-data",
+        "pkg_type": "debian",
+        "installed_version": "2.4.54-1~deb11u1",
+        "fixed_version": "2.4.61-1~deb11u1",
+        "severity": "CRITICAL",
+        "title": "httpd: Security issues via backend applications whose response headers are malicious or exploitable",
+        "target": "/out/image.tar (debian 11.5)",
+        "cvss_score": 9.8,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      },
+      {
+        "vuln_id": "CVE-2023-25690",
+        "pkg_name": "apache2-utils",
+        "pkg_type": "debian",
+        "installed_version": "2.4.54-1~deb11u1",
+        "fixed_version": "2.4.56-1~deb11u1",
+        "severity": "CRITICAL",
+        "title": "httpd: HTTP request splitting with mod_rewrite and mod_proxy",
+        "target": "/out/image.tar (debian 11.5)",
+        "cvss_score": 9.8,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      },
+      {
+        "vuln_id": "CVE-2024-38474",
+        "pkg_name": "apache2-utils",
+        "pkg_type": "debian",
+        "installed_version": "2.4.54-1~deb11u1",
+        "fixed_version": "2.4.61-1~deb11u1",
+        "severity": "CRITICAL",
+        "title": "httpd: Substitution encoding issue in mod_rewrite",
+        "target": "/out/image.tar (debian 11.5)",
+        "cvss_score": 9.8,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      },
+      {
+        "vuln_id": "CVE-2024-38476",
+        "pkg_name": "apache2-utils",
+        "pkg_type": "debian",
+        "installed_version": "2.4.54-1~deb11u1",
+        "fixed_version": "2.4.61-1~deb11u1",
+        "severity": "CRITICAL",
+        "title": "httpd: Security issues via backend applications whose response headers are malicious or exploitable",
+        "target": "/out/image.tar (debian 11.5)",
+        "cvss_score": 9.8,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      },
+      {
+        "vuln_id": "CVE-2022-32221",
+        "pkg_name": "curl",
+        "pkg_type": "debian",
+        "installed_version": "7.74.0-1.3+deb11u3",
+        "fixed_version": "7.74.0-1.3+deb11u5",
+        "severity": "CRITICAL",
+        "title": "curl: POST following PUT confusion",
+        "target": "/out/image.tar (debian 11.5)",
+        "cvss_score": 9.8,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      },
+      {
+        "vuln_id": "CVE-2023-38545",
+        "pkg_name": "curl",
+        "pkg_type": "debian",
+        "installed_version": "7.74.0-1.3+deb11u3",
+        "fixed_version": "7.74.0-1.3+deb11u10",
+        "severity": "CRITICAL",
+        "title": "curl: heap based buffer overflow in the SOCKS5 proxy handshake",
+        "target": "/out/image.tar (debian 11.5)",
+        "cvss_score": 9.8,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      },
+      {
+        "vuln_id": "CVE-2022-24963",
+        "pkg_name": "libapr1",
+        "pkg_type": "debian",
+        "installed_version": "1.7.0-6+deb11u1",
+        "fixed_version": "1.7.0-6+deb11u2",
+        "severity": "CRITICAL",
+        "title": "apr: integer overflow/wraparound in apr_encode",
+        "target": "/out/image.tar (debian 11.5)",
+        "cvss_score": 9.8,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      },
+      {
+        "vuln_id": "CVE-2022-32221",
+        "pkg_name": "libcurl4",
+        "pkg_type": "debian",
+        "installed_version": "7.74.0-1.3+deb11u3",
+        "fixed_version": "7.74.0-1.3+deb11u5",
+        "severity": "CRITICAL",
+        "title": "curl: POST following PUT confusion",
+        "target": "/out/image.tar (debian 11.5)",
+        "cvss_score": 9.8,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      },
+      {
+        "vuln_id": "CVE-2023-38545",
+        "pkg_name": "libcurl4",
+        "pkg_type": "debian",
+        "installed_version": "7.74.0-1.3+deb11u3",
+        "fixed_version": "7.74.0-1.3+deb11u10",
+        "severity": "CRITICAL",
+        "title": "curl: heap based buffer overflow in the SOCKS5 proxy handshake",
+        "target": "/out/image.tar (debian 11.5)",
+        "cvss_score": 9.8,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      },
+      {
+        "vuln_id": "CVE-2019-8457",
+        "pkg_name": "libdb5.3",
+        "pkg_type": "debian",
+        "installed_version": "5.3.28+dfsg1-0.8",
+        "fixed_version": "",
+        "severity": "CRITICAL",
+        "title": "sqlite: heap out-of-bound read in function rtreenode()",
+        "target": "/out/image.tar (debian 11.5)",
+        "cvss_score": 9.8,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      },
+      {
+        "vuln_id": "CVE-2024-45491",
+        "pkg_name": "libexpat1",
+        "pkg_type": "debian",
+        "installed_version": "2.2.10-2+deb11u5",
+        "fixed_version": "2.2.10-2+deb11u6",
+        "severity": "CRITICAL",
+        "title": "libexpat: Integer Overflow or Wraparound",
+        "target": "/out/image.tar (debian 11.5)",
+        "cvss_score": 9.8,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      },
+      {
+        "vuln_id": "CVE-2024-45492",
+        "pkg_name": "libexpat1",
+        "pkg_type": "debian",
+        "installed_version": "2.2.10-2+deb11u5",
+        "fixed_version": "2.2.10-2+deb11u6",
+        "severity": "CRITICAL",
+        "title": "libexpat: integer overflow",
+        "target": "/out/image.tar (debian 11.5)",
+        "cvss_score": 9.8,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      },
+      {
+        "vuln_id": "CVE-2025-14087",
+        "pkg_name": "libglib2.0-0",
+        "pkg_type": "debian",
+        "installed_version": "2.66.8-1",
+        "fixed_version": "2.66.8-1+deb11u7",
+        "severity": "CRITICAL",
+        "title": "glib: GLib: Buffer underflow in GVariant parser leads to heap corruption",
+        "target": "/out/image.tar (debian 11.5)",
+        "cvss_score": 9.8,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      },
+      {
+        "vuln_id": "CVE-2026-42010",
+        "pkg_name": "libgnutls30",
+        "pkg_type": "debian",
+        "installed_version": "3.7.1-5+deb11u2",
+        "fixed_version": "3.7.1-5+deb11u10",
+        "severity": "CRITICAL",
+        "title": "gnutls: gnutls: Authentication Bypass via NUL Character in Username",
+        "target": "/out/image.tar (debian 11.5)",
+        "cvss_score": 9.8,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      },
+      {
+        "vuln_id": "CVE-2026-8376",
+        "pkg_name": "libperl5.32",
+        "pkg_type": "debian",
+        "installed_version": "5.32.1-4+deb11u2",
+        "fixed_version": "",
+        "severity": "CRITICAL",
+        "title": "perl: Perl: Heap buffer overflow when compiling regular expressions on 32-bit builds",
+        "target": "/out/image.tar (debian 11.5)",
+        "cvss_score": 9.8,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      },
+      {
+        "vuln_id": "CVE-2024-56171",
+        "pkg_name": "libxml2",
+        "pkg_type": "debian",
+        "installed_version": "2.9.10+dfsg-6.7+deb11u3",
+        "fixed_version": "2.9.10+dfsg-6.7+deb11u6",
+        "severity": "CRITICAL",
+        "title": "libxml2: Use-After-Free in libxml2",
+        "target": "/out/image.tar (debian 11.5)",
+        "cvss_score": 9.8,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      },
+      {
+        "vuln_id": "CVE-2026-6653",
+        "pkg_name": "libxml2",
+        "pkg_type": "debian",
+        "installed_version": "2.9.10+dfsg-6.7+deb11u3",
+        "fixed_version": "",
+        "severity": "CRITICAL",
+        "title": "libxml2: mingw-libxml2: libxml2: Denial of Service via crafted XML input due to use-after-free",
+        "target": "/out/image.tar (debian 11.5)",
+        "cvss_score": 9.8,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      },
+      {
+        "vuln_id": "CVE-2023-25775",
+        "pkg_name": "linux-libc-dev",
+        "pkg_type": "debian",
+        "installed_version": "5.10.149-2",
+        "fixed_version": "5.10.205-2",
+        "severity": "CRITICAL",
+        "title": "kernel: irdma: Improper access control",
+        "target": "/out/image.tar (debian 11.5)",
+        "cvss_score": 9.8,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      },
+      {
+        "vuln_id": "CVE-2023-54257",
+        "pkg_name": "linux-libc-dev",
+        "pkg_type": "debian",
+        "installed_version": "5.10.149-2",
+        "fixed_version": "5.10.178-1",
+        "severity": "CRITICAL",
+        "title": "kernel: Linux kernel: macb Ethernet driver memory corruption leads to denial of service.",
+        "target": "/out/image.tar (debian 11.5)",
+        "cvss_score": 9.8,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      },
+      {
+        "vuln_id": "CVE-2026-23112",
+        "pkg_name": "linux-libc-dev",
+        "pkg_type": "debian",
+        "installed_version": "5.10.149-2",
+        "fixed_version": "5.10.257-1",
+        "severity": "CRITICAL",
+        "title": "kernel: nvmet-tcp: add bounds checks in nvmet_tcp_build_pdu_iovec",
+        "target": "/out/image.tar (debian 11.5)",
+        "cvss_score": 9.8,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      },
+      {
+        "vuln_id": "CVE-2026-8376",
+        "pkg_name": "perl",
+        "pkg_type": "debian",
+        "installed_version": "5.32.1-4+deb11u2",
+        "fixed_version": "",
+        "severity": "CRITICAL",
+        "title": "perl: Perl: Heap buffer overflow when compiling regular expressions on 32-bit builds",
+        "target": "/out/image.tar (debian 11.5)",
+        "cvss_score": 9.8,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      },
+      {
+        "vuln_id": "CVE-2026-8376",
+        "pkg_name": "perl-base",
+        "pkg_type": "debian",
+        "installed_version": "5.32.1-4+deb11u2",
+        "fixed_version": "",
+        "severity": "CRITICAL",
+        "title": "perl: Perl: Heap buffer overflow when compiling regular expressions on 32-bit builds",
+        "target": "/out/image.tar (debian 11.5)",
+        "cvss_score": 9.8,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      },
+      {
+        "vuln_id": "CVE-2026-8376",
+        "pkg_name": "perl-modules-5.32",
+        "pkg_type": "debian",
+        "installed_version": "5.32.1-4+deb11u2",
+        "fixed_version": "",
+        "severity": "CRITICAL",
+        "title": "perl: Perl: Heap buffer overflow when compiling regular expressions on 32-bit builds",
+        "target": "/out/image.tar (debian 11.5)",
+        "cvss_score": 9.8,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      },
+      {
+        "vuln_id": "CVE-2023-45853",
+        "pkg_name": "zlib1g",
+        "pkg_type": "debian",
+        "installed_version": "1:1.2.11.dfsg-2+deb11u2",
+        "fixed_version": "",
+        "severity": "CRITICAL",
+        "title": "zlib: integer overflow and resultant heap-based buffer overflow in zipOpenNewFileInZip4_6",
+        "target": "/out/image.tar (debian 11.5)",
+        "cvss_score": 9.8,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      },
+      {
+        "vuln_id": "CVE-2022-36760",
+        "pkg_name": "apache2",
+        "pkg_type": "debian",
+        "installed_version": "2.4.54-1~deb11u1",
+        "fixed_version": "2.4.56-1~deb11u1",
+        "severity": "CRITICAL",
+        "title": "httpd: mod_proxy_ajp: Possible request smuggling",
+        "target": "/out/image.tar (debian 11.5)",
+        "cvss_score": 9.1,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      },
+      {
+        "vuln_id": "CVE-2024-38475",
+        "pkg_name": "apache2",
+        "pkg_type": "debian",
+        "installed_version": "2.4.54-1~deb11u1",
+        "fixed_version": "2.4.61-1~deb11u1",
+        "severity": "CRITICAL",
+        "title": "httpd: Improper escaping of output in mod_rewrite",
+        "target": "/out/image.tar (debian 11.5)",
+        "cvss_score": 9.1,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      },
+      {
+        "vuln_id": "CVE-2022-36760",
+        "pkg_name": "apache2-bin",
+        "pkg_type": "debian",
+        "installed_version": "2.4.54-1~deb11u1",
+        "fixed_version": "2.4.56-1~deb11u1",
+        "severity": "CRITICAL",
+        "title": "httpd: mod_proxy_ajp: Possible request smuggling",
+        "target": "/out/image.tar (debian 11.5)",
+        "cvss_score": 9.1,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      },
+      {
+        "vuln_id": "CVE-2024-38475",
+        "pkg_name": "apache2-bin",
+        "pkg_type": "debian",
+        "installed_version": "2.4.54-1~deb11u1",
+        "fixed_version": "2.4.61-1~deb11u1",
+        "severity": "CRITICAL",
+        "title": "httpd: Improper escaping of output in mod_rewrite",
+        "target": "/out/image.tar (debian 11.5)",
+        "cvss_score": 9.1,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      },
+      {
+        "vuln_id": "CVE-2022-36760",
+        "pkg_name": "apache2-data",
+        "pkg_type": "debian",
+        "installed_version": "2.4.54-1~deb11u1",
+        "fixed_version": "2.4.56-1~deb11u1",
+        "severity": "CRITICAL",
+        "title": "httpd: mod_proxy_ajp: Possible request smuggling",
+        "target": "/out/image.tar (debian 11.5)",
+        "cvss_score": 9.1,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      },
+      {
+        "vuln_id": "CVE-2024-38475",
+        "pkg_name": "apache2-data",
+        "pkg_type": "debian",
+        "installed_version": "2.4.54-1~deb11u1",
+        "fixed_version": "2.4.61-1~deb11u1",
+        "severity": "CRITICAL",
+        "title": "httpd: Improper escaping of output in mod_rewrite",
+        "target": "/out/image.tar (debian 11.5)",
+        "cvss_score": 9.1,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      },
+      {
+        "vuln_id": "CVE-2022-36760",
+        "pkg_name": "apache2-utils",
+        "pkg_type": "debian",
+        "installed_version": "2.4.54-1~deb11u1",
+        "fixed_version": "2.4.56-1~deb11u1",
+        "severity": "CRITICAL",
+        "title": "httpd: mod_proxy_ajp: Possible request smuggling",
+        "target": "/out/image.tar (debian 11.5)",
+        "cvss_score": 9.1,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      },
+      {
+        "vuln_id": "CVE-2024-38475",
+        "pkg_name": "apache2-utils",
+        "pkg_type": "debian",
+        "installed_version": "2.4.54-1~deb11u1",
+        "fixed_version": "2.4.61-1~deb11u1",
+        "severity": "CRITICAL",
+        "title": "httpd: Improper escaping of output in mod_rewrite",
+        "target": "/out/image.tar (debian 11.5)",
+        "cvss_score": 9.1,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      }
+    ],
+    "misconfigurations": [
+      {
+        "check_id": "DS-0002",
+        "severity": "HIGH",
+        "title": "Image user should not be 'root'",
+        "file_path": "Dockerfile",
+        "start_line": null,
+        "message": "Specify at least 1 USER command in Dockerfile with non-root user as argument",
+        "resolution": "Add 'USER <non root user name>' line to the Dockerfile"
+      },
+      {
+        "check_id": "DS-0026",
+        "severity": "LOW",
+        "title": "No HEALTHCHECK defined",
+        "file_path": "Dockerfile",
+        "start_line": null,
+        "message": "Add HEALTHCHECK instruction in your Dockerfile",
+        "resolution": "Add HEALTHCHECK instruction in Dockerfile"
+      }
+    ],
+    "secrets": [
+      {
+        "rule_id": "stripe-secret-token",
+        "category": "Stripe",
+        "severity": "CRITICAL",
+        "title": "Stripe Secret Key",
+        "file_path": "includes/db.php",
+        "start_line": 7,
+        "redacted_match": "$stripe_api_secret = '***********************************';"
+      }
+    ]
+  },
+  "pentest_facts": {
+    "status": "failed",
+    "container_engine": "docker",
+    "engine_available": true,
+    "skip_reason": "",
+    "pentests_dir": ".pni/pentests/examples/php/legacy_shop_messy",
+    "materialized_files": [
+      ".pni/pentests/examples/php/legacy_shop_messy/conftest.py",
+      ".pni/pentests/examples/php/legacy_shop_messy/test_app_probes.py",
+      ".pni/pentests/examples/php/legacy_shop_messy/test_baseline_http.py",
+      ".pni/pentests/examples/php/legacy_shop_messy/test_target_surface.py"
+    ],
+    "target_base_url": "http://127.0.0.1:39919",
+    "server_booted": true,
+    "boot_failure_reason": "",
+    "duration_sec": 4.31,
+    "artifacts_dir": ".pni/cache/php_legacy_shop_messy/pentest",
+    "probe_summary": {
+      "total_probes": 19,
+      "passed_probes": 9,
+      "failed_probes": 10,
+      "skipped_probes": 0,
+      "error_probes": 0
+    },
+    "findings": [
+      {
+        "test_id": "test_app_probes::test_login_md5_magic_hash_authentication_bypass",
+        "test_file": "test_app_probes.py",
+        "cwe_id": "CWE-697",
+        "category": "authentication_bypass",
+        "severity": "critical",
+        "endpoint": "/login.php",
+        "title": "Authentication bypass via loose PHP '==' MD5 magic-hash collision on POST /login.php",
+        "evidence": "POST /login.php with magic-hash input '240610708' returned 'Logged in as admin'"
+      },
+      {
+        "test_id": "test_app_probes::test_admin_backup_os_command_injection",
+        "test_file": "test_app_probes.py",
+        "cwe_id": "CWE-78",
+        "category": "os_command_injection",
+        "severity": "critical",
+        "endpoint": "/admin_backup.php",
+        "title": "Unauthenticated OS command injection via backup_dir parameter on POST /admin_backup.php",
+        "evidence": "POST /admin_backup.php executed injected shell echo canary (PNI_RCE_CANARY_8842)"
+      },
+      {
+        "test_id": "test_target_surface::test_path_traversal_and_lfi_canary[/index.php]",
+        "test_file": "test_target_surface.py",
+        "cwe_id": "CWE-22",
+        "category": "path_traversal_or_lfi",
+        "severity": "high",
+        "endpoint": "/index.php",
+        "title": "Path traversal or file inclusion exposure on /index.php",
+        "evidence": "GET /index.php (../../../../etc/passwd) -> 200 (\"Failed opening '\")"
+      },
+      {
+        "test_id": "test_target_surface::test_privileged_endpoints_require_authentication[POST-/admin_backup.php]",
+        "test_file": "test_target_surface.py",
+        "cwe_id": "CWE-306",
+        "category": "missing_authentication",
+        "severity": "high",
+        "endpoint": "/admin_backup.php",
+        "title": "Privileged endpoint POST /admin_backup.php accessible without authentication",
+        "evidence": "Unauthenticated POST /admin_backup.php returned 200"
+      },
+      {
+        "test_id": "test_target_surface::test_reflected_xss_canary_escaped[/index.php]",
+        "test_file": "test_target_surface.py",
+        "cwe_id": "CWE-79",
+        "category": "reflected_xss",
+        "severity": "high",
+        "endpoint": "/index.php",
+        "title": "Unescaped reflected XSS via query parameters on /index.php",
+        "evidence": "GET /index.php with '<pni-xss-canary-7f3a>' -> 200 reflected raw HTML tag"
+      },
+      {
+        "test_id": "test_app_probes::test_product_promo_html_reflected_xss",
+        "test_file": "test_app_probes.py",
+        "cwe_id": "CWE-79",
+        "category": "reflected_xss",
+        "severity": "high",
+        "endpoint": "/product.php",
+        "title": "Unescaped reflected XSS via promo_html query parameter on /product.php",
+        "evidence": "GET /product.php?promo_html=<pni-promo-xss-9a2b> -> 200 echoed raw HTML banner"
+      },
+      {
+        "test_id": "test_baseline_http::test_clickjacking_protection_on_html",
+        "test_file": "test_baseline_http.py",
+        "cwe_id": "CWE-1021",
+        "category": "clickjacking_protection",
+        "severity": "medium",
+        "endpoint": "/",
+        "title": "HTML response lacks X-Frame-Options or CSP frame-ancestors guard",
+        "evidence": "GET / (Content-Type=text/html; charset=utf-8) missing X-Frame-Options and CSP frame-ancestors"
+      },
+      {
+        "test_id": "test_baseline_http::test_http_trace_method_disabled",
+        "test_file": "test_baseline_http.py",
+        "cwe_id": "CWE-693",
+        "category": "unsafe_http_method",
+        "severity": "medium",
+        "endpoint": "/",
+        "title": "HTTP TRACE method enabled on web server",
+        "evidence": "TRACE / -> 200"
+      },
+      {
+        "test_id": "test_baseline_http::test_runtime_version_banner_not_leaked",
+        "test_file": "test_baseline_http.py",
+        "cwe_id": "CWE-200",
+        "category": "banner_information_disclosure",
+        "severity": "low",
+        "endpoint": "/",
+        "title": "X-Powered-By header discloses backend runtime technology/version",
+        "evidence": "GET / -> X-Powered-By: PHP/8.3.36"
+      },
+      {
+        "test_id": "test_baseline_http::test_x_content_type_options_nosniff",
+        "test_file": "test_baseline_http.py",
+        "cwe_id": "CWE-693",
+        "category": "missing_security_headers",
+        "severity": "low",
+        "endpoint": "/",
+        "title": "Missing X-Content-Type-Options: nosniff response header",
+        "evidence": "GET / -> 200, X-Content-Type-Options=<absent>"
+      }
+    ]
+  },
+  "module_inventory": [
+    {
+      "file": "examples/php/legacy_shop_messy/admin_backup.php",
+      "loc": 12,
+      "public_types": [],
+      "public_callables": []
+    },
+    {
+      "file": "examples/php/legacy_shop_messy/includes/db.php",
+      "loc": 16,
+      "public_types": [],
+      "public_callables": [
+        "get_db_conn"
+      ]
+    },
+    {
+      "file": "examples/php/legacy_shop_messy/includes/helpers.php",
+      "loc": 15,
+      "public_types": [],
+      "public_callables": [
+        "fetch_partner_catalog"
+      ]
+    },
+    {
+      "file": "examples/php/legacy_shop_messy/index.php",
+      "loc": 29,
+      "public_types": [],
+      "public_callables": []
+    },
+    {
+      "file": "examples/php/legacy_shop_messy/login.php",
+      "loc": 20,
+      "public_types": [],
+      "public_callables": []
+    },
+    {
+      "file": "examples/php/legacy_shop_messy/product.php",
+      "loc": 15,
+      "public_types": [],
+      "public_callables": []
+    }
+  ],
+  "dangerous_sinks": [
+    {
+      "category": "command_injection",
+      "cwe_id": "CWE-78",
+      "severity": "high",
+      "file": "examples/php/legacy_shop_messy/admin_backup.php",
+      "line": 6,
+      "symbol": null,
+      "detail": "OS shell command execution via 'shell_exec(...)'"
+    },
+    {
+      "category": "insecure_transport",
+      "cwe_id": "CWE-295",
+      "severity": "high",
+      "file": "examples/php/legacy_shop_messy/includes/helpers.php",
+      "line": 9,
+      "symbol": "fetch_partner_catalog",
+      "detail": "TLS certificate verification disabled via 'CURLOPT_SSL_VERIFYPEER => false'"
+    },
+    {
+      "category": "unsafe_deserialization",
+      "cwe_id": "CWE-502",
+      "severity": "high",
+      "file": "examples/php/legacy_shop_messy/index.php",
+      "line": 4,
+      "symbol": null,
+      "detail": "Unsafe 'unserialize(...)' without ['allowed_classes' => false] enables Object Injection"
+    },
+    {
+      "category": "sql_injection",
+      "cwe_id": "CWE-89",
+      "severity": "high",
+      "file": "examples/php/legacy_shop_messy/index.php",
+      "line": 8,
+      "symbol": null,
+      "detail": "Unparameterized SQL execution via 'mysqli_query(\"SELECT id, title, price FROM products WHERE title)'"
+    },
+    {
+      "category": "xss",
+      "cwe_id": "CWE-79",
+      "severity": "high",
+      "file": "examples/php/legacy_shop_messy/index.php",
+      "line": 21,
+      "symbol": null,
+      "detail": "Unescaped request input rendered directly via 'echo  isset($_GET['q']) ? $_GET['q'] : 'all items' ;'"
+    },
+    {
+      "category": "file_inclusion_or_traversal",
+      "cwe_id": "CWE-98",
+      "severity": "high",
+      "file": "examples/php/legacy_shop_messy/index.php",
+      "line": 25,
+      "symbol": null,
+      "detail": "Dynamic PHP file inclusion 'include $_GET['page'] . '.php'' risks Local/Remote File Inclusion"
+    },
+    {
+      "category": "loose_comparison_or_auth",
+      "cwe_id": "CWE-621",
+      "severity": "high",
+      "file": "examples/php/legacy_shop_messy/login.php",
+      "line": 6,
+      "symbol": null,
+      "detail": "Variable table pollution via 'extract(...)' allows overwriting local security state"
+    },
+    {
+      "category": "sql_injection",
+      "cwe_id": "CWE-89",
+      "severity": "high",
+      "file": "examples/php/legacy_shop_messy/login.php",
+      "line": 12,
+      "symbol": null,
+      "detail": "Unparameterized SQL execution via 'mysqli_query(\"SELECT password_hash FROM admins WHERE username =)'"
+    },
+    {
+      "category": "loose_comparison_or_auth",
+      "cwe_id": "CWE-697",
+      "severity": "high",
+      "file": "examples/php/legacy_shop_messy/login.php",
+      "line": 17,
+      "symbol": null,
+      "detail": "Loose '==' comparison on credential/hash '$pw_hash == $expected_hash' enables PHP type-juggling bypass — use 'hash_equals()' or '==='"
+    },
+    {
+      "category": "xss",
+      "cwe_id": "CWE-79",
+      "severity": "high",
+      "file": "examples/php/legacy_shop_messy/login.php",
+      "line": 19,
+      "symbol": null,
+      "detail": "Unescaped request input rendered directly via 'echo \"Logged in as \" . $_POST['username'];'"
+    },
+    {
+      "category": "sql_injection",
+      "cwe_id": "CWE-89",
+      "severity": "high",
+      "file": "examples/php/legacy_shop_messy/product.php",
+      "line": 7,
+      "symbol": null,
+      "detail": "Unparameterized SQL execution via 'mysqli_query($sql)'"
+    },
+    {
+      "category": "xss",
+      "cwe_id": "CWE-79",
+      "severity": "high",
+      "file": "examples/php/legacy_shop_messy/product.php",
+      "line": 14,
+      "symbol": null,
+      "detail": "Unescaped request input rendered directly via 'echo $_GET['promo_html'] ?? 'Special Sale';'"
+    },
+    {
+      "category": "weak_cryptography",
+      "cwe_id": "CWE-327",
+      "severity": "medium",
+      "file": "examples/php/legacy_shop_messy/login.php",
+      "line": 7,
+      "symbol": null,
+      "detail": "Broken digest 'md5(...)' — use 'password_hash()' for passwords or SHA-256/HMAC"
+    }
+  ],
+  "api_endpoints": [
+    {
+      "http_method": "POST",
+      "path": "/examples/php/legacy_shop_messy/admin_backup.php",
+      "handler": "admin_backup.php",
+      "file": "examples/php/legacy_shop_messy/admin_backup.php",
+      "line": 1,
+      "has_auth_hint": false,
+      "auth_mechanisms": []
+    },
+    {
+      "http_method": "GET",
+      "path": "/examples/php/legacy_shop_messy/index.php",
+      "handler": "index.php",
+      "file": "examples/php/legacy_shop_messy/index.php",
+      "line": 1,
+      "has_auth_hint": false,
+      "auth_mechanisms": []
+    },
+    {
+      "http_method": "POST",
+      "path": "/examples/php/legacy_shop_messy/login.php",
+      "handler": "login.php",
+      "file": "examples/php/legacy_shop_messy/login.php",
+      "line": 1,
+      "has_auth_hint": false,
+      "auth_mechanisms": []
+    },
+    {
+      "http_method": "GET",
+      "path": "/examples/php/legacy_shop_messy/product.php",
+      "handler": "product.php",
+      "file": "examples/php/legacy_shop_messy/product.php",
+      "line": 1,
+      "has_auth_hint": false,
+      "auth_mechanisms": []
+    }
+  ],
+  "language_version_mismatches": [],
+  "architecture_overview": {
+    "pattern": "手続き型レガシースパゲッティ構造（Page Script / Inline HTML+SQL Monolith with Circular Procedural Includes）",
+    "entry_points": [
+      "index.php",
+      "product.php",
+      "login.php",
+      "admin_backup.php"
+    ],
+    "modules": [
+      {
+        "path": "index.php",
+        "role": "トップページ・商品検索・Cookie カート復元・動的サブページ読込スクリプト",
+        "key_symbols": [],
+        "depends_on": [
+          "includes/db.php"
+        ],
+        "health_note": "L4 unserialize($_COOKIE['shop_cart']), L8 SQLi ($_GET['q']), L21 XSS, L25 LFI (include $_GET['page'].'.php')。"
+      },
+      {
+        "path": "product.php",
+        "role": "カテゴリ別商品検索およびプロモーション HTML バナー描画スクリプト",
+        "key_symbols": [],
+        "depends_on": [
+          "includes/db.php"
+        ],
+        "health_note": "L6-7 SQLi ($_GET['cat']), L9 die(mysqli_error($conn)), L14 XSS ($_GET['promo_html'])。"
+      },
+      {
+        "path": "login.php",
+        "role": "管理者ログイン・セッション開始スクリプト",
+        "key_symbols": [],
+        "depends_on": [
+          "includes/db.php"
+        ],
+        "health_note": "L6 extract($_POST), L7 md5(), L12 SQLi ($_POST['username']), L9&17 緩い比較 == '0e...' 認証バイパス, L19 XSS。"
+      },
+      {
+        "path": "admin_backup.php",
+        "role": "アップロードディレクトリの tar 圧縮バックアップ管理スクリプト",
+        "key_symbols": [],
+        "depends_on": [
+          "includes/db.php"
+        ],
+        "health_note": "認証・CSRF チェック欠如のまま L6 shell_exec('tar -czf ... ' . $target) を実行する致命的 RCE エンドポイント。"
+      },
+      {
+        "path": "includes/db.php",
+        "role": "MySQL 接続関数 get_db_conn() と DB/Stripe 定数・変数定義",
+        "key_symbols": [
+          "get_db_conn"
+        ],
+        "depends_on": [
+          "includes/helpers.php"
+        ],
+        "health_note": "L2 で includes/helpers.php と相互 include_once 循環、L6-7 に秘密情報ハードコード、L11 global 変数、L12 @mysqli_connect。"
+      },
+      {
+        "path": "includes/helpers.php",
+        "role": "パートナーカタログ HTTP 取得関数 fetch_partner_catalog()",
+        "key_symbols": [
+          "fetch_partner_catalog"
+        ],
+        "depends_on": [
+          "includes/db.php"
+        ],
+        "health_note": "L2 で includes/db.php と相互 include_once 循環、L7 タイムアウトなし cURL + URL トークン、L9 SSL 検証無効化、L12 var_dump。"
+      }
+    ],
+    "dependency_notes": "レイヤ境界が崩壊している。(1) 全エントリスクリプトおよび includes/*.php が同一ドキュメントルート配下に露出しており、includes/db.php や includes/helpers.php にも HTTP 経由で直接アクセス可能。(2) index.php・product.php・login.php・admin_backup.php がプレゼンテーション・入力取得・生 SQL / OS シェル実行を単一ファイル内に混在させている。(3) includes/db.php:2 と includes/helpers.php:2 が相互に include_once し合う循環ファイル依存を持つ。"
+  },
+  "architecture_record": {
+    "workflow_id": "php_legacy_shop_messy",
+    "workflow_run_id": "wf-1abc5e13",
+    "recorded_at": "2026-10-24T14:58:53.285333+00:00",
+    "target_root": "examples/php/legacy_shop_messy",
+    "system_profile": {
+      "system_purpose": "Composerやフレームワークを使用しない手続き型のレガシー素PHP（raw_php）ECショップおよび管理画面アプリケーション。商品キーワード検索・Cookieカート復元・動的ページ表示（index.php）、カテゴリ別商品取得・プロモーション表示（product.php）、管理者ログイン認証（login.php）、およびtarアーカイブ生成によるバックアップ実行（admin_backup.php）を提供する。",
+      "domain_context": "ECサイトの商品カタログ閲覧・カート保持・管理者ログイン・サーバー上ディレクトリ（/var/www/html/uploads等）のバックアップ運用、および外部パートナーフィードからのカタログ取得ヘルパーを含む小規模レガシーWebシステム。",
+      "runtime_type": "web_api",
+      "tech_stack": [
+        "PHP 7.4 (Dockerfile: FROM php:7.4-apache, EOL runtime)",
+        "Apache HTTP Server (/var/www/html document root)",
+        "ext-mysqli (procedural mysqli_connect / mysqli_query)",
+        "ext-curl (procedural curl_init / curl_exec)",
+        "GNU tar via shell_exec (admin_backup.php)"
+      ],
+      "external_integrations": [
+        "MySQL database 'legacy_shop' at 127.0.0.1 (products, admins tables via includes/db.php)",
+        "Partner catalog HTTP endpoint via ext-curl with PARTNER_FEED_TOKEN query parameter (includes/helpers.php)",
+        "Stripe API secret key definition $stripe_api_secret in includes/db.php (unused in current scripts, hardcoded live key literal)"
+      ]
+    },
+    "structure_map": {
+      "architecture_pattern": "手続き型レガシースパゲッティ構造（Page Script / Inline HTML+SQL Monolith with Circular Procedural Includes）",
+      "layers": [
+        {
+          "name": "Web Entry Scripts (Mixed Presentation + Business + SQL)",
+          "responsibility": "Apache ドキュメントルート直下で HTTP リクエスト（$_GET/$_POST/$_COOKIE）を直接受け取り、SQL クエリや OS コマンドを実行してインライン HTML を出力するエントリスクリプト群。",
+          "paths": [
+            "index.php",
+            "product.php",
+            "login.php",
+            "admin_backup.php"
+          ],
+          "allowed_dependencies": [
+            "Shared Procedural Includes"
+          ]
+        },
+        {
+          "name": "Shared Procedural Includes (DB & External HTTP Helpers)",
+          "responsibility": "MySQL 接続初期化とグローバル認証定数定義（includes/db.php）、および cURL による外部パートナーカタログ取得関数（includes/helpers.php）。",
+          "paths": [
+            "includes/db.php",
+            "includes/helpers.php"
+          ],
+          "allowed_dependencies": []
+        },
+        {
+          "name": "Container Runtime Packaging",
+          "responsibility": "Apache + PHP 7.4 (ext-mysqli) 実行環境の定義およびドキュメントルート (/var/www/html/) への全ファイル配置。",
+          "paths": [
+            "Dockerfile"
+          ],
+          "allowed_dependencies": [
+            "Web Entry Scripts (Mixed Presentation + Business + SQL)",
+            "Shared Procedural Includes (DB & External HTTP Helpers)"
+          ]
+        }
+      ],
+      "modules": [
+        {
+          "path": "index.php",
+          "role": "トップページ・商品検索・Cookie カート復元・動的サブページ読込スクリプト",
+          "key_symbols": [],
+          "depends_on": [
+            "includes/db.php"
+          ],
+          "health_note": "L4 unserialize($_COOKIE['shop_cart']), L8 SQLi ($_GET['q']), L21 XSS, L25 LFI (include $_GET['page'].'.php')。"
+        },
+        {
+          "path": "product.php",
+          "role": "カテゴリ別商品検索およびプロモーション HTML バナー描画スクリプト",
+          "key_symbols": [],
+          "depends_on": [
+            "includes/db.php"
+          ],
+          "health_note": "L6-7 SQLi ($_GET['cat']), L9 die(mysqli_error($conn)), L14 XSS ($_GET['promo_html'])。"
+        },
+        {
+          "path": "login.php",
+          "role": "管理者ログイン・セッション開始スクリプト",
+          "key_symbols": [],
+          "depends_on": [
+            "includes/db.php"
+          ],
+          "health_note": "L6 extract($_POST), L7 md5(), L12 SQLi ($_POST['username']), L9&17 緩い比較 == '0e...' 認証バイパス, L19 XSS。"
+        },
+        {
+          "path": "admin_backup.php",
+          "role": "アップロードディレクトリの tar 圧縮バックアップ管理スクリプト",
+          "key_symbols": [],
+          "depends_on": [
+            "includes/db.php"
+          ],
+          "health_note": "認証・CSRF チェック欠如のまま L6 shell_exec('tar -czf ... ' . $target) を実行する致命的 RCE エンドポイント。"
+        },
+        {
+          "path": "includes/db.php",
+          "role": "MySQL 接続関数 get_db_conn() と DB/Stripe 定数・変数定義",
+          "key_symbols": [
+            "get_db_conn"
+          ],
+          "depends_on": [
+            "includes/helpers.php"
+          ],
+          "health_note": "L2 で includes/helpers.php と相互 include_once 循環、L6-7 に秘密情報ハードコード、L11 global 変数、L12 @mysqli_connect。"
+        },
+        {
+          "path": "includes/helpers.php",
+          "role": "パートナーカタログ HTTP 取得関数 fetch_partner_catalog()",
+          "key_symbols": [
+            "fetch_partner_catalog"
+          ],
+          "depends_on": [
+            "includes/db.php"
+          ],
+          "health_note": "L2 で includes/db.php と相互 include_once 循環、L7 タイムアウトなし cURL + URL トークン、L9 SSL 検証無効化、L12 var_dump。"
+        }
+      ],
+      "boundary_assessment": "レイヤ境界が崩壊している。(1) 全エントリスクリプトおよび includes/*.php が同一ドキュメントルート配下に露出しており、includes/db.php や includes/helpers.php にも HTTP 経由で直接アクセス可能。(2) index.php・product.php・login.php・admin_backup.php がプレゼンテーション・入力取得・生 SQL / OS シェル実行を単一ファイル内に混在させている。(3) includes/db.php:2 と includes/helpers.php:2 が相互に include_once し合う循環ファイル依存を持つ。"
+    },
+    "execution_flow_map": {
+      "entry_points": [
+        "index.php",
+        "product.php",
+        "login.php",
+        "admin_backup.php"
+      ],
+      "execution_flows": [
+        {
+          "name": "商品検索・Cookie カート復元・動的サブページ表示フロー",
+          "trigger": "HTTP GET /index.php?q=<keyword>&page=<subpage> (Cookie: shop_cart=...)",
+          "steps": [
+            "index.php:2 が includes/db.php を include_once し、includes/db.php:2 がさらに includes/helpers.php を相互 include_once する",
+            "index.php:3 が get_db_conn() (includes/db.php:9-18) を呼び出し、@mysqli_connect で 127.0.0.1 の legacy_shop DB への接続を試行する",
+            "index.php:4 が $_COOKIE['shop_cart'] を unserialize() でデシリアライズする（CWE-502 Object Injection シンク）",
+            "index.php:7-14 が DB 接続有効時に $_GET['q'] を文字列連結した SELECT ... LIKE '%$search%' を mysqli_query() で実行する（CWE-89 SQLi シンク）",
+            "index.php:21 が $_GET['q'] を未エスケープ出力し（CWE-79 XSS）、index.php:24-26 が include $_GET['page'] . '.php' で任意の PHP ファイルを読み込む（CWE-98 LFI シンク）"
+          ],
+          "involved_files": [
+            "index.php",
+            "includes/db.php:get_db_conn",
+            "includes/helpers.php"
+          ]
+        },
+        {
+          "name": "カテゴリ商品一覧取得・プロモーションバナー描画フロー",
+          "trigger": "HTTP GET /product.php?cat=<category>&promo_html=<html_banner>",
+          "steps": [
+            "product.php:2-3 が includes/db.php を読み込み get_db_conn() で MySQL ハンドルを取得する",
+            "product.php:4-11 が $_GET['cat'] を直接連結した SELECT * FROM products WHERE category = '$cat' を mysqli_query() で実行し（CWE-89 SQLi）、失敗時は die(mysqli_error($conn)) で生の DB エラーを返して即座に終了する",
+            "product.php:14 が $_GET['promo_html'] を未エスケープのまま HTML 出力する（CWE-79 XSS）"
+          ],
+          "involved_files": [
+            "product.php",
+            "includes/db.php:get_db_conn"
+          ]
+        },
+        {
+          "name": "管理者ログイン認証フロー（マジックハッシュ・変数汚染経路）",
+          "trigger": "HTTP POST /login.php (username, password)",
+          "steps": [
+            "login.php:2-3 が session_start() を開始し includes/db.php を読み込む",
+            "login.php:6-9 が extract($_POST) でローカル変数を汚染させた後、md5($_POST['password']) を算出し $expected_hash = '0e462097431906509019562988736854' を初期化する",
+            "login.php:10-16 が DB 接続成功時のみ SELECT password_hash FROM admins WHERE username = '$u' を未パラメータ化実行する（CWE-89 SQLi）。DB オフライン時は $expected_hash が '0e...' のまま残る",
+            "login.php:17-20 が緩い比較 $pw_hash == $expected_hash を行い（CWE-697 マジックハッシュ 0 == 0 バイパス）、一致時に $_SESSION['is_admin'] = true を設定して $_POST['username'] を未エスケープ出力する（CWE-79 XSS）"
+          ],
+          "involved_files": [
+            "login.php",
+            "includes/db.php:get_db_conn"
+          ]
+        },
+        {
+          "name": "無認証バックアップ tar 実行フロー（OS コマンドインジェクション経路）",
+          "trigger": "HTTP POST /admin_backup.php (backup_dir)",
+          "steps": [
+            "admin_backup.php:2 が includes/db.php を読み込むが、session_start() も $_SESSION['is_admin'] 確認も一切行わない",
+            "admin_backup.php:4-7 が $_POST['backup_dir'] を検証せず shell_exec('tar -czf /tmp/shop_backup.tar.gz ' . $target) に直接渡し（CWE-78 CMDi）、標準出力を <pre> 内にそのまま出力する"
+          ],
+          "involved_files": [
+            "admin_backup.php",
+            "includes/db.php"
+          ]
+        }
+      ],
+      "state_and_storage": [
+        "MySQL データベース 'legacy_shop' (127.0.0.1, user 'shop_root'): products テーブル (id, title, price, category) および admins テーブル (username, password_hash)",
+        "PHP ネイティブファイルセッション (session_start() in login.php:2): $_SESSION['is_admin'] フラグ（ただし admin_backup.php では未参照）",
+        "クライアントサイド Cookie: $_COOKIE['shop_cart']（PHP serialize 形式で保持し index.php:4 で unserialize）",
+        "プロセス内グローバル状態: global $LAST_DB_ERR (includes/db.php:11-14)",
+        "コンテナローカル一時ストレージ: /tmp/shop_backup.tar.gz (admin_backup.php:6)"
+      ],
+      "error_and_concurrency_model": "Apache prefork (mod_php) による 1 リクエスト 1 プロセス同期実行モデル。エラー処理は一貫性を欠き、includes/db.php:12 は @mysqli_connect で接続エラーを完全に握り潰して null を返す一方、product.php:9 は die(mysqli_error($conn)) で内部 SQL エラーをクライアントへ露出させてプロセスを強制終了する。includes/helpers.php:7 の cURL 通信には接続・応答タイムアウトが設定されておらず、外部パートナー API 遅延時に Apache ワーカープロセスが無期限ブロックするリスクがある。また admin_backup.php:6 は全リクエスト共通の固定パス /tmp/shop_backup.tar.gz に排他制御なしで上書き書き込みを行うため、同時実行時にファイル破損競合が発生する。"
+    }
+  },
+  "audit_dimensions": [
+    {
+      "action_id": "act-10",
+      "audit_id": "php_test_audit",
+      "title": "Evaluate PHP Test Suite Completeness & Structure",
+      "score": 0,
+      "grade": "D",
+      "rules_evaluated": [
+        "php/testing"
+      ],
+      "pass_count": 0,
+      "warn_count": 0,
+      "fail_count": 1,
+      "summary": "リポジトリ内に自動テストファイル（`0` 件 / ソース `6` ファイル）、テストランナー設定（`phpunit.xml` / `phpunit.xml.dist` / Pest）、およびカバレッジ計測機構（`pcov`）が一切存在しない。さらに全エンドポイントがスーパーグローバル（`$_GET`/`$_POST`/`$_COOKIE`）と直書き `mysqli_connect(127.0.0.1)`・`shell_exec` に直接結合した手続き型スクリプトであるため、外部 DB なしでの単体テスト実行（Hermetic Execution）も不可能な構造となっている。"
+    },
+    {
+      "action_id": "act-16",
+      "audit_id": "web_penetration_audit",
+      "title": "Evaluate Live HTTP Penetration Findings, Security Headers & Endpoint Defenses",
+      "score": 0,
+      "grade": "D",
+      "rules_evaluated": [
+        "common/security_vulnerability"
+      ],
+      "pass_count": 0,
+      "warn_count": 0,
+      "fail_count": 1,
+      "summary": "隔離ループバックコンテナ上で `.pni/pentests/examples/php/legacy_shop_messy/`（`test_baseline_http.py`, `test_target_surface.py`, `test_app_probes.py`）の計 `19` プローブによる動的 Web ペネトレーションテスト（`web_pentest`）を実施した結果、**`status = \"failed\"`（`9` PASS / `10` FAIL、`CRITICAL: 2`・`HIGH: 4`・`MEDIUM: 2`・`LOW: 2`）** と判定され、SAST で指摘された致命的脆弱性がライブ HTTP リクエスト単発で実際に悪用可能であることが実証された。具体的には、(1) `POST /admin_backup.php` に対して未認証のまま `backup_dir` 経由で任意 OS コマンドを実行しレスポンス内に `PNI_RCE_CANARY_8842` が出力される無認証 RCE（`CWE-78` CRITICAL + `CWE-306` HIGH）、(2) `POST /login.php` にマジックハッシュ入力 `'240610708'` を送信するだけで DB 非接続時にも `0 == 0` 型ジャグリングが成立し `'Logged in as admin'` が返る認証バイパス（`CWE-697` CRITICAL）、(3) `GET /index.php` の `../../../../etc/passwd` 指定で PHP `include` エラー `\"Failed opening '\"` が露出するパストラバーサル/LFI（`CWE-22` HIGH）、(4) `GET /index.php`（`<pni-xss-canary-7f3a>`）および `GET /product.php?promo_html=<pni-promo-xss-9a2b>` における生の HTML タグ反射（`CWE-79` HIGH × 2）、さらにクリックジャッキング防止ヘッダ欠如（`CWE-1021` MEDIUM）、`TRACE / -> 200`（`CWE-693` MEDIUM）、`X-Powered-By: PHP/8.3.36` 露出（`CWE-200` LOW）、`X-Content-Type-Options: nosniff` 欠如（`CWE-693` LOW）の計 10 件が確認された。"
+    },
+    {
+      "action_id": "act-14",
+      "audit_id": "security_vulnerability_audit",
+      "title": "Evaluate Supply-Chain CVEs, Container Misconfigs, Secrets, Dangerous Sinks & API Boundaries",
+      "score": 5,
+      "grade": "D",
+      "rules_evaluated": [
+        "common/security_vulnerability",
+        "common/supply_chain"
+      ],
+      "pass_count": 0,
+      "warn_count": 0,
+      "fail_count": 2,
+      "summary": "Trivy (`0.69.3`) コンテナ・ファイルシステムスキャンおよび AST SAST 解析を統合評価した結果、`SEC-01`〜`SEC-05` の全セキュリティゲートで致命的な違反が確認された。(1) `SEC-01`: `composer.lock` 不在のためアプリ依存 CVE は `0` 件だが、2022年11月 EOL 時点で凍結された `php:7.4-apache` (`debian 11.5`) イメージから **計 `12,051` 件の OS 層 CVE（`CRITICAL: 62`, `HIGH: 1,940`, `MEDIUM: 7,496`, `LOW: 2,296`）** が検出された（`apache2@2.4.54` の `CVE-2023-25690` / `CVE-2024-38474` / `CVE-2024-38476`、`curl/libcurl4@7.74.0` の `CVE-2023-38545` 等 CVSS 9.8 多数）。(2) `SEC-02`: `DS-0002`（`HIGH`: `root` 実行）と `DS-0026`（`LOW`: `HEALTHCHECK` 未定義）および `.dockerignore` 不在。(3) `SEC-03`: Trivy Secret Scanner が `includes/db.php:7` の Stripe Live 秘密鍵（`stripe-secret-token`）を `CRITICAL` 検出し、同 `6` 行目に MySQL 本番パスワードも直書き。(4) `SEC-04` & `SEC-05`: 無認証公開されている `admin_backup.php:6` の `shell_exec`（CWE-78）を含む 13 件の高深刻度シンクと 4 つの無防備エンドポイントが露出し、即時侵害可能な状態にある。"
+    },
+    {
+      "action_id": "act-05",
+      "audit_id": "php_ast_audit",
+      "title": "Interpret PHP AST Facts & Evaluate Quality, Strict Types, Sinks & Frameworks",
+      "score": 8,
+      "grade": "D",
+      "rules_evaluated": [
+        "common/architecture",
+        "common/maintainability",
+        "common/security",
+        "common/security_vulnerability",
+        "php/code_quality",
+        "php/typing",
+        "php/modern_stack",
+        "php/frameworks/laravel",
+        "php/frameworks/wordpress"
+      ],
+      "pass_count": 0,
+      "warn_count": 0,
+      "fail_count": 7,
+      "summary": "AST 静的解析の結果、`import_hygiene_coverage_pct=0.0%`・`type_safety_coverage_pct=0.0%`・`docstring_coverage_pct=0.0%` と品質・型安全指標がすべて 0% であった。全6ファイルで `declare(strict_types=1);` と名前空間が欠如し、`index.php`・`product.php` は生 SQL とインライン HTML が混在するスパゲッティ構造、`includes/db.php` と `includes/helpers.php` は相互 `include_once` 循環を形成している。セキュリティ面では 13 件の CWE SAST シンク（OSコマンドインジェクション CWE-78、SQLi CWE-89×3、XSS CWE-79×3、LFI CWE-98、Cookie `unserialize` CWE-502、`extract($_POST)` CWE-621、MD5 + `== '0e...'` マジックハッシュ認証バイパス CWE-327/697、TLS 検証無効化 CWE-295）および無認証管理画面 `admin_backup.php` を含む 4 エンドポイントの境界防御欠如が検出された。"
+    },
+    {
+      "action_id": "act-03",
+      "audit_id": "supply_chain_audit",
+      "title": "Evaluate Supply-Chain, CI Permissions, Container & Secret Hygiene",
+      "score": 10,
+      "grade": "D",
+      "rules_evaluated": [
+        "common/supply_chain",
+        "common/security",
+        "common/git_workflow"
+      ],
+      "pass_count": 0,
+      "warn_count": 0,
+      "fail_count": 3,
+      "summary": "サプライチェーン・CI権限・コンテナ衛生・秘密情報管理の全面的な欠落を確認。`composer.json` / `composer.lock`・`LICENSE`・`SECURITY.md`・Dependabot/Renovate・CIワークフロー・`.gitignore`・`.dockerignore` がすべて存在せず、`Dockerfile` は EOL の `php:7.4-apache` を `root` ユーザーのまま稼働させている。さらに `includes/db.php` に MySQL 本番パスワード (`DB_PASSWORD`) と Stripe 本番秘密鍵 (`sk_live_...`) が平文でハードコードされており、そのままコンテナイメージ内 (`/var/www/html/includes/db.php`) に焼き込まれる深刻な漏洩構造となっている。"
+    },
+    {
+      "action_id": "act-09",
+      "audit_id": "service_readiness_audit",
+      "title": "Evaluate 12-Factor Config/Statelessness & SRE PRR Timeouts/Observability",
+      "score": 12,
+      "grade": "D",
+      "rules_evaluated": [
+        "common/twelve_factor",
+        "common/production_readiness",
+        "common/security"
+      ],
+      "pass_count": 0,
+      "warn_count": 0,
+      "fail_count": 3,
+      "summary": "12-Factor App および Google SRE PRR 観点で評価した結果、クラウドネイティブ・本番運用要件が全面的に未達であった。`includes/db.php:4-7` に DB ホスト (`127.0.0.1`) と認証情報・Stripe 秘密鍵が直書きされる一方、`includes/helpers.php:6` は設定モジュール外で `getenv('PARTNER_FEED_TOKEN')` を直接呼び出している（Factor III/IV 違反）。状態管理も PHP デフォルトファイルセッション・ローカル `/tmp/shop_backup.tar.gz` 固定書き出し・`global $LAST_DB_ERR` に依存し（Factor VI 違反）、ログ出力は `var_dump()` と `echo` のみ（Factor XI 違反）。SRE PRR 面では `includes/helpers.php:7` の cURL 通信と `@mysqli_connect` にタイムアウトがなく、`@` によるエラー握り潰しと `die(mysqli_error($conn))` による内部情報露出、ヘルスチェック（`/healthz`）欠如が確認された。"
+    },
+    {
+      "action_id": "act-02",
+      "audit_id": "repo_structure_audit",
+      "title": "Evaluate PHP Packaging, Composer Lockfile, Runtime Version & Governance",
+      "score": 14,
+      "grade": "D",
+      "rules_evaluated": [
+        "common/supply_chain",
+        "php/dependencies",
+        "php/modern_stack",
+        "common/documentation",
+        "common/git_workflow",
+        "common/security"
+      ],
+      "pass_count": 0,
+      "warn_count": 0,
+      "fail_count": 6,
+      "summary": "Composer不使用のレガシー素PHP (`raw_php`) EC・管理アプリケーション。`composer.json` / `composer.lock`・PSR-4 オートローディング・CI/CD・`.gitignore`・`.dockerignore`・`LICENSE`・`SECURITY.md`・自動テストランナーがいずれも欠如している。`Dockerfile` は2022年11月にEOLを迎えた `php:7.4-apache` を root 権限のまま実行しており、`includes/db.php` と `includes/helpers.php` の相互 `include_once` 循環やハードコード秘密情報など、ガバナンス・依存管理・サプライチェーン基盤が全面的に欠落している。"
+    },
+    {
+      "action_id": "act-12",
+      "audit_id": "container_runtime_audit",
+      "title": "Evaluate Buildability, Offline Test Results, Measured Coverage & Startup Health",
+      "score": 28,
+      "grade": "D",
+      "rules_evaluated": [
+        "common/runtime_verification",
+        "common/production_readiness"
+      ],
+      "pass_count": 0,
+      "warn_count": 0,
+      "fail_count": 2,
+      "summary": "隔離 Docker コンテナによる動的検証（`run_check`）の結果、同梱 `Dockerfile` ビルド（`php:7.4-apache`、`1.11s`）、PHP 8.3 ハーネスビルド（`php/raw.dockerfile`、`0.94s`）、オフライン環境での PHP 8.3.36 構文検査 `php -l`（全6ファイル通過、`1.01s`）、および `php -S` 組込みサーバ起動スモーク検証（`smoke_check: status=passed`、`/up -> 200` フォールバック応答、`1.06s`）は通過した。しかし PHPUnit テストが `0` 件であるため実測コードカバレッジは完全に未計測（`measured=False`, `0/0` statements, `RV-03 FAIL`）であり、また `/up -> 200` も専用ヘルスエンドポイントではなく `php -S` が未知パスを `index.php`（毎回 `127.0.0.1` MySQL 接続を `@mysqli_connect` 試行した上で HTML を返す）へフォールバックした応答に過ぎず、`Dockerfile` の `HEALTHCHECK` 命令も欠如している。"
+    }
+  ],
+  "rule_compliance": [
+    {
+      "rule_id": "common/architecture",
+      "status": "fail",
+      "source_action": "act-05",
+      "evidence": "0 classes, 7 procedural include/include_once statements; mutual cycle includes/db.php:2 <-> includes/helpers.php:2; inline HTML + raw SQL in index.php:8,16-29 and product.php:6-7,13-15",
+      "summary": "プレゼンテーション・ビジネスロジック・データアクセスが単一 .php スクリプトに混在し、db.php と helpers.php が相互インクルード循環を形成している。"
+    },
+    {
+      "rule_id": "common/documentation",
+      "status": "fail",
+      "source_action": "act-02",
+      "evidence": "README.md:1-3 (only 1 heading '# Legacy EC Shop (PHP)' and 1 sentence 'Copy all .php files to /var/www/html on Apache + MySQL server.')",
+      "summary": "README.md は実質2行のみで、環境構築手順・設定変数・セキュリティ前提・テスト実行手順・アーキテクチャ説明が一切記載されていない。"
+    },
+    {
+      "rule_id": "common/git_workflow",
+      "status": "fail",
+      "source_action": "act-02",
+      "evidence": "has_gitignore=False, missing .dockerignore, ci_workflows=[]",
+      "summary": ".gitignore と .dockerignore が存在せず、一時ファイルや機密設定の誤コミットおよびコンテナビルドコンテキスト漏洩を防止できない。"
+    },
+    {
+      "rule_id": "common/maintainability",
+      "status": "fail",
+      "source_action": "act-05",
+      "evidence": "17 mutable global/superglobal usages (global $LAST_DB_ERR at includes/db.php:11; $_GET/$_POST/$_COOKIE/$_SERVER), @mysqli_connect at includes/db.php:12, die() at product.php:9, missing CURLOPT_TIMEOUT at includes/helpers.php:7",
+      "summary": "スーパーグローバル直参照16箇所 + global変数結合1箇所、@演算子によるエラー握り潰し、die() 強制終了、cURL タイムアウト欠如により保守性・耐障害性が著しく低い。"
+    },
+    {
+      "rule_id": "common/production_readiness",
+      "status": "fail",
+      "source_action": "act-09",
+      "evidence": "missing_io_timeouts=1 (includes/helpers.php:7 curl_init without CURLOPT_TIMEOUT); includes/db.php:12 @mysqli_connect silent failure; product.php:9 die(mysqli_error($conn)) internal error leak; no /healthz or readiness probe; No dedicated /healthz, /readyz, or /up endpoint in repository (php -S falls back to index.php HTML); Dockerfile lacks HEALTHCHECK; index.php:3 invokes @mysqli_connect('127.0.0.1', ...) on every request without connection timeout",
+      "summary": "外部 HTTP/DB 接続のタイムアウト未設定、@演算子による障害隠蔽、die(mysqli_error) によるクライアントへの内部エラー露出、Liveness/Readiness プローブ欠如により不合格。"
+    },
+    {
+      "rule_id": "common/runtime_verification",
+      "status": "fail",
+      "source_action": "act-12",
+      "evidence": "RuntimeFacts.status='passed': project_dockerfile_build='passed' (1.11s), harness_build='passed' (0.94s, PHP 8.3), test_execution='passed' (php -l passed in 1.01s, total_tests=0), coverage.measured=False (line=None%, branch=None%), smoke_check.status='passed' (/up -> 200 in 1.06s via php -S index.php fallback)",
+      "summary": "コンテナビルド・php -l 構文検査・起動スモーク応答は通過したものの、自動テスト 0 件により実測ライン/ブランチカバレッジが未計測（RV-02 実テスト欠如 / RV-03 不合格）。"
+    },
+    {
+      "rule_id": "common/security",
+      "status": "fail",
+      "source_action": "act-02",
+      "evidence": "includes/db.php:6-7 (hardcoded DB_PASSWORD and $stripe_api_secret), Dockerfile:1-5 (root container COPY . /var/www/html/), admin_backup.php:6 (shell_exec), index.php:4,8,25 (unserialize, SQLi, LFI); includes/db.php:6 (define('DB_PASSWORD', 'ShopProdMysql!9981_Secret')), includes/db.php:7 ($stripe_api_secret = 'sk_live_LegacyShopSecretKey99887766'), Dockerfile:1,4 (FROM php:7.4-apache, COPY . /var/www/html/ as root); hardcoded_secrets=2 (includes/db.php:6-7 redacted), unparameterized mysqli_query in index.php:8, product.php:7, login.php:12, shell_exec in admin_backup.php:6, unserialize in index.php:4; includes/helpers.php:7,9 (?token=$token in URL query + CURLOPT_SSL_VERIFYPEER => false), includes/helpers.php:11-13 ($_GET['debug'] triggers var_dump($raw)), product.php:9 mysqli_error leak",
+      "summary": "本番DBパスワード・Stripe秘密鍵のハードコード、root権限コンテナ、未検証外部入力からのSQLi/CMDi/LFI/unserializeが複合的に存在する。"
+    },
+    {
+      "rule_id": "common/security_vulnerability",
+      "status": "fail",
+      "source_action": "act-05",
+      "evidence": "dangerous_sinks=13 (CWE-78, CWE-89x3, CWE-79x3, CWE-98, CWE-502, CWE-295, CWE-621, CWE-697), api_endpoints=4 with without_auth_hint=4 (including POST admin_backup.php); SecurityFacts: os_vuln_counts={critical:62, high:1940, medium:7496, low:2296, total:12051} (CVE-2023-25690, CVE-2024-38474, CVE-2023-38545 CVSS 9.8); misconfigurations=[DS-0002 HIGH root, DS-0026 LOW]; secrets=[CRITICAL stripe-secret-token at includes/db.php:7]; AstFacts: 13 CWE sinks + 4 unauthenticated endpoints; PentestFacts.status='failed' (19 probes: 9 passed, 10 failed): [CRITICAL] CWE-78 POST /admin_backup.php executed PNI_RCE_CANARY_8842 (admin_backup.php:6); [CRITICAL] CWE-697 POST /login.php magic-hash '240610708' -> 'Logged in as admin' (login.php:17); [HIGH] CWE-22 /index.php LFI exposure (index.php:25); [HIGH] CWE-306 unauthenticated POST /admin_backup.php -> 200 (admin_backup.php:4); [HIGH] CWE-79 reflected XSS on /index.php (index.php:21) & /product.php (product.php:14); [MEDIUM] CWE-1021 & CWE-693 TRACE; [LOW] CWE-200 & CWE-693 nosniff",
+      "summary": "SEC-03（秘密情報直書き）、SEC-04（13件の高深刻度 CWE シンク）、SEC-05（全4エンドポイントで認証ヒント・スキーマ検証・CSRF対策欠如）のすべてに違反。"
+    },
+    {
+      "rule_id": "common/supply_chain",
+      "status": "fail",
+      "source_action": "act-02",
+      "evidence": "manifests=[], lockfiles=[], LICENSE=False, SECURITY.md=False, dependency_automation=False, ci_workflows=[], Dockerfile:1-5 (FROM php:7.4-apache, missing USER, missing .dockerignore); manifests=[], lockfiles=[], has_license=False, has_security_policy=False, has_dependency_automation=False, ci_workflows=[], container_hygiene_issues=['Dockerfile: final stage runs as root', 'Dockerfile: missing .dockerignore']; Dockerfile:1 FROM php:7.4-apache (EOL Debian 11.5 image with 12,051 OS CVEs, DS-0002 root user, missing .dockerignore); missing composer.json/composer.lock, LICENSE, SECURITY.md, Dependabot",
+      "summary": "ロックファイル・CIワークフロー・Dependabot/Renovate・LICENSE・SECURITY.md がすべて欠如し、Dockerfile は root 実行かつ .dockerignore 未整備。"
+    },
+    {
+      "rule_id": "common/twelve_factor",
+      "status": "fail",
+      "source_action": "act-09",
+      "evidence": "includes/db.php:4-7 hardcoded DB_HOST='127.0.0.1', DB_USER, DB_PASSWORD, $stripe_api_secret; includes/helpers.php:6 scattered getenv(); login.php:2 sticky file session + admin_backup.php:6 /tmp/shop_backup.tar.gz + global $LAST_DB_ERR; includes/helpers.php:12 var_dump()",
+      "summary": "設定の直書きと分散 getenv()（Factor III/IV）、ローカルセッション・/tmp ファイル・global 変数への依存（Factor VI）、var_dump による非構造化出力（Factor XI）により全面不合格。"
+    },
+    {
+      "rule_id": "php/code_quality",
+      "status": "fail",
+      "source_action": "act-05",
+      "evidence": "import_hygiene_coverage_pct=0.0%, docstring_coverage_pct=0.0% (missing PHPDoc on get_db_conn and fetch_partner_catalog), @mysqli_connect (includes/db.php:12), die() (product.php:9)",
+      "summary": "PSR-4 名前空間不使用、PHPDoc カバレッジ 0%、HTML+SQL スパゲッティ構造、スーパーグローバル直結、@抑制・die() 使用と全項目で基準未達。"
+    },
+    {
+      "rule_id": "php/dependencies",
+      "status": "fail",
+      "source_action": "act-02",
+      "evidence": "build_system=raw_php (missing composer.json & composer.lock); Dockerfile:1 (FROM php:7.4-apache EOL); includes/db.php:2 <-> includes/helpers.php:2 mutual include_once cycle",
+      "summary": "Composer・PSR-4 名前空間管理が未導入で手動 include_once に依存し、db.php と helpers.php が相互インクルード循環を形成。ランタイムも EOL の PHP 7.4。"
+    },
+    {
+      "rule_id": "php/modern_stack",
+      "status": "fail",
+      "source_action": "act-02",
+      "evidence": "Dockerfile:1 (PHP 7.4 EOL), login.php:6 (extract($_POST)), login.php:7-17 (md5 + loose == magic hash '0e462097431906509019562988736854'), includes/helpers.php:7-13 (curl without timeout, CURLOPT_SSL_VERIFYPEER=false, var_dump); login.php:6 extract($_POST); login.php:7 md5($_POST['password']); login.php:9,17 $pw_hash == '0e462097431906509019562988736854'; includes/helpers.php:7,12 curl without timeout & var_dump()",
+      "summary": "PHP 8.2+ のモダン構文・型機構が皆無であり、extract($_POST)、MD5 + 緩い比較 (==)、タイムアウトなしの cURL、var_dump デバッグ出力が残存。"
+    },
+    {
+      "rule_id": "php/testing",
+      "status": "fail",
+      "source_action": "act-10",
+      "evidence": "source_files_count=6, test_files_count=0, test_functions_count=0, module_test_coverage_pct=N/A, tooling_modernization_issues=['No automated PHP test runner (PHPUnit / Pest) configured']",
+      "summary": "PHPUnit / Pest テストスイートおよび phpunit.xml が完全に欠如（0テスト・カバレッジ0%）し、オフライン単体テスト分離も行われていない。"
+    },
+    {
+      "rule_id": "php/typing",
+      "status": "fail",
+      "source_action": "act-05",
+      "evidence": "type_safety_coverage_pct=0.0%, 8 type_safety_issues: 0/6 files have declare(strict_types=1); get_db_conn() (includes/db.php:9) & fetch_partner_catalog($endpoint) (includes/helpers.php:4) lack parameter/return types",
+      "summary": "全6ファイルで declare(strict_types=1); が欠落し、全関数で引数型・戻り値型アノテーションが未指定、PHPStan/Psalm も未導入。"
+    },
+    {
+      "rule_id": "php/frameworks/laravel",
+      "status": "not_applicable",
+      "source_action": "act-05",
+      "evidence": "ProjectFacts.detected_frameworks=[] (build_system=raw_php)",
+      "summary": "Laravel / Illuminate コンポーネントを使用していない素 PHP アプリケーションのため対象外。"
+    },
+    {
+      "rule_id": "php/frameworks/wordpress",
+      "status": "not_applicable",
+      "source_action": "act-05",
+      "evidence": "ProjectFacts.detected_frameworks=[] (build_system=raw_php)",
+      "summary": "WordPress プラグイン・テーマではない素 PHP アプリケーションのため対象外。"
+    }
+  ],
+  "module_hotspots": [
+    {
+      "file_path": "Dockerfile",
+      "loc": 0,
+      "risk_score": 1.0,
+      "finding_counts": {
+        "critical": 1,
+        "high": 3,
+        "medium": 3
+      },
+      "top_rules": [
+        "common/security_vulnerability",
+        "common/supply_chain",
+        "php/dependencies",
+        "common/production_readiness"
+      ]
+    },
+    {
+      "file_path": "admin_backup.php",
+      "loc": 0,
+      "risk_score": 1.0,
+      "finding_counts": {
+        "critical": 2,
+        "high": 1
+      },
+      "top_rules": [
+        "common/security_vulnerability"
+      ]
+    },
+    {
+      "file_path": "includes/db.php",
+      "loc": 0,
+      "risk_score": 1.0,
+      "finding_counts": {
+        "critical": 2,
+        "medium": 3
+      },
+      "top_rules": [
+        "common/security",
+        "common/security_vulnerability",
+        "common/architecture",
+        "common/twelve_factor"
+      ]
+    },
+    {
+      "file_path": "index.php",
+      "loc": 0,
+      "risk_score": 1.0,
+      "finding_counts": {
+        "critical": 3,
+        "high": 4
+      },
+      "top_rules": [
+        "common/security_vulnerability",
+        "common/runtime_verification"
+      ]
+    },
+    {
+      "file_path": "login.php",
+      "loc": 0,
+      "risk_score": 1.0,
+      "finding_counts": {
+        "critical": 2,
+        "high": 1
+      },
+      "top_rules": [
+        "common/security_vulnerability",
+        "php/modern_stack",
+        "php/testing"
+      ]
+    },
+    {
+      "file_path": "includes/helpers.php",
+      "loc": 0,
+      "risk_score": 0.86,
+      "finding_counts": {
+        "high": 2,
+        "medium": 2
+      },
+      "top_rules": [
+        "common/production_readiness",
+        "common/security_vulnerability",
+        "common/twelve_factor",
+        "php/typing"
+      ]
+    },
+    {
+      "file_path": "examples/php/legacy_shop_messy/includes/db.php",
+      "loc": 16,
+      "risk_score": 0.54,
+      "finding_counts": {},
+      "top_rules": []
+    },
+    {
+      "file_path": "examples/php/legacy_shop_messy/index.php",
+      "loc": 29,
+      "risk_score": 0.44,
+      "finding_counts": {},
+      "top_rules": []
+    },
+    {
+      "file_path": "examples/php/legacy_shop_messy/login.php",
+      "loc": 20,
+      "risk_score": 0.44,
+      "finding_counts": {},
+      "top_rules": []
+    },
+    {
+      "file_path": "examples/php/legacy_shop_messy/product.php",
+      "loc": 15,
+      "risk_score": 0.38,
+      "finding_counts": {},
+      "top_rules": []
+    },
+    {
+      "file_path": "examples/php/legacy_shop_messy/Dockerfile",
+      "loc": 0,
+      "risk_score": 0.3,
+      "finding_counts": {},
+      "top_rules": []
+    },
+    {
+      "file_path": "product.php",
+      "loc": 0,
+      "risk_score": 0.28,
+      "finding_counts": {
+        "high": 1
+      },
+      "top_rules": [
+        "common/security_vulnerability"
+      ]
+    },
+    {
+      "file_path": "examples/php/legacy_shop_messy/includes/helpers.php",
+      "loc": 15,
+      "risk_score": 0.26,
+      "finding_counts": {},
+      "top_rules": []
+    },
+    {
+      "file_path": "examples/php/legacy_shop_messy/admin_backup.php",
+      "loc": 12,
+      "risk_score": 0.26,
+      "finding_counts": {},
+      "top_rules": []
+    },
+    {
+      "file_path": "README.md",
+      "loc": 0,
+      "risk_score": 0.21,
+      "finding_counts": {
+        "medium": 1,
+        "low": 1
+      },
+      "top_rules": [
+        "common/supply_chain",
+        "common/documentation"
+      ]
+    }
+  ],
+  "strengths": [
+    "全6ファイル・計118行とコードベースが極小規模であるため、ルーティング・DBアクセス・認証の全エンドポイントを短期間で棚卸し・全面刷新しやすい。",
+    "Dockerfile が同梱されており、レガシー構成の再現とコンテナスキャン（Trivy）による脆弱性可視化が即座に実行可能である。",
+    "サードパーティの未固定 Composer パッケージや危険な `pull_request_target` ワークフロー自体は存在しない（ただし依存管理・CI自体が未導入）。",
+    "関数サイズ自体は小さく（`get_db_conn`・`fetch_partner_catalog` の2関数のみ、全107 LOC）、巨大クラスや深い継承階層は存在しないため Controller / Service / Repository への分割リファクタリングが容易である。",
+    "PHP リクエスト単位のライフサイクル自体は短命であり、設定の環境変数化とセッションの外部ストア（Redis 等）移行を行えば水平スケール可能な構成へ転換しやすい。",
+    "全6ファイルの PHP ソースコードが PHP 8.3.36 の構文ゲート（`php -l`）をエラーなく通過しており（`1.01s`）、PHP 7.4 から PHP 8.3 ランタイムへの移行において致命的なパーサー構文互換性ブロッカーは存在しない。",
+    "同梱 `Dockerfile`（`1.11s`）と PNI PHP 8.3 ハーネスイメージ（`0.94s`）の双方がクリーンビルドに成功し、PHP 8.3 開発サーバの HTTP ブート応答（`1.06s`）も確認された。",
+    "サードパーティ製の脆弱な Composer パッケージ自体はバンドルされていない（`app_vuln_counts.total=0`）。ただし今後フレームワーク・ライブラリ導入時には `composer.lock` と Dependabot の同時整備が不可欠である。",
+    "`.env`・`.git/HEAD`・`composer.json` 等の典型的なドットファイル/設定ファイル直接取得プローブおよび存在しない静的パスへの 404 応答については情報漏洩なく `9/19` プローブを通過している。"
+  ],
+  "findings": [
+    {
+      "severity": "critical",
+      "category": "dependencies",
+      "rule_id": "common/security_vulnerability",
+      "file_path": "Dockerfile",
+      "line": 1,
+      "symbol": null,
+      "evidence": "FROM php:7.4-apache -> debian 11.5 OS CVEs: total=12051 (CRITICAL=62, HIGH=1940), e.g., apache2@2.4.54-1~deb11u1 CVE-2023-25690/CVE-2024-38474/CVE-2024-38476 (fix 2.4.61-1~deb11u1, CVSS 9.8), curl/libcurl4@7.74.0 CVE-2023-38545 (fix 7.74.0-1.3+deb11u10, CVSS 9.8)",
+      "description": "EOL ベースイメージ `php:7.4-apache`（Debian 11.5 凍結状態）の使用により、Apache HTTP Server のリクエストスプリッティング/RCE（`CVE-2023-25690`, `CVE-2024-38474`, `CVE-2024-38476`）や libcurl ヒープ破壊（`CVE-2023-38545`）を含む `CRITICAL` 62件・`HIGH` 1,940件（総計 12,051件）の OS パッケージ脆弱性が残存している（SEC-01）。",
+      "recommendation": "ベースイメージを現役サポート・最新セキュリティパッチ適用済みの `php:8.3-apache-bookworm`（または最小構成の `php:8.3-fpm-alpine` + リバースプロキシ）へ即時刷新し、ダイジェスト固定と週次リビルドを導入する。"
+    },
+    {
+      "severity": "critical",
+      "category": "security",
+      "rule_id": "common/security",
+      "file_path": "includes/db.php",
+      "line": 6,
+      "symbol": "DB_PASSWORD",
+      "evidence": "define('DB_PASSWORD', 'ShopProdMysql!9981_Secret'); / $stripe_api_secret = 'sk_live_LegacyShopSecretKey99887766';",
+      "description": "本番 MySQL パスワード (`DB_PASSWORD`) および Stripe Live API シークレットキー (`$stripe_api_secret`) がソースコードリテラルに平文でハードコードされている（CWE-798）。",
+      "recommendation": "漏洩済みの DB パスワードと Stripe API キーを即時ローテーション（失効）し、環境変数またはシークレットマネージャから実行時に注入するよう変更する。"
+    },
+    {
+      "severity": "critical",
+      "category": "security",
+      "rule_id": "common/security_vulnerability",
+      "file_path": "admin_backup.php",
+      "line": 6,
+      "symbol": null,
+      "evidence": "$output = shell_exec(\"tar -czf /tmp/shop_backup.tar.gz \" . $target); (no $_SESSION['is_admin'] check)",
+      "description": "認証チェックもCSRF検証も一切行わない公開エンドポイントで、`$_POST['backup_dir']` を `shell_exec()` に直接文字列連結しており、未認証のリモート攻撃者が `root` 権限（コンテナ実行ユーザー）で任意の OS コマンドを実行できる（CWE-78 / CWE-306）。",
+      "recommendation": "管理者認可ミドルウェアと CSRF トークン検証を必須化した上で、Web リクエストからのシェル呼び出しを廃止し、PHP `PharData` / `ZipArchive` または固定パス引数のバックグラウンドジョブへ置き換える。"
+    },
+    {
+      "severity": "critical",
+      "category": "security",
+      "rule_id": "common/security_vulnerability",
+      "file_path": "admin_backup.php",
+      "line": 6,
+      "symbol": null,
+      "evidence": "[DAST test_app_probes::test_admin_backup_os_command_injection & test_target_surface::test_privileged_endpoints_require_authentication] POST /admin_backup.php executed injected shell echo canary (PNI_RCE_CANARY_8842) with HTTP 200 without authentication",
+      "description": "ライブ DAST 検証（`test_app_probes.py` / `test_target_surface.py`）において、セッション Cookie を一切付与しない未認証 `POST /admin_backup.php` リクエストの `backup_dir` パラメータ経由でシェルコマンド注入が成立し、レスポンス本文に実行結果カナリア `PNI_RCE_CANARY_8842` が返却されるリモートコード実行（RCE）が実証された（SEC-06 / CWE-78 / CWE-306）。",
+      "recommendation": "`admin_backup.php` への外部アクセスを即時遮断し、管理者セッション認可＋CSRF トークン検証を強制した上で `shell_exec()` を撤廃し、PHP ネイティブ `ZipArchive` / `PharData` と固定ディレクトリ設定へ置換する。"
+    },
+    {
+      "severity": "critical",
+      "category": "security",
+      "rule_id": "common/security_vulnerability",
+      "file_path": "includes/db.php",
+      "line": 7,
+      "symbol": "stripe_api_secret",
+      "evidence": "Trivy Secret [CRITICAL] stripe-secret-token at includes/db.php:7 ($stripe_api_secret = '***REDACTED***') + AST DB_PASSWORD at includes/db.php:6",
+      "description": "Trivy Secret スキャナにより `includes/db.php:7` から本番形式の Stripe Secret Key（`stripe-secret-token`）が `CRITICAL` として検出され、さらに `6` 行目に MySQL パスワード定数も平文で直書きされている（SEC-03 / CWE-798）。",
+      "recommendation": "Stripe ダッシュボードおよび MySQL で該当キー/パスワードを直ちに失効・再発行し、ソースコードからリテラルを完全除去して Secret Manager / 環境変数注入へ移行する。"
+    },
+    {
+      "severity": "critical",
+      "category": "security",
+      "rule_id": "common/security_vulnerability",
+      "file_path": "index.php",
+      "line": 4,
+      "symbol": null,
+      "evidence": "$cart = isset($_COOKIE['shop_cart']) ? unserialize($_COOKIE['shop_cart']) : [];",
+      "description": "クライアント改ざん可能な `$_COOKIE['shop_cart']` を `allowed_classes => false` 指定なしで `unserialize()` しており、PHP Object Injection / ガジェットチェーン悪用リスクがある（CWE-502）。",
+      "recommendation": "`unserialize()` を廃止し、サーバーサイドセッションまたは HMAC 署名付き `json_decode(..., true, 16, JSON_THROW_ON_ERROR)` に変更する。"
+    },
+    {
+      "severity": "critical",
+      "category": "security",
+      "rule_id": "common/security_vulnerability",
+      "file_path": "index.php",
+      "line": 8,
+      "symbol": null,
+      "evidence": "mysqli_query($conn, \"SELECT id, title, price FROM products WHERE title LIKE '%\" . $search . \"%'\"); (also product.php:6-7, login.php:12)",
+      "description": "`index.php:8` (`$_GET['q']`)、`product.php:6-7` (`$_GET['cat']`)、`login.php:12` (`$_POST['username']`) の全3箇所で未エスケープ入力を SQL 文字列へ直接連結しており、認証回避や全テーブル抽出が可能な SQL インジェクションが存在する（CWE-89）。",
+      "recommendation": "PDO (`PDO::ATTR_EMULATE_PREPARES => false`) または `mysqli_prepare()` + `mysqli_stmt_bind_param()` によるプリペアドステートメントへ全面移行する。"
+    },
+    {
+      "severity": "critical",
+      "category": "security",
+      "rule_id": "common/security_vulnerability",
+      "file_path": "index.php",
+      "line": 25,
+      "symbol": null,
+      "evidence": "include $_GET['page'] . '.php';",
+      "description": "`$_GET['page']` を未検証のまま `include` に渡しており、ディレクトリトラバーサルおよびローカル/リモートファイルインクルードによる任意 PHP コード実行や情報漏洩が可能である（CWE-98 / CWE-22）。",
+      "recommendation": "動的ファイルインクルードを廃止し、`match` 式による固定ホワイトリストルーティングまたはフロントコントローラへ移行する。"
+    },
+    {
+      "severity": "critical",
+      "category": "security",
+      "rule_id": "common/security_vulnerability",
+      "file_path": "login.php",
+      "line": 17,
+      "symbol": null,
+      "evidence": "[DAST test_app_probes::test_login_md5_magic_hash_authentication_bypass] POST /login.php with magic-hash input '240610708' returned 'Logged in as admin'",
+      "description": "ライブ DAST 検証（`test_app_probes.py`）において、`POST /login.php` にパスワード `'240610708'`（MD5 値が `'0e462097431906509019562988736854'` と同じく `0e` + 数字のみとなるマジックハッシュ入力）を送信した結果、MySQL 非稼働環境でも緩い比較 `$pw_hash == $expected_hash` が `true` と評価され `'Logged in as admin'` で管理者セッション奪取が成立した（SEC-06 / CWE-697）。",
+      "recommendation": "フォールバックハッシュ定数・`md5()`・緩い比較 `==`・`extract($_POST)` をすべて廃止し、DB 接続失敗時は即座に認証失敗（Fail-Closed）とした上で `password_verify()` と厳密比較 `===` を使用する。"
+    },
+    {
+      "severity": "critical",
+      "category": "security",
+      "rule_id": "php/modern_stack",
+      "file_path": "login.php",
+      "line": 17,
+      "symbol": null,
+      "evidence": "extract($_POST); $pw_hash = md5($_POST['password'] ?? ''); $expected_hash = '0e462097431906509019562988736854'; if ($pw_hash == $expected_hash)",
+      "description": "`login.php` は (1) `extract($_POST)` によるローカル変数汚染（CWE-621）、(2) ソルトなし `md5()`（CWE-327）、(3) フォールバック値 `'0e462097431906509019562988736854'` と緩い比較 `==` による PHP マジックハッシュ型ジャグリング（例: `240610708` 等の入力で `0 == 0` が成立し DB オフライン時でも管理者認証バイパス、CWE-697）を複合的に抱えている。",
+      "recommendation": "`extract()` とハードコードされたフォールバックハッシュを削除し、`password_hash(..., PASSWORD_ARGON2ID)` と `password_verify()` + `session_regenerate_id(true)` に置換し、DB 接続失敗時は即座に認証拒否（Fail-Closed）とする。"
+    },
+    {
+      "severity": "high",
+      "category": "code_quality",
+      "rule_id": "common/production_readiness",
+      "file_path": "includes/helpers.php",
+      "line": 7,
+      "symbol": "fetch_partner_catalog",
+      "evidence": "$ch = curl_init($endpoint . '?token=' . $token); (missing CURLOPT_CONNECTTIMEOUT and CURLOPT_TIMEOUT)",
+      "description": "外部パートナー API への cURL リクエストに接続・読み取りタイムアウトが設定されておらず、対向先ハング時に Apache ワーカープールが枯渇してサービス全体が応答不能に陥る。",
+      "recommendation": "`CURLOPT_CONNECTTIMEOUT => 3` および `CURLOPT_TIMEOUT => 10` を明示設定し、失敗時は指数バックオフまたはフォールバック応答と構造化エラーログを記録する。"
+    },
+    {
+      "severity": "high",
+      "category": "dependencies",
+      "rule_id": "common/supply_chain",
+      "file_path": "Dockerfile",
+      "line": 1,
+      "symbol": null,
+      "evidence": "FROM php:7.4-apache / COPY . /var/www/html/ (missing USER and .dockerignore)",
+      "description": "セキュリティパッチ提供が終了した `php:7.4-apache` をダイジェスト固定なしで使用し、`.dockerignore` なし・`root` 権限のまま Web サーバーを起動している。",
+      "recommendation": "`php:8.3-apache` 等の現役サポート版イメージを SHA256 ダイジェスト固定で利用し、`.dockerignore` の追加と `USER www-data` による非特権実行を徹底する。"
+    },
+    {
+      "severity": "high",
+      "category": "security",
+      "rule_id": "common/security_vulnerability",
+      "file_path": "Dockerfile",
+      "line": 1,
+      "symbol": null,
+      "evidence": "Trivy IaC Misconfigurations: [HIGH] DS-0002 (Image user should not be 'root'), [LOW] DS-0026 (No HEALTHCHECK defined), plus missing .dockerignore",
+      "description": "`Dockerfile` に非特権 `USER` 指定がなくコンテナ内 Apache/PHP ワーカーが `root` 権限で稼働するため（`DS-0002`）、`admin_backup.php:6` のコマンドインジェクションや `index.php:25` の LFI 悪用時に即座にコンテナ root 奪取へ直結する（SEC-02）。",
+      "recommendation": "`.dockerignore` を整備して不要ファイルを除外し、ポート `8080` + `USER www-data` による非 root 実行と `HEALTHCHECK` 命令（`DS-0026` 解消）を `Dockerfile` に設定する。"
+    },
+    {
+      "severity": "high",
+      "category": "security",
+      "rule_id": "common/security_vulnerability",
+      "file_path": "admin_backup.php",
+      "line": 1,
+      "symbol": null,
+      "evidence": "api_endpoints=4 (admin_backup.php, index.php, login.php, product.php) all with auth_hint=NONE, no CSRF token, no input schema validation",
+      "description": "全4つの公開 PHP エンドポイントに認証・認可ガードおよび入力スキーマ検証・CSRF トークン検証が存在せず、特に管理機能である `POST /admin_backup.php` が未認証のまま外部公開されている（SEC-05）。",
+      "recommendation": "`public/` 単一エントリポイント配下に全ルートを集約し、`includes/` を公開ディレクトリ外へ移動した上で、管理系ルートへのセッション認可ミドルウェア・CSRF トークン・型付き入力バリデーションを強制する。"
+    },
+    {
+      "severity": "high",
+      "category": "security",
+      "rule_id": "common/security_vulnerability",
+      "file_path": "includes/helpers.php",
+      "line": 9,
+      "symbol": "fetch_partner_catalog",
+      "evidence": "curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false); (and no CURLOPT_TIMEOUT on L7, var_dump on L12)",
+      "description": "`fetch_partner_catalog()` が TLS 証明書検証を無効化（`CURLOPT_SSL_VERIFYPEER => false`, CWE-295）した上で API トークンを URL クエリ文字列に付与して送信しており、中間者攻撃によるトークン窃取・応答改ざんおよびタイムアウト未設定によるワーカー枯渇リスクがある。",
+      "recommendation": "`CURLOPT_SSL_VERIFYPEER => true`・`CURLOPT_SSL_VERIFYHOST => 2`・`CURLOPT_CONNECTTIMEOUT => 3`・`CURLOPT_TIMEOUT => 10` を強制し、トークンは `Authorization: Bearer` ヘッダで送信、`var_dump()` を PSR-3 ロガーへ置換する。"
+    },
+    {
+      "severity": "high",
+      "category": "security",
+      "rule_id": "common/security_vulnerability",
+      "file_path": "index.php",
+      "line": 21,
+      "symbol": null,
+      "evidence": "<?= isset($_GET['q']) ? $_GET['q'] : 'all items' ?> (also product.php:14 $_GET['promo_html'], login.php:19 $_POST['username'])",
+      "description": "`index.php:21`、`product.php:14`、`login.php:19` の3箇所でリクエストパラメータを HTML エスケープせず直接 `echo` 出力しており、反射型クロスサイトスクリプティング（Reflected XSS）が成立する（CWE-79）。",
+      "recommendation": "自動エスケープ機構を持つテンプレートエンジン（Twig / Blade）を導入するか、全出力箇所に `htmlspecialchars($val, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8')` を適用する。"
+    },
+    {
+      "severity": "high",
+      "category": "security",
+      "rule_id": "common/security_vulnerability",
+      "file_path": "index.php",
+      "line": 21,
+      "symbol": null,
+      "evidence": "[DAST test_target_surface::test_reflected_xss_canary_escaped[/index.php]] GET /index.php with '<pni-xss-canary-7f3a>' -> 200 reflected raw HTML tag",
+      "description": "ライブ DAST 検証（`test_target_surface.py`）において、`GET /index.php?q=<pni-xss-canary-7f3a>` の入力タグがサニタイズ・HTML エンコードされることなく HTTP 200 レスポンス HTML 内に生のタグとして反射されることが実証された（SEC-06 / CWE-79）。",
+      "recommendation": "Twig / Blade 等の自動エスケープ付きテンプレートエンジンを導入し、すべての動的 HTML 出力で `htmlspecialchars($v, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8')` を強制する。"
+    },
+    {
+      "severity": "high",
+      "category": "security",
+      "rule_id": "common/security_vulnerability",
+      "file_path": "index.php",
+      "line": 25,
+      "symbol": null,
+      "evidence": "[DAST test_target_surface::test_path_traversal_and_lfi_canary[/index.php]] GET /index.php (../../../../etc/passwd) -> 200 (\"Failed opening '\")",
+      "description": "ライブ DAST 検証（`test_target_surface.py`）において、`GET /index.php?page=../../../../etc/passwd` リクエストに対し `include $_GET['page'] . '.php'` がトラバーサルパスを直接解決試行し、レスポンス（HTTP 200）に内部ファイルオープン失敗メッセージ `\"Failed opening '\"` を露出させながら任意 `.php` ファイル読込（LFI）が可能な状態であることが実証された（SEC-06 / CWE-22 / CWE-98）。",
+      "recommendation": "クエリパラメータからの動的 `include` を完全撤廃し、許可済みルート名のみを `match` 式で解決するフロントコントローラへ移行するとともに本番環境で `display_errors=Off` を徹底する。"
+    },
+    {
+      "severity": "high",
+      "category": "security",
+      "rule_id": "common/security_vulnerability",
+      "file_path": "product.php",
+      "line": 14,
+      "symbol": null,
+      "evidence": "[DAST test_app_probes::test_product_promo_html_reflected_xss] GET /product.php?promo_html=<pni-promo-xss-9a2b> -> 200 echoed raw HTML banner",
+      "description": "ライブ DAST 検証（`test_app_probes.py`）において、`GET /product.php?promo_html=<pni-promo-xss-9a2b>` がプロモーションバナー領域に生の HTML 要素としてそのまま出力され、任意スクリプト注入（Reflected XSS）が成立することが実証された（SEC-06 / CWE-79）。",
+      "recommendation": "外部クエリから生 HTML を受け取る `promo_html` パラメータ仕様を廃止してサーバー管理下の定数/テンプレート ID 指定へ変更し、全出力を HTML エスケープする。"
+    },
+    {
+      "severity": "high",
+      "category": "supply_chain",
+      "rule_id": "php/dependencies",
+      "file_path": "Dockerfile",
+      "line": 1,
+      "symbol": null,
+      "evidence": "FROM php:7.4-apache (and missing composer.json / composer.lock)",
+      "description": "Composer (`composer.json` / `composer.lock`) が未導入で PSR-4 オートローディングが存在せず、コンテナベースイメージに 2022年11月 EOL の PHP 7.4 を使用している。",
+      "recommendation": "`composer.json` と `composer.lock` を導入して PSR-4 (`src/`) 構成へ移行し、ベースイメージを現役サポート対象の `php:8.3-apache` または `php:8.3-fpm` へ更新する。"
+    },
+    {
+      "severity": "high",
+      "category": "testing",
+      "rule_id": "common/runtime_verification",
+      "file_path": "index.php",
+      "line": 1,
+      "symbol": null,
+      "evidence": "RuntimeFacts.test_execution.total_tests=0 ('PHP syntax gate (php -l) passed; no PHPUnit tests executed.'); RuntimeFacts.coverage.measured=False",
+      "description": "隔離コンテナ環境（`--network=none`）で `php -l` 構文検査は通過したが、PHPUnit/Pest テストが 0 件のため実測ライン・ブランチカバレッジが完全に未計測（`0%` 相当）となっている（RV-02/RV-03）。",
+      "recommendation": "PHPUnit 11 と `pcov` を導入し、オフライン（`--network=none` + `pdo_sqlite`）で全エンドポイントの正常系・異常系・セキュリティ境界を検証してラインカバレッジ 80% 以上を計測可能にする。"
+    },
+    {
+      "severity": "high",
+      "category": "testing",
+      "rule_id": "php/testing",
+      "file_path": "login.php",
+      "line": 1,
+      "symbol": null,
+      "evidence": "source_files=6 (index.php, product.php, login.php, admin_backup.php, includes/db.php, includes/helpers.php), test_files=0, no phpunit.xml",
+      "description": "6つの本番 PHP スクリプトに対して自動テストが 0 件であり、ログイン認証・商品検索・バックアップ認可に関する単体テストやセキュリティ境界回帰テストが一切存在しない。",
+      "recommendation": "Composer 導入とビジネスロジックのクラス分離を行った上で PHPUnit 11 + `pcov`（インメモリ `pdo_sqlite` 利用）を構成し、認証失敗・SQLi/XSS エスケープ・認可拒否を含むテストスイート（カバレッジ 80% 以上）を整備する。"
+    },
+    {
+      "severity": "medium",
+      "category": "architecture",
+      "rule_id": "common/architecture",
+      "file_path": "includes/db.php",
+      "line": 2,
+      "symbol": "get_db_conn",
+      "evidence": "includes/db.php:2 include_once 'includes/helpers.php'; <-> includes/helpers.php:2 include_once 'includes/db.php';",
+      "description": "`includes/db.php` と `includes/helpers.php` が互いに `include_once` し合う循環依存構造となっており、さらにプレゼンテーション層（`index.php`, `product.php`）が HTML と SQL を直接混在させている。",
+      "recommendation": "Composer PSR-4 オートローディングを導入し、`Controller -> Service -> Repository` の単方向レイヤードアーキテクチャへ分離する。"
+    },
+    {
+      "severity": "medium",
+      "category": "architecture",
+      "rule_id": "common/twelve_factor",
+      "file_path": "includes/db.php",
+      "line": 4,
+      "symbol": "DB_HOST",
+      "evidence": "define('DB_HOST', '127.0.0.1'); ... and scattered getenv('PARTNER_FEED_TOKEN') in includes/helpers.php:6",
+      "description": "DB 接続ホスト・ユーザー・パスワードが定数リテラルとしてハードコードされる一方、外部トークンはヘルパー関数内で直接 `getenv()` されており、型付きの一元設定レイヤが存在しない。",
+      "recommendation": "起動時に必須環境変数（`DB_HOST`, `DB_PORT`, `DB_NAME`, `DB_USER`, `DB_PASSWORD`, `PARTNER_FEED_TOKEN`）をスキーマ検証して保持するイミュータブルな `AppConfig` クラスへ統合する。"
+    },
+    {
+      "severity": "medium",
+      "category": "code_quality",
+      "rule_id": "common/production_readiness",
+      "file_path": "Dockerfile",
+      "line": 5,
+      "symbol": null,
+      "evidence": "No dedicated /healthz or /readyz route in app (smoke_check /up -> 200 only via php -S fallback to index.php HTML) and no HEALTHCHECK in Dockerfile",
+      "description": "アプリケーションに専用の `/healthz`（Liveness）および DB 疎通を確認する `/readyz`（Readiness）JSON エンドポイントが存在せず、`Dockerfile` にも `HEALTHCHECK` 命令が定義されていないため、Apache 本番稼働時にオーケストレータが健全性を正確に判定できない。",
+      "recommendation": "軽量な `/healthz`（プロセス生存確認）とタイムアウト付き DB 疎通確認 `/readyz` を実装し、`Dockerfile` に `HEALTHCHECK` 命令を追加する。"
+    },
+    {
+      "severity": "medium",
+      "category": "code_quality",
+      "rule_id": "common/twelve_factor",
+      "file_path": "includes/helpers.php",
+      "line": 12,
+      "symbol": "fetch_partner_catalog",
+      "evidence": "if ($_GET['debug'] ?? '') { var_dump($raw); } and admin_backup.php:6 /tmp/shop_backup.tar.gz",
+      "description": "クエリパラメータ `?debug=1` で外部 API の生レスポンスを `var_dump()` 出力するデバッグバックドアが残存しており、またバックアップ出力先がコンテナ内 `/tmp/shop_backup.tar.gz` 固定でステートレス性を損なっている。",
+      "recommendation": "`$_GET['debug']` 分岐と `var_dump()` を削除して Monolog 等の PSR-3 JSON ロガー（`php://stderr` 出力）へ移行し、バックアップはオブジェクトストレージ（S3/GCS）または一意一時ファイルへ出力する。"
+    },
+    {
+      "severity": "medium",
+      "category": "code_quality",
+      "rule_id": "php/code_quality",
+      "file_path": "includes/db.php",
+      "line": 12,
+      "symbol": "get_db_conn",
+      "evidence": "global $LAST_DB_ERR; $conn = @mysqli_connect(...); and product.php:9 die(\"Database query failed: \" . mysqli_error($conn));",
+      "description": "`@mysqli_connect` による接続エラーの握り潰しと `global $LAST_DB_ERR` への暗黙書き込み、および `product.php:9` の `die(mysqli_error($conn))` による内部 DB スキーマエラーの直接露出が混在している。",
+      "recommendation": "`@` 演算子・`global` 変数・`die()` を廃止し、`PDO::ERRMODE_EXCEPTION` と共通例外ハンドラ＋PSR-3 構造化ログによる安全なエラー処理へ統一する。"
+    },
+    {
+      "severity": "medium",
+      "category": "dependencies",
+      "rule_id": "common/supply_chain",
+      "file_path": "README.md",
+      "line": 1,
+      "symbol": null,
+      "evidence": "has_license=False, has_security_policy=False, has_dependency_automation=False, ci_workflows=[]",
+      "description": "OpenSSF Scorecard が求める `LICENSE`、`SECURITY.md`、Dependabot/Renovate、および最小権限トークン設定済みの CI ワークフローが欠如している。",
+      "recommendation": "`LICENSE` と脆弱性報告窓口を明記した `SECURITY.md` を追加し、`permissions: contents: read` と SHA 固定 Action を備えた GitHub Actions + Dependabot を整備する。"
+    },
+    {
+      "severity": "medium",
+      "category": "security",
+      "rule_id": "common/security_vulnerability",
+      "file_path": "Dockerfile",
+      "line": 1,
+      "symbol": null,
+      "evidence": "[DAST test_baseline_http] GET / missing X-Frame-Options & CSP frame-ancestors (CWE-1021); TRACE / -> 200 (CWE-693); X-Powered-By: PHP/8.3.36 (CWE-200); X-Content-Type-Options=<absent> (CWE-693)",
+      "description": "ライブ HTTP ベースライン検査（`test_baseline_http.py`）において、HTML レスポンスに `X-Frame-Options` / `Content-Security-Policy: frame-ancestors` と `X-Content-Type-Options: nosniff` が欠落し、さらに `TRACE / -> 200` 応答および `X-Powered-By` による PHP パッチバージョン露出が確認された（SEC-06 / CWE-1021 / CWE-693 / CWE-200）。",
+      "recommendation": "Web サーバー / ミドルウェア層で `TraceEnable Off`（TRACE 405 拒否）、`expose_php = Off`、および `X-Frame-Options: DENY`・`Content-Security-Policy: default-src 'self'; frame-ancestors 'none'`・`X-Content-Type-Options: nosniff` ヘッダを一律付与する。"
+    },
+    {
+      "severity": "medium",
+      "category": "supply_chain",
+      "rule_id": "common/supply_chain",
+      "file_path": "Dockerfile",
+      "line": 4,
+      "symbol": null,
+      "evidence": "COPY . /var/www/html/ (no .dockerignore, no non-root USER instruction)",
+      "description": "`.dockerignore` が存在せずリポジトリ全体が `/var/www/html/` にコピーされ、最終ステージが `root` ユーザーのまま稼働する。",
+      "recommendation": "`.dockerignore` を追加して `.git` や不要ファイルを除外し、`USER www-data` 等で非 root 実行を強制する。"
+    },
+    {
+      "severity": "medium",
+      "category": "type_safety",
+      "rule_id": "php/typing",
+      "file_path": "includes/helpers.php",
+      "line": 4,
+      "symbol": "fetch_partner_catalog",
+      "evidence": "Missing declare(strict_types=1) across all 6 files; untyped function get_db_conn() and fetch_partner_catalog($endpoint)",
+      "description": "全6ファイルで `declare(strict_types=1);` が欠落して暗黙の型変換が許容されており、全関数で引数型・戻り値型および PHPDoc が未定義である。",
+      "recommendation": "全 `.php` ファイル先頭に `declare(strict_types=1);` を追加し、ネイティブ型宣言（`?PDO`, `string` 等）と PHPStan (level 8) による CI 検査を導入する。"
+    },
+    {
+      "severity": "low",
+      "category": "documentation",
+      "rule_id": "common/documentation",
+      "file_path": "README.md",
+      "line": 1,
+      "symbol": null,
+      "evidence": "# Legacy EC Shop (PHP) / Copy all .php files to /var/www/html on Apache + MySQL server.",
+      "description": "`README.md` が2行のみで、必要な環境変数・DBスキーマ・ローカル起動方法・テスト実行方法が欠落している。",
+      "recommendation": "Standard Readme 構成に従い、システム概要・必要要件・環境変数設定・Docker起動手順・テスト/静的解析コマンドを整備する。"
+    },
+    {
+      "severity": "low",
+      "category": "governance",
+      "rule_id": "common/git_workflow",
+      "file_path": null,
+      "line": null,
+      "symbol": null,
+      "evidence": "has_gitignore=False, has_license=False, has_security_policy=False, ci_workflows=[]",
+      "description": "`.gitignore`、`LICENSE`、`SECURITY.md`、CI ワークフロー、依存関係自動更新設定がいずれも未整備である。",
+      "recommendation": "`.gitignore`（`vendor/`, `.env` 等除外）、`LICENSE`、`SECURITY.md`、最小権限 (`permissions: contents: read`) の GitHub Actions CI と Dependabot を追加する。"
+    }
+  ],
+  "consolidated_findings": [
+    {
+      "severity": "critical",
+      "file_path": "Dockerfile",
+      "line": 1,
+      "symbol": null,
+      "rule_ids": [
+        "common/security_vulnerability",
+        "common/supply_chain",
+        "php/dependencies"
+      ],
+      "categories": [
+        "dependencies",
+        "security",
+        "supply_chain"
+      ],
+      "primary_description": "EOL ベースイメージ `php:7.4-apache`（Debian 11.5 凍結状態）の使用により、Apache HTTP Server のリクエストスプリッティング/RCE（`CVE-2023-25690`, `CVE-2024-38474`, `CVE-2024-38476`）や libcurl ヒープ破壊（`CVE-2023-38545`）を含む `CRITICAL` 62件・`HIGH` 1,940件（総計 12,051件）の OS パッケージ脆弱性が残存している（SEC-01）。",
+      "combined_evidence": "FROM php:7.4-apache -> debian 11.5 OS CVEs: total=12051 (CRITICAL=62, HIGH=1940), e.g., apache2@2.4.54-1~deb11u1 CVE-2023-25690/CVE-2024-38474/CVE-2024-38476 (fix 2.4.61-1~deb11u1, CVSS 9.8), curl/libcurl4@7.74.0 CVE-2023-38545 (fix 7.74.0-1.3+deb11u10, CVSS 9.8) | FROM php:7.4-apache / COPY . /var/www/html/ (missing USER and .dockerignore) | Trivy IaC Misconfigurations: [HIGH] DS-0002 (Image user should not be 'root'), [LOW] DS-0026 (No HEALTHCHECK defined), plus missing .dockerignore | FROM php:7.4-apache (and missing composer.json / composer.lock) | [DAST test_baseline_http] GET / missing X-Frame-Options & CSP frame-ancestors (CWE-1021); TRACE / -> 200 (CWE-693); X-Powered-By: PHP/8.3.36 (CWE-200); X-Content-Type-Options=<absent> (CWE-693)",
+      "merged_recommendation": "ベースイメージを現役サポート・最新セキュリティパッチ適用済みの `php:8.3-apache-bookworm`（または最小構成の `php:8.3-fpm-alpine` + リバースプロキシ）へ即時刷新し、ダイジェスト固定と週次リビルドを導入する。 / `php:8.3-apache` 等の現役サポート版イメージを SHA256 ダイジェスト固定で利用し、`.dockerignore` の追加と `USER www-data` による非特権実行を徹底する。 / `.dockerignore` を整備して不要ファイルを除外し、ポート `8080` + `USER www-data` による非 root 実行と `HEALTHCHECK` 命令（`DS-0026` 解消）を `Dockerfile` に設定する。 / `composer.json` と `composer.lock` を導入して PSR-4 (`src/`) 構成へ移行し、ベースイメージを現役サポート対象の `php:8.3-apache` または `php:8.3-fpm` へ更新する。 / Web サーバー / ミドルウェア層で `TraceEnable Off`（TRACE 405 拒否）、`expose_php = Off`、および `X-Frame-Options: DENY`・`Content-Security-Policy: default-src 'self'; frame-ancestors 'none'`・`X-Content-Type-Options: nosniff` ヘッダを一律付与する。"
+    },
+    {
+      "severity": "critical",
+      "file_path": "admin_backup.php",
+      "line": 6,
+      "symbol": null,
+      "rule_ids": [
+        "common/security_vulnerability"
+      ],
+      "categories": [
+        "security"
+      ],
+      "primary_description": "認証チェックもCSRF検証も一切行わない公開エンドポイントで、`$_POST['backup_dir']` を `shell_exec()` に直接文字列連結しており、未認証のリモート攻撃者が `root` 権限（コンテナ実行ユーザー）で任意の OS コマンドを実行できる（CWE-78 / CWE-306）。",
+      "combined_evidence": "$output = shell_exec(\"tar -czf /tmp/shop_backup.tar.gz \" . $target); (no $_SESSION['is_admin'] check) | [DAST test_app_probes::test_admin_backup_os_command_injection & test_target_surface::test_privileged_endpoints_require_authentication] POST /admin_backup.php executed injected shell echo canary (PNI_RCE_CANARY_8842) with HTTP 200 without authentication",
+      "merged_recommendation": "管理者認可ミドルウェアと CSRF トークン検証を必須化した上で、Web リクエストからのシェル呼び出しを廃止し、PHP `PharData` / `ZipArchive` または固定パス引数のバックグラウンドジョブへ置き換える。 / `admin_backup.php` への外部アクセスを即時遮断し、管理者セッション認可＋CSRF トークン検証を強制した上で `shell_exec()` を撤廃し、PHP ネイティブ `ZipArchive` / `PharData` と固定ディレクトリ設定へ置換する。"
+    },
+    {
+      "severity": "critical",
+      "file_path": "includes/db.php",
+      "line": 6,
+      "symbol": "DB_PASSWORD",
+      "rule_ids": [
+        "common/security"
+      ],
+      "categories": [
+        "security"
+      ],
+      "primary_description": "本番 MySQL パスワード (`DB_PASSWORD`) および Stripe Live API シークレットキー (`$stripe_api_secret`) がソースコードリテラルに平文でハードコードされている（CWE-798）。",
+      "combined_evidence": "define('DB_PASSWORD', 'ShopProdMysql!9981_Secret'); / $stripe_api_secret = 'sk_live_LegacyShopSecretKey99887766';",
+      "merged_recommendation": "漏洩済みの DB パスワードと Stripe API キーを即時ローテーション（失効）し、環境変数またはシークレットマネージャから実行時に注入するよう変更する。"
+    },
+    {
+      "severity": "critical",
+      "file_path": "includes/db.php",
+      "line": 7,
+      "symbol": "stripe_api_secret",
+      "rule_ids": [
+        "common/security_vulnerability"
+      ],
+      "categories": [
+        "security"
+      ],
+      "primary_description": "Trivy Secret スキャナにより `includes/db.php:7` から本番形式の Stripe Secret Key（`stripe-secret-token`）が `CRITICAL` として検出され、さらに `6` 行目に MySQL パスワード定数も平文で直書きされている（SEC-03 / CWE-798）。",
+      "combined_evidence": "Trivy Secret [CRITICAL] stripe-secret-token at includes/db.php:7 ($stripe_api_secret = '***REDACTED***') + AST DB_PASSWORD at includes/db.php:6",
+      "merged_recommendation": "Stripe ダッシュボードおよび MySQL で該当キー/パスワードを直ちに失効・再発行し、ソースコードからリテラルを完全除去して Secret Manager / 環境変数注入へ移行する。"
+    },
+    {
+      "severity": "critical",
+      "file_path": "index.php",
+      "line": 4,
+      "symbol": null,
+      "rule_ids": [
+        "common/security_vulnerability"
+      ],
+      "categories": [
+        "security"
+      ],
+      "primary_description": "クライアント改ざん可能な `$_COOKIE['shop_cart']` を `allowed_classes => false` 指定なしで `unserialize()` しており、PHP Object Injection / ガジェットチェーン悪用リスクがある（CWE-502）。",
+      "combined_evidence": "$cart = isset($_COOKIE['shop_cart']) ? unserialize($_COOKIE['shop_cart']) : [];",
+      "merged_recommendation": "`unserialize()` を廃止し、サーバーサイドセッションまたは HMAC 署名付き `json_decode(..., true, 16, JSON_THROW_ON_ERROR)` に変更する。"
+    },
+    {
+      "severity": "critical",
+      "file_path": "index.php",
+      "line": 8,
+      "symbol": null,
+      "rule_ids": [
+        "common/security_vulnerability"
+      ],
+      "categories": [
+        "security"
+      ],
+      "primary_description": "`index.php:8` (`$_GET['q']`)、`product.php:6-7` (`$_GET['cat']`)、`login.php:12` (`$_POST['username']`) の全3箇所で未エスケープ入力を SQL 文字列へ直接連結しており、認証回避や全テーブル抽出が可能な SQL インジェクションが存在する（CWE-89）。",
+      "combined_evidence": "mysqli_query($conn, \"SELECT id, title, price FROM products WHERE title LIKE '%\" . $search . \"%'\"); (also product.php:6-7, login.php:12)",
+      "merged_recommendation": "PDO (`PDO::ATTR_EMULATE_PREPARES => false`) または `mysqli_prepare()` + `mysqli_stmt_bind_param()` によるプリペアドステートメントへ全面移行する。"
+    },
+    {
+      "severity": "critical",
+      "file_path": "index.php",
+      "line": 25,
+      "symbol": null,
+      "rule_ids": [
+        "common/security_vulnerability"
+      ],
+      "categories": [
+        "security"
+      ],
+      "primary_description": "`$_GET['page']` を未検証のまま `include` に渡しており、ディレクトリトラバーサルおよびローカル/リモートファイルインクルードによる任意 PHP コード実行や情報漏洩が可能である（CWE-98 / CWE-22）。",
+      "combined_evidence": "include $_GET['page'] . '.php'; | [DAST test_target_surface::test_path_traversal_and_lfi_canary[/index.php]] GET /index.php (../../../../etc/passwd) -> 200 (\"Failed opening '\")",
+      "merged_recommendation": "動的ファイルインクルードを廃止し、`match` 式による固定ホワイトリストルーティングまたはフロントコントローラへ移行する。 / クエリパラメータからの動的 `include` を完全撤廃し、許可済みルート名のみを `match` 式で解決するフロントコントローラへ移行するとともに本番環境で `display_errors=Off` を徹底する。"
+    },
+    {
+      "severity": "critical",
+      "file_path": "login.php",
+      "line": 17,
+      "symbol": null,
+      "rule_ids": [
+        "common/security_vulnerability",
+        "php/modern_stack"
+      ],
+      "categories": [
+        "security"
+      ],
+      "primary_description": "ライブ DAST 検証（`test_app_probes.py`）において、`POST /login.php` にパスワード `'240610708'`（MD5 値が `'0e462097431906509019562988736854'` と同じく `0e` + 数字のみとなるマジックハッシュ入力）を送信した結果、MySQL 非稼働環境でも緩い比較 `$pw_hash == $expected_hash` が `true` と評価され `'Logged in as admin'` で管理者セッション奪取が成立した（SEC-06 / CWE-697）。",
+      "combined_evidence": "[DAST test_app_probes::test_login_md5_magic_hash_authentication_bypass] POST /login.php with magic-hash input '240610708' returned 'Logged in as admin' | extract($_POST); $pw_hash = md5($_POST['password'] ?? ''); $expected_hash = '0e462097431906509019562988736854'; if ($pw_hash == $expected_hash)",
+      "merged_recommendation": "フォールバックハッシュ定数・`md5()`・緩い比較 `==`・`extract($_POST)` をすべて廃止し、DB 接続失敗時は即座に認証失敗（Fail-Closed）とした上で `password_verify()` と厳密比較 `===` を使用する。 / `extract()` とハードコードされたフォールバックハッシュを削除し、`password_hash(..., PASSWORD_ARGON2ID)` と `password_verify()` + `session_regenerate_id(true)` に置換し、DB 接続失敗時は即座に認証拒否（Fail-Closed）とする。"
+    },
+    {
+      "severity": "high",
+      "file_path": "admin_backup.php",
+      "line": 1,
+      "symbol": null,
+      "rule_ids": [
+        "common/security_vulnerability"
+      ],
+      "categories": [
+        "security"
+      ],
+      "primary_description": "全4つの公開 PHP エンドポイントに認証・認可ガードおよび入力スキーマ検証・CSRF トークン検証が存在せず、特に管理機能である `POST /admin_backup.php` が未認証のまま外部公開されている（SEC-05）。",
+      "combined_evidence": "api_endpoints=4 (admin_backup.php, index.php, login.php, product.php) all with auth_hint=NONE, no CSRF token, no input schema validation",
+      "merged_recommendation": "`public/` 単一エントリポイント配下に全ルートを集約し、`includes/` を公開ディレクトリ外へ移動した上で、管理系ルートへのセッション認可ミドルウェア・CSRF トークン・型付き入力バリデーションを強制する。"
+    },
+    {
+      "severity": "high",
+      "file_path": "includes/helpers.php",
+      "line": 7,
+      "symbol": "fetch_partner_catalog",
+      "rule_ids": [
+        "common/production_readiness"
+      ],
+      "categories": [
+        "code_quality"
+      ],
+      "primary_description": "外部パートナー API への cURL リクエストに接続・読み取りタイムアウトが設定されておらず、対向先ハング時に Apache ワーカープールが枯渇してサービス全体が応答不能に陥る。",
+      "combined_evidence": "$ch = curl_init($endpoint . '?token=' . $token); (missing CURLOPT_CONNECTTIMEOUT and CURLOPT_TIMEOUT)",
+      "merged_recommendation": "`CURLOPT_CONNECTTIMEOUT => 3` および `CURLOPT_TIMEOUT => 10` を明示設定し、失敗時は指数バックオフまたはフォールバック応答と構造化エラーログを記録する。"
+    },
+    {
+      "severity": "high",
+      "file_path": "includes/helpers.php",
+      "line": 9,
+      "symbol": "fetch_partner_catalog",
+      "rule_ids": [
+        "common/security_vulnerability"
+      ],
+      "categories": [
+        "security"
+      ],
+      "primary_description": "`fetch_partner_catalog()` が TLS 証明書検証を無効化（`CURLOPT_SSL_VERIFYPEER => false`, CWE-295）した上で API トークンを URL クエリ文字列に付与して送信しており、中間者攻撃によるトークン窃取・応答改ざんおよびタイムアウト未設定によるワーカー枯渇リスクがある。",
+      "combined_evidence": "curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false); (and no CURLOPT_TIMEOUT on L7, var_dump on L12)",
+      "merged_recommendation": "`CURLOPT_SSL_VERIFYPEER => true`・`CURLOPT_SSL_VERIFYHOST => 2`・`CURLOPT_CONNECTTIMEOUT => 3`・`CURLOPT_TIMEOUT => 10` を強制し、トークンは `Authorization: Bearer` ヘッダで送信、`var_dump()` を PSR-3 ロガーへ置換する。"
+    },
+    {
+      "severity": "high",
+      "file_path": "index.php",
+      "line": 1,
+      "symbol": null,
+      "rule_ids": [
+        "common/runtime_verification"
+      ],
+      "categories": [
+        "testing"
+      ],
+      "primary_description": "隔離コンテナ環境（`--network=none`）で `php -l` 構文検査は通過したが、PHPUnit/Pest テストが 0 件のため実測ライン・ブランチカバレッジが完全に未計測（`0%` 相当）となっている（RV-02/RV-03）。",
+      "combined_evidence": "RuntimeFacts.test_execution.total_tests=0 ('PHP syntax gate (php -l) passed; no PHPUnit tests executed.'); RuntimeFacts.coverage.measured=False",
+      "merged_recommendation": "PHPUnit 11 と `pcov` を導入し、オフライン（`--network=none` + `pdo_sqlite`）で全エンドポイントの正常系・異常系・セキュリティ境界を検証してラインカバレッジ 80% 以上を計測可能にする。"
+    },
+    {
+      "severity": "high",
+      "file_path": "index.php",
+      "line": 21,
+      "symbol": null,
+      "rule_ids": [
+        "common/security_vulnerability"
+      ],
+      "categories": [
+        "security"
+      ],
+      "primary_description": "`index.php:21`、`product.php:14`、`login.php:19` の3箇所でリクエストパラメータを HTML エスケープせず直接 `echo` 出力しており、反射型クロスサイトスクリプティング（Reflected XSS）が成立する（CWE-79）。",
+      "combined_evidence": "<?= isset($_GET['q']) ? $_GET['q'] : 'all items' ?> (also product.php:14 $_GET['promo_html'], login.php:19 $_POST['username']) | [DAST test_target_surface::test_reflected_xss_canary_escaped[/index.php]] GET /index.php with '<pni-xss-canary-7f3a>' -> 200 reflected raw HTML tag",
+      "merged_recommendation": "自動エスケープ機構を持つテンプレートエンジン（Twig / Blade）を導入するか、全出力箇所に `htmlspecialchars($val, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8')` を適用する。 / Twig / Blade 等の自動エスケープ付きテンプレートエンジンを導入し、すべての動的 HTML 出力で `htmlspecialchars($v, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8')` を強制する。"
+    },
+    {
+      "severity": "high",
+      "file_path": "login.php",
+      "line": 1,
+      "symbol": null,
+      "rule_ids": [
+        "php/testing"
+      ],
+      "categories": [
+        "testing"
+      ],
+      "primary_description": "6つの本番 PHP スクリプトに対して自動テストが 0 件であり、ログイン認証・商品検索・バックアップ認可に関する単体テストやセキュリティ境界回帰テストが一切存在しない。",
+      "combined_evidence": "source_files=6 (index.php, product.php, login.php, admin_backup.php, includes/db.php, includes/helpers.php), test_files=0, no phpunit.xml",
+      "merged_recommendation": "Composer 導入とビジネスロジックのクラス分離を行った上で PHPUnit 11 + `pcov`（インメモリ `pdo_sqlite` 利用）を構成し、認証失敗・SQLi/XSS エスケープ・認可拒否を含むテストスイート（カバレッジ 80% 以上）を整備する。"
+    },
+    {
+      "severity": "high",
+      "file_path": "product.php",
+      "line": 14,
+      "symbol": null,
+      "rule_ids": [
+        "common/security_vulnerability"
+      ],
+      "categories": [
+        "security"
+      ],
+      "primary_description": "ライブ DAST 検証（`test_app_probes.py`）において、`GET /product.php?promo_html=<pni-promo-xss-9a2b>` がプロモーションバナー領域に生の HTML 要素としてそのまま出力され、任意スクリプト注入（Reflected XSS）が成立することが実証された（SEC-06 / CWE-79）。",
+      "combined_evidence": "[DAST test_app_probes::test_product_promo_html_reflected_xss] GET /product.php?promo_html=<pni-promo-xss-9a2b> -> 200 echoed raw HTML banner",
+      "merged_recommendation": "外部クエリから生 HTML を受け取る `promo_html` パラメータ仕様を廃止してサーバー管理下の定数/テンプレート ID 指定へ変更し、全出力を HTML エスケープする。"
+    },
+    {
+      "severity": "medium",
+      "file_path": "Dockerfile",
+      "line": 4,
+      "symbol": null,
+      "rule_ids": [
+        "common/supply_chain"
+      ],
+      "categories": [
+        "supply_chain"
+      ],
+      "primary_description": "`.dockerignore` が存在せずリポジトリ全体が `/var/www/html/` にコピーされ、最終ステージが `root` ユーザーのまま稼働する。",
+      "combined_evidence": "COPY . /var/www/html/ (no .dockerignore, no non-root USER instruction)",
+      "merged_recommendation": "`.dockerignore` を追加して `.git` や不要ファイルを除外し、`USER www-data` 等で非 root 実行を強制する。"
+    },
+    {
+      "severity": "medium",
+      "file_path": "Dockerfile",
+      "line": 5,
+      "symbol": null,
+      "rule_ids": [
+        "common/production_readiness"
+      ],
+      "categories": [
+        "code_quality"
+      ],
+      "primary_description": "アプリケーションに専用の `/healthz`（Liveness）および DB 疎通を確認する `/readyz`（Readiness）JSON エンドポイントが存在せず、`Dockerfile` にも `HEALTHCHECK` 命令が定義されていないため、Apache 本番稼働時にオーケストレータが健全性を正確に判定できない。",
+      "combined_evidence": "No dedicated /healthz or /readyz route in app (smoke_check /up -> 200 only via php -S fallback to index.php HTML) and no HEALTHCHECK in Dockerfile",
+      "merged_recommendation": "軽量な `/healthz`（プロセス生存確認）とタイムアウト付き DB 疎通確認 `/readyz` を実装し、`Dockerfile` に `HEALTHCHECK` 命令を追加する。"
+    },
+    {
+      "severity": "medium",
+      "file_path": "README.md",
+      "line": 1,
+      "symbol": null,
+      "rule_ids": [
+        "common/supply_chain",
+        "common/documentation"
+      ],
+      "categories": [
+        "dependencies",
+        "documentation"
+      ],
+      "primary_description": "OpenSSF Scorecard が求める `LICENSE`、`SECURITY.md`、Dependabot/Renovate、および最小権限トークン設定済みの CI ワークフローが欠如している。",
+      "combined_evidence": "has_license=False, has_security_policy=False, has_dependency_automation=False, ci_workflows=[] | # Legacy EC Shop (PHP) / Copy all .php files to /var/www/html on Apache + MySQL server.",
+      "merged_recommendation": "`LICENSE` と脆弱性報告窓口を明記した `SECURITY.md` を追加し、`permissions: contents: read` と SHA 固定 Action を備えた GitHub Actions + Dependabot を整備する。 / Standard Readme 構成に従い、システム概要・必要要件・環境変数設定・Docker起動手順・テスト/静的解析コマンドを整備する。"
+    },
+    {
+      "severity": "medium",
+      "file_path": "includes/db.php",
+      "line": 2,
+      "symbol": "get_db_conn",
+      "rule_ids": [
+        "common/architecture"
+      ],
+      "categories": [
+        "architecture"
+      ],
+      "primary_description": "`includes/db.php` と `includes/helpers.php` が互いに `include_once` し合う循環依存構造となっており、さらにプレゼンテーション層（`index.php`, `product.php`）が HTML と SQL を直接混在させている。",
+      "combined_evidence": "includes/db.php:2 include_once 'includes/helpers.php'; <-> includes/helpers.php:2 include_once 'includes/db.php';",
+      "merged_recommendation": "Composer PSR-4 オートローディングを導入し、`Controller -> Service -> Repository` の単方向レイヤードアーキテクチャへ分離する。"
+    },
+    {
+      "severity": "medium",
+      "file_path": "includes/db.php",
+      "line": 4,
+      "symbol": "DB_HOST",
+      "rule_ids": [
+        "common/twelve_factor"
+      ],
+      "categories": [
+        "architecture"
+      ],
+      "primary_description": "DB 接続ホスト・ユーザー・パスワードが定数リテラルとしてハードコードされる一方、外部トークンはヘルパー関数内で直接 `getenv()` されており、型付きの一元設定レイヤが存在しない。",
+      "combined_evidence": "define('DB_HOST', '127.0.0.1'); ... and scattered getenv('PARTNER_FEED_TOKEN') in includes/helpers.php:6",
+      "merged_recommendation": "起動時に必須環境変数（`DB_HOST`, `DB_PORT`, `DB_NAME`, `DB_USER`, `DB_PASSWORD`, `PARTNER_FEED_TOKEN`）をスキーマ検証して保持するイミュータブルな `AppConfig` クラスへ統合する。"
+    },
+    {
+      "severity": "medium",
+      "file_path": "includes/db.php",
+      "line": 12,
+      "symbol": "get_db_conn",
+      "rule_ids": [
+        "php/code_quality"
+      ],
+      "categories": [
+        "code_quality"
+      ],
+      "primary_description": "`@mysqli_connect` による接続エラーの握り潰しと `global $LAST_DB_ERR` への暗黙書き込み、および `product.php:9` の `die(mysqli_error($conn))` による内部 DB スキーマエラーの直接露出が混在している。",
+      "combined_evidence": "global $LAST_DB_ERR; $conn = @mysqli_connect(...); and product.php:9 die(\"Database query failed: \" . mysqli_error($conn));",
+      "merged_recommendation": "`@` 演算子・`global` 変数・`die()` を廃止し、`PDO::ERRMODE_EXCEPTION` と共通例外ハンドラ＋PSR-3 構造化ログによる安全なエラー処理へ統一する。"
+    },
+    {
+      "severity": "medium",
+      "file_path": "includes/helpers.php",
+      "line": 4,
+      "symbol": "fetch_partner_catalog",
+      "rule_ids": [
+        "php/typing"
+      ],
+      "categories": [
+        "type_safety"
+      ],
+      "primary_description": "全6ファイルで `declare(strict_types=1);` が欠落して暗黙の型変換が許容されており、全関数で引数型・戻り値型および PHPDoc が未定義である。",
+      "combined_evidence": "Missing declare(strict_types=1) across all 6 files; untyped function get_db_conn() and fetch_partner_catalog($endpoint)",
+      "merged_recommendation": "全 `.php` ファイル先頭に `declare(strict_types=1);` を追加し、ネイティブ型宣言（`?PDO`, `string` 等）と PHPStan (level 8) による CI 検査を導入する。"
+    },
+    {
+      "severity": "medium",
+      "file_path": "includes/helpers.php",
+      "line": 12,
+      "symbol": "fetch_partner_catalog",
+      "rule_ids": [
+        "common/twelve_factor"
+      ],
+      "categories": [
+        "code_quality"
+      ],
+      "primary_description": "クエリパラメータ `?debug=1` で外部 API の生レスポンスを `var_dump()` 出力するデバッグバックドアが残存しており、またバックアップ出力先がコンテナ内 `/tmp/shop_backup.tar.gz` 固定でステートレス性を損なっている。",
+      "combined_evidence": "if ($_GET['debug'] ?? '') { var_dump($raw); } and admin_backup.php:6 /tmp/shop_backup.tar.gz",
+      "merged_recommendation": "`$_GET['debug']` 分岐と `var_dump()` を削除して Monolog 等の PSR-3 JSON ロガー（`php://stderr` 出力）へ移行し、バックアップはオブジェクトストレージ（S3/GCS）または一意一時ファイルへ出力する。"
+    },
+    {
+      "severity": "low",
+      "file_path": "",
+      "line": null,
+      "symbol": null,
+      "rule_ids": [
+        "common/git_workflow"
+      ],
+      "categories": [
+        "governance"
+      ],
+      "primary_description": "`.gitignore`、`LICENSE`、`SECURITY.md`、CI ワークフロー、依存関係自動更新設定がいずれも未整備である。",
+      "combined_evidence": "has_gitignore=False, has_license=False, has_security_policy=False, ci_workflows=[]",
+      "merged_recommendation": "`.gitignore`（`vendor/`, `.env` 等除外）、`LICENSE`、`SECURITY.md`、最小権限 (`permissions: contents: read`) の GitHub Actions CI と Dependabot を追加する。"
+    }
+  ],
+  "action_plan": [
+    {
+      "priority": "P0",
+      "title": "EOL php:7.4-apache の廃止と PHP 8.3 非 root セキュアコンテナへの刷新（OS CVE 12,051件 & DS-0002 解消）",
+      "category": "dependencies",
+      "target_files": [
+        "Dockerfile"
+      ],
+      "related_rules": [
+        "common/security_vulnerability",
+        "common/supply_chain",
+        "CVE-2023-25690",
+        "CVE-2024-38474",
+        "CVE-2024-38476",
+        "CVE-2023-38545",
+        "DS-0002",
+        "DS-0026"
+      ],
+      "action": "`Dockerfile` を `php:8.3-apache-bookworm` ベースへ更新し、`apt-get upgrade`・`.dockerignore`・非特権 `USER www-data`・`HEALTHCHECK` を適用して Trivy 再スキャンで CRITICAL/HIGH CVE ゼロを確認する。",
+      "expected_impact": "`CRITICAL` 62件・`HIGH` 1,940件の既知 OS 脆弱性と root 実行（DS-0002）による権限昇格リスクを一括解消する。"
+    },
+    {
+      "priority": "P0",
+      "title": "ハードコードされた DB パスワードと Stripe 本番秘密鍵の即時失効・環境変数化",
+      "category": "security",
+      "target_files": [
+        "includes/db.php"
+      ],
+      "related_rules": [
+        "common/security"
+      ],
+      "action": "`includes/db.php` から `DB_PASSWORD` と `$stripe_api_secret` の直書きを削除して既存キーを即時ローテーションし、`getenv()` / シークレット管理基盤からの読込へ移行する。",
+      "expected_impact": "リポジトリ・コンテナイメージからの本番 DB / 決済 API 認証情報の直接漏洩（CWE-798）を根絶する。"
+    },
+    {
+      "priority": "P0",
+      "title": "ライブ実証された無認証RCE・マジックハッシュ認証突破・LFI・XSSの緊急遮断と .pni/pentests DAST 回帰ゲート化",
+      "category": "security",
+      "target_files": [
+        "admin_backup.php",
+        "login.php",
+        "index.php",
+        "product.php",
+        "Dockerfile"
+      ],
+      "related_rules": [
+        "common/security_vulnerability"
+      ],
+      "action": "`POST /admin_backup.php` の `shell_exec()` 撤廃と認証強制、`POST /login.php` のマジックハッシュ比較撤廃と `password_verify()` 化、`index.php` の動的 `include` 廃止、`index.php` / `product.php` の HTML 自動エスケープ、およびセキュリティレスポンスヘッダ（CSP/`X-Frame-Options`/`nosniff`/`expose_php=Off`/TRACE 無効化）を実装し、`.pni/pentests/examples/php/legacy_shop_messy/` 全19プローブの完全 PASS を CI リリースゲートとする。",
+      "expected_impact": "実 HTTP 通信で再現確認された CRITICAL 2件（RCE・認証回避）・HIGH 4件（LFI・無認証管理操作・XSS×2）・MEDIUM/LOW 4件の全 10 件の動的脆弱性を根絶し、再発を CI で自動阻止する。"
+    },
+    {
+      "priority": "P0",
+      "title": "無認証 OS コマンドインジェクション・LFI・unserialize・SQLi・マジックハッシュ認証バイパスの即時封じ込め",
+      "category": "security",
+      "target_files": [
+        "admin_backup.php",
+        "index.php",
+        "product.php",
+        "login.php",
+        "includes/helpers.php"
+      ],
+      "related_rules": [
+        "common/security_vulnerability",
+        "common/security",
+        "php/modern_stack"
+      ],
+      "action": "`admin_backup.php` の `shell_exec` 廃止と管理者認証強制、`index.php` の `unserialize($_COOKIE)` と動的 `include $_GET['page']` 廃止、全 SQL の PDO プリペアド化、`login.php` の `extract()` 削除と `password_verify()` 移行、全 HTML 出力の `htmlspecialchars()` 適用、`helpers.php` の TLS 検証有効化＋タイムアウト設定を実施する。",
+      "expected_impact": "未認証リモートコード実行（RCE）・認証バイパス・全件 DB 漏洩・XSS の致命的な攻撃経路（13 CWE シンク）を遮断する。"
+    },
+    {
+      "priority": "P1",
+      "title": "HTML+SQL スパゲッティ構造と相互 include_once 循環の解消（PSR-4 レイヤ分離）",
+      "category": "architecture",
+      "target_files": [
+        "index.php",
+        "product.php",
+        "login.php",
+        "includes/db.php",
+        "includes/helpers.php"
+      ],
+      "related_rules": [
+        "common/architecture",
+        "php/code_quality",
+        "common/maintainability"
+      ],
+      "action": "`public/index.php` フロントコントローラと PSR-4 名前空間（`App\\Controller`, `App\\Service`, `App\\Repository`）を導入し、スーパーグローバル直参照を型付き Request DTO に集約、`@` 抑制と `die()` を例外ハンドラ＋PSR-3 ロガーへ置き換える。",
+      "expected_impact": "プレゼンテーション・ドメイン・永続化の責務を分離し、相互インクルード循環とグローバル状態結合を解消する。"
+    },
+    {
+      "priority": "P1",
+      "title": "12-Factor 設定一元化・外部 I/O タイムアウト設定・PSR-3 構造化ログ/Health エンドポイント整備",
+      "category": "code_quality",
+      "target_files": [
+        "includes/db.php",
+        "includes/helpers.php",
+        "product.php",
+        "admin_backup.php"
+      ],
+      "related_rules": [
+        "common/twelve_factor",
+        "common/production_readiness"
+      ],
+      "action": "`AppConfig` による環境変数一元読み込み、PDO 接続タイムアウトおよび cURL `CURLOPT_CONNECTTIMEOUT`/`CURLOPT_TIMEOUT` の明示、`?debug=` `var_dump` と `die(mysqli_error)` の撤廃、Monolog JSON ログと `/healthz` プローブの実装を行う。",
+      "expected_impact": "ワーカー枯渇による全面障害と内部情報漏洩を防止し、コンテナ環境での安全な水平スケーリングと可観測性を実現する。"
+    },
+    {
+      "priority": "P1",
+      "title": "専用ヘルスチェックエンドポイント（/healthz・/readyz）とコンテナ HEALTHCHECK の実装",
+      "category": "code_quality",
+      "target_files": [
+        "index.php",
+        "includes/db.php",
+        "Dockerfile"
+      ],
+      "related_rules": [
+        "common/runtime_verification",
+        "common/production_readiness"
+      ],
+      "action": "`/healthz` と DB タイムアウト付き `/readyz` JSON ルートを追加し、`Dockerfile` に非 root 実行設定および `HEALTHCHECK` を定義する。",
+      "expected_impact": "Apache / PHP-FPM 本番環境における確実な起動ヘルス検証とオーケストレータ自動復旧を確立する。"
+    },
+    {
+      "priority": "P1",
+      "title": "Composer (PSR-4) の導入と PHP 8.3 非 root コンテナへの刷新",
+      "category": "supply_chain",
+      "target_files": [
+        "Dockerfile",
+        "includes/db.php",
+        "includes/helpers.php"
+      ],
+      "related_rules": [
+        "php/dependencies",
+        "common/supply_chain"
+      ],
+      "action": "`composer.json` / `composer.lock` を作成して `src/` 配下の PSR-4 名前空間へ整理し、`Dockerfile` を `php:8.3-apache` + `USER www-data` + `.dockerignore` 構成へ刷新する。",
+      "expected_impact": "EOL ランタイム由来の既知脆弱性と循環 `include_once` を解消し、再現性のある依存関係管理と最小権限コンテナを実現する。"
+    },
+    {
+      "priority": "P2",
+      "title": "OpenSSF ガバナンス基盤（.gitignore / .dockerignore / LICENSE / SECURITY.md / CI）の整備",
+      "category": "dependencies",
+      "target_files": [
+        "Dockerfile",
+        "README.md"
+      ],
+      "related_rules": [
+        "common/supply_chain",
+        "common/git_workflow"
+      ],
+      "action": "`.gitignore`・`.dockerignore`・`LICENSE`・`SECURITY.md` を作成し、SHA 固定・最小権限 `permissions: contents: read` の CI と Dependabot を導入する。",
+      "expected_impact": "意図しない機密ファイル混入を防ぎ、継続的な脆弱性検知とサプライチェーン監査性を確立する。"
+    },
+    {
+      "priority": "P2",
+      "title": "PHPUnit 11 + pcov オフライン自動テストスイート（pdo_sqlite / HTTP モック）の構築",
+      "category": "testing",
+      "target_files": [
+        "login.php",
+        "index.php",
+        "product.php",
+        "admin_backup.php"
+      ],
+      "related_rules": [
+        "php/testing"
+      ],
+      "action": "`phpunit.xml.dist` と `tests/` ディレクトリを新設し、インメモリ SQLite とモック HTTP クライアントを用いた単体・機能テストおよび境界値/認可回帰テスト（`pcov` カバレッジ >= 80%）を CI で自動実行する。",
+      "expected_impact": "リファクタリング時のデグレ防止と、認証バイパス・インジェクション脆弱性の再発を自動検知できる品質ゲートを確立する。"
+    },
+    {
+      "priority": "P2",
+      "title": "declare(strict_types=1) 全ファイル適用とネイティブ型宣言・PHPStan 導入",
+      "category": "type_safety",
+      "target_files": [
+        "index.php",
+        "product.php",
+        "login.php",
+        "admin_backup.php",
+        "includes/db.php",
+        "includes/helpers.php"
+      ],
+      "related_rules": [
+        "php/typing"
+      ],
+      "action": "全 PHP ファイル先頭に `declare(strict_types=1);` を付与し、全メソッド・プロパティに PHP 8.3 ネイティブ型宣言と PHPDoc を整備した上で PHPStan (level 8) を CI に組み込む。",
+      "expected_impact": "暗黙の型ジャグリングバグをコンパイル/静的解析段階で防止し、型安全カバレッジを 0% から 90% 以上へ引き上げる。"
+    }
+  ],
+  "report_hints": [
+    "7軸レーダーチャートと全8監査ディメンション（web_penetration_audit: 0/100 Grade D を含む）で Grade D (15/100) プロファイルと P0 緊急リスクを対比表示する。",
+    "アーキテクチャ章で (1) HTML+SQL スパゲッティ構造と includes/db.php <-> includes/helpers.php 相互 include_once 循環 + リスクヒートマップ、(2) 無認証エンドポイントからの CMDi/SQLi/LFI/unserialize/マジックハッシュ攻撃データフロー、(3) EOL php:7.4-apache root コンテナ実行トポロジの3観点図を描画する。",
+    "セキュリティ章で Trivy OS 層 CVE 12,051件（CRITICAL 62 / HIGH 1,940）、13 CWE コードシンク、および .pni/pentests/ 動的ペネトレーションテスト全19プローブ（CRITICAL 2件: PNI_RCE_CANARY_8842 実証・'240610708' 管理者奪取実証、HIGH 4件: LFI・無認証管理操作・反射型XSS×2）のライブ悪用結果を可視化する。"
+  ],
+  "summary": "レガシー素PHP EC・管理アプリケーション `legacy_shop_messy` の総合健全性スコアは 15/100 (Grade D) と診断された。Composer・PSR-4・strict_types・自動テストがいずれも未導入（0%）である上、動的 Web ペネトレーションテスト（`.pni/pentests/examples/php/legacy_shop_messy/`、全19プローブ中 9 PASS / 10 FAIL）により、無認証 `POST /admin_backup.php` における任意 OS コマンド実行（`PNI_RCE_CANARY_8842` 出力、CWE-78/306 CRITICAL）と `POST /login.php` における MD5 マジックハッシュ `'240610708'` 管理者認証突破（`'Logged in as admin'`、CWE-697 CRITICAL）、`/index.php` の LFI トラバーサル露出（CWE-22 HIGH）および `/index.php`・`/product.php` の反射型 XSS（CWE-79 HIGH×2）がライブ HTTP 通信で実際に成立することが実証された。さらに SQL インジェクション 3箇所（CWE-89）、Cookie `unserialize`（CWE-502）、`includes/db.php` の本番 DB パスワード・Stripe Live 秘密鍵直書き（CWE-798）、EOL `php:7.4-apache` root コンテナから検出された 12,051 件の OS 層脆弱性（CRITICAL 62件、HIGH 1,940件）が重なっており、即時公開停止レベルの P0 緊急封じ込めと PHP 8.3 モダン構成への刷新が必須である。"
+}

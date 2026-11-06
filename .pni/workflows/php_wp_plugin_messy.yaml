@@ -1,0 +1,53 @@
+id: php_wp_plugin_messy
+category: audit
+name: Sample Audit - Vulnerable WordPress Analytics Plugin (member-analytics-portal)
+description: Evaluate examples/php/wp_plugin_messy against WordPress plugin security standards (REST permission_callback, wp_ajax_nopriv, $wpdb->prepare, wp_verify_nonce, current_user_can, esc_html, ABSPATH guards, and PHP 8 typing).
+
+targets:
+  root: "examples/php/wp_plugin_messy"
+  source:
+    - "."
+  tests:
+    - "tests"
+  docs:
+    - "README.md"
+
+steps:
+  - id: repo_and_deps
+    uses: php/repo_structure_audit
+
+  - id: supply_chain
+    uses: supply_chain_audit
+
+  - id: ast_and_quality
+    uses: php_ast_audit
+
+  - id: arch_recording
+    uses: architecture_analysis
+
+  - id: service_readiness
+    uses: service_readiness_audit
+
+  - id: test_health
+    uses: php_test_audit
+
+  - id: runtime_verification
+    uses: container_runtime_audit
+
+  - id: security_audit
+    uses: security_vulnerability_audit
+
+  - id: output_score
+    uses: emit_score
+    with:
+      output_dir: "reports/php"
+      target: "wp_plugin_messy"
+
+  - id: create_report
+    uses: write_drawlib_report
+    with:
+      src_dir: "reports_src/php"
+      output_dir: "reports/php"
+      target: "wp_plugin_messy"
+      lang: "ja"
+      style: "google"

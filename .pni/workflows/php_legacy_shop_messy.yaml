@@ -1,0 +1,56 @@
+id: php_legacy_shop_messy
+category: audit
+name: Sample Audit - Legacy Raw-PHP Shop & Admin Scripts (legacy-shop)
+description: Evaluate examples/php/legacy_shop_messy ("素PHP" Composer-less EC app) against PHP strict typing, SQLi/XSS/LFI/CMDi/deserialization/MD5 CWE sinks, superglobal coupling, EOL container security, and testing.
+
+targets:
+  root: "examples/php/legacy_shop_messy"
+  source:
+    - "."
+  tests:
+    - "tests"
+  docs:
+    - "README.md"
+
+steps:
+  - id: repo_and_deps
+    uses: php/repo_structure_audit
+
+  - id: supply_chain
+    uses: supply_chain_audit
+
+  - id: ast_and_quality
+    uses: php_ast_audit
+
+  - id: arch_recording
+    uses: architecture_analysis
+
+  - id: service_readiness
+    uses: service_readiness_audit
+
+  - id: test_health
+    uses: php_test_audit
+
+  - id: runtime_verification
+    uses: container_runtime_audit
+
+  - id: security_audit
+    uses: security_vulnerability_audit
+
+  - id: web_pentest
+    uses: web_penetration_audit
+
+  - id: output_score
+    uses: emit_score
+    with:
+      output_dir: "reports/php"
+      target: "legacy_shop_messy"
+
+  - id: create_report
+    uses: write_drawlib_report
+    with:
+      src_dir: "reports_src/php"
+      output_dir: "reports/php"
+      target: "legacy_shop_messy"
+      lang: "ja"
+      style: "google"

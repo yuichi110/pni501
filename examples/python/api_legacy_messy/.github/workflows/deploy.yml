@@ -1,0 +1,13 @@
+name: Legacy Deploy
+
+on:
+  pull_request_target:
+    types: [opened, synchronize]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@main
+      - uses: actions/setup-python@v5
+      - run: bash scripts/legacy_sync.sh

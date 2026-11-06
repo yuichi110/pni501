@@ -1,0 +1,14 @@
+version = 1
+requires-python = ">=3.11"
+
+[[package]]
+name = "order-dispatch"
+version = "1.2.0"
+source = { editable = "." }
+dependencies = [
+    { name = "fastapi" },
+    { name = "httpx" },
+    { name = "pydantic" },
+    { name = "pydantic-settings" },
+    { name = "uvicorn" },
+]

@@ -1,0 +1,6 @@
+#!/usr/bin/env php
+<?php
+
+declare(strict_types=1);
+
+echo "Laravel Framework 11.x (order-fulfillment-api CLI)\n";

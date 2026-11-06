@@ -1,0 +1,1032 @@
+{
+  "project_name": "legacy_shop_messy",
+  "workflow_id": "php_legacy_shop_messy_migration",
+  "workflow_run_id": "wf-20d0b5ba",
+  "generated_at": "2026-10-24T15:10:30.000000+00:00",
+  "source_language": "php",
+  "target_root": "examples/php/legacy_shop_messy",
+  "migration_facts_file": ".pni/cache/php_legacy_shop_messy_migration/migration_facts.json",
+  "transformation_mode": "cross_stack_replacement",
+  "migration_strategy": "strangler_fig",
+  "api_compatibility": "strict",
+  "bug_handling_policy": "ask_human",
+  "executive_summary": "ベースライン監査（wf-1abc5e13: 15/100 Grade D）およびライブ Docker DAST（web_pentest 19 プローブ中 10 件失敗: admin_backup.php 未認証 OS コマンド実行 PNI_RCE_CANARY_8842、login.php MD5 マジックハッシュ '240610708' 管理者奪取、?page= LFI、Reflected XSS 等）で即時侵害が実証された手続き型「素 PHP」EC アプリケーション legacy_shop_messy（EOL PHP 7.4 Apache・db.php<->helpers.php 循環 include）を、一括凍結リスクのある全面書き換えではなく、Nginx リバースプロキシ配下の Strangler Fig（絞め殺しの木）戦略により PHP 8.3 + Laravel 11 + MySQL 8.0（Eloquent/PDO プリペアドステートメント）+ Redis 7（セッション・サーバー側カート）へ 5 フェーズ・計 10 PR でルート単位に無停止移行し、.pni/pentests/ の 19 プローブ DAST 回帰スイート全件 PASS で封じ込めを保証する。",
+  "confirmed_assumptions": [
+    "移行戦略は Strangler Fig（strangler_fig）とし、Nginx ルーティングで /product.php → /（検索・カート）→ /login.php → /admin_backup.php の順に Laravel 11 へ段階カットオーバーする。",
+    "ランタイム・フレームワークは PHP 8.3（declare(strict_types=1) 徹底）+ Laravel 11 + Composer PSR-4 + PHPUnit 11 + PHPStan Level 6 を採用する。",
+    "DB アクセスは生 mysqli_query 文字列結合と global $LAST_DB_ERR を全廃し、MySQL 8.0 + Laravel Eloquent / PDO プリペアドステートメント + マイグレーション管理へ統一する。",
+    "Cookie 直列化カート（unserialize($_COOKIE['shop_cart'])）と生 $_SESSION 操作は廃止し、Redis 7 バックエンドの Laravel Session および CartRepository Port へ外部化する。",
+    "既存 MD5 パスワードハッシュ利用者をロックアウトしないよう、ログイン成功時に bcrypt へ透過再ハッシュする Dual-Verify 段階移行を採用する。",
+    "動的侵入テスト資産（.pni/pentests/examples/php/legacy_shop_messy/ の全 19 DAST プローブ）を各ルート置換 PR および Phase 2〜4 完了ゲートの必須 CI 回帰テストとして再利用する。"
+  ],
+  "non_goals": [
+    "React / Vue / Next.js 等の SPA フロントエンド分離は本移行スコープ外とし、XSS 自動エスケープを備えた Laravel Blade サーバーサイド描画へまず移行する。",
+    "別言語（Go / Python / Java）へのリライトおよびマイクロサービス分割は行わない。"
+  ],
+  "target_axes": [
+    {
+      "category": "language_runtime",
+      "title": "EOL PHP 7.4 (型宣言ゼロ・緩い比較) → PHP 8.3 (strict_types=1 / Readonly Class)",
+      "as_is": "EOL の php:7.4-apache 上で動作し、declare(strict_types=1) ゼロ・型ヒントゼロ・DAST で突破実証済みのマジックハッシュ '240610708' ('0e...') 緩い == 比較・@ エラー抑制演算子が散在。",
+      "to_be": "PHP 8.3 FPM + Nginx 構成。全クラスに declare(strict_types=1)、コンストラクタ Readonly プロパティ、厳密比較（=== / hash_equals）およびセキュリティヘッダ付与を強制。",
+      "migration_approach": "Laravel 11 新規モジュールに PHPStan Level 6 + Rector UP_TO_PHP_83 / DeclareStrictTypesRector を CI 適用。",
+      "risk_level": "high",
+      "affected_files": [
+        "examples/php/legacy_shop_messy/Dockerfile",
+        "examples/php/legacy_shop_messy/login.php",
+        "examples/php/legacy_shop_messy/includes/db.php"
+      ]
+    },
+    {
+      "category": "framework",
+      "title": "Composer 不在「素 PHP」スクリプト群 → Laravel 11 (Strangler Fig ルート段階置換)",
+      "as_is": "composer.json 不在。index.php, product.php, login.php, admin_backup.php がそれぞれ HTML 出力・SQL・$_GET/$_POST 直参照を混在し、X-Powered-By 露出や CSP/HSTS 欠落を伴う。",
+      "to_be": "Laravel 11 ルーティング + FormRequest バリデーション + Blade 自動エスケープ + Artisan Queue Worker + SecurityHeadersMiddleware による責務分離。",
+      "migration_approach": "Nginx で未移行 URL のみ旧スクリプトへフォールバックさせ、読み取り系（product.php）から管理系（admin_backup.php）へ順次置換。",
+      "risk_level": "critical",
+      "affected_files": [
+        "examples/php/legacy_shop_messy/index.php",
+        "examples/php/legacy_shop_messy/product.php",
+        "examples/php/legacy_shop_messy/login.php",
+        "examples/php/legacy_shop_messy/admin_backup.php"
+      ]
+    },
+    {
+      "category": "architecture_pattern",
+      "title": "循環 include & スーパーグローバル密結合 → Modular Laravel (Controller / Action / Port / Infrastructure)",
+      "as_is": "includes/db.php と includes/helpers.php が相互 include_once する循環依存（Wave 3 SCC）を形成し、全ファイルが $_GET/$_POST/$_SESSION に直接依存。",
+      "to_be": "Http（Controller/FormRequest）→ Actions（ユースケース）→ Domain/Contracts（Port）→ Infrastructure（Eloquent/Redis/Http）の 4 層単方向構造。",
+      "migration_approach": "Phase 1 で共通 DB・HTTP ヘルパーの循環を解消して Laravel 基盤を立ち上げ、各エンドポイントを Action + Repository Port として実装。",
+      "risk_level": "high",
+      "affected_files": [
+        "examples/php/legacy_shop_messy/includes/db.php",
+        "examples/php/legacy_shop_messy/includes/helpers.php"
+      ]
+    },
+    {
+      "category": "database_persistence",
+      "title": "生 mysqli_query 文字列結合 & 定数パスワード直書き → MySQL 8 Eloquent / PDO Prepared",
+      "as_is": "index.php(?q=), product.php(?cat=), login.php(username) の全 SQL が文字列結合（CWE-89 SQLi）。db.php に DB_PASSWORD 直書きと global $LAST_DB_ERR。",
+      "to_be": "Laravel Eloquent / Query Builder による PDO プリペアドステートメント 100% 化、.env シークレット外部注入、database/migrations 管理。",
+      "migration_approach": "既存 legacy_shop テーブル互換の Eloquent モデルを定義し、Strangler Fig 共存期間中は同一 MySQL スキーマを安全に共有参照する。",
+      "risk_level": "critical",
+      "affected_files": [
+        "examples/php/legacy_shop_messy/includes/db.php",
+        "examples/php/legacy_shop_messy/index.php",
+        "examples/php/legacy_shop_messy/product.php",
+        "examples/php/legacy_shop_messy/login.php"
+      ]
+    },
+    {
+      "category": "cache_state",
+      "title": "危険な unserialize($_COOKIE) & 生 $_SESSION → Redis 7 セッション & Server-Side Cart",
+      "as_is": "index.php が $_COOKIE['shop_cart'] を直接 unserialize()（CWE-502 PHP Object Injection RCE）し、login.php が HttpOnly/Secure 属性なしで $_SESSION['is_admin'] を直接書き換え。",
+      "to_be": "Redis 7 をバックエンドとする暗号化 HttpOnly/Secure/SameSite=Lax セッション（SESSION_DRIVER=redis）および RedisCartRepository（TTL 7日・JSON 保存）。",
+      "migration_approach": "Cookie 内オブジェクト直列化を即時廃止し、セッション ID に紐づく Redis カートへ移行（旧形式 Cookie 検出時は安全に破棄・空カート初期化）。",
+      "risk_level": "critical",
+      "affected_files": [
+        "examples/php/legacy_shop_messy/index.php",
+        "examples/php/legacy_shop_messy/login.php"
+      ]
+    },
+    {
+      "category": "auth_security",
+      "title": "DAST 実証済み RCE / マジックハッシュ認証バイパス / LFI / XSS → 多層防御 & 透過 bcrypt 移行",
+      "as_is": "web_pentest で実証された未認証 shell_exec RCE（PNI_RCE_CANARY_8842）、マジックハッシュ '240610708' 管理者突破、include($_GET['page']) LFI、Reflected XSS 2 箇所、CURLOPT_SSL_VERIFYPEER=false。",
+      "to_be": "Dual-Verify bcrypt 認証 + Auth Gate + CSRF、静的ホワイトリスト Blade 描画、Symfony Process 配列引数による非同期 BackupJob、TLS 検証 + 5秒 Timeout Http Client。",
+      "migration_approach": "各ルートの Laravel カットオーバーと同時に CWE シンクを根絶し、.pni/pentests/ の 19 プローブ DAST 回帰テストで攻撃遮断を継続検証する。",
+      "risk_level": "critical",
+      "affected_files": [
+        "examples/php/legacy_shop_messy/login.php",
+        "examples/php/legacy_shop_messy/index.php",
+        "examples/php/legacy_shop_messy/product.php",
+        "examples/php/legacy_shop_messy/admin_backup.php",
+        "examples/php/legacy_shop_messy/includes/helpers.php"
+      ]
+    }
+  ],
+  "target_architecture": {
+    "pattern_name": "Strangler Fig + Modular Laravel 11 (Http / Actions / Domain Contracts / Infrastructure)",
+    "summary": "前段の Nginx リバースプロキシで URL ルート単位にトラフィックを振り分け、レガシー PHP スクリプトを 1 本ずつ Laravel 11 のモジュラー構造へ置換する。Laravel 内部では Controller から Eloquent / Redis / Http クライアントを直接叩かず、Action（UseCase）と Contract（Port インターフェース）を介して単方向依存を維持する。",
+    "dependency_rules": [
+      "App\\Domain\\*（エンティティ・値オブジェクト・Contract インターフェース）は Illuminate\\Http\\*, Illuminate\\Database\\*, Redis ファサードに依存しない。",
+      "App\\Actions\\*（ユースケース層）は Domain と Contracts のみに依存し、$_GET / $_POST / $_SESSION / $_COOKIE への直接アクセスを PHPStan ルールで全面禁止する。",
+      "すべての外部プロセス実行は shell_exec を禁止し、Symfony Process の引数配列渡し（シェル解釈なし）に限定する。"
+    ],
+    "target_layers": [
+      {
+        "layer_name": "Domain & Contracts (App\\Domain)",
+        "package_or_dir": "app/Domain",
+        "responsibility": "純粋 PHP 8.3 Readonly エンティティ（Product, Cart, CartItem, UserAccount）およびリポジトリ・外部連携 Contract（ProductRepositoryInterface, CartStoreInterface, PartnerCatalogPort）。",
+        "allowed_dependencies": [],
+        "forbidden_imports": [
+          "Illuminate\\Http\\*",
+          "Illuminate\\Database\\Eloquent\\*",
+          "Illuminate\\Support\\Facades\\*"
+        ]
+      },
+      {
+        "layer_name": "Application Actions (App\\Actions)",
+        "package_or_dir": "app/Actions",
+        "responsibility": "単一責務ユースケース（SearchProductsAction, AuthenticateUserWithRehashAction, TriggerDatabaseBackupAction）。",
+        "allowed_dependencies": [
+          "Domain & Contracts (App\\Domain)"
+        ],
+        "forbidden_imports": [
+          "Illuminate\\Http\\*"
+        ]
+      },
+      {
+        "layer_name": "Inbound HTTP & Console (App\\Http / App\\Jobs)",
+        "package_or_dir": "app/Http",
+        "responsibility": "FormRequest 入力検証・認証認可ミドルウェア・SecurityHeadersMiddleware・Controller・自動エスケープ Blade ビュー（?q=, ?cat= クエリ互換維持）。",
+        "allowed_dependencies": [
+          "Domain & Contracts (App\\Domain)",
+          "Application Actions (App\\Actions)"
+        ],
+        "forbidden_imports": []
+      },
+      {
+        "layer_name": "Outbound Infrastructure (App\\Infrastructure)",
+        "package_or_dir": "app/Infrastructure",
+        "responsibility": "EloquentProductRepository（PDO Prepared）、RedisCartStore（TTL 7日 JSON）、HttpPartnerCatalogClient（TLS + Timeout 5s）、ProcessDatabaseDumper。",
+        "allowed_dependencies": [
+          "Domain & Contracts (App\\Domain)"
+        ],
+        "forbidden_imports": [
+          "Illuminate\\Http\\*"
+        ]
+      }
+    ],
+    "component_mappings": [
+      {
+        "source_file": "examples/php/legacy_shop_messy/includes/db.php",
+        "source_symbol": "get_db_conn / DB_PASSWORD / $LAST_DB_ERR",
+        "target_layer": "Outbound Infrastructure (App\\Infrastructure)",
+        "target_component": "config/database.php & App\\Infrastructure\\Persistence\\Eloquent*",
+        "port_or_adapter_role": "Outbound Persistence Configuration & PDO Adapter",
+        "refactoring_note": "ハードコード DB_PASSWORD と $stripe_api_secret を .env 注入へ移行し、@mysqli_connect と global $LAST_DB_ERR を PDO 例外管理へ置換する。"
+      },
+      {
+        "source_file": "examples/php/legacy_shop_messy/includes/helpers.php",
+        "source_symbol": "fetch_partner_catalog",
+        "target_layer": "Outbound Infrastructure (App\\Infrastructure)",
+        "target_component": "App\\Infrastructure\\Http\\HttpPartnerCatalogClient",
+        "port_or_adapter_role": "Outbound Adapter -> PartnerCatalogPort",
+        "refactoring_note": "CURLOPT_SSL_VERIFYPEER=false とクエリ文字列トークン露出を廃止し、Bearer ヘッダ + TLS 検証強制 + Http::timeout(5) へ移行する。"
+      },
+      {
+        "source_file": "examples/php/legacy_shop_messy/product.php",
+        "source_symbol": "product.php (?cat= & ?promo_html=)",
+        "target_layer": "Inbound HTTP & Console (App\\Http / App\\Jobs)",
+        "target_component": "App\\Http\\Controllers\\ProductController",
+        "port_or_adapter_role": "Strangler Route #1 (GET /product.php & /products)",
+        "refactoring_note": "?cat= 検索を PDO バインド化し、DAST で Reflected XSS が実証された ?promo_html= の生 HTML 出力を事前定義プロモーションコード表 + Blade {{ }} エスケープへ置換する。"
+      },
+      {
+        "source_file": "examples/php/legacy_shop_messy/index.php",
+        "source_symbol": "index.php ($_COOKIE['shop_cart'] / ?q= / ?page=)",
+        "target_layer": "Inbound HTTP & Console (App\\Http / App\\Jobs)",
+        "target_component": "App\\Http\\Controllers\\StorefrontController & RedisCartStore",
+        "port_or_adapter_role": "Strangler Route #2 (GET / & CartStoreInterface)",
+        "refactoring_note": "unserialize($_COOKIE['shop_cart']) を Redis 7 サーバー側カートへ完全移行し、DAST で実証された ?page= LFI と ?q= Reflected XSS / SQLi を固定ルートマップと Blade 自動エスケープで封じ込める。"
+      },
+      {
+        "source_file": "examples/php/legacy_shop_messy/login.php",
+        "source_symbol": "login.php (extract / md5 / == / $_SESSION)",
+        "target_layer": "Application Actions (App\\Actions)",
+        "target_component": "App\\Actions\\Auth\\AuthenticateUserWithRehashAction",
+        "port_or_adapter_role": "Strangler Route #3 (POST /login & Redis Session)",
+        "refactoring_note": "extract($_POST) と DAST 突破済みのマジックハッシュ定数（'0e462097...'）を撤去。hash_equals で旧 MD5 を照合成功した瞬間に Hash::make(bcrypt) で DB を自動更新しセッション ID を再生成する。"
+      },
+      {
+        "source_file": "examples/php/legacy_shop_messy/admin_backup.php",
+        "source_symbol": "admin_backup.php (shell_exec)",
+        "target_layer": "Inbound HTTP & Console (App\\Http / App\\Jobs)",
+        "target_component": "App\\Http\\Controllers\\Admin\\BackupController & BackupDatabaseJob",
+        "port_or_adapter_role": "Strangler Route #4 (POST /admin/backup + Queue)",
+        "refactoring_note": "DAST で未認証 RCE（PNI_RCE_CANARY_8842）が実証された shell_exec と認可欠落を根絶し、admin 認可 Gate + CSRF 保護 + 固定ストレージ先への非同期 Symfony Process Job へ移行する。"
+      }
+    ]
+  },
+  "decision_log": [
+    {
+      "decision_id": "DEC-01",
+      "file_path": "examples/php/legacy_shop_messy/login.php",
+      "line": 7,
+      "current_behavior": "パスワードをソルト無し md5() でハッシュ化し、緩い等価演算子（==）およびハードコードされたマジックハッシュ '0e462097...' と比較している（DAST プローブで password='240610708' による管理者突破を実証済み）。",
+      "impact_if_changed": "既存の users.password_hash カラムが 32 文字 MD5 のまま単純に Hash::check（bcrypt のみ）へ切り替えると、全既存会員がログイン不能になる。",
+      "recommended_option": "Option A（推奨）: password_algo カラムを追加し、legacy_md5 ユーザーは hash_equals(md5($plain), $stored) 成功直後に bcrypt へ透過再ハッシュ保存する（マジックハッシュフォールバックは即時削除）。",
+      "stakeholder_options": [
+        "Option A（推奨）: Dual-Verify 透過再ハッシュ方式で既存会員を無停止移行し、90日後に未移行 MD5 をリセット対象化する",
+        "Option B: メンテナンスウィンドウで既存パスワードを一括無効化し全会員にパスワード再設定メールを送信する"
+      ]
+    },
+    {
+      "decision_id": "DEC-02",
+      "file_path": "examples/php/legacy_shop_messy/index.php",
+      "line": 4,
+      "current_behavior": "ブラウザ Cookie shop_cart に PHP serialize 文字列を保持し、サーバー側で unserialize() してカート配列を復元している。",
+      "impact_if_changed": "Strangler Fig カットオーバー直後、既にブラウザに残っている旧 shop_cart Cookie は Redis セッション側に存在しないため、移行瞬間の未決済カートが空になる。",
+      "recommended_option": "Option A（推奨）: Object Injection 防止を最優先し unserialize() は一切呼ばず、旧 shop_cart Cookie 検出時は Set-Cookie で削除して空の Redis カートへ安全に初期化する。",
+      "stakeholder_options": [
+        "Option A（推奨）: セキュリティ最優先で unserialize を全廃し、旧 Cookie は失効・空カート初期化する",
+        "Option B: ['allowed_classes' => false] 制約付きで数値商品 ID のみを 1 回だけ読み取り Redis カートへマイグレーション後 Cookie を削除する"
+      ]
+    },
+    {
+      "decision_id": "DEC-03",
+      "file_path": "examples/php/legacy_shop_messy/product.php",
+      "line": 14,
+      "current_behavior": "GET パラメータ ?promo_html= の文字列をエスケープせずそのまま画面に echo 出力している（web_pentest DAST で Reflected XSS 発火を実証済み）。",
+      "impact_if_changed": "マーケティング施策メール等が ?promo_html=<b>Sale</b> のように HTML タグ付き URL を配布していた場合、エスケープ化によりタグ文字列がそのまま表示される。",
+      "recommended_option": "Option A（推奨）: 任意 HTML クエリ受け渡しを廃止し、許可済みキャンペーン識別子（?promo_code=summer_sale）からサーバー側 Blade パーシャルを選択描画する。",
+      "stakeholder_options": [
+        "Option A（推奨）: 許可リスト方式の promo_code へ切り替え、旧 promo_html はプレーンテキストエスケープまたは無視する",
+        "Option B: promo_html クエリ自体を廃止し DB 管理バナーのみ表示する"
+      ]
+    },
+    {
+      "decision_id": "DEC-04",
+      "file_path": "examples/php/legacy_shop_messy/index.php",
+      "line": 24,
+      "current_behavior": "?page= パラメータに '.php' を連結して直接 include しており（web_pentest DAST で LFI パス露出を実証済み）、さらに helpers.php は ?debug=1 で外部レスポンス生データを var_dump 出力する。",
+      "impact_if_changed": "正規の静的ページ遷移（例: ?page=about, ?page=terms）にブックマークしているユーザーがいる場合、?page= の完全削除で 404 が発生する。",
+      "recommended_option": "Option A（推奨）: ?debug=1 出力は本番から完全削除し、?page= は固定 Enum ホワイトリスト（about, terms, contact のみ）から 301 リダイレクトまたは固定 Blade ビューへマッピングする。",
+      "stakeholder_options": [
+        "Option A（推奨）: 許可済みページ名のみ /pages/{slug} へ 301 リダイレクトし未知値は 404 応答、?debug は完全削除",
+        "Option B: ?page= パラメータを即時廃止する"
+      ]
+    }
+  ],
+  "phase_gates": [
+    {
+      "phase_number": 0,
+      "title": "Phase 0: Composer / Laravel 11 共存基盤ブートストラップ & HTTP 特性テスト整備",
+      "objective": "レガシー PHP ファイルに手を入れず、前段 Nginx Strangler ルーター・Composer PSR-4・PHPUnit 11 + PHPStan Level 6 ハーネス・MySQL/Redis 開発コンテナを立ち上げ、現行エンドポイントの HTTP 契約テストを作成する。",
+      "key_tasks": [
+        "Laravel 11 スケルトン（PHP 8.3）と Nginx リバースプロキシ構成を作成し、未移行ルートを旧スクリプトへ透過プロキシする",
+        "GET /, GET /product.php, POST /login.php の正常系 HTTP ステータス・主要 HTML 要素を検証する Feature テストを整備する"
+      ],
+      "exit_criteria": [
+        "Nginx 経由で全現行 URL が 100% 従来通り応答し、composer test && vendor/bin/phpstan analyse が Exit Code 0 で通ること",
+        "DB_PASSWORD 等のハードコード秘密情報が .env 注入へ切り出し可能な設定構造が整っていること"
+      ],
+      "rollback_or_coexistence_note": "Nginx upstream 切替のみで 1 秒以内に旧 Apache/PHP コンテナ単体構成へ切り戻し可能。"
+    },
+    {
+      "phase_number": 1,
+      "title": "Phase 1: 共通インフラ循環依存の解消 & Domain / Eloquent / Redis 7 基盤実装",
+      "objective": "includes/db.php <-> includes/helpers.php の循環責務を Laravel 側のクリーンな Infrastructure アダプタ（PDO Eloquent / Redis 7 Session & Cart / TLS 強制 Http Client）として再構築する。",
+      "key_tasks": [
+        "既存 MySQL テーブル互換の Eloquent モデルとマイグレーション、および ProductRepositoryInterface / CartStoreInterface を実装する",
+        "Redis 7 セッション・RedisCartStore（TTL 7日）および TLS 検証 + 5秒 Timeout 付き HttpPartnerCatalogClient を実装し統合テストを通す"
+      ],
+      "exit_criteria": [
+        "PHPUnit 統合テストで MySQL PDO プリペアドクエリ・Redis カート読み書き・Partner API モック通信（TLS 有効）が全件 PASS すること",
+        "PHPStan Level 6 で App\\Domain / App\\Actions / App\\Infrastructure の型検査エラーが 0 件であること"
+      ],
+      "rollback_or_coexistence_note": "本番トラフィックはまだ旧ルートへ流れており、新インフラ層を無影響で検証できる。"
+    },
+    {
+      "phase_number": 2,
+      "title": "Phase 2: 読み取り・カタログ・カート系ルートの Strangler カットオーバー (product.php & index.php)",
+      "objective": "ステート変更リスクの低い商品一覧（product.php）からトップ・検索・カート（index.php）の順で Laravel Controller + Blade へ切り替え、SQLi / XSS / LFI / Cookie unserialize を根絶する。",
+      "key_tasks": [
+        "Route #1: ProductController（?cat= バインド検索 + Blade 自動エスケープ）を公開し Nginx で /product.php を Laravel へ切り替える",
+        "Route #2: StorefrontController（?q= バインド検索 + Redis カート + ?page= ホワイトリスト 301）を公開し / および /index.php を切り替える",
+        "Rector（UP_TO_PHP_83, DeclareStrictTypesRector, LARAVEL_110）を CI 強制化する"
+      ],
+      "exit_criteria": [
+        ".pni/pentests/examples/php/legacy_shop_messy/ の対象 DAST プローブ（SQLi・Reflected XSS 2 箇所・?page= LFI・Cookie unserialize）が全件 PASS（防御成功）すること",
+        "本番コード上で unserialize($_COOKIE[...]) の呼び出し経路が完全に遮断されること"
+      ],
+      "rollback_or_coexistence_note": "ルート単位の Nginx location 定義により、異常検知時は該当 URL のみ即座に旧バックエンドへ戻せる（ただし Cookie unserialize 廃止後は Option A に従う）。"
+    },
+    {
+      "phase_number": 3,
+      "title": "Phase 3: Dual-Verify 認証移行 (login.php) & 非同期バックアップ Job 化 (admin_backup.php)",
+      "objective": "DAST で CRITICAL 侵害が実証された認証（login.php）と管理バックアップ（admin_backup.php）を PO 合意済み Decision Log に基づき Laravel へ完全移行し、旧 PHP ファイルを退役可能にする。",
+      "key_tasks": [
+        "Route #3: AuthenticateUserWithRehashAction（extract 廃止・マジックハッシュ撤去・MD5->bcrypt 透過再ハッシュ・セッション再生成・レート制限）へ /login.php を切り替える",
+        "Route #4: Admin Gate + CSRF 必須の BackupController と Symfony Process 配列引数を用いた非同期 BackupDatabaseJob へ /admin_backup.php を切り替える"
+      ],
+      "exit_criteria": [
+        "既存 MD5 パスワード会員がログイン成功後に自動で bcrypt ハッシュへ更新され、DAST マジックハッシュ '240610708' ('0e...') 突破プローブが 100% 拒否されること",
+        "DAST 未認証 RCE プローブ（backup_dir=; echo PNI_RCE_CANARY_8842）および未認証バックアップ実行が 401/403 で完全に遮断されること"
+      ],
+      "rollback_or_coexistence_note": "Dual-Verify 期間中は password_algo カラムにより移行済み bcrypt と未移行 MD5 の双方を認証可能。"
+    },
+    {
+      "phase_number": 4,
+      "title": "Phase 4: レガシースクリプト退役・PHP 8.3 非 root コンテナ刷新 & DAST / PNI 最終監査",
+      "objective": "退役済みの素 PHP スクリプト群（index.php, product.php, login.php, admin_backup.php, includes/*）を削除し、PHP 8.3 FPM 非 root マルチステージコンテナと DAST 19 プローブ全件 PASS・Grade A を達成する。",
+      "key_tasks": [
+        "旧手続き型 PHP ファイル群と php:7.4-apache 設定をリポジトリから完全撤去する",
+        "php:8.3-fpm-alpine マルチステージ・非 root USER・HEALTHCHECK・SecurityHeadersMiddleware 付き構成と GitHub Actions CI（PHPUnit + PHPStan + Rector + Trivy + DAST）を整備する"
+      ],
+      "exit_criteria": [
+        "Trivy スキャンおよび .pni/pentests/examples/php/legacy_shop_messy/ の全 19 DAST プローブが 19/19 PASS（CRITICAL / HIGH 脆弱性・秘密情報露出 0 件）であること",
+        "PNI 健全性再診断（web_pentest 含む全 8 次元）で CWE 危険シンク 0 件・総合スコア 85 点以上（Grade A）を達成すること"
+      ],
+      "rollback_or_coexistence_note": "旧スクリプト削除 PR は全ルートの Laravel 稼働安定（7日間エラー率基準クリア）を確認した後にマージする。"
+    }
+  ],
+  "pr_wbs": [
+    {
+      "pr_id": "PR-01",
+      "phase_number": 0,
+      "wave": 4,
+      "axis_category": "framework",
+      "title": "Composer / Laravel 11 + Nginx Strangler ルーター基盤と HTTP 特性テスト構築",
+      "target_files": [
+        "examples/php/legacy_shop_messy/README.md",
+        "examples/php/legacy_shop_messy/Dockerfile"
+      ],
+      "changes_summary": "PHP 8.3 + Laravel 11 プロジェクト骨格、Nginx URL 振り分け設定、PHPUnit 11 + PHPStan Level 6 設定、および現行 URL 群の HTTP スモークテストを追加する。",
+      "automated_or_manual": "manual",
+      "verification_cmd": "composer test && vendor/bin/phpstan analyse",
+      "estimated_size": "M",
+      "depends_on_prs": []
+    },
+    {
+      "pr_id": "PR-02",
+      "phase_number": 1,
+      "wave": 3,
+      "axis_category": "database_persistence",
+      "title": "db.php 秘密情報外部化と MySQL 8 Eloquent / PDO Repository Port 実装",
+      "target_files": [
+        "examples/php/legacy_shop_messy/includes/db.php"
+      ],
+      "changes_summary": "DB_PASSWORD / Stripe 秘密鍵を .env 管理へ移行し、Product / UserAccount の Domain エンティティ・Repository Contract・PDO Eloquent 実装を作成する。",
+      "automated_or_manual": "manual",
+      "verification_cmd": "php artisan test --filter=EloquentRepositoryTest",
+      "estimated_size": "M",
+      "depends_on_prs": [
+        "PR-01"
+      ]
+    },
+    {
+      "pr_id": "PR-03",
+      "phase_number": 1,
+      "wave": 3,
+      "axis_category": "cache_state",
+      "title": "Redis 7 セッション・RedisCartStore 実装と TLS 検証付き Partner HTTP Client 構築",
+      "target_files": [
+        "examples/php/legacy_shop_messy/includes/helpers.php"
+      ],
+      "changes_summary": "db.php<->helpers.php 循環依存を解消する形で、TTL 付き RedisCartStore と TLS 検証強制・5秒 Timeout の HttpPartnerCatalogClient を実装する。",
+      "automated_or_manual": "manual",
+      "verification_cmd": "php artisan test --filter=RedisCartAndPartnerClientTest",
+      "estimated_size": "S",
+      "depends_on_prs": [
+        "PR-01"
+      ]
+    },
+    {
+      "pr_id": "PR-04",
+      "phase_number": 2,
+      "wave": 4,
+      "axis_category": "language_runtime",
+      "title": "Rector (PHP 8.3 / strict_types=1 / Laravel 11) 自動規約パイプライン導入",
+      "target_files": [
+        "examples/php/legacy_shop_messy/README.md"
+      ],
+      "changes_summary": "Rector の UP_TO_PHP_83・DeclareStrictTypesRector・LARAVEL_110 セットを設定し、全モダナイズ対象クラスへの strict_types=1 機械適用を CI 化する。",
+      "automated_or_manual": "codemod",
+      "verification_cmd": "vendor/bin/rector process --dry-run && vendor/bin/phpstan analyse",
+      "estimated_size": "XS",
+      "depends_on_prs": [
+        "PR-02",
+        "PR-03"
+      ]
+    },
+    {
+      "pr_id": "PR-05",
+      "phase_number": 2,
+      "wave": 4,
+      "axis_category": "framework",
+      "title": "Strangler Route #1: product.php の Laravel ProductController + Blade 移行 (SQLi/XSS 根絶)",
+      "target_files": [
+        "examples/php/legacy_shop_messy/product.php"
+      ],
+      "changes_summary": "?cat= 検索の PDO バインド化と DEC-03 合意に基づく promo_code ホワイトリスト Blade 描画を実装し、Nginx で /product.php を Laravel へ切り替えて DAST XSS/SQLi プローブ通過を確認する。",
+      "automated_or_manual": "manual",
+      "verification_cmd": "php artisan test --filter=ProductCatalogSecurityTest && pytest .pni/pentests/examples/php/legacy_shop_messy -k product",
+      "estimated_size": "S",
+      "depends_on_prs": [
+        "PR-04"
+      ]
+    },
+    {
+      "pr_id": "PR-06",
+      "phase_number": 2,
+      "wave": 4,
+      "axis_category": "cache_state",
+      "title": "Strangler Route #2: index.php の Storefront + Redis カート移行 (unserialize/LFI/XSS 根絶)",
+      "target_files": [
+        "examples/php/legacy_shop_messy/index.php"
+      ],
+      "changes_summary": "unserialize($_COOKIE['shop_cart']) を撤去して RedisCartStore へ切り替え（DEC-02）、?q= SQLi/XSS 修正と ?page= 固定ホワイトリスト化（DEC-04）を完了する。",
+      "automated_or_manual": "manual",
+      "verification_cmd": "php artisan test --filter=StorefrontAndCartSecurityTest && pytest .pni/pentests/examples/php/legacy_shop_messy -k 'lfi or xss or cart'",
+      "estimated_size": "M",
+      "depends_on_prs": [
+        "PR-05"
+      ]
+    },
+    {
+      "pr_id": "PR-07",
+      "phase_number": 3,
+      "wave": 4,
+      "axis_category": "auth_security",
+      "title": "Strangler Route #3: login.php の Dual-Verify bcrypt 透過移行とマジックハッシュ根絶",
+      "target_files": [
+        "examples/php/legacy_shop_messy/login.php"
+      ],
+      "changes_summary": "extract($_POST) と DAST 実証済みのマジックハッシュ '240610708' == 比較を全廃。DEC-01 に従い旧 MD5 照合成功時に bcrypt へ自動再ハッシュし、HttpOnly/Secure セッション再生成とレート制限を導入する。",
+      "automated_or_manual": "manual",
+      "verification_cmd": "php artisan test --filter=DualVerifyAuthenticationTest && pytest .pni/pentests/examples/php/legacy_shop_messy -k 'auth or session'",
+      "estimated_size": "M",
+      "depends_on_prs": [
+        "PR-06"
+      ]
+    },
+    {
+      "pr_id": "PR-08",
+      "phase_number": 3,
+      "wave": 4,
+      "axis_category": "auth_security",
+      "title": "Strangler Route #4: admin_backup.php の Admin Gate + 非同期 Symfony Process Job 化 (RCE 根絶)",
+      "target_files": [
+        "examples/php/legacy_shop_messy/admin_backup.php"
+      ],
+      "changes_summary": "DAST で PNI_RCE_CANARY_8842 実行が実証された shell_exec($_POST['backup_dir']) と未認証アクセスを根絶し、管理者認可 Gate + CSRF 保護 + 引数配列 Process による Queue Job へ置換する。",
+      "automated_or_manual": "manual",
+      "verification_cmd": "php artisan test --filter=AdminBackupAuthorizationAndProcessTest && pytest .pni/pentests/examples/php/legacy_shop_messy -k backup",
+      "estimated_size": "S",
+      "depends_on_prs": [
+        "PR-07"
+      ]
+    },
+    {
+      "pr_id": "PR-09",
+      "phase_number": 4,
+      "wave": 4,
+      "axis_category": "architecture_pattern",
+      "title": "退役済み手続き型 PHP スクリプト群 (index/product/login/admin/includes) の完全撤去",
+      "target_files": [
+        "examples/php/legacy_shop_messy/index.php",
+        "examples/php/legacy_shop_messy/product.php",
+        "examples/php/legacy_shop_messy/login.php",
+        "examples/php/legacy_shop_messy/admin_backup.php",
+        "examples/php/legacy_shop_messy/includes/db.php",
+        "examples/php/legacy_shop_messy/includes/helpers.php"
+      ],
+      "changes_summary": "全ルートの Laravel 11 カットオーバー完了確認後、Nginx フォールバック設定と旧手続き型 PHP ファイル一式をリポジトリから削除する。",
+      "automated_or_manual": "manual",
+      "verification_cmd": "composer test && vendor/bin/phpstan analyse --level=6",
+      "estimated_size": "S",
+      "depends_on_prs": [
+        "PR-08"
+      ]
+    },
+    {
+      "pr_id": "PR-10",
+      "phase_number": 4,
+      "wave": 4,
+      "axis_category": "language_runtime",
+      "title": "PHP 8.3-FPM 非 root マルチステージ Dockerfile・セキュリティヘッダ・DAST CI 完成",
+      "target_files": [
+        "examples/php/legacy_shop_messy/Dockerfile",
+        "examples/php/legacy_shop_messy/README.md"
+      ],
+      "changes_summary": "EOL の php:7.4-apache を廃止し、php:8.3-fpm-alpine 非 root USER + HEALTHCHECK + CSP/HSTS/X-Frame-Options 強制および Trivy / PHPStan / Rector / 19 プローブ DAST CI ゲートを完成させる。",
+      "automated_or_manual": "hybrid",
+      "verification_cmd": "pni workflows run-action php_legacy_shop_messy web_pentest && trivy config examples/php/legacy_shop_messy",
+      "estimated_size": "S",
+      "depends_on_prs": [
+        "PR-09"
+      ]
+    }
+  ],
+  "migration_facts": {
+    "project_name": "legacy_shop_messy",
+    "source_language": "php",
+    "base_audit_workflow": "php_legacy_shop_messy",
+    "resolved_brief": "Target Stack & Infrastructure (Confirmed):\n  - Runtime & Framework: PHP 8.3 (`declare(strict_types=1)`) + Laravel 11 with Composer PSR-4 autoloading and PHPUnit 11 + PHPStan Level 6\n  - Database & Persistence: MySQL 8.0 via Laravel Eloquent / PDO prepared statements and versioned database migrations (eliminate raw `mysqli_query` SQLi and `global $LAST_DB_ERR`)\n  - Cache & Session State: Redis 7 backed Laravel Session & server-side `CartRepository` (replace insecure `unserialize($_COOKIE['shop_cart'])` and raw `$_SESSION` mutations)\n  - Outbound HTTP & Admin Jobs: Laravel `Http::timeout(5)` client with TLS verification (`CURLOPT_SSL_VERIFYPEER=true`) and queued Artisan `BackupDatabaseJob` via Symfony `Process` array args (eliminate `shell_exec`)\n  - Authentication Upgrade: Dual-verify transparent password hash upgrade (`bcrypt(md5($plain))` or rehash-on-login) replacing raw `md5()` and loose `==` magic-hash comparison (`0e462097...`)\nTarget Design Philosophy:\n  - Incremental **Strangler Fig** route-by-route cutover behind Nginx reverse proxy (`/products` -> `/cart` & `/` -> `/login` -> `/admin/backup`) into Modular Laravel Architecture (`Http/Controllers` + `Http/Requests` -> `Actions/UseCases` -> `Domain/Contracts` -> `Infrastructure/{Eloquent,Redis,Http}`).\nCompatibility & Ambiguity Guardrails:\n  - Preserve existing URL paths and query parameter keys (`?q=`, `?cat=`) during Strangler Fig coexistence while neutralizing LFI (`?page=`), XSS (`?promo_html=`), and `?debug=1` raw `var_dump` leaks via Stakeholder Decision Log.\nConfirmed Non-Goals:\n  - Do not introduce a separate React/Vue SPA or split microservices; render server-side escaped Blade templates first.",
+    "effective_options": {
+      "base_audit_workflow": "php_legacy_shop_messy",
+      "brief": "Target Stack & Infrastructure (Confirmed):\n  - Runtime & Framework: PHP 8.3 (`declare(strict_types=1)`) + Laravel 11 with Composer PSR-4 autoloading and PHPUnit 11 + PHPStan Level 6\n  - Database & Persistence: MySQL 8.0 via Laravel Eloquent / PDO prepared statements and versioned database migrations (eliminate raw `mysqli_query` SQLi and `global $LAST_DB_ERR`)\n  - Cache & Session State: Redis 7 backed Laravel Session & server-side `CartRepository` (replace insecure `unserialize($_COOKIE['shop_cart'])` and raw `$_SESSION` mutations)\n  - Outbound HTTP & Admin Jobs: Laravel `Http::timeout(5)` client with TLS verification (`CURLOPT_SSL_VERIFYPEER=true`) and queued Artisan `BackupDatabaseJob` via Symfony `Process` array args (eliminate `shell_exec`)\n  - Authentication Upgrade: Dual-verify transparent password hash upgrade (`bcrypt(md5($plain))` or rehash-on-login) replacing raw `md5()` and loose `==` magic-hash comparison (`0e462097...`)\nTarget Design Philosophy:\n  - Incremental **Strangler Fig** route-by-route cutover behind Nginx reverse proxy (`/products` -> `/cart` & `/` -> `/login` -> `/admin/backup`) into Modular Laravel Architecture (`Http/Controllers` + `Http/Requests` -> `Actions/UseCases` -> `Domain/Contracts` -> `Infrastructure/{Eloquent,Redis,Http}`).\nCompatibility & Ambiguity Guardrails:\n  - Preserve existing URL paths and query parameter keys (`?q=`, `?cat=`) during Strangler Fig coexistence while neutralizing LFI (`?page=`), XSS (`?promo_html=`), and `?debug=1` raw `var_dump` leaks via Stakeholder Decision Log.\nConfirmed Non-Goals:\n  - Do not introduce a separate React/Vue SPA or split microservices; render server-side escaped Blade templates first.\n",
+      "brief_file": null,
+      "migration_strategy": "strangler_fig",
+      "api_compatibility": "strict",
+      "bug_handling_policy": "ask_human",
+      "codemod_tool": "rector",
+      "output_dir": "reports/php",
+      "target": "legacy_shop_messy_migration",
+      "plan_path": ""
+    },
+    "transformation_mode": "cross_stack_replacement",
+    "resolved_strategy": "strangler_fig",
+    "preflight_hints": [],
+    "refactoring_waves": [
+      {
+        "wave": 3,
+        "label": "Wave 3: Strongly Connected Components (Cycle Cut Targets)",
+        "modules": [
+          "examples/php/legacy_shop_messy/includes/db.php",
+          "examples/php/legacy_shop_messy/includes/helpers.php"
+        ],
+        "rationale": "Bidirectional circular dependencies that must be severed before layered/Clean Arch isolation."
+      },
+      {
+        "wave": 4,
+        "label": "Wave 4: Application Orchestrators, Controllers & Entrypoints",
+        "modules": [
+          "examples/php/legacy_shop_messy/admin_backup.php",
+          "examples/php/legacy_shop_messy/index.php",
+          "examples/php/legacy_shop_messy/login.php",
+          "examples/php/legacy_shop_messy/product.php"
+        ],
+        "rationale": "Top-level inbound adapters and boot entrypoints wired after Domain, Ports, and Adapters exist."
+      }
+    ],
+    "cycle_cuts": [
+      {
+        "cycle_modules": [
+          "examples/php/legacy_shop_messy/includes/db.php",
+          "examples/php/legacy_shop_messy/includes/helpers.php"
+        ],
+        "recommended_cut_from": "examples/php/legacy_shop_messy/includes/helpers.php",
+        "recommended_cut_to": "examples/php/legacy_shop_messy/includes/db.php",
+        "rationale": "Break upward/cyclic back-reference `examples/php/legacy_shop_messy/includes/helpers.php -> examples/php/legacy_shop_messy/includes/db.php` by passing required scalar/DTO inputs explicitly or inverting dependency via a Port interface."
+      }
+    ],
+    "implicit_contracts": [
+      {
+        "endpoint_or_file": "/examples/php/legacy_shop_messy/admin_backup.php",
+        "http_method": "POST",
+        "handler": "admin_backup.php",
+        "input_fields": [
+          {
+            "key": "backup_dir",
+            "direction": "input",
+            "inferred_type": "string",
+            "default_value": null,
+            "file": "examples/php/legacy_shop_messy/admin_backup.php",
+            "line": 4
+          }
+        ],
+        "output_fields": []
+      },
+      {
+        "endpoint_or_file": "examples/php/legacy_shop_messy/includes/helpers.php",
+        "http_method": "POST/GET",
+        "handler": "examples/php/legacy_shop_messy/includes/helpers.php",
+        "input_fields": [
+          {
+            "key": "debug",
+            "direction": "input",
+            "inferred_type": "string",
+            "default_value": "",
+            "file": "examples/php/legacy_shop_messy/includes/helpers.php",
+            "line": 11
+          }
+        ],
+        "output_fields": []
+      },
+      {
+        "endpoint_or_file": "/examples/php/legacy_shop_messy/index.php",
+        "http_method": "GET",
+        "handler": "index.php",
+        "input_fields": [
+          {
+            "key": "shop_cart",
+            "direction": "input",
+            "inferred_type": "string",
+            "default_value": null,
+            "file": "examples/php/legacy_shop_messy/index.php",
+            "line": 4
+          },
+          {
+            "key": "q",
+            "direction": "input",
+            "inferred_type": "string",
+            "default_value": null,
+            "file": "examples/php/legacy_shop_messy/index.php",
+            "line": 5
+          },
+          {
+            "key": "page",
+            "direction": "input",
+            "inferred_type": "string",
+            "default_value": null,
+            "file": "examples/php/legacy_shop_messy/index.php",
+            "line": 24
+          }
+        ],
+        "output_fields": []
+      },
+      {
+        "endpoint_or_file": "/examples/php/legacy_shop_messy/login.php",
+        "http_method": "POST",
+        "handler": "login.php",
+        "input_fields": [
+          {
+            "key": "password",
+            "direction": "input",
+            "inferred_type": "string",
+            "default_value": "<REDACTED>",
+            "file": "examples/php/legacy_shop_messy/login.php",
+            "line": 7
+          },
+          {
+            "key": "username",
+            "direction": "input",
+            "inferred_type": "string",
+            "default_value": "",
+            "file": "examples/php/legacy_shop_messy/login.php",
+            "line": 11
+          }
+        ],
+        "output_fields": []
+      },
+      {
+        "endpoint_or_file": "/examples/php/legacy_shop_messy/product.php",
+        "http_method": "GET",
+        "handler": "product.php",
+        "input_fields": [
+          {
+            "key": "cat",
+            "direction": "input",
+            "inferred_type": "string",
+            "default_value": "featured",
+            "file": "examples/php/legacy_shop_messy/product.php",
+            "line": 4
+          },
+          {
+            "key": "promo_html",
+            "direction": "input",
+            "inferred_type": "string",
+            "default_value": "Special Sale",
+            "file": "examples/php/legacy_shop_messy/product.php",
+            "line": 14
+          }
+        ],
+        "output_fields": []
+      }
+    ],
+    "env_contracts": [
+      {
+        "name": "DB_HOST",
+        "default_value": "127.0.0.1",
+        "file": "examples/php/legacy_shop_messy/includes/db.php",
+        "line": 4,
+        "kind": "constant"
+      },
+      {
+        "name": "DB_USER",
+        "default_value": "shop_root",
+        "file": "examples/php/legacy_shop_messy/includes/db.php",
+        "line": 5,
+        "kind": "constant"
+      },
+      {
+        "name": "DB_PASSWORD",
+        "default_value": "<REDACTED>",
+        "file": "examples/php/legacy_shop_messy/includes/db.php",
+        "line": 6,
+        "kind": "constant"
+      },
+      {
+        "name": "PARTNER_FEED_TOKEN",
+        "default_value": null,
+        "file": "examples/php/legacy_shop_messy/includes/helpers.php",
+        "line": 6,
+        "kind": "env"
+      }
+    ],
+    "boundary_touchpoints": [
+      {
+        "kind": "in_memory_state",
+        "file": "examples/php/legacy_shop_messy/admin_backup.php",
+        "line": 4,
+        "symbol": "<script>",
+        "current_coupling": "Direct superglobal '$_POST' access — encapsulate via typed Request/Session abstraction",
+        "recommended_port_hint": "Externalize shared mutable state into Cache/State Port or stateless DI"
+      },
+      {
+        "kind": "in_memory_state",
+        "file": "examples/php/legacy_shop_messy/admin_backup.php",
+        "line": 5,
+        "symbol": "<script>",
+        "current_coupling": "Direct superglobal '$_POST' access — encapsulate via typed Request/Session abstraction",
+        "recommended_port_hint": "Externalize shared mutable state into Cache/State Port or stateless DI"
+      },
+      {
+        "kind": "in_memory_state",
+        "file": "examples/php/legacy_shop_messy/includes/db.php",
+        "line": 11,
+        "symbol": "$LAST_DB_ERR",
+        "current_coupling": "Mutable PHP `global` state variable ($LAST_DB_ERR)",
+        "recommended_port_hint": "Eliminate global state via stateless Service DI or external Cache/Repository"
+      },
+      {
+        "kind": "in_memory_state",
+        "file": "examples/php/legacy_shop_messy/includes/helpers.php",
+        "line": 11,
+        "symbol": "fetch_partner_catalog",
+        "current_coupling": "Direct superglobal '$_GET' access — encapsulate via typed Request/Session abstraction",
+        "recommended_port_hint": "Externalize shared mutable state into Cache/State Port or stateless DI"
+      },
+      {
+        "kind": "in_memory_state",
+        "file": "examples/php/legacy_shop_messy/index.php",
+        "line": 4,
+        "symbol": "$_COOKIE['shop_cart']",
+        "current_coupling": "Client cookie PHP object/array deserialization state ($_COOKIE['shop_cart'])",
+        "recommended_port_hint": "Replace insecure cookie state with server-side Redis/DB cart state or signed JSON DTO"
+      },
+      {
+        "kind": "in_memory_state",
+        "file": "examples/php/legacy_shop_messy/index.php",
+        "line": 5,
+        "symbol": "<script>",
+        "current_coupling": "Direct superglobal '$_GET' access — encapsulate via typed Request/Session abstraction",
+        "recommended_port_hint": "Externalize shared mutable state into Cache/State Port or stateless DI"
+      },
+      {
+        "kind": "in_memory_state",
+        "file": "examples/php/legacy_shop_messy/index.php",
+        "line": 21,
+        "symbol": "<script>",
+        "current_coupling": "Direct superglobal '$_GET' access — encapsulate via typed Request/Session abstraction",
+        "recommended_port_hint": "Externalize shared mutable state into Cache/State Port or stateless DI"
+      },
+      {
+        "kind": "in_memory_state",
+        "file": "examples/php/legacy_shop_messy/index.php",
+        "line": 24,
+        "symbol": "<script>",
+        "current_coupling": "Direct superglobal '$_GET' access — encapsulate via typed Request/Session abstraction",
+        "recommended_port_hint": "Externalize shared mutable state into Cache/State Port or stateless DI"
+      },
+      {
+        "kind": "in_memory_state",
+        "file": "examples/php/legacy_shop_messy/index.php",
+        "line": 25,
+        "symbol": "<script>",
+        "current_coupling": "Direct superglobal '$_GET' access — encapsulate via typed Request/Session abstraction",
+        "recommended_port_hint": "Externalize shared mutable state into Cache/State Port or stateless DI"
+      },
+      {
+        "kind": "in_memory_state",
+        "file": "examples/php/legacy_shop_messy/login.php",
+        "line": 5,
+        "symbol": "<script>",
+        "current_coupling": "Direct superglobal '$_SERVER' access — encapsulate via typed Request/Session abstraction",
+        "recommended_port_hint": "Externalize shared mutable state into Cache/State Port or stateless DI"
+      },
+      {
+        "kind": "in_memory_state",
+        "file": "examples/php/legacy_shop_messy/login.php",
+        "line": 6,
+        "symbol": "<script>",
+        "current_coupling": "Direct superglobal '$_POST' access — encapsulate via typed Request/Session abstraction",
+        "recommended_port_hint": "Externalize shared mutable state into Cache/State Port or stateless DI"
+      },
+      {
+        "kind": "in_memory_state",
+        "file": "examples/php/legacy_shop_messy/login.php",
+        "line": 7,
+        "symbol": "<script>",
+        "current_coupling": "Direct superglobal '$_POST' access — encapsulate via typed Request/Session abstraction",
+        "recommended_port_hint": "Externalize shared mutable state into Cache/State Port or stateless DI"
+      },
+      {
+        "kind": "in_memory_state",
+        "file": "examples/php/legacy_shop_messy/login.php",
+        "line": 11,
+        "symbol": "<script>",
+        "current_coupling": "Direct superglobal '$_POST' access — encapsulate via typed Request/Session abstraction",
+        "recommended_port_hint": "Externalize shared mutable state into Cache/State Port or stateless DI"
+      },
+      {
+        "kind": "in_memory_state",
+        "file": "examples/php/legacy_shop_messy/login.php",
+        "line": 18,
+        "symbol": "$_SESSION['is_admin']",
+        "current_coupling": "Direct PHP superglobal session state access ($_SESSION['is_admin'])",
+        "recommended_port_hint": "Migrate to framework Session/Cache store (e.g. Redis-backed session/cache driver)"
+      },
+      {
+        "kind": "in_memory_state",
+        "file": "examples/php/legacy_shop_messy/login.php",
+        "line": 19,
+        "symbol": "<script>",
+        "current_coupling": "Direct superglobal '$_POST' access — encapsulate via typed Request/Session abstraction",
+        "recommended_port_hint": "Externalize shared mutable state into Cache/State Port or stateless DI"
+      },
+      {
+        "kind": "in_memory_state",
+        "file": "examples/php/legacy_shop_messy/product.php",
+        "line": 4,
+        "symbol": "<script>",
+        "current_coupling": "Direct superglobal '$_GET' access — encapsulate via typed Request/Session abstraction",
+        "recommended_port_hint": "Externalize shared mutable state into Cache/State Port or stateless DI"
+      },
+      {
+        "kind": "in_memory_state",
+        "file": "examples/php/legacy_shop_messy/product.php",
+        "line": 14,
+        "symbol": "<script>",
+        "current_coupling": "Direct superglobal '$_GET' access — encapsulate via typed Request/Session abstraction",
+        "recommended_port_hint": "Externalize shared mutable state into Cache/State Port or stateless DI"
+      },
+      {
+        "kind": "persistence_db",
+        "file": "examples/php/legacy_shop_messy/includes/db.php",
+        "line": 12,
+        "symbol": "mysqli_connect",
+        "current_coupling": "Direct procedural/raw database call (mysqli_connect)",
+        "recommended_port_hint": "Extract Repository / Eloquent / parameterized PDO Query Adapter"
+      },
+      {
+        "kind": "persistence_db",
+        "file": "examples/php/legacy_shop_messy/index.php",
+        "line": 8,
+        "symbol": "mysqli_query",
+        "current_coupling": "Direct procedural/raw database call (mysqli_query)",
+        "recommended_port_hint": "Extract Repository / Eloquent / parameterized PDO Query Adapter"
+      },
+      {
+        "kind": "persistence_db",
+        "file": "examples/php/legacy_shop_messy/login.php",
+        "line": 12,
+        "symbol": "mysqli_query",
+        "current_coupling": "Direct procedural/raw database call (mysqli_query)",
+        "recommended_port_hint": "Extract Repository / Eloquent / parameterized PDO Query Adapter"
+      },
+      {
+        "kind": "persistence_db",
+        "file": "examples/php/legacy_shop_messy/product.php",
+        "line": 7,
+        "symbol": "mysqli_query",
+        "current_coupling": "Direct procedural/raw database call (mysqli_query)",
+        "recommended_port_hint": "Extract Repository / Eloquent / parameterized PDO Query Adapter"
+      },
+      {
+        "kind": "external_http_rpc",
+        "file": "examples/php/legacy_shop_messy/includes/helpers.php",
+        "line": 7,
+        "symbol": "curl_init",
+        "current_coupling": "Outbound HTTP partner/API call (curl_init)",
+        "recommended_port_hint": "Wrap in Outbound HTTP Gateway Service/Port with TLS verification & timeout enforcement"
+      },
+      {
+        "kind": "external_http_rpc",
+        "file": "examples/php/legacy_shop_messy/includes/helpers.php",
+        "line": 10,
+        "symbol": "curl_exec",
+        "current_coupling": "Outbound HTTP partner/API call (curl_exec)",
+        "recommended_port_hint": "Wrap in Outbound HTTP Gateway Service/Port with TLS verification & timeout enforcement"
+      }
+    ],
+    "mechanical_codemods": [
+      {
+        "tool": "rector",
+        "recipe_id": "Rector\\Set\\ValueObject\\LevelSetList::UP_TO_PHP_83",
+        "title": "Upgrade PHP Syntax, Typed Properties & Null-Safe Idioms up to PHP 8.3",
+        "applicable_files_count": 6,
+        "rationale": "Applies deterministic PHP 8.x parameter/return type promotions and legacy syntax upgrades."
+      },
+      {
+        "tool": "rector",
+        "recipe_id": "Rector\\TypeDeclaration\\Rector\\StmtsAwareInterface\\DeclareStrictTypesRector",
+        "title": "Enforce declare(strict_types=1) on Refactored PHP Modules",
+        "applicable_files_count": 6,
+        "rationale": "Prevents silent PHP type-juggling coercions once characterization tests pass."
+      },
+      {
+        "tool": "rector",
+        "recipe_id": "RectorLaravel\\Set\\LaravelSetList::LARAVEL_110",
+        "title": "Standardize Laravel 11 Service/Controller Conventions",
+        "applicable_files_count": 6,
+        "rationale": "Aligns newly extracted Laravel controllers, FormRequests, and Eloquent models to v11."
+      }
+    ],
+    "manual_blockers": [
+      {
+        "blocker_id": "BLK-01",
+        "severity": "high",
+        "file": "examples/php/legacy_shop_messy/includes/db.php",
+        "line": null,
+        "description": "Bidirectional circular dependency across modules: examples/php/legacy_shop_messy/includes/db.php <-> examples/php/legacy_shop_messy/includes/helpers.php <-> examples/php/legacy_shop_messy/includes/db.php",
+        "resolution_hint": "Break back-edge in Phase 1 before extracting Clean Architecture / domain layers."
+      },
+      {
+        "blocker_id": "BLK-02",
+        "severity": "high",
+        "file": "examples/php/legacy_shop_messy/includes/helpers.php",
+        "line": null,
+        "description": "Bidirectional circular dependency across modules: examples/php/legacy_shop_messy/includes/helpers.php <-> examples/php/legacy_shop_messy/includes/db.php <-> examples/php/legacy_shop_messy/includes/helpers.php",
+        "resolution_hint": "Break back-edge in Phase 1 before extracting Clean Architecture / domain layers."
+      },
+      {
+        "blocker_id": "BLK-03",
+        "severity": "high",
+        "file": null,
+        "line": null,
+        "description": "No package/build manifest (`composer.json`, `pom.xml`, `pyproject.toml`) detected.",
+        "resolution_hint": "Initialize manifest and PSR-4 / module autoloading in Phase 0 before refactoring."
+      }
+    ],
+    "spec_vs_bug_candidates": [
+      {
+        "candidate_id": "DEC-01",
+        "file": "examples/php/legacy_shop_messy/includes/db.php",
+        "line": 12,
+        "symbol": "get_db_conn",
+        "observed_behavior": "Error-suppression operator '@mysqli_connect(DB_HOST, DB_USER, DB_PASSWORD' hides runtime failures",
+        "risk_if_changed_silently": "Fixing bug-risk idiom (e.g. Java `==` string reference comparison, swallowed exception, or `extract($_POST)`) alters runtime branch/error behavior(Hyrum's Law).",
+        "options": [
+          "Option A (Recommended): Lock current behavior in Phase 0 characterization test, obtain Product Owner sign-off, and apply fix in dedicated Phase 3 PR.",
+          "Option B: Preserve exact legacy behavior behind feature flag during initial cutover."
+        ]
+      },
+      {
+        "candidate_id": "DEC-02",
+        "file": "examples/php/legacy_shop_messy/index.php",
+        "line": 1,
+        "symbol": "index.php",
+        "observed_behavior": "Spaghetti script mixes inline HTML markup ('?>') and raw SQL queries in the same file",
+        "risk_if_changed_silently": "Fixing bug-risk idiom (e.g. Java `==` string reference comparison, swallowed exception, or `extract($_POST)`) alters runtime branch/error behavior(Hyrum's Law).",
+        "options": [
+          "Option A (Recommended): Lock current behavior in Phase 0 characterization test, obtain Product Owner sign-off, and apply fix in dedicated Phase 3 PR.",
+          "Option B: Preserve exact legacy behavior behind feature flag during initial cutover."
+        ]
+      },
+      {
+        "candidate_id": "DEC-03",
+        "file": "examples/php/legacy_shop_messy/product.php",
+        "line": 1,
+        "symbol": "product.php",
+        "observed_behavior": "Spaghetti script mixes inline HTML markup ('?>') and raw SQL queries in the same file",
+        "risk_if_changed_silently": "Fixing bug-risk idiom (e.g. Java `==` string reference comparison, swallowed exception, or `extract($_POST)`) alters runtime branch/error behavior(Hyrum's Law).",
+        "options": [
+          "Option A (Recommended): Lock current behavior in Phase 0 characterization test, obtain Product Owner sign-off, and apply fix in dedicated Phase 3 PR.",
+          "Option B: Preserve exact legacy behavior behind feature flag during initial cutover."
+        ]
+      },
+      {
+        "candidate_id": "DEC-04",
+        "file": "examples/php/legacy_shop_messy/index.php",
+        "line": 4,
+        "symbol": "",
+        "observed_behavior": "Untrusted payload/cookie deserialization (`CWE-502`): Unsafe 'unserialize(...)' without ['allowed_classes' => false] enables Object Injection",
+        "risk_if_changed_silently": "In-flight browser cookies or cached payloads serialized in legacy format will fail to parse during rolling/Strangler Fig cutover.",
+        "options": [
+          "Option A (Recommended): Replace with signed JSON / server-side Redis session and gracefully reset unparseable legacy cookies to empty cart.",
+          "Option B: Hard-cut cookie format during maintenance window."
+        ]
+      },
+      {
+        "candidate_id": "DEC-05",
+        "file": "examples/php/legacy_shop_messy/login.php",
+        "line": 6,
+        "symbol": "",
+        "observed_behavior": "Loose equality / auth comparison (`CWE-621`): Variable table pollution via 'extract(...)' allows overwriting local security state",
+        "risk_if_changed_silently": "Switching to strict comparison or new password hashing without dual-read migration can lock out existing users or alter edge-case request matching.",
+        "options": [
+          "Option A (Recommended): Preserve legacy hash verification via dual-verify rehash-on-login in Phase 3.",
+          "Option B: Force password reset / immediate strict check at cutover."
+        ]
+      },
+      {
+        "candidate_id": "DEC-06",
+        "file": "examples/php/legacy_shop_messy/login.php",
+        "line": 17,
+        "symbol": "",
+        "observed_behavior": "Loose equality / auth comparison (`CWE-697`): Loose '==' comparison on credential/hash '$pw_hash == $expected_hash' enables PHP type-juggling bypass — use 'hash_equals()' or '==='",
+        "risk_if_changed_silently": "Switching to strict comparison or new password hashing without dual-read migration can lock out existing users or alter edge-case request matching.",
+        "options": [
+          "Option A (Recommended): Preserve legacy hash verification via dual-verify rehash-on-login in Phase 3.",
+          "Option B: Force password reset / immediate strict check at cutover."
+        ]
+      },
+      {
+        "candidate_id": "DEC-07",
+        "file": "examples/php/legacy_shop_messy/login.php",
+        "line": 7,
+        "symbol": "",
+        "observed_behavior": "Legacy weak digest (`CWE-327`): Broken digest 'md5(...)' — use 'password_hash()' for passwords or SHA-256/HMAC",
+        "risk_if_changed_silently": "Existing stored digests in the database will fail authentication if replaced with bcrypt/Argon2id without an online upgrade wrapper.",
+        "options": [
+          "Option A (Recommended): Wrap legacy digest in bcrypt(`md5(pw)`) or rehash on next login.",
+          "Option B: Invalidate legacy credentials and require credential rotation."
+        ]
+      }
+    ]
+  }
+}

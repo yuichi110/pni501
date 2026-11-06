@@ -1,0 +1,15 @@
+version = 1
+requires-python = ">=3.11"
+
+[[package]]
+name = "metrics-kit"
+version = "0.4.2"
+source = { editable = "." }
+dependencies = [
+    { name = "pydantic" },
+]
+
+[[package]]
+name = "pydantic"
+version = "2.10.6"
+source = { registry = "https://pypi.org/simple" }

@@ -1,0 +1,32 @@
+[build-system]
+requires = ["uv-build<0.12"]
+build-backend = "uv_build"
+
+[project]
+name = "order-dispatch"
+version = "1.2.0"
+description = "Async FastAPI order fulfillment and outbound webhook dispatch microservice."
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "Apache-2.0" }
+dependencies = [
+    "fastapi>=0.115.0",
+    "httpx>=0.27.0",
+    "pydantic>=2.8.0",
+    "pydantic-settings>=2.4.0",
+    "uvicorn>=0.30.0",
+]
+
+[tool.uv.build-backend]
+module-name = "order_dispatch"
+
+[dependency-groups]
+dev = [
+    "pytest>=8.3.0",
+    "pytest-cov>=6.0.0",
+    "ruff>=0.9.0",
+    "ty>=0.0.35",
+]
+
+[tool.ruff]
+line-length = 100

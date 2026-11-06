@@ -1,0 +1,10 @@
+id: php_test_audit
+name: PHP PHPUnit / Pest Testing Standards Audit
+description: Evaluate PHPUnit or Pest test suite completeness, assertion density, and offline test isolation against php/testing standards.
+rules:
+  - php/testing
+primitives:
+  - type: ai_interpret
+    name: Evaluate PHP Test Suite Completeness & Structure
+    prompt: |
+      Compare `source_files_count` vs `test_files_count` from ProjectFacts alongside `test_functions_count`, `module_test_coverage_pct`, and `assertion_free_tests` from AstFacts. Inspect `tests/` (or note total absence of automated tests in legacy PHP repositories) according to `php/testing`.

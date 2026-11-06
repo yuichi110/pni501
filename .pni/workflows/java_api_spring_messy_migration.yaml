@@ -1,0 +1,42 @@
+id: java_api_spring_messy_migration
+category: migration
+based_on: java_api_spring_messy
+name: Migration Execution Plan - Java Legacy Spring Service -> Java 21 + Spring Boot 3.4 + Clean Architecture
+description: Multi-axis migration proposal for examples/java/api_spring_messy targeting Java 21 LTS, Spring Boot 3.4 (Jakarta EE 10), PostgreSQL 16 (JPA + Flyway), Redis 7 cache externalization, and Clean Architecture (domain/usecase/port/adapter).
+
+steps:
+  - id: migration_intelligence_and_plan
+    uses: migration_proposal
+    with:
+      output_dir: "reports/java"
+      target: "api_spring_messy_migration"
+      migration_strategy: "phased_pr"
+      api_compatibility: "strict"
+      bug_handling_policy: "ask_human"
+      codemod_tool: "openrewrite"
+      brief: |
+        Target Stack & Infrastructure (Confirmed):
+          - Runtime & Framework: Java 21 LTS + Spring Boot 3.4.x BOM (Jakarta EE 10, JUnit 5 Jupiter, Mockito, JaCoCo)
+          - Database & Persistence: PostgreSQL 16 via Spring Data JPA + Flyway versioned DDL migrations (replace ineffective @Transactional audit stub)
+          - Cache & Session State: Redis 7 (Spring Data Redis / StringRedisTemplate) with explicit TTL (replace BillingManager.INVOICE_CACHE static raw Map and remove mutable BillingController.channel field)
+          - Outbound HTTP Client: Spring RestClient / java.net.http.HttpClient with explicit connect/read timeouts and @ConfigurationProperties secret injection
+          - Container & CI: Multi-stage eclipse-temurin:21-jdk / 21-jre-alpine non-root image with HEALTHCHECK; GitHub Actions pull_request trigger with pinned SHA actions
+        Target Design Philosophy:
+          - Introduce Clean Architecture (`domain` / `usecase` / `port` / `adapter`):
+            * `domain`: Pure Java 21 immutable `record` models (`Invoice`, `Money`, `BillingSummary`) and tax policy with zero Spring/JPA/Redis imports
+            * `port`: Inbound `ChargeCustomerUseCase` / `ProcessBatchBillingUseCase` interfaces and outbound `PaymentGatewayPort`, `InvoiceCachePort`, `BillingAuditRepositoryPort`
+            * `usecase`: Pure orchestration services implementing inbound ports without upward Controller dependencies
+            * `adapter`: `adapter.in.web` (`BillingController` + `@Valid` request/response DTOs) and `adapter.out.{gateway,persistence,cache}`
+        Compatibility & Ambiguity Guardrails:
+          - Strictly preserve external HTTP JSON contract on `POST /charge` (`customerId`, `amountCents`, `billedCents`); evaluate `controllerPing` diagnostic key, `currency == "USD"` reference comparison, and fixed `100L` retry charge via Stakeholder Decision Log before Phase 3 changes.
+        Confirmed Non-Goals:
+          - No microservice split or Kafka/RabbitMQ event bus introduction in this migration wave (keep single deployable Maven artifact).
+
+  - id: compile_migration_report
+    uses: write_migration_report
+    with:
+      src_dir: "reports_src/java"
+      output_dir: "reports/java"
+      target: "api_spring_messy_migration"
+      lang: "ja"
+      style: "google"

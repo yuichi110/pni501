@@ -1,0 +1,50 @@
+id: py_cli_audit_tool
+category: audit
+name: Sample Audit - Python CLI Log Analyzer (logpulse)
+description: Evaluate examples/python/cli_audit_tool as an intermediate-grade Typer CLI project against clig.dev UX, typing, and test coverage rules.
+
+targets:
+  root: "examples/python/cli_audit_tool"
+  source:
+    - "src"
+  tests:
+    - "tests"
+  docs:
+    - "README.md"
+
+steps:
+  - id: repo_and_deps
+    uses: repo_structure_audit
+
+  - id: ast_and_quality
+    uses: python_ast_audit
+
+  - id: arch_recording
+    uses: architecture_analysis
+
+  - id: cli_ux
+    uses: cli_guidelines_audit
+
+  - id: test_health
+    uses: python_test_audit
+
+  - id: runtime_verification
+    uses: container_runtime_audit
+
+  - id: security_audit
+    uses: security_vulnerability_audit
+
+  - id: output_score
+    uses: emit_score
+    with:
+      output_dir: "reports/python"
+      target: "cli_audit_tool"
+
+  - id: create_report
+    uses: write_drawlib_report
+    with:
+      src_dir: "reports_src/python"
+      output_dir: "reports/python"
+      target: "cli_audit_tool"
+      lang: "ja"
+      style: "google"

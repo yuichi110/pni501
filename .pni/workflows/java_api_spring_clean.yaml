@@ -1,0 +1,56 @@
+id: java_api_spring_clean
+category: audit
+name: Sample Audit - Java 21 Clean Spring Boot Service (inventory-service)
+description: Evaluate examples/java/api_spring_clean against Java 21 LTS idioms, Spring Boot 3 constructor DI, SRE readiness, Maven wrapper/supply-chain hygiene, and JUnit 5 testing.
+
+targets:
+  root: "examples/java/api_spring_clean"
+  source:
+    - "src/main/java"
+  tests:
+    - "src/test/java"
+  docs:
+    - "README.md"
+
+steps:
+  - id: repo_and_deps
+    uses: java/repo_structure_audit
+
+  - id: supply_chain
+    uses: supply_chain_audit
+
+  - id: ast_and_quality
+    uses: java_ast_audit
+
+  - id: arch_recording
+    uses: architecture_analysis
+
+  - id: service_readiness
+    uses: service_readiness_audit
+
+  - id: test_health
+    uses: java_test_audit
+
+  - id: runtime_verification
+    uses: container_runtime_audit
+
+  - id: security_audit
+    uses: security_vulnerability_audit
+
+  - id: web_pentest
+    uses: web_penetration_audit
+
+  - id: output_score
+    uses: emit_score
+    with:
+      output_dir: "reports/java"
+      target: "api_spring_clean"
+
+  - id: create_report
+    uses: write_drawlib_report
+    with:
+      src_dir: "reports_src/java"
+      output_dir: "reports/java"
+      target: "api_spring_clean"
+      lang: "ja"
+      style: "google"

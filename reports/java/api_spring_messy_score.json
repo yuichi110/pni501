@@ -1,0 +1,1907 @@
+{
+  "project_name": "legacy-billing",
+  "workflow_id": "java_api_spring_messy",
+  "workflow_run_id": "wf-da941741",
+  "evaluated_at": "2026-10-24T14:59:08.282916+00:00",
+  "language": "java",
+  "target_root": "examples/java/api_spring_messy",
+  "facts_file": ".pni/cache/java_api_spring_messy/facts.json",
+  "key_files_inspected": [
+    "pom.xml",
+    "Dockerfile",
+    "README.md",
+    ".github/workflows/build.yml",
+    "src/main/java/com/example/billing/BillingApp.java",
+    "src/main/java/com/example/billing/controller/BillingController.java",
+    "src/main/java/com/example/billing/service/BillingManager.java",
+    "src/main/java/com/example/billing/client/GatewayClient.java",
+    "src/main/java/com/example/billing/model/InvoiceRecord.java",
+    "src/main/java/com/example/billing/util/LegacyDateHelper.java",
+    "src/test/java/com/example/billing/BillingManagerTest.java"
+  ],
+  "overall_score": 23,
+  "grade": "D",
+  "category_scores": {
+    "architecture": 29,
+    "code_quality": 22,
+    "typing": 35,
+    "testing": 14,
+    "dependencies": 18,
+    "security": 17,
+    "documentation": 26
+  },
+  "category_rationales": {
+    "architecture": "パッケージは5層に分割されているが、BillingManager が上位の BillingController を @Autowired 注入する双方向循環依存、public static 生 HashMap キャッシュ、Controller の可変フィールド channel、タイムアウト未設定の都度生成 HttpClient により層境界とステートレス性が破綻している。",
+    "code_quality": "BillingManager.processBatchBilling の認知的複雑度 56・引数 8 個、文字列の == 参照比較バグ（3箇所）、未定義メソッド dateHelper.currentPeriodLabel() 呼び出し、空の catch ブロック、無効な private @Transactional、System.out / printStackTrace 出力など深刻な品質欠陥が集中している。",
+    "typing": "InvoiceRecord は不変かつ型安全だが、主要な業務パスで Raw Map / List / Vector、Object 型引数、@SuppressWarnings(\"unchecked\") が多用されており、ドメイン境界での型安全性が失われている。",
+    "testing": "テストはレガシー JUnit 4 の BillingManagerTest 1件のみでアサーションが0件、パッケージ階層も不一致であり、さらに Maven ビルド失敗によってコンテナ内オフラインテスト実行と JaCoCo カバレッジ計測が完全にブロックされている。",
+    "dependencies": "pom.xml の Java 1.8 設定に対し spring-boot-starter-web:LATEST が Java 17+ 必須の 4.2.0-RC1 (class version 61.0) を解決してビルド不能に陥っており、Java 11 HttpClient 使用・spring-tx 欠落・mvnw 不在・壊れた Dockerfile も重なっている。",
+    "security": "Trivy SCA による CVE-2022-22965 (Spring4Shell, CRITICAL CVSS 9.8) 検出、Dockerfile の root 実行・:latest 使用 (DS-0002/DS-0001/DS-0026)、GatewayClient のハードコード秘密情報、無認証かつ HTTP メソッド無制限・未検証 Long.parseLong 入力の ANY /charge エンドポイント、特権 pull_request_target CI に加え、コンテナビルド破綻により隔離ループバック DAST（web_pentest: status=error, 15.74s）もブロックされており極めて危険な状態にある。",
+    "documentation": "README.md は実質2行のみで前提条件・環境変数・API 仕様・テスト手順を欠き、Javadoc カバレッジも 33.3%（10箇所欠落＋@param obsoleteToken 不整合1件）と低水準である。"
+  },
+  "metrics_snapshot": {
+    "language": "java",
+    "runtime_type_hint": "web_api",
+    "build_system": "maven",
+    "has_manifest": true,
+    "has_lockfile": false,
+    "has_license": false,
+    "has_security_policy": false,
+    "has_dependency_automation": false,
+    "dependencies_count": 2,
+    "unpinned_dependencies_count": 1,
+    "source_files_count": 6,
+    "test_files_count": 1,
+    "readme_line_count": 2,
+    "ci_supply_chain_issues_count": 3,
+    "committed_secret_files_count": 0,
+    "container_hygiene_issues_count": 3,
+    "legacy_language_findings_count": 0,
+    "total_files": 6,
+    "total_loc": 187,
+    "total_classes": 6,
+    "total_functions": 11,
+    "import_hygiene_coverage_pct": 83.3,
+    "type_safety_coverage_pct": 81.8,
+    "docstring_coverage_pct": 33.3,
+    "module_test_coverage_pct": 33.3,
+    "unsorted_imports_count": 4,
+    "wildcard_imports_count": 1,
+    "type_safety_issues_count": 2,
+    "weak_type_usages_count": 4,
+    "empty_docstrings_count": 0,
+    "doc_signature_mismatches_count": 1,
+    "complex_functions_count": 1,
+    "excessive_parameters_count": 1,
+    "global_state_usages_count": 1,
+    "bug_risk_idioms_count": 7,
+    "circular_dependencies_count": 2,
+    "unused_dependencies_count": 0,
+    "undeclared_dependencies_count": 1,
+    "test_functions_count": 1,
+    "assertion_free_tests_count": 1,
+    "framework_issues_count": 3,
+    "modernization_hints_count": 6,
+    "language_version_mismatches_count": 1,
+    "missing_io_timeouts_count": 1,
+    "scattered_env_access_count": 1,
+    "unstructured_logging_count": 4,
+    "hardcoded_secrets_count": 1,
+    "ast_dangerous_sinks_count": 0,
+    "api_endpoints_count": 1,
+    "runtime_status": "failed",
+    "harness_build_status": "failed",
+    "tests_status": "blocked",
+    "tests_total": 0,
+    "tests_passed": 0,
+    "tests_failed": 0,
+    "smoke_check_status": "blocked",
+    "security_scan_status": "failed",
+    "app_vuln_critical": 1,
+    "app_vuln_high": 0,
+    "app_vuln_total": 1,
+    "app_vuln_unpinned_range_matches": 1,
+    "os_vuln_high_or_crit": 0,
+    "misconfig_count": 3,
+    "secret_leak_count": 0,
+    "pentest_status": "error",
+    "pentest_probes_total": 0,
+    "pentest_probes_passed": 0,
+    "pentest_probes_failed": 0,
+    "pentest_findings_count": 0,
+    "pentest_high_or_crit_count": 0
+  },
+  "runtime_facts": {
+    "status": "failed",
+    "container_engine": "docker",
+    "engine_available": true,
+    "skip_reason": "",
+    "language": "java",
+    "selected_dockerfile_template": "java/maven.dockerfile",
+    "harness_dockerfile_path": ".pni/dockerfiles/examples/java/api_spring_messy/Dockerfile",
+    "build_args": {
+      "JAVA_VERSION": "8"
+    },
+    "artifacts_dir": ".pni/cache/java_api_spring_messy/runtime",
+    "project_dockerfile_build": {
+      "attempted": true,
+      "status": "failed",
+      "dockerfile_used": "examples/java/api_spring_messy/Dockerfile",
+      "duration_sec": 1.51,
+      "exit_code": 1,
+      "error_tail": [
+        "#0 building with \"default\" instance using docker driver",
+        "#1 [internal] load build definition from Dockerfile",
+        "#1 transferring dockerfile: 127B 0.0s done",
+        "#1 DONE 0.0s",
+        "#2 [internal] load metadata for docker.io/library/openjdk:latest",
+        "#2 ERROR: docker.io/library/openjdk:latest: not found",
+        "------",
+        " > [internal] load metadata for docker.io/library/openjdk:latest:",
+        "------",
+        "Dockerfile:1",
+        "--------------------",
+        "   1 | >>> FROM openjdk:latest",
+        "   2 |     WORKDIR /app",
+        "   3 |     COPY . .",
+        "--------------------",
+        "ERROR: failed to build: failed to solve: openjdk:latest: failed to resolve source metadata for docker.io/library/openjdk:latest: docker.io/library/openjdk:latest: not found"
+      ]
+    },
+    "harness_build": {
+      "attempted": true,
+      "status": "failed",
+      "dockerfile_used": ".pni/dockerfiles/examples/java/api_spring_messy/Dockerfile",
+      "duration_sec": 25.76,
+      "exit_code": 1,
+      "error_tail": [
+        "#8 ERROR: process \"/bin/sh -c mvn -B -Dmaven.repo.local=/m2repo       org.jacoco:jacoco-maven-plugin:${JACOCO_VERSION}:prepare-agent       test       -DfailIfNoTests=false       -Dmaven.test.failure.ignore=true       org.jacoco:jacoco-maven-plugin:${JACOCO_VERSION}:report       dependency:build-classpath -Dmdep.outputFile=/m2repo/runtime_cp.txt     && rm -rf target/surefire-reports target/site target/jacoco.exec     && chown -R pni:pni /workspace /m2repo     && chmod -R a+rwX /workspace /m2repo /out\" did not complete successfully: exit code: 1",
+        "------",
+        " > [5/5] RUN mvn -B -Dmaven.repo.local=/m2repo       org.jacoco:jacoco-maven-plugin:0.8.12:prepare-agent       test       -DfailIfNoTests=false       -Dmaven.test.failure.ignore=true       org.jacoco:jacoco-maven-plugin:0.8.12:report       dependency:build-classpath -Dmdep.outputFile=/m2repo/runtime_cp.txt     && rm -rf target/surefire-reports target/site target/jacoco.exec     && chown -R pni:pni /workspace /m2repo     && chmod -R a+rwX /workspace /m2repo /out:",
+        "23.86 [ERROR]   bad class file: /m2repo/org/springframework/boot/spring-boot/4.2.0-RC1/spring-boot-4.2.0-RC1.jar(org/springframework/boot/SpringApplication.class)",
+        "23.86 [ERROR]     class file has wrong version 61.0, should be 52.0",
+        "23.86 [ERROR]     Please remove or make sure it appears in the correct subdirectory of the classpath.",
+        "23.86 [ERROR] -> [Help 1]",
+        "23.86 [ERROR]",
+        "23.86 [ERROR] To see the full stack trace of the errors, re-run Maven with the -e switch.",
+        "23.86 [ERROR] Re-run Maven using the -X switch to enable full debug logging.",
+        "23.87 [ERROR]",
+        "23.87 [ERROR] For more information about the errors and possible solutions, please read the following articles:",
+        "23.87 [ERROR] [Help 1] http://cwiki.apache.org/confluence/display/MAVEN/MojoFailureException",
+        "------",
+        "Dockerfile:16",
+        "--------------------",
+        "  15 |",
+        "  16 | >>> RUN mvn -B -Dmaven.repo.local=/m2repo \\",
+        "  17 | >>>       org.jacoco:jacoco-maven-plugin:${JACOCO_VERSION}:prepare-agent \\",
+        "  18 | >>>       test \\",
+        "  19 | >>>       -DfailIfNoTests=false \\",
+        "  20 | >>>       -Dmaven.test.failure.ignore=true \\",
+        "  21 | >>>       org.jacoco:jacoco-maven-plugin:${JACOCO_VERSION}:report \\",
+        "  22 | >>>       dependency:build-classpath -Dmdep.outputFile=/m2repo/runtime_cp.txt \\",
+        "  23 | >>>     && rm -rf target/surefire-reports target/site target/jacoco.exec \\",
+        "  24 | >>>     && chown -R pni:pni /workspace /m2repo \\",
+        "  25 | >>>     && chmod -R a+rwX /workspace /m2repo /out",
+        "  26 |",
+        "--------------------",
+        "ERROR: failed to build: failed to solve: process \"/bin/sh -c mvn -B -Dmaven.repo.local=/m2repo       org.jacoco:jacoco-maven-plugin:${JACOCO_VERSION}:prepare-agent       test       -DfailIfNoTests=false       -Dmaven.test.failure.ignore=true       org.jacoco:jacoco-maven-plugin:${JACOCO_VERSION}:report       dependency:build-classpath -Dmdep.outputFile=/m2repo/runtime_cp.txt     && rm -rf target/surefire-reports target/site target/jacoco.exec     && chown -R pni:pni /workspace /m2repo     && chmod -R a+rwX /workspace /m2repo /out\" did not complete successfully: exit code: 1"
+      ]
+    },
+    "test_execution": {
+      "attempted": false,
+      "status": "blocked",
+      "command": "",
+      "duration_sec": 0.0,
+      "exit_code": null,
+      "total_tests": 0,
+      "passed_tests": 0,
+      "failed_tests": 0,
+      "error_tests": 0,
+      "skipped_tests": 0,
+      "failures": [],
+      "log_tail": []
+    },
+    "coverage": {
+      "measured": false,
+      "tool": "",
+      "line_coverage_pct": null,
+      "branch_coverage_pct": null,
+      "covered_lines": 0,
+      "total_statements": 0,
+      "lowest_covered_modules": []
+    },
+    "smoke_check": {
+      "attempted": false,
+      "archetype": "web_api",
+      "status": "blocked",
+      "command": "",
+      "duration_sec": 0.0,
+      "exit_code": null,
+      "http_status": null,
+      "probed_endpoint": null,
+      "failure_kind": "none",
+      "detail": "Blocked by harness build failure",
+      "log_tail": []
+    }
+  },
+  "security_facts": {
+    "status": "failed",
+    "scanner": "trivy",
+    "container_engine": "docker",
+    "engine_available": true,
+    "skip_reason": "",
+    "trivy_image": "ghcr.io/aquasecurity/trivy:0.69.3",
+    "scanned_filesystem": true,
+    "scanned_resolved_image": false,
+    "resolved_image_source": "",
+    "artifacts_dir": ".pni/cache/java_api_spring_messy/security",
+    "vuln_counts": {
+      "critical": 1,
+      "high": 0,
+      "medium": 0,
+      "low": 0,
+      "total": 1
+    },
+    "app_vuln_counts": {
+      "critical": 1,
+      "high": 0,
+      "medium": 0,
+      "low": 0,
+      "total": 1
+    },
+    "os_vuln_counts": {
+      "critical": 0,
+      "high": 0,
+      "medium": 0,
+      "low": 0,
+      "total": 0
+    },
+    "vulnerabilities": [
+      {
+        "vuln_id": "CVE-2022-22965",
+        "pkg_name": "org.springframework.boot:spring-boot-starter-web",
+        "pkg_type": "pom",
+        "installed_version": "LATEST",
+        "fixed_version": "2.5.12, 2.6.6",
+        "severity": "CRITICAL",
+        "title": "spring-framework: RCE via Data Binding on JDK 9+",
+        "target": "pom.xml",
+        "cvss_score": 9.8,
+        "is_unpinned_specifier": true,
+        "version_resolution_note": "Unpinned symbolic version in manifest; static SCA evaluates full historical CVE range until locked"
+      }
+    ],
+    "misconfigurations": [
+      {
+        "check_id": "DS-0002",
+        "severity": "HIGH",
+        "title": "Image user should not be 'root'",
+        "file_path": "Dockerfile",
+        "start_line": null,
+        "message": "Specify at least 1 USER command in Dockerfile with non-root user as argument",
+        "resolution": "Add 'USER <non root user name>' line to the Dockerfile"
+      },
+      {
+        "check_id": "DS-0001",
+        "severity": "MEDIUM",
+        "title": "':latest' tag used",
+        "file_path": "Dockerfile",
+        "start_line": 1,
+        "message": "Specify a tag in the 'FROM' statement for image 'openjdk'",
+        "resolution": "Add a tag to the image in the 'FROM' statement"
+      },
+      {
+        "check_id": "DS-0026",
+        "severity": "LOW",
+        "title": "No HEALTHCHECK defined",
+        "file_path": "Dockerfile",
+        "start_line": null,
+        "message": "Add HEALTHCHECK instruction in your Dockerfile",
+        "resolution": "Add HEALTHCHECK instruction in Dockerfile"
+      }
+    ],
+    "secrets": []
+  },
+  "pentest_facts": {
+    "status": "error",
+    "container_engine": "docker",
+    "engine_available": true,
+    "skip_reason": "",
+    "pentests_dir": ".pni/pentests/examples/java/api_spring_messy",
+    "materialized_files": [
+      ".pni/pentests/examples/java/api_spring_messy/conftest.py",
+      ".pni/pentests/examples/java/api_spring_messy/test_app_probes.py",
+      ".pni/pentests/examples/java/api_spring_messy/test_baseline_http.py",
+      ".pni/pentests/examples/java/api_spring_messy/test_target_surface.py"
+    ],
+    "target_base_url": "",
+    "server_booted": false,
+    "boot_failure_reason": "Container build failed: ERROR: failed to build: failed to solve: process \"/bin/sh -c mvn -B -Dmaven.repo.local=/m2repo       org.jacoco:jacoco-maven-plugin:${JACOCO_VERSION}:prepare-agent       test       -DfailIfNoTests=false       -Dmaven.test.failure.ignore=tru",
+    "duration_sec": 15.74,
+    "artifacts_dir": ".pni/cache/java_api_spring_messy/pentest",
+    "probe_summary": {
+      "total_probes": 0,
+      "passed_probes": 0,
+      "failed_probes": 0,
+      "skipped_probes": 0,
+      "error_probes": 0
+    },
+    "findings": []
+  },
+  "module_inventory": [
+    {
+      "file": "examples/java/api_spring_messy/src/main/java/com/example/billing/BillingApp.java",
+      "loc": 9,
+      "public_types": [
+        "BillingApp"
+      ],
+      "public_callables": [
+        "main"
+      ]
+    },
+    {
+      "file": "examples/java/api_spring_messy/src/main/java/com/example/billing/client/GatewayClient.java",
+      "loc": 32,
+      "public_types": [
+        "GatewayClient"
+      ],
+      "public_callables": [
+        "sendCharge"
+      ]
+    },
+    {
+      "file": "examples/java/api_spring_messy/src/main/java/com/example/billing/controller/BillingController.java",
+      "loc": 38,
+      "public_types": [
+        "BillingController"
+      ],
+      "public_callables": [
+        "chargeCustomer",
+        "lastChannel"
+      ]
+    },
+    {
+      "file": "examples/java/api_spring_messy/src/main/java/com/example/billing/model/InvoiceRecord.java",
+      "loc": 15,
+      "public_types": [
+        "InvoiceRecord"
+      ],
+      "public_callables": [
+        "InvoiceRecord",
+        "getAmountCents",
+        "getInvoiceId"
+      ]
+    },
+    {
+      "file": "examples/java/api_spring_messy/src/main/java/com/example/billing/service/BillingManager.java",
+      "loc": 78,
+      "public_types": [
+        "BillingManager"
+      ],
+      "public_callables": [
+        "processBatchBilling"
+      ]
+    },
+    {
+      "file": "examples/java/api_spring_messy/src/main/java/com/example/billing/util/LegacyDateHelper.java",
+      "loc": 15,
+      "public_types": [
+        "LegacyDateHelper"
+      ],
+      "public_callables": [
+        "collectAuditTags",
+        "formatTimestamp"
+      ]
+    }
+  ],
+  "dangerous_sinks": [],
+  "api_endpoints": [
+    {
+      "http_method": "ANY",
+      "path": "/charge",
+      "handler": "BillingController.chargeCustomer",
+      "file": "examples/java/api_spring_messy/src/main/java/com/example/billing/controller/BillingController.java",
+      "line": 22,
+      "has_auth_hint": false,
+      "auth_mechanisms": []
+    }
+  ],
+  "language_version_mismatches": [
+    {
+      "file": "examples/java/api_spring_messy/src/main/java/com/example/billing/client/GatewayClient.java",
+      "line": 4,
+      "symbol": "java.net.http.HttpResponse",
+      "detail": "Java 11+ 'java.net.http' API imported while declared target is Java 1.8"
+    }
+  ],
+  "architecture_overview": {
+    "pattern": "Layered Spring MVC / Service Architecture (with Controller <-> Service Circular Dependency)",
+    "entry_points": [
+      "src/main/java/com/example/billing/BillingApp.java:main",
+      "src/main/java/com/example/billing/controller/BillingController.java:chargeCustomer"
+    ],
+    "modules": [
+      {
+        "path": "src/main/java/com/example/billing/BillingApp.java",
+        "role": "Spring Boot 起動メインクラス",
+        "key_symbols": [
+          "BillingApp",
+          "main"
+        ],
+        "depends_on": [],
+        "health_note": "最小限のエントリポイントであり構造上の問題なし"
+      },
+      {
+        "path": "src/main/java/com/example/billing/controller/BillingController.java",
+        "role": "/charge エンドポイントを公開する REST コントローラ",
+        "key_symbols": [
+          "BillingController",
+          "chargeCustomer",
+          "lastChannel"
+        ],
+        "depends_on": [
+          "src/main/java/com/example/billing/service/BillingManager.java",
+          "src/main/java/com/example/billing/model/InvoiceRecord.java"
+        ],
+        "health_note": "ANY /charge 無認証公開、フィールド DI、可変フィールド channel、Raw Map 入出力"
+      },
+      {
+        "path": "src/main/java/com/example/billing/service/BillingManager.java",
+        "role": "請求バッチ計算・課金リトライ・キャッシュ更新サービスクラス",
+        "key_symbols": [
+          "BillingManager",
+          "INVOICE_CACHE",
+          "processBatchBilling",
+          "saveAuditTrail"
+        ],
+        "depends_on": [
+          "src/main/java/com/example/billing/controller/BillingController.java",
+          "src/main/java/com/example/billing/client/GatewayClient.java",
+          "src/main/java/com/example/billing/model/InvoiceRecord.java",
+          "src/main/java/com/example/billing/util/LegacyDateHelper.java"
+        ],
+        "health_note": "循環依存、認知的複雑度56、8引数、String == 比較、未定義メソッド呼出、空 catch、private @Transactional、static 生 HashMap"
+      },
+      {
+        "path": "src/main/java/com/example/billing/client/GatewayClient.java",
+        "role": "外部決済ゲートウェイ HTTP クライアント",
+        "key_symbols": [
+          "GatewayClient",
+          "GATEWAY_SECRET",
+          "sendCharge"
+        ],
+        "depends_on": [],
+        "health_note": "ハードコード秘密情報、タイムアウト未設定 HttpClient、System.getenv 直参照、wildcard/未整列 import"
+      },
+      {
+        "path": "src/main/java/com/example/billing/model/InvoiceRecord.java",
+        "role": "不変の請求書レコード DTO",
+        "key_symbols": [
+          "InvoiceRecord",
+          "getInvoiceId",
+          "getAmountCents"
+        ],
+        "depends_on": [],
+        "health_note": "final フィールドと完全な Javadoc を持つ健全なベースラインモジュール"
+      },
+      {
+        "path": "src/main/java/com/example/billing/util/LegacyDateHelper.java",
+        "role": "レガシー日時フォーマット・監査タグ補助クラス",
+        "key_symbols": [
+          "LegacyDateHelper",
+          "formatTimestamp",
+          "collectAuditTags"
+        ],
+        "depends_on": [],
+        "health_note": "Date / SimpleDateFormat / Raw Vector 使用、currentPeriodLabel() 未定義"
+      }
+    ],
+    "dependency_notes": "BillingController -> BillingManager -> BillingController の双方向循環依存が存在し、pom.xml の Java 1.8 と spring-boot-starter-web:LATEST (4.2.0-RC1, Java 17+) が衝突してコンパイル不能となっている。"
+  },
+  "architecture_record": {
+    "workflow_id": "java_api_spring_messy",
+    "workflow_run_id": "wf-da941741",
+    "recorded_at": "2026-10-24T14:55:08.254247+00:00",
+    "target_root": "examples/java/api_spring_messy",
+    "system_profile": {
+      "system_purpose": "顧客の請求書レコード集計（通貨別税計算・再試行課金・インメモリキャッシュ更新）を /charge HTTP エンドポイント経由で実行するレガシー Spring Boot 請求処理 API サービス",
+      "domain_context": "請求・決済ドメイン（Legacy Billing: InvoiceRecord のバッチ集計、USD 8% / JPY 10% の税率適用、外部決済ゲートウェイへの少額リトライ課金、インメモリ請求キャッシュ管理）",
+      "runtime_type": "api_service",
+      "tech_stack": [
+        "Java (pom.xml: maven.compiler.source/target=1.8, コード内 java.net.http.HttpClient 使用)",
+        "Apache Maven (pom.xml)",
+        "Spring Boot Web (org.springframework.boot:spring-boot-starter-web:LATEST)",
+        "Java Servlet API (javax.servlet:javax.servlet-api:4.0.1)",
+        "JUnit 4 (junit:junit:4.13.2)",
+        "Docker (openjdk:latest)",
+        "GitHub Actions (.github/workflows/build.yml)"
+      ],
+      "external_integrations": [
+        "外部決済ゲートウェイ HTTP API (GatewayClient: 環境変数 LEGACY_PAYMENT_URL またはデフォルト https://billing.example.invalid/charge への POST リクエスト)"
+      ]
+    },
+    "structure_map": {
+      "architecture_pattern": "Layered Spring MVC / Service Architecture (with Controller-Service Circular Dependency Violation)",
+      "layers": [
+        {
+          "name": "Entrypoint & Bootstrap Layer",
+          "responsibility": "Spring Boot アプリケーションの起動エントリポイント",
+          "paths": [
+            "src/main/java/com/example/billing/BillingApp.java"
+          ],
+          "allowed_dependencies": [
+            "Presentation / Controller Layer",
+            "Business Logic / Service Layer",
+            "External Integration / Client Layer",
+            "Domain Model & Utility Layer"
+          ]
+        },
+        {
+          "name": "Presentation / Controller Layer",
+          "responsibility": "HTTP エンドポイント（/charge）の公開、リクエストペイロード受け取りとサービス呼び出し",
+          "paths": [
+            "src/main/java/com/example/billing/controller"
+          ],
+          "allowed_dependencies": [
+            "Business Logic / Service Layer",
+            "Domain Model & Utility Layer"
+          ]
+        },
+        {
+          "name": "Business Logic / Service Layer",
+          "responsibility": "請求バッチ計算、通貨別税率加算、リトライ課金制御、インメモリキャッシュと監査証跡の記録",
+          "paths": [
+            "src/main/java/com/example/billing/service"
+          ],
+          "allowed_dependencies": [
+            "External Integration / Client Layer",
+            "Domain Model & Utility Layer"
+          ]
+        },
+        {
+          "name": "External Integration / Client Layer",
+          "responsibility": "外部決済ゲートウェイへの HTTP POST リクエスト送信",
+          "paths": [
+            "src/main/java/com/example/billing/client"
+          ],
+          "allowed_dependencies": [
+            "Domain Model & Utility Layer"
+          ]
+        },
+        {
+          "name": "Domain Model & Utility Layer",
+          "responsibility": "不変の請求書 DTO（InvoiceRecord）および日時フォーマット・監査タグ補助処理（LegacyDateHelper）",
+          "paths": [
+            "src/main/java/com/example/billing/model",
+            "src/main/java/com/example/billing/util"
+          ],
+          "allowed_dependencies": []
+        }
+      ],
+      "modules": [
+        {
+          "path": "src/main/java/com/example/billing/BillingApp.java",
+          "role": "Spring Boot 起動メインクラス",
+          "key_symbols": [
+            "BillingApp",
+            "main"
+          ],
+          "depends_on": [],
+          "health_note": "最小限のエントリポイントであり構造上の問題なし"
+        },
+        {
+          "path": "src/main/java/com/example/billing/controller/BillingController.java",
+          "role": "/charge エンドポイントを公開する REST コントローラ",
+          "key_symbols": [
+            "BillingController",
+            "chargeCustomer",
+            "lastChannel"
+          ],
+          "depends_on": [
+            "src/main/java/com/example/billing/service/BillingManager.java",
+            "src/main/java/com/example/billing/model/InvoiceRecord.java"
+          ],
+          "health_note": "@RequestMapping(\"/charge\") で HTTP メソッド無制限、フィールドインジェクション、シングルトン上の可変状態 channel、Raw 型 Map/List を使用"
+        },
+        {
+          "path": "src/main/java/com/example/billing/service/BillingManager.java",
+          "role": "請求バッチ計算・課金リトライ・キャッシュ更新を担う中核サービスクラス",
+          "key_symbols": [
+            "BillingManager",
+            "INVOICE_CACHE",
+            "processBatchBilling",
+            "saveAuditTrail"
+          ],
+          "depends_on": [
+            "src/main/java/com/example/billing/controller/BillingController.java",
+            "src/main/java/com/example/billing/client/GatewayClient.java",
+            "src/main/java/com/example/billing/model/InvoiceRecord.java",
+            "src/main/java/com/example/billing/util/LegacyDateHelper.java"
+          ],
+          "health_note": "BillingController への逆方向循環依存、public static 生 HashMap キャッシュ、private @Transactional 無効化、8引数・深いネスト、存在しない currentPeriodLabel() 呼び出し、== 文字列比較、空 catch を抱える最大ホットスポット"
+        },
+        {
+          "path": "src/main/java/com/example/billing/client/GatewayClient.java",
+          "role": "外部決済ゲートウェイへの HTTP 通信クライアント",
+          "key_symbols": [
+            "GatewayClient",
+            "GATEWAY_SECRET",
+            "sendCharge"
+          ],
+          "depends_on": [],
+          "health_note": "ハードコードされたシークレット GATEWAY_SECRET、ワイルドカード import、タイムアウト未設定の毎回 HttpClient 生成、Raw List、printStackTrace を含む高リスク境界モジュール"
+        },
+        {
+          "path": "src/main/java/com/example/billing/model/InvoiceRecord.java",
+          "role": "不変の請求書レコード DTO",
+          "key_symbols": [
+            "InvoiceRecord",
+            "getInvoiceId",
+            "getAmountCents"
+          ],
+          "depends_on": [],
+          "health_note": "final フィールドと Javadoc を備えたクリーンで低リスクなドメインモデル"
+        },
+        {
+          "path": "src/main/java/com/example/billing/util/LegacyDateHelper.java",
+          "role": "レガシー日時フォーマットおよび監査タグ生成ユーティリティ",
+          "key_symbols": [
+            "LegacyDateHelper",
+            "formatTimestamp",
+            "collectAuditTags"
+          ],
+          "depends_on": [],
+          "health_note": "旧式の Date / SimpleDateFormat / Raw Vector を使用しており、BillingManager が呼び出す currentPeriodLabel() メソッドが未定義"
+        },
+        {
+          "path": "src/test/java/com/example/billing/BillingManagerTest.java",
+          "role": "JUnit 4 スモークテスト",
+          "key_symbols": [
+            "BillingManagerTest",
+            "testSmokeRun"
+          ],
+          "depends_on": [
+            "src/main/java/com/example/billing/model/InvoiceRecord.java"
+          ],
+          "health_note": "InvoiceRecord を生成するだけでアサーションが1件もなく、BillingManager 本体も未テスト"
+        }
+      ],
+      "boundary_assessment": "パッケージ構成上は controller / service / client / model / util の5層に分割されているが、BillingManager が @Autowired で BillingController を直接フィールド注入・参照しており（BillingController <-> BillingManager の双方向循環依存）、レイヤー階層原則に重大な違反がある。また BillingController と BillingManager の境界が Raw Map / List と8個のプリミティブ・Object 引数で結合されており、DTO による型安全な契約が欠如している。"
+    },
+    "execution_flow_map": {
+      "entry_points": [
+        "src/main/java/com/example/billing/BillingApp.java:main",
+        "src/main/java/com/example/billing/controller/BillingController.java:chargeCustomer"
+      ],
+      "execution_flows": [
+        {
+          "name": "HTTP 請求処理・税計算・リトライ課金フロー (/charge)",
+          "trigger": "ANY /charge HTTP リクエスト (@RequestMapping(\"/charge\") in BillingController.chargeCustomer)",
+          "steps": [
+            "1. BillingController.chargeCustomer が無型 Map ペイロードと HttpServletRequest を受け取り、シングルトンフィールド channel を更新",
+            "2. customerId と amountCents を文字列変換・Long.parseLong で取り出し、InvoiceRecord を生成して生 ArrayList に格納",
+            "3. BillingManager.processBatchBilling を8引数で呼び出し、InvoiceRecord リストを走査して USD (8%) / JPY (10%) 税加算（ただし == による文字列参照比較）を実行",
+            "4. 金額 0 以下かつ forceRetry=true の場合、GatewayClient.sendCharge を最大 maxRetries 回呼び出して外部決済エンドポイントへ POST 送信",
+            "5. saveAuditTrail (private @Transactional のため Spring AOP プロキシ無効) 呼び出し後、public static INVOICE_CACHE の更新と circularController.lastChannel() 参照を試みるが、未定義メソッド呼び出しや例外が空 catch ブロックで握り潰される",
+            "6. customerId と billedCents を格納した生 HashMap を HTTP レスポンスとして返却"
+          ],
+          "involved_files": [
+            "src/main/java/com/example/billing/controller/BillingController.java",
+            "src/main/java/com/example/billing/model/InvoiceRecord.java",
+            "src/main/java/com/example/billing/service/BillingManager.java",
+            "src/main/java/com/example/billing/client/GatewayClient.java",
+            "src/main/java/com/example/billing/util/LegacyDateHelper.java"
+          ]
+        },
+        {
+          "name": "Spring Boot アプリケーション起動フロー",
+          "trigger": "JVM エントリポイント BillingApp.main(String[] args)",
+          "steps": [
+            "1. SpringApplication.run(BillingApp.class, args) によりコンポーネントスキャンを開始",
+            "2. BillingController, BillingManager, GatewayClient のシングルトン Bean 生成とフィールドインジェクション（BillingController <-> BillingManager の循環参照を含む）を解決"
+          ],
+          "involved_files": [
+            "src/main/java/com/example/billing/BillingApp.java",
+            "src/main/java/com/example/billing/controller/BillingController.java",
+            "src/main/java/com/example/billing/service/BillingManager.java",
+            "src/main/java/com/example/billing/client/GatewayClient.java"
+          ]
+        }
+      ],
+      "state_and_storage": [
+        "BillingManager.INVOICE_CACHE: public static 生 HashMap による非スレッドセーフ・無制限なインメモリキャッシュ（永続化 DB なし）",
+        "BillingController.channel: シングルトン @RestController インスタンス上の非同期・並行リクエスト間で競合する可変 String フィールド"
+      ],
+      "error_and_concurrency_model": "スレッド安全性とエラー処理に深刻な欠陥がある。BillingController.channel と BillingManager.INVOICE_CACHE (HashMap) および LegacyDateHelper 内の SimpleDateFormat は並行リクエスト下でデータ競合を引き起こす。エラー処理では BillingManager が catch (Exception e) {} で全例外を無言で握り潰し、GatewayClient は catch (Exception e) { e.printStackTrace(); return false; } で標準エラー出力へスタックトレースを露出する。さらに saveAuditTrail の @Transactional は private メソッドに付与されておりトランザクション境界として機能しない。"
+    }
+  },
+  "audit_dimensions": [
+    {
+      "action_id": "act-12",
+      "audit_id": "container_runtime_audit",
+      "title": "Evaluate Buildability, Offline Test Results, Measured Coverage & Startup Health",
+      "score": 10,
+      "grade": "D",
+      "rules_evaluated": [
+        "common/runtime_verification",
+        "common/production_readiness"
+      ],
+      "pass_count": 0,
+      "warn_count": 0,
+      "fail_count": 2,
+      "summary": "隔離 Docker コンテナによる動的検証（RV-01〜RV-04）はビルド段階で全面的に失敗・ブロックされた。リポジトリ同梱の Dockerfile ビルド（RV-01）は廃止済みの FROM openjdk:latest タグ解決エラー（1.51s, exit 1）かつ JAR ビルド工程不在により失敗し、Maven ハーネスビルド（25.76s, exit 1）も pom.xml の Java 1.8 (class version 52.0) 指定と spring-boot-starter-web:LATEST が解決した spring-boot-4.2.0-RC1.jar (class version 61.0 / Java 17+) のバイトコード不整合により MojoFailureException で停止した。結果としてオフライン単体テスト（RV-02）、JaCoCo カバレッジ計測（RV-03）、および Spring ApplicationContext スモーク起動検証（RV-04）はすべて BLOCKED となった。"
+    },
+    {
+      "action_id": "act-14",
+      "audit_id": "security_vulnerability_audit",
+      "title": "Evaluate Supply-Chain CVEs, Container Misconfigs, Secrets, Dangerous Sinks & API Boundaries",
+      "score": 15,
+      "grade": "D",
+      "rules_evaluated": [
+        "common/security_vulnerability",
+        "common/supply_chain"
+      ],
+      "pass_count": 0,
+      "warn_count": 0,
+      "fail_count": 2,
+      "summary": "Trivy (0.69.3) によるファイルシステムスキャンおよび AST セキュリティ検査の結果、SEC-01・SEC-02・SEC-03・SEC-05 の4ゲートで深刻な脆弱性が確認された。SEC-01 では pom.xml の spring-boot-starter-web@LATEST 指定に対し CRITICAL 脆弱性 CVE-2022-22965 (Spring4Shell, CVSS 9.8) が検出された（なお解決済みイメージの OS 層スキャンはコンテナビルド失敗により未実行）。SEC-02 では Dockerfile に DS-0002 (HIGH: root 実行)、DS-0001 (MEDIUM: :latest タグ使用)、DS-0026 (LOW: HEALTHCHECK 未定義) の3件が検出された。さらに SEC-03 で GatewayClient.java:13 のハードコード API シークレット、SEC-05 で無認証・全 HTTP メソッド許可・無型 Map 入力の ANY /charge エンドポイントが露出している。"
+    },
+    {
+      "action_id": "act-10",
+      "audit_id": "java_test_audit",
+      "title": "Evaluate JUnit Test Suite Completeness & Structure",
+      "score": 15,
+      "grade": "D",
+      "rules_evaluated": [
+        "java/testing"
+      ],
+      "pass_count": 0,
+      "warn_count": 0,
+      "fail_count": 1,
+      "summary": "テストスイートは実質的に機能していない。ソースファイル6件に対しテストファイルは BillingManagerTest.java の1件のみであり、レガシーな JUnit 4 (org.junit.Test) を使用している。さらにパッケージ階層も com.example.billing.service をミラーリングしておらず、唯一のテストメソッド testSmokeRun は InvoiceRecord を生成して getter を呼ぶだけでアサーションが0件であり、BillingManager・BillingController・GatewayClient・LegacyDateHelper の業務ロジックや境界条件は一切検証されていない。"
+    },
+    {
+      "action_id": "act-16",
+      "audit_id": "web_penetration_audit",
+      "title": "Evaluate Live HTTP Penetration Findings, Security Headers & Endpoint Defenses",
+      "score": 15,
+      "grade": "D",
+      "rules_evaluated": [
+        "common/security_vulnerability"
+      ],
+      "pass_count": 0,
+      "warn_count": 0,
+      "fail_count": 1,
+      "summary": "動的 Web ペネトレーション監査（SEC-06 / web_pentest）は .pni/pentests/examples/java/api_spring_messy/ 配下の 4 ファイル（conftest.py, test_app_probes.py, test_baseline_http.py, test_target_surface.py）を検証スイートとして確認したが、コンテナイメージビルド失敗（status=error, server_booted=false, 15.74s, boot_failure_reason: Container build failed: ERROR: failed to build: failed to solve: process \"/bin/sh -c mvn -B -Dmaven.repo.local=/m2repo       org.jacoco:jacoco-maven-plugin:${JACOCO_VERSION}:prepare-agent       test       -DfailIfNoTests=false       -Dmaven.test.failure.ignore=tru）により隔離ループバック環境でのライブ HTTP DAST プローブ実行が完全にブロックされた（probe_summary: total=0）。静的・プローブ定義照合では、BillingController.chargeCustomer の無認証課金実行（CWE-306）、@RequestMapping(\"/charge\") による HTTP メソッド無制限受理（CWE-650）、および未検証 Map に対する Long.parseLong 呼び出しによる 500 例外誘発（CWE-20）が未防御のまま残存している。"
+    },
+    {
+      "action_id": "act-06",
+      "audit_id": "supply_chain_audit",
+      "title": "Evaluate Supply-Chain, CI Permissions, Container & Secret Hygiene",
+      "score": 18,
+      "grade": "D",
+      "rules_evaluated": [
+        "common/supply_chain",
+        "common/security",
+        "common/git_workflow"
+      ],
+      "pass_count": 0,
+      "warn_count": 1,
+      "fail_count": 2,
+      "summary": "サプライチェーン・CI・コンテナ・シークレット衛生のすべてで深刻な違反が確認された。GitHub Actions (.github/workflows/build.yml) は特権トリガー pull_request_target、permissions 未設定、actions/checkout@main ブランチ参照の三重苦を抱える。Dockerfile は廃止された docker.io/library/openjdk:latest を参照してビルド不能である上、非 root USER と .dockerignore を欠く。さらに GatewayClient.java:13 に本番プレフィックスを持つ GATEWAY_SECRET リテラルがハードコードされており、LICENSE・SECURITY.md・Dependabot・.gitignore も未整備である。"
+    },
+    {
+      "action_id": "act-09",
+      "audit_id": "service_readiness_audit",
+      "title": "Evaluate 12-Factor Config/Statelessness & SRE PRR Timeouts/Observability",
+      "score": 20,
+      "grade": "D",
+      "rules_evaluated": [
+        "common/twelve_factor",
+        "common/production_readiness",
+        "common/security"
+      ],
+      "pass_count": 0,
+      "warn_count": 0,
+      "fail_count": 3,
+      "summary": "Twelve-Factor App および Google SRE 本番稼働準備基準（PRR）に対して重大な未達事項が多数存在する。GatewayClient はリクエストごとにタイムアウト未設定の HttpClient.newHttpClient() を都度生成し、バックオフなしの同期リトライを実行している。設定取得は System.getenv(\"LEGACY_PAYMENT_URL\") の直呼び出しとハードコード秘密情報に分散し、application.yml / @ConfigurationProperties が存在しない。また public static HashMap (INVOICE_CACHE) と Controller の可変フィールド channel によりステートレス性が損なわれ、SLF4J を使わない System.out.println / printStackTrace と空 catch ブロックにより可観測性も欠如している。"
+    },
+    {
+      "action_id": "act-05",
+      "audit_id": "repo_structure_audit",
+      "title": "Evaluate Maven/Gradle Build, Supply Chain & Dependencies",
+      "score": 22,
+      "grade": "D",
+      "rules_evaluated": [
+        "common/supply_chain",
+        "java/dependencies",
+        "common/documentation",
+        "common/git_workflow",
+        "common/security"
+      ],
+      "pass_count": 0,
+      "warn_count": 1,
+      "fail_count": 4,
+      "summary": "ビルド・依存関係・サプライチェーン・ドキュメントに重大な欠陥が集中している。pom.xml は Java 1.8 指定のまま spring-boot-starter-web:LATEST（非固定バージョン）、javax.servlet-api:4.0.1、junit:4.13.2 を混在させ、Maven Wrapper (mvnw) も欠落している。CI (.github/workflows/build.yml) は特権的な pull_request_target トリガー・permissions 未宣言・actions/checkout@main ブランチ参照を含み、Dockerfile は廃止済みの openjdk:latest ベースイメージ・root 実行・ビルド工程欠落（存在しない billing.jar を起動）という致命的構成である。さらに README.md は実質2行のみで LICENSE・SECURITY.md・Dependabot・.gitignore もすべて欠如している。"
+    },
+    {
+      "action_id": "act-08",
+      "audit_id": "java_ast_audit",
+      "title": "Interpret Java AST Facts & Evaluate Quality/Generics/Imports/Security",
+      "score": 25,
+      "grade": "D",
+      "rules_evaluated": [
+        "common/architecture",
+        "common/maintainability",
+        "common/security",
+        "common/security_vulnerability",
+        "java/code_quality",
+        "java/typing",
+        "java/frameworks/spring_boot"
+      ],
+      "pass_count": 0,
+      "warn_count": 0,
+      "fail_count": 7,
+      "summary": "Java AST・フレームワーク・型安全性・保守性の全般で深刻な技術的負債が検出された。BillingController と BillingManager が双方向循環依存を形成し、BillingManager.processBatchBilling は認知的複雑度 56・引数 8 個・57 行の肥大化したメソッドとなっている。さらに String リテラルの == 参照比較（3箇所）、空の catch ブロック、未定義メソッド dateHelper.currentPeriodLabel() 呼び出し、private メソッドへの無効な @Transactional、public static 生 HashMap キャッシュ、シングルトン Controller の可変フィールド channel など致命的なバグ要因が集中している。API 境界（ANY /charge）も認証・HTTP メソッド制限・DTO スキーマ検証を欠いている。"
+    }
+  ],
+  "rule_compliance": [
+    {
+      "rule_id": "common/architecture",
+      "status": "fail",
+      "source_action": "java_ast_audit",
+      "evidence": "circular_dependencies: BillingController <-> BillingManager (BillingManager.java:22 @Autowired private BillingController circularController)",
+      "summary": "Service 層（BillingManager）が上位の Controller 層（BillingController）へ逆依存する双方向循環依存が発生している"
+    },
+    {
+      "rule_id": "common/documentation",
+      "status": "fail",
+      "source_action": "project_structure",
+      "evidence": "README.md: 4 lines ('# Legacy Billing' + 'Run mvn spring-boot:run.'), missing overview, prerequisites, API specification, and test instructions",
+      "summary": "README が見出し1件・本文1行のみで導入手順・前提条件・API 仕様・テスト実行手順が一切記載されていない"
+    },
+    {
+      "rule_id": "common/maintainability",
+      "status": "fail",
+      "source_action": "java_ast_audit",
+      "evidence": "BillingManager.processBatchBilling: length=57, branches=13, cognitive=56, params=8 (>6); bug_risk_idioms=7 (empty catch at line 83, String == at lines 52/55/57)",
+      "summary": "認知的複雑度 56・8 引数の巨大メソッドに加え、空 catch と String 参照比較による重大な論理バグを抱える"
+    },
+    {
+      "rule_id": "common/production_readiness",
+      "status": "fail",
+      "source_action": "service_readiness_audit",
+      "evidence": "GatewayClient.java:22-27 HttpClient.newHttpClient() & HttpRequest without connectTimeout/timeout; BillingManager.java:66 tight retry loop without backoff; BillingManager.java:83 empty catch; no Spring Actuator health probes; smoke_check=blocked; Dockerfile lacks build stage & billing.jar; GatewayClient.java:22 missing connectTimeout/timeout; BillingManager.java:83 empty catch",
+      "summary": "外部 HTTP 通信の接続・応答タイムアウト未設定、バックオフなしの即時リトライ、例外握り潰し、ヘルスプローブ不在により SRE PRR 不合格"
+    },
+    {
+      "rule_id": "common/runtime_verification",
+      "status": "fail",
+      "source_action": "container_runtime_audit",
+      "evidence": "project_dockerfile_build=failed (1.51s, FROM openjdk:latest); harness_build=failed (25.76s, spring-boot-4.2.0-RC1 class file version 61.0 vs 52.0); test_execution=blocked; coverage.measured=false; smoke_check=blocked",
+      "summary": "RV-01（Dockerfile および Maven クリーンビルド）がバージョン不整合により失敗し、RV-02〜RV-04 が全面ブロックされたため不合格"
+    },
+    {
+      "rule_id": "common/security",
+      "status": "fail",
+      "source_action": "project_structure",
+      "evidence": ".github/workflows/build.yml: pull_request_target running mvn package; Dockerfile: root container user; GatewayClient.java:13 hardcoded GATEWAY_SECRET; src/main/java/com/example/billing/client/GatewayClient.java:13 private static final String GATEWAY_SECRET = \"rk_live_EXAMPLE_DUMMY_SECRET_9876543210\"; .github/workflows/build.yml: pull_request_target; Dockerfile: root execution; GatewayClient.java:13 hardcoded GATEWAY_SECRET; BillingController.java:22-27 unvalidated raw Map payload + Long.parseLong without schema validation; GatewayClient.java:13 hardcoded GATEWAY_SECRET; GatewayClient.java:20 logs customerId & secret length to stdout; BillingController.java:24 unvalidated Map payload",
+      "summary": "特権 CI ワークフローでの未検証コード実行リスク、root コンテナ実行、ハードコード秘密情報により最小権限・秘密管理原則に違反"
+    },
+    {
+      "rule_id": "common/security_vulnerability",
+      "status": "fail",
+      "source_action": "java_ast_audit",
+      "evidence": "SEC-03: GatewayClient.java:13 hardcoded secret; SEC-05: ANY /charge in BillingController.java:22 (has_auth_hint=false, unrestricted @RequestMapping, raw Map payload); SEC-04: dangerous_sinks=[]; SEC-01: CVE-2022-22965 (CRITICAL, CVSS 9.8) in spring-boot-starter-web@LATEST (os_vuln_counts=0 due to failed image build); SEC-02: Dockerfile DS-0002 (HIGH), DS-0001 (MEDIUM), DS-0026 (LOW); SEC-03: GatewayClient.java:13 GATEWAY_SECRET=[REDACTED]; SEC-04: dangerous_sinks=0; SEC-05: ANY /charge has_auth_hint=false + raw Map; SEC-06: PentestFacts.status=error, server_booted=false, duration_sec=15.74, boot_failure_reason=Container build failed: ERROR: failed to build: failed to solve: process \"/bin/sh -c mvn -B -Dmaven.repo.local=/m2repo       org.jacoco:jacoco-maven-plugin:${JACOCO_VERSION}:prepare-agent       test       -DfailIfNoTests=false       -Dmaven.test.failure.ignore=tru; materialized_files=4 (.pni/pentests/examples/java/api_spring_messy/); target=ANY /charge (CWE-306, CWE-650, CWE-20)",
+      "summary": "SQLi/CMDi シンクはないが、SEC-03（秘密情報直書き）および SEC-05（無認証・全 HTTP メソッド許可の課金 API）に違反"
+    },
+    {
+      "rule_id": "common/supply_chain",
+      "status": "fail",
+      "source_action": "project_structure",
+      "evidence": ".github/workflows/build.yml: pull_request_target, missing permissions:, actions/checkout@main; Dockerfile: FROM openjdk:latest, no non-root USER, missing .dockerignore; LICENSE=False, SECURITY.md=False, dependency_automation=False; unpinned_dependencies=['org.springframework.boot:spring-boot-starter-web:LATEST']; lockfiles=[]; .github/workflows/build.yml: pull_request_target + missing permissions: + actions/checkout@main; Dockerfile: openjdk:latest + root + missing .dockerignore; LICENSE=False, SECURITY.md=False, dependency_automation=False; pom.xml unpinned LATEST; .github/workflows/build.yml pull_request_target + actions/checkout@main + no permissions; Dockerfile DS-0001/DS-0002/DS-0026; missing SECURITY.md, LICENSE, Dependabot",
+      "summary": "CI の特権トリガー・未固定 Action・トークン権限未制限、Dockerfile の latest/root 実行、ガバナンス文書全欠落により不合格"
+    },
+    {
+      "rule_id": "common/twelve_factor",
+      "status": "fail",
+      "source_action": "service_readiness_audit",
+      "evidence": "GatewayClient.java:16 System.getenv(\"LEGACY_PAYMENT_URL\"); BillingManager.java:17 public static Map INVOICE_CACHE; BillingController.java:20 mutable channel; unstructured System.out (3) & printStackTrace (1)",
+      "summary": "環境変数の直接参照、プロセス内可変 static キャッシュによるステートフル化、非構造化標準出力ログにより Twelve-Factor (III, VI, XI) に違反"
+    },
+    {
+      "rule_id": "java/code_quality",
+      "status": "fail",
+      "source_action": "java_ast_audit",
+      "evidence": "docstring_coverage_pct=33.3% (10 missing Javadocs, 1 @param mismatch obsoleteToken); global_state_usages: public static Map INVOICE_CACHE; wildcard import java.util.* & 4 unsorted imports in GatewayClient.java",
+      "summary": "Javadoc カバレッジ 33.3%・@param 不整合、public static 可変状態、ワイルドカード/未整列 import により基準未達"
+    },
+    {
+      "rule_id": "java/dependencies",
+      "status": "fail",
+      "source_action": "project_structure",
+      "evidence": "pom.xml: spring-boot-starter-web version=LATEST, maven.compiler.source/target=1.8 (while GatewayClient uses Java 11 HttpClient), javax.servlet-api:4.0.1, junit:4.13.2, missing mvnw and spring-boot-starter-parent/BOM",
+      "summary": "LATEST 動的バージョン指定、Java 1.8 設定と Java 11 API / Spring Boot 3 系との不整合、mvnw 不在によりビルド再現性が崩壊"
+    },
+    {
+      "rule_id": "java/frameworks/spring_boot",
+      "status": "fail",
+      "source_action": "java_ast_audit",
+      "evidence": "3 @Autowired field injections; method-level @RequestMapping(\"/charge\"); private @Transactional saveAuditTrail; mutable field channel in @RestController; legacy Date/SimpleDateFormat/Vector",
+      "summary": "フィールドインジェクション、汎用 @RequestMapping、無効な private @Transactional、Controller 可変フィールド、旧日時 API により不合格"
+    },
+    {
+      "rule_id": "java/testing",
+      "status": "fail",
+      "source_action": "java_test_audit",
+      "evidence": "test_files_count=1 vs source_files_count=6; JUnit 4 (org.junit.Test); package mismatch com.example.billing vs com.example.billing.service; assertion_free_tests=['testSmokeRun' at BillingManagerTest.java:8]",
+      "summary": "JUnit 4 使用、パッケージ階層不一致、アサーション0件の形骸化したテスト1本のみでカバレッジ基準（80%以上）に遠く及ばない"
+    },
+    {
+      "rule_id": "java/typing",
+      "status": "fail",
+      "source_action": "java_ast_audit",
+      "evidence": "type_safety_coverage_pct=81.8%; raw Map/List/Vector in BillingController, BillingManager, GatewayClient, LegacyDateHelper; untyped Object params (traceHint, extraContext); @SuppressWarnings(\"unchecked\") x2",
+      "summary": "ドメイン境界で Raw 型コレクションと Object 引数、@SuppressWarnings(\"unchecked\") が多用されており型安全性が損なわれている"
+    },
+    {
+      "rule_id": "common/git_workflow",
+      "status": "warn",
+      "source_action": "project_structure",
+      "evidence": "has_gitignore=False; target/ や IDE 設定ファイルの混入防止策が未整備; has_gitignore=False; committed_secret_files=[]",
+      "summary": ".gitignore が存在せず Maven ビルド成果物やローカル設定の誤コミットリスクがある"
+    }
+  ],
+  "module_hotspots": [
+    {
+      "file_path": "Dockerfile",
+      "loc": 0,
+      "risk_score": 1.0,
+      "finding_counts": {
+        "high": 4
+      },
+      "top_rules": [
+        "common/supply_chain",
+        "common/runtime_verification",
+        "common/security_vulnerability"
+      ]
+    },
+    {
+      "file_path": "pom.xml",
+      "loc": 0,
+      "risk_score": 1.0,
+      "finding_counts": {
+        "critical": 2,
+        "high": 2,
+        "low": 1
+      },
+      "top_rules": [
+        "common/runtime_verification",
+        "common/security_vulnerability",
+        "java/dependencies",
+        "common/supply_chain"
+      ]
+    },
+    {
+      "file_path": "src/main/java/com/example/billing/service/BillingManager.java",
+      "loc": 0,
+      "risk_score": 1.0,
+      "finding_counts": {
+        "critical": 1,
+        "high": 3,
+        "low": 1
+      },
+      "top_rules": [
+        "java/code_quality",
+        "common/architecture",
+        "common/maintainability",
+        "java/frameworks/spring_boot"
+      ]
+    },
+    {
+      "file_path": ".github/workflows/build.yml",
+      "loc": 0,
+      "risk_score": 0.9,
+      "finding_counts": {
+        "critical": 2
+      },
+      "top_rules": [
+        "common/supply_chain"
+      ]
+    },
+    {
+      "file_path": "src/main/java/com/example/billing/client/GatewayClient.java",
+      "loc": 0,
+      "risk_score": 0.88,
+      "finding_counts": {
+        "critical": 1,
+        "high": 1,
+        "medium": 1
+      },
+      "top_rules": [
+        "common/security",
+        "common/production_readiness",
+        "common/twelve_factor"
+      ]
+    },
+    {
+      "file_path": "src/main/java/com/example/billing/controller/BillingController.java",
+      "loc": 0,
+      "risk_score": 0.58,
+      "finding_counts": {
+        "high": 1,
+        "medium": 2
+      },
+      "top_rules": [
+        "common/security_vulnerability",
+        "java/typing"
+      ]
+    },
+    {
+      "file_path": "examples/java/api_spring_messy/Dockerfile",
+      "loc": 0,
+      "risk_score": 0.3,
+      "finding_counts": {},
+      "top_rules": []
+    },
+    {
+      "file_path": "src/test/java/com/example/billing/BillingManagerTest.java",
+      "loc": 0,
+      "risk_score": 0.28,
+      "finding_counts": {
+        "high": 1
+      },
+      "top_rules": [
+        "java/testing"
+      ]
+    },
+    {
+      "file_path": "examples/java/api_spring_messy/src/main/java/com/example/billing/service/BillingManager.java",
+      "loc": 78,
+      "risk_score": 0.26,
+      "finding_counts": {},
+      "top_rules": []
+    },
+    {
+      "file_path": "examples/java/api_spring_messy/src/main/java/com/example/billing/client/GatewayClient.java",
+      "loc": 32,
+      "risk_score": 0.25,
+      "finding_counts": {},
+      "top_rules": []
+    },
+    {
+      "file_path": "README.md",
+      "loc": 0,
+      "risk_score": 0.15,
+      "finding_counts": {
+        "medium": 1
+      },
+      "top_rules": [
+        "common/documentation"
+      ]
+    },
+    {
+      "file_path": "examples/java/api_spring_messy/src/main/java/com/example/billing/controller/BillingController.java",
+      "loc": 38,
+      "risk_score": 0.06,
+      "finding_counts": {},
+      "top_rules": []
+    },
+    {
+      "file_path": "examples/java/api_spring_messy/src/main/java/com/example/billing/model/InvoiceRecord.java",
+      "loc": 15,
+      "risk_score": 0.06,
+      "finding_counts": {},
+      "top_rules": []
+    },
+    {
+      "file_path": "examples/java/api_spring_messy/src/main/java/com/example/billing/util/LegacyDateHelper.java",
+      "loc": 15,
+      "risk_score": 0.06,
+      "finding_counts": {},
+      "top_rules": []
+    },
+    {
+      "file_path": "examples/java/api_spring_messy/src/main/java/com/example/billing/BillingApp.java",
+      "loc": 9,
+      "risk_score": 0.06,
+      "finding_counts": {},
+      "top_rules": []
+    }
+  ],
+  "strengths": [
+    "pom.xml において JUnit 依存関係には <scope>test</scope> が明示され、本番スコープとの最低限の分離が行われている",
+    "Maven 標準ディレクトリ構成（src/main/java, src/test/java）に準拠しているため標準ツールでの解析が容易である",
+    ".env や *.pem / *.key などの認証情報ファイル自体はリポジトリにコミットされていない（committed_secret_files=[]）",
+    "InvoiceRecord.java は private final フィールドと正確な Javadoc を備えた不変 DTO としてクリーンに実装されている",
+    "AST 走査において SQL インジェクションや OS コマンド実行などの危険な CWE コードシンク（dangerous_sinks）は 0 件である",
+    "決済エンドポイント URL 自体は環境変数（LEGACY_PAYMENT_URL）で外部から上書きしようとする意図が最小限見られる",
+    "src/test/java ディレクトリ自体は標準 Maven 構造に沿って配置されており、テストクラス命名（*Test.java）は規約に一致している",
+    "Docker エンジン環境が利用可能であり、非決定的依存（LATEST）と旧式 JDK ターゲット（1.8）の衝突が決定的ビルドログとして明確に再現・特定された",
+    "AST 危険シンク検査（SEC-04）において SQL インジェクション（CWE-89）、OS コマンドインジェクション（CWE-78）、安全でないデシリアライズ（CWE-502）の呼び出しは 0 件である",
+    ".pni/pentests/examples/java/api_spring_messy/ にエンドポイント固有プローブ（CWE-306 無認証課金・CWE-650 HTTP メソッド改ざん・CWE-20 不正金額入力）とベースライン HTTP スイートの計 4 ファイルが整備済みであり、ビルド復旧後ただちに自動 DAST ゲートとして実行可能である"
+  ],
+  "findings": [
+    {
+      "severity": "critical",
+      "category": "code_quality",
+      "rule_id": "java/code_quality",
+      "file_path": "src/main/java/com/example/billing/service/BillingManager.java",
+      "line": 79,
+      "symbol": "processBatchBilling",
+      "evidence": "dateHelper.currentPeriodLabel() (undefined in LegacyDateHelper) + @Transactional without spring-tx dependency",
+      "description": "BillingManager が LegacyDateHelper に存在しない currentPeriodLabel() を呼び出しており、コンパイル不能および空 catch による障害隠蔽を引き起こしている。",
+      "recommendation": "java.time.YearMonth / DateTimeFormatter を用いた明示的な期間ラベル生成メソッドを実装し、空 catch ブロックを廃止する。"
+    },
+    {
+      "severity": "critical",
+      "category": "dependencies",
+      "rule_id": "common/runtime_verification",
+      "file_path": "pom.xml",
+      "line": 20,
+      "symbol": null,
+      "evidence": "bad class file: spring-boot-4.2.0-RC1.jar(SpringApplication.class) — class file has wrong version 61.0, should be 52.0 (harness_build exit_code=1, 25.76s)",
+      "description": "pom.xml の Java 1.8 指定と spring-boot-starter-web:LATEST の組み合わせにより、Java 17+ バイトコード（version 61.0）との不整合が発生してクリーンビルドが失敗し、単体テスト・カバレッジ・起動検証をすべてブロックしている（RV-01〜RV-04）。",
+      "recommendation": "pom.xml の Java ターゲットを 21 に引き上げ、Spring Boot 3.4.x 安定版 BOM で全依存バージョンを固定し、コンパイル不能箇所（LegacyDateHelper.currentPeriodLabel・spring-tx）を修正する。"
+    },
+    {
+      "severity": "critical",
+      "category": "security",
+      "rule_id": "common/security",
+      "file_path": "src/main/java/com/example/billing/client/GatewayClient.java",
+      "line": 13,
+      "symbol": "GatewayClient",
+      "evidence": "private static final String GATEWAY_SECRET = \"rk_live_EXAMPLE_DUMMY_SECRET_9876543210\";",
+      "description": "決済ゲートウェイのライブシークレットキー（rk_live_...）がソースコード定数としてハードコードされている。",
+      "recommendation": "ハードコード定数を即時削除してキーをローテーションし、環境変数または Secret Manager から Spring @Value / ConfigurationProperties 経由で注入する。"
+    },
+    {
+      "severity": "critical",
+      "category": "security",
+      "rule_id": "common/security_vulnerability",
+      "file_path": "pom.xml",
+      "line": 20,
+      "symbol": null,
+      "evidence": "CVE-2022-22965 (CRITICAL, CVSS 9.8): org.springframework.boot:spring-boot-starter-web@LATEST (fixed_version: 2.5.12, 2.6.6 / 3.4.x)",
+      "description": "pom.xml の spring-boot-starter-web@LATEST に対して CRITICAL 脆弱性 CVE-2022-22965（Spring Framework データバインディング経由の RCE, CVSS 9.8）が検出された（SEC-01）。",
+      "recommendation": "LATEST 指定を廃止し、Spring Boot 3.4.x 安定版 BOM で修正済みバージョンへ厳密にピン留めする。"
+    },
+    {
+      "severity": "critical",
+      "category": "security",
+      "rule_id": "common/supply_chain",
+      "file_path": ".github/workflows/build.yml",
+      "line": 4,
+      "symbol": null,
+      "evidence": "on: pull_request_target + uses: actions/checkout@main + run: mvn package (no permissions block)",
+      "description": "GitHub Actions が特権トリガー pull_request_target を使用しつつ GITHUB_TOKEN の permissions 制限を持たず、さらに actions/checkout@main を可変ブランチ指定で参照している。",
+      "recommendation": "トリガーを pull_request に変更し、permissions: { contents: read } を明記した上で、actions/checkout をフルコミット SHA にピン留めする。"
+    },
+    {
+      "severity": "critical",
+      "category": "security",
+      "rule_id": "common/supply_chain",
+      "file_path": ".github/workflows/build.yml",
+      "line": 4,
+      "symbol": null,
+      "evidence": "on: pull_request_target / steps: uses: actions/checkout@main, run: mvn package",
+      "description": "pull_request_target トリガーと GITHUB_TOKEN 権限未制限、および可変タグ actions/checkout@main の組み合わせにより CI サプライチェーン侵害リスクが高い。",
+      "recommendation": "pull_request トリガーへ変更し、permissions: { contents: read } の明示と actions/checkout のコミット SHA ピン留めを実施する。"
+    },
+    {
+      "severity": "high",
+      "category": "architecture",
+      "rule_id": "common/architecture",
+      "file_path": "src/main/java/com/example/billing/service/BillingManager.java",
+      "line": 22,
+      "symbol": "circularController",
+      "evidence": "@Autowired private BillingController circularController; -> circularController.lastChannel()",
+      "description": "Service 層の BillingManager が Presentation 層の BillingController を逆方向にフィールド注入しており、双方向循環依存とレイヤー侵害を招いている。",
+      "recommendation": "circularController フィールドを削除し、必要なチャネル情報は型安全なリクエスト DTO またはコンテキスト値オブジェクトとして上位から渡す。"
+    },
+    {
+      "severity": "high",
+      "category": "code_quality",
+      "rule_id": "common/maintainability",
+      "file_path": "src/main/java/com/example/billing/service/BillingManager.java",
+      "line": 52,
+      "symbol": "processBatchBilling",
+      "evidence": "status == \"PAID\", currency == \"USD\", currency == \"JPY\"; catch (Exception e) {}; cognitive=56, params=8",
+      "description": "文字列比較に == 参照等価演算子が3箇所で使われており外部入力文字列で税計算条件が不成立になる論理バグがあるほか、認知的複雑度 56・引数 8 個・空 catch が重なっている。",
+      "recommendation": "\"PAID\".equals(status) や Enum 比較へ置換し、8引数を BillingCommand レコードに集約して税計算・リトライ処理を小関数に分割する。"
+    },
+    {
+      "severity": "high",
+      "category": "code_quality",
+      "rule_id": "common/production_readiness",
+      "file_path": "src/main/java/com/example/billing/client/GatewayClient.java",
+      "line": 22,
+      "symbol": "sendCharge",
+      "evidence": "HttpClient client = HttpClient.newHttpClient(); HttpRequest.newBuilder().uri(...).POST(...).build();",
+      "description": "外部決済ゲートウェイ呼び出しで connectTimeout / request timeout が一切設定されておらず、かつリクエストごとに HttpClient インスタンスを生成している。",
+      "recommendation": "connectTimeout とリクエスト timeout（例: 3〜5秒）を設定したシングルトン HttpClient / Spring RestClient Bean を注入して再利用し、指数バックオフ付きリトライを導入する。"
+    },
+    {
+      "severity": "high",
+      "category": "code_quality",
+      "rule_id": "java/frameworks/spring_boot",
+      "file_path": "src/main/java/com/example/billing/service/BillingManager.java",
+      "line": 17,
+      "symbol": "INVOICE_CACHE",
+      "evidence": "public static Map INVOICE_CACHE = new HashMap(); @Transactional private void saveAuditTrail(...); BillingController.channel",
+      "description": "非スレッドセーフな public static 生 HashMap やシングルトン Controller の可変フィールド channel が競合状態を生む上、private メソッドの @Transactional が Spring AOP で無視される。",
+      "recommendation": "可変フィールドを除去し、キャッシュが必要な場合は Spring Cache / ConcurrentHashMap<String, String> を管理された Bean 内に閉じ込め、トランザクション境界は別 Bean の public メソッドに分離する。"
+    },
+    {
+      "severity": "high",
+      "category": "dependencies",
+      "rule_id": "common/supply_chain",
+      "file_path": "Dockerfile",
+      "line": 1,
+      "symbol": null,
+      "evidence": "FROM openjdk:latest (no USER, no .dockerignore)",
+      "description": "Docker Hub で廃止済みの openjdk:latest タグを参照しており、非 root USER 設定および .dockerignore も存在しない。",
+      "recommendation": "ダイジェスト固定済みの eclipse-temurin:21-jre イメージを採用し、非 root USER の作成と .dockerignore の整備を行う。"
+    },
+    {
+      "severity": "high",
+      "category": "dependencies",
+      "rule_id": "java/dependencies",
+      "file_path": "pom.xml",
+      "line": 20,
+      "symbol": null,
+      "evidence": "<artifactId>spring-boot-starter-web</artifactId><version>LATEST</version> with <maven.compiler.source>1.8</maven.compiler.source>",
+      "description": "spring-boot-starter-web に動的バージョン LATEST が指定され、Java 1.8 設定・javax.servlet-api:4.0.1・コード内の Java 11 HttpClient / @Transactional と不整合を起こしている。",
+      "recommendation": "Spring Boot 3.4+ BOM でバージョンを厳密固定し、Java 21 LTS・jakarta.servlet・spring-boot-starter-test (JUnit 5) へ統一するとともに mvnw をコミットする。"
+    },
+    {
+      "severity": "high",
+      "category": "security",
+      "rule_id": "common/runtime_verification",
+      "file_path": "Dockerfile",
+      "line": 1,
+      "symbol": null,
+      "evidence": "project_dockerfile_build failed (exit_code=1, 1.51s): FROM openjdk:latest + CMD [\"java\", \"-jar\", \"billing.jar\"] without mvn package stage",
+      "description": "Dockerfile が解決不能な openjdk:latest を指定している上、JAR 生成ステップを含まず存在しない billing.jar を起動しようとしておりコンテナイメージを構築できない（RV-01）。",
+      "recommendation": "eclipse-temurin:21-jdk / 21-jre によるマルチステージビルドへ書き換え、target/*.jar を非 root USER で起動するよう修正する。"
+    },
+    {
+      "severity": "high",
+      "category": "security",
+      "rule_id": "common/security_vulnerability",
+      "file_path": "Dockerfile",
+      "line": 1,
+      "symbol": null,
+      "evidence": "Trivy IaC: DS-0002 (HIGH: Image user should not be 'root'), DS-0001 (MEDIUM: ':latest' tag used), DS-0026 (LOW: No HEALTHCHECK defined)",
+      "description": "Dockerfile に Trivy IaC スキャンで3件の設定不備（root ユーザ実行・:latest タグ使用・HEALTHCHECK 未定義）が検出された（SEC-02）。",
+      "recommendation": "バージョン/ダイジェスト固定ベースイメージへの変更、非 root USER の明示、および HEALTHCHECK 命令の追加を実施する。"
+    },
+    {
+      "severity": "high",
+      "category": "security",
+      "rule_id": "common/security_vulnerability",
+      "file_path": "pom.xml",
+      "line": 13,
+      "symbol": null,
+      "evidence": "PentestFacts.status=error, server_booted=false (15.74s): Container build failed: ERROR: failed to build: failed to solve: process \"/bin/sh -c mvn -B -Dmaven.repo.local=/m2repo       org.jacoco:jacoco-maven-plugin:${JACOCO_VERSION}:prepare-agent       test       -DfailIfNoTests=false       -Dmaven.test.failure.ignore=tru",
+      "description": "動的 Web ペネトレーション監査（SEC-06 / web_pentest）において、pom.xml の Java 1.8 指定と spring-boot-starter-web:LATEST のコンパイル不整合によりコンテナビルドが失敗し、.pni/pentests/examples/java/api_spring_messy/ の全 HTTP セキュリティプローブ実行がブロックされた。",
+      "recommendation": "pom.xml の Java 21 + Spring Boot 3.4.x 固定 BOM 化およびコンパイルエラー修正を実施して隔離ループバック起動を復旧し、web_pentest の全プローブを実行可能にする。"
+    },
+    {
+      "severity": "high",
+      "category": "security",
+      "rule_id": "common/security_vulnerability",
+      "file_path": "src/main/java/com/example/billing/controller/BillingController.java",
+      "line": 22,
+      "symbol": "chargeCustomer",
+      "evidence": "@RequestMapping(\"/charge\") public Map chargeCustomer(@RequestBody Map payload, ...) [has_auth_hint=false]",
+      "description": "課金実行エンドポイント /charge が HTTP メソッド無制限（ANY）かつ認証・認可機構なし、さらに未検証の Raw Map 入力で公開されている（SEC-05）。",
+      "recommendation": "@PostMapping(\"/charge\") に限定し、Spring Security による認証・認可と @Valid ChargeRequest DTO による入力バリデーションを導入する。"
+    },
+    {
+      "severity": "high",
+      "category": "security",
+      "rule_id": "common/supply_chain",
+      "file_path": "Dockerfile",
+      "line": 1,
+      "symbol": null,
+      "evidence": "FROM openjdk:latest / COPY . . / CMD [\"java\", \"-jar\", \"billing.jar\"] (no USER, no multi-stage mvn build)",
+      "description": "Dockerfile が非推奨かつ可変タグの openjdk:latest を使用し、非 root USER 指定と .dockerignore を欠き、さらに JAR ビルド工程がなく存在しない billing.jar を指定している。",
+      "recommendation": "eclipse-temurin:21-jre-jammy 等のダイジェスト/バージョン固定マルチステージビルドへ刷新し、非 root USER の設定と .dockerignore の追加を行う。"
+    },
+    {
+      "severity": "high",
+      "category": "testing",
+      "rule_id": "java/testing",
+      "file_path": "src/test/java/com/example/billing/BillingManagerTest.java",
+      "line": 8,
+      "symbol": "testSmokeRun",
+      "evidence": "@Test public void testSmokeRun() { InvoiceRecord record = new InvoiceRecord(\"INV-SMOKE-01\", 1200L); record.getAmountCents(); }",
+      "description": "唯一のユニットテストがレガシー JUnit 4 で記述され、アサーションを1つも持たず、BillingManager や /charge エンドポイントを一切テストしていない。",
+      "recommendation": "JUnit 5 (junit-jupiter) + Mockito + MockMvc へ移行し、com.example.billing.service パッケージ配下で USD/JPY 税計算・0円以下リトライ・異常系バリデーションのアサーション付きテストと JaCoCo 80% ゲートを整備する。"
+    },
+    {
+      "severity": "medium",
+      "category": "architecture",
+      "rule_id": "common/twelve_factor",
+      "file_path": "src/main/java/com/example/billing/client/GatewayClient.java",
+      "line": 16,
+      "symbol": "sendCharge",
+      "evidence": "String endpoint = System.getenv(\"LEGACY_PAYMENT_URL\"); + System.out.println(...) + e.printStackTrace()",
+      "description": "環境変数がクライアントコード内で直接参照され、ログ出力も SLF4J ではなく System.out / printStackTrace に散在している。",
+      "recommendation": "@ConfigurationProperties(prefix = \"billing.gateway\") record で設定を一元管理し、全ログ出力を SLF4J 構造化ロガーへ統一するとともに spring-boot-starter-actuator でヘルスプローブを公開する。"
+    },
+    {
+      "severity": "medium",
+      "category": "documentation",
+      "rule_id": "common/documentation",
+      "file_path": "README.md",
+      "line": 1,
+      "symbol": null,
+      "evidence": "# Legacy Billing / Run `mvn spring-boot:run`.",
+      "description": "README.md が2行のみで、システム概要・必要な JDK バージョン・環境変数 (LEGACY_PAYMENT_URL)・API リクエスト例・テスト手順が欠落している。",
+      "recommendation": "Standard Readme 構成に従い、前提条件（JDK 21 / Maven）、環境変数設定、POST /charge の入出力仕様、テスト・コンテナ起動手順を整備する。"
+    },
+    {
+      "severity": "medium",
+      "category": "security",
+      "rule_id": "common/security_vulnerability",
+      "file_path": "src/main/java/com/example/billing/controller/BillingController.java",
+      "line": 27,
+      "symbol": "chargeCustomer",
+      "evidence": "Long.parseLong(String.valueOf(payload.getOrDefault(\"amountCents\", \"500\"))) + @RequestMapping(\"/charge\") targeted by test_app_probes.py (CWE-306, CWE-650, CWE-20)",
+      "description": "BillingController.chargeCustomer (line 27) は未検証の Map 入力に対して Long.parseLong を直接実行しており、非数値 amountCents 送信時に NumberFormatException による未処理 500 エラーを誘発する（CWE-20）。無認証アクセス（CWE-306）および @RequestMapping メソッド無制限（CWE-650）と合わせ、test_app_probes.py の DAST プローブが検出対象とする脆弱性が内在している。",
+      "recommendation": "@PostMapping(\"/charge\") への限定、Spring Security 認証必須化、@Valid ChargeRequest DTO + @RestControllerAdvice による 400 応答化、およびセキュリティヘッダ（nosniff 等）の設定を実装する。"
+    },
+    {
+      "severity": "medium",
+      "category": "typing",
+      "rule_id": "java/typing",
+      "file_path": "src/main/java/com/example/billing/controller/BillingController.java",
+      "line": 24,
+      "symbol": "chargeCustomer",
+      "evidence": "Raw Map, Raw List, Raw Vector, Object traceHint/extraContext, @SuppressWarnings(\"unchecked\")",
+      "description": "Controller・Service・Client・Util の各層で Raw ジェネリクス型と Object 型引数が使用されており、コンパイル時の型検査が機能していない。",
+      "recommendation": "ChargeRequest / ChargeResponse Java record および List<InvoiceRecord> 等のパラメータ化ジェネリクスへ全面移行し、@SuppressWarnings(\"unchecked\") を撤廃する。"
+    },
+    {
+      "severity": "low",
+      "category": "dependencies",
+      "rule_id": "common/supply_chain",
+      "file_path": "pom.xml",
+      "line": 1,
+      "symbol": null,
+      "evidence": "has_license=False, has_security_policy=False, has_dependency_automation=False, has_gitignore=False",
+      "description": "リポジトリに LICENSE、SECURITY.md、Dependabot/Renovate 設定、および .gitignore が存在しない。",
+      "recommendation": ".gitignore、LICENSE、SECURITY.md、および .github/dependabot.yml（maven・github-actions・docker エコシステム対象）を追加する。"
+    },
+    {
+      "severity": "low",
+      "category": "documentation",
+      "rule_id": "java/code_quality",
+      "file_path": "src/main/java/com/example/billing/service/BillingManager.java",
+      "line": 31,
+      "symbol": "processBatchBilling",
+      "evidence": "@param obsoleteToken stale javadoc parameter; docstring_coverage_pct=33.3%",
+      "description": "公開クラス・メソッド 15 箇所中 10 箇所で Javadoc が欠落し、processBatchBilling には存在しない @param obsoleteToken が残存している。",
+      "recommendation": "全公開クラス・メソッドに正確な Javadoc を記述し、実際の引数シグネチャと @param / @return タグを同期させる。"
+    }
+  ],
+  "consolidated_findings": [
+    {
+      "severity": "critical",
+      "file_path": ".github/workflows/build.yml",
+      "line": 4,
+      "symbol": null,
+      "rule_ids": [
+        "common/supply_chain"
+      ],
+      "categories": [
+        "security"
+      ],
+      "primary_description": "GitHub Actions が特権トリガー pull_request_target を使用しつつ GITHUB_TOKEN の permissions 制限を持たず、さらに actions/checkout@main を可変ブランチ指定で参照している。",
+      "combined_evidence": "on: pull_request_target + uses: actions/checkout@main + run: mvn package (no permissions block) | on: pull_request_target / steps: uses: actions/checkout@main, run: mvn package",
+      "merged_recommendation": "トリガーを pull_request に変更し、permissions: { contents: read } を明記した上で、actions/checkout をフルコミット SHA にピン留めする。 / pull_request トリガーへ変更し、permissions: { contents: read } の明示と actions/checkout のコミット SHA ピン留めを実施する。"
+    },
+    {
+      "severity": "critical",
+      "file_path": "pom.xml",
+      "line": 20,
+      "symbol": null,
+      "rule_ids": [
+        "common/runtime_verification",
+        "common/security_vulnerability",
+        "java/dependencies"
+      ],
+      "categories": [
+        "dependencies",
+        "security"
+      ],
+      "primary_description": "pom.xml の Java 1.8 指定と spring-boot-starter-web:LATEST の組み合わせにより、Java 17+ バイトコード（version 61.0）との不整合が発生してクリーンビルドが失敗し、単体テスト・カバレッジ・起動検証をすべてブロックしている（RV-01〜RV-04）。",
+      "combined_evidence": "bad class file: spring-boot-4.2.0-RC1.jar(SpringApplication.class) — class file has wrong version 61.0, should be 52.0 (harness_build exit_code=1, 25.76s) | CVE-2022-22965 (CRITICAL, CVSS 9.8): org.springframework.boot:spring-boot-starter-web@LATEST (fixed_version: 2.5.12, 2.6.6 / 3.4.x) | <artifactId>spring-boot-starter-web</artifactId><version>LATEST</version> with <maven.compiler.source>1.8</maven.compiler.source>",
+      "merged_recommendation": "pom.xml の Java ターゲットを 21 に引き上げ、Spring Boot 3.4.x 安定版 BOM で全依存バージョンを固定し、コンパイル不能箇所（LegacyDateHelper.currentPeriodLabel・spring-tx）を修正する。 / LATEST 指定を廃止し、Spring Boot 3.4.x 安定版 BOM で修正済みバージョンへ厳密にピン留めする。 / Spring Boot 3.4+ BOM でバージョンを厳密固定し、Java 21 LTS・jakarta.servlet・spring-boot-starter-test (JUnit 5) へ統一するとともに mvnw をコミットする。"
+    },
+    {
+      "severity": "critical",
+      "file_path": "src/main/java/com/example/billing/client/GatewayClient.java",
+      "line": 13,
+      "symbol": "GatewayClient",
+      "rule_ids": [
+        "common/security"
+      ],
+      "categories": [
+        "security"
+      ],
+      "primary_description": "決済ゲートウェイのライブシークレットキー（rk_live_...）がソースコード定数としてハードコードされている。",
+      "combined_evidence": "private static final String GATEWAY_SECRET = \"rk_live_EXAMPLE_DUMMY_SECRET_9876543210\";",
+      "merged_recommendation": "ハードコード定数を即時削除してキーをローテーションし、環境変数または Secret Manager から Spring @Value / ConfigurationProperties 経由で注入する。"
+    },
+    {
+      "severity": "critical",
+      "file_path": "src/main/java/com/example/billing/service/BillingManager.java",
+      "line": 79,
+      "symbol": "processBatchBilling",
+      "rule_ids": [
+        "java/code_quality"
+      ],
+      "categories": [
+        "code_quality"
+      ],
+      "primary_description": "BillingManager が LegacyDateHelper に存在しない currentPeriodLabel() を呼び出しており、コンパイル不能および空 catch による障害隠蔽を引き起こしている。",
+      "combined_evidence": "dateHelper.currentPeriodLabel() (undefined in LegacyDateHelper) + @Transactional without spring-tx dependency",
+      "merged_recommendation": "java.time.YearMonth / DateTimeFormatter を用いた明示的な期間ラベル生成メソッドを実装し、空 catch ブロックを廃止する。"
+    },
+    {
+      "severity": "high",
+      "file_path": "Dockerfile",
+      "line": 1,
+      "symbol": null,
+      "rule_ids": [
+        "common/supply_chain",
+        "common/runtime_verification",
+        "common/security_vulnerability"
+      ],
+      "categories": [
+        "dependencies",
+        "security"
+      ],
+      "primary_description": "Docker Hub で廃止済みの openjdk:latest タグを参照しており、非 root USER 設定および .dockerignore も存在しない。",
+      "combined_evidence": "FROM openjdk:latest (no USER, no .dockerignore) | project_dockerfile_build failed (exit_code=1, 1.51s): FROM openjdk:latest + CMD [\"java\", \"-jar\", \"billing.jar\"] without mvn package stage | Trivy IaC: DS-0002 (HIGH: Image user should not be 'root'), DS-0001 (MEDIUM: ':latest' tag used), DS-0026 (LOW: No HEALTHCHECK defined) | FROM openjdk:latest / COPY . . / CMD [\"java\", \"-jar\", \"billing.jar\"] (no USER, no multi-stage mvn build)",
+      "merged_recommendation": "ダイジェスト固定済みの eclipse-temurin:21-jre イメージを採用し、非 root USER の作成と .dockerignore の整備を行う。 / eclipse-temurin:21-jdk / 21-jre によるマルチステージビルドへ書き換え、target/*.jar を非 root USER で起動するよう修正する。 / バージョン/ダイジェスト固定ベースイメージへの変更、非 root USER の明示、および HEALTHCHECK 命令の追加を実施する。 / eclipse-temurin:21-jre-jammy 等のダイジェスト/バージョン固定マルチステージビルドへ刷新し、非 root USER の設定と .dockerignore の追加を行う。"
+    },
+    {
+      "severity": "high",
+      "file_path": "pom.xml",
+      "line": 13,
+      "symbol": null,
+      "rule_ids": [
+        "common/security_vulnerability"
+      ],
+      "categories": [
+        "security"
+      ],
+      "primary_description": "動的 Web ペネトレーション監査（SEC-06 / web_pentest）において、pom.xml の Java 1.8 指定と spring-boot-starter-web:LATEST のコンパイル不整合によりコンテナビルドが失敗し、.pni/pentests/examples/java/api_spring_messy/ の全 HTTP セキュリティプローブ実行がブロックされた。",
+      "combined_evidence": "PentestFacts.status=error, server_booted=false (15.74s): Container build failed: ERROR: failed to build: failed to solve: process \"/bin/sh -c mvn -B -Dmaven.repo.local=/m2repo       org.jacoco:jacoco-maven-plugin:${JACOCO_VERSION}:prepare-agent       test       -DfailIfNoTests=false       -Dmaven.test.failure.ignore=tru",
+      "merged_recommendation": "pom.xml の Java 21 + Spring Boot 3.4.x 固定 BOM 化およびコンパイルエラー修正を実施して隔離ループバック起動を復旧し、web_pentest の全プローブを実行可能にする。"
+    },
+    {
+      "severity": "high",
+      "file_path": "src/main/java/com/example/billing/client/GatewayClient.java",
+      "line": 22,
+      "symbol": "sendCharge",
+      "rule_ids": [
+        "common/production_readiness"
+      ],
+      "categories": [
+        "code_quality"
+      ],
+      "primary_description": "外部決済ゲートウェイ呼び出しで connectTimeout / request timeout が一切設定されておらず、かつリクエストごとに HttpClient インスタンスを生成している。",
+      "combined_evidence": "HttpClient client = HttpClient.newHttpClient(); HttpRequest.newBuilder().uri(...).POST(...).build();",
+      "merged_recommendation": "connectTimeout とリクエスト timeout（例: 3〜5秒）を設定したシングルトン HttpClient / Spring RestClient Bean を注入して再利用し、指数バックオフ付きリトライを導入する。"
+    },
+    {
+      "severity": "high",
+      "file_path": "src/main/java/com/example/billing/controller/BillingController.java",
+      "line": 22,
+      "symbol": "chargeCustomer",
+      "rule_ids": [
+        "common/security_vulnerability"
+      ],
+      "categories": [
+        "security"
+      ],
+      "primary_description": "課金実行エンドポイント /charge が HTTP メソッド無制限（ANY）かつ認証・認可機構なし、さらに未検証の Raw Map 入力で公開されている（SEC-05）。",
+      "combined_evidence": "@RequestMapping(\"/charge\") public Map chargeCustomer(@RequestBody Map payload, ...) [has_auth_hint=false]",
+      "merged_recommendation": "@PostMapping(\"/charge\") に限定し、Spring Security による認証・認可と @Valid ChargeRequest DTO による入力バリデーションを導入する。"
+    },
+    {
+      "severity": "high",
+      "file_path": "src/main/java/com/example/billing/service/BillingManager.java",
+      "line": 17,
+      "symbol": "INVOICE_CACHE",
+      "rule_ids": [
+        "java/frameworks/spring_boot"
+      ],
+      "categories": [
+        "code_quality"
+      ],
+      "primary_description": "非スレッドセーフな public static 生 HashMap やシングルトン Controller の可変フィールド channel が競合状態を生む上、private メソッドの @Transactional が Spring AOP で無視される。",
+      "combined_evidence": "public static Map INVOICE_CACHE = new HashMap(); @Transactional private void saveAuditTrail(...); BillingController.channel",
+      "merged_recommendation": "可変フィールドを除去し、キャッシュが必要な場合は Spring Cache / ConcurrentHashMap<String, String> を管理された Bean 内に閉じ込め、トランザクション境界は別 Bean の public メソッドに分離する。"
+    },
+    {
+      "severity": "high",
+      "file_path": "src/main/java/com/example/billing/service/BillingManager.java",
+      "line": 22,
+      "symbol": "circularController",
+      "rule_ids": [
+        "common/architecture"
+      ],
+      "categories": [
+        "architecture"
+      ],
+      "primary_description": "Service 層の BillingManager が Presentation 層の BillingController を逆方向にフィールド注入しており、双方向循環依存とレイヤー侵害を招いている。",
+      "combined_evidence": "@Autowired private BillingController circularController; -> circularController.lastChannel()",
+      "merged_recommendation": "circularController フィールドを削除し、必要なチャネル情報は型安全なリクエスト DTO またはコンテキスト値オブジェクトとして上位から渡す。"
+    },
+    {
+      "severity": "high",
+      "file_path": "src/main/java/com/example/billing/service/BillingManager.java",
+      "line": 52,
+      "symbol": "processBatchBilling",
+      "rule_ids": [
+        "common/maintainability"
+      ],
+      "categories": [
+        "code_quality"
+      ],
+      "primary_description": "文字列比較に == 参照等価演算子が3箇所で使われており外部入力文字列で税計算条件が不成立になる論理バグがあるほか、認知的複雑度 56・引数 8 個・空 catch が重なっている。",
+      "combined_evidence": "status == \"PAID\", currency == \"USD\", currency == \"JPY\"; catch (Exception e) {}; cognitive=56, params=8",
+      "merged_recommendation": "\"PAID\".equals(status) や Enum 比較へ置換し、8引数を BillingCommand レコードに集約して税計算・リトライ処理を小関数に分割する。"
+    },
+    {
+      "severity": "high",
+      "file_path": "src/test/java/com/example/billing/BillingManagerTest.java",
+      "line": 8,
+      "symbol": "testSmokeRun",
+      "rule_ids": [
+        "java/testing"
+      ],
+      "categories": [
+        "testing"
+      ],
+      "primary_description": "唯一のユニットテストがレガシー JUnit 4 で記述され、アサーションを1つも持たず、BillingManager や /charge エンドポイントを一切テストしていない。",
+      "combined_evidence": "@Test public void testSmokeRun() { InvoiceRecord record = new InvoiceRecord(\"INV-SMOKE-01\", 1200L); record.getAmountCents(); }",
+      "merged_recommendation": "JUnit 5 (junit-jupiter) + Mockito + MockMvc へ移行し、com.example.billing.service パッケージ配下で USD/JPY 税計算・0円以下リトライ・異常系バリデーションのアサーション付きテストと JaCoCo 80% ゲートを整備する。"
+    },
+    {
+      "severity": "medium",
+      "file_path": "README.md",
+      "line": 1,
+      "symbol": null,
+      "rule_ids": [
+        "common/documentation"
+      ],
+      "categories": [
+        "documentation"
+      ],
+      "primary_description": "README.md が2行のみで、システム概要・必要な JDK バージョン・環境変数 (LEGACY_PAYMENT_URL)・API リクエスト例・テスト手順が欠落している。",
+      "combined_evidence": "# Legacy Billing / Run `mvn spring-boot:run`.",
+      "merged_recommendation": "Standard Readme 構成に従い、前提条件（JDK 21 / Maven）、環境変数設定、POST /charge の入出力仕様、テスト・コンテナ起動手順を整備する。"
+    },
+    {
+      "severity": "medium",
+      "file_path": "src/main/java/com/example/billing/client/GatewayClient.java",
+      "line": 16,
+      "symbol": "sendCharge",
+      "rule_ids": [
+        "common/twelve_factor"
+      ],
+      "categories": [
+        "architecture"
+      ],
+      "primary_description": "環境変数がクライアントコード内で直接参照され、ログ出力も SLF4J ではなく System.out / printStackTrace に散在している。",
+      "combined_evidence": "String endpoint = System.getenv(\"LEGACY_PAYMENT_URL\"); + System.out.println(...) + e.printStackTrace()",
+      "merged_recommendation": "@ConfigurationProperties(prefix = \"billing.gateway\") record で設定を一元管理し、全ログ出力を SLF4J 構造化ロガーへ統一するとともに spring-boot-starter-actuator でヘルスプローブを公開する。"
+    },
+    {
+      "severity": "medium",
+      "file_path": "src/main/java/com/example/billing/controller/BillingController.java",
+      "line": 24,
+      "symbol": "chargeCustomer",
+      "rule_ids": [
+        "java/typing"
+      ],
+      "categories": [
+        "typing"
+      ],
+      "primary_description": "Controller・Service・Client・Util の各層で Raw ジェネリクス型と Object 型引数が使用されており、コンパイル時の型検査が機能していない。",
+      "combined_evidence": "Raw Map, Raw List, Raw Vector, Object traceHint/extraContext, @SuppressWarnings(\"unchecked\")",
+      "merged_recommendation": "ChargeRequest / ChargeResponse Java record および List<InvoiceRecord> 等のパラメータ化ジェネリクスへ全面移行し、@SuppressWarnings(\"unchecked\") を撤廃する。"
+    },
+    {
+      "severity": "medium",
+      "file_path": "src/main/java/com/example/billing/controller/BillingController.java",
+      "line": 27,
+      "symbol": "chargeCustomer",
+      "rule_ids": [
+        "common/security_vulnerability"
+      ],
+      "categories": [
+        "security"
+      ],
+      "primary_description": "BillingController.chargeCustomer (line 27) は未検証の Map 入力に対して Long.parseLong を直接実行しており、非数値 amountCents 送信時に NumberFormatException による未処理 500 エラーを誘発する（CWE-20）。無認証アクセス（CWE-306）および @RequestMapping メソッド無制限（CWE-650）と合わせ、test_app_probes.py の DAST プローブが検出対象とする脆弱性が内在している。",
+      "combined_evidence": "Long.parseLong(String.valueOf(payload.getOrDefault(\"amountCents\", \"500\"))) + @RequestMapping(\"/charge\") targeted by test_app_probes.py (CWE-306, CWE-650, CWE-20)",
+      "merged_recommendation": "@PostMapping(\"/charge\") への限定、Spring Security 認証必須化、@Valid ChargeRequest DTO + @RestControllerAdvice による 400 応答化、およびセキュリティヘッダ（nosniff 等）の設定を実装する。"
+    },
+    {
+      "severity": "low",
+      "file_path": "pom.xml",
+      "line": 1,
+      "symbol": null,
+      "rule_ids": [
+        "common/supply_chain"
+      ],
+      "categories": [
+        "dependencies"
+      ],
+      "primary_description": "リポジトリに LICENSE、SECURITY.md、Dependabot/Renovate 設定、および .gitignore が存在しない。",
+      "combined_evidence": "has_license=False, has_security_policy=False, has_dependency_automation=False, has_gitignore=False",
+      "merged_recommendation": ".gitignore、LICENSE、SECURITY.md、および .github/dependabot.yml（maven・github-actions・docker エコシステム対象）を追加する。"
+    },
+    {
+      "severity": "low",
+      "file_path": "src/main/java/com/example/billing/service/BillingManager.java",
+      "line": 31,
+      "symbol": "processBatchBilling",
+      "rule_ids": [
+        "java/code_quality"
+      ],
+      "categories": [
+        "documentation"
+      ],
+      "primary_description": "公開クラス・メソッド 15 箇所中 10 箇所で Javadoc が欠落し、processBatchBilling には存在しない @param obsoleteToken が残存している。",
+      "combined_evidence": "@param obsoleteToken stale javadoc parameter; docstring_coverage_pct=33.3%",
+      "merged_recommendation": "全公開クラス・メソッドに正確な Javadoc を記述し、実際の引数シグネチャと @param / @return タグを同期させる。"
+    }
+  ],
+  "action_plan": [
+    {
+      "priority": "P0",
+      "title": "BillingManager の未定義メソッド呼び出し・文字列 == 比較・空 catch バグの修正と循環依存解消",
+      "category": "code_quality",
+      "target_files": [
+        "src/main/java/com/example/billing/service/BillingManager.java",
+        "src/main/java/com/example/billing/controller/BillingController.java",
+        "src/main/java/com/example/billing/util/LegacyDateHelper.java"
+      ],
+      "related_rules": [
+        "common/architecture",
+        "common/maintainability",
+        "java/code_quality",
+        "java/frameworks/spring_boot"
+      ],
+      "action": "BillingController への逆参照とコンストラクタ DI 未対応フィールドを解消し、String.equals/Enum 比較への修正、java.time ベースの期間ラベル実装、空 catch の構造化エラー処理への置換、8引数のコマンド DTO 化を行う。",
+      "expected_impact": "コンパイル不全と課金税率計算の論理バグ、および Controller-Service 間の循環依存を一括解消する。"
+    },
+    {
+      "priority": "P0",
+      "title": "RV-01〜RV-04 ブロック解消：Java 21 + Spring Boot 固定 BOM 化とコンテナマルチステージビルド構築",
+      "category": "dependencies",
+      "target_files": [
+        "pom.xml",
+        "Dockerfile"
+      ],
+      "related_rules": [
+        "common/runtime_verification",
+        "common/production_readiness",
+        "java/dependencies"
+      ],
+      "action": "pom.xml を Java 21 + Spring Boot 固定バージョン BOM + spring-boot-maven-plugin 構成に刷新し、Dockerfile を eclipse-temurin マルチステージビルドに更新してオフラインテスト・JaCoCo カバレッジ計測・スモーク起動を通過させる。",
+      "expected_impact": "コンテナクリーンビルド（RV-01）を復旧し、オフライン単体テスト（RV-02）・実測カバレッジ（RV-03）・起動スモーク検証（RV-04）の自動ゲートを有効化する。"
+    },
+    {
+      "priority": "P0",
+      "title": "pom.xml のツールチェーン・Spring Boot BOM 固定化とビルド整合性の回復",
+      "category": "dependencies",
+      "target_files": [
+        "pom.xml"
+      ],
+      "related_rules": [
+        "java/dependencies",
+        "common/supply_chain"
+      ],
+      "action": "Java 21 LTS へのターゲット更新、Spring Boot BOM によるバージョン固定（LATEST 排除）、jakarta.servlet / spring-tx 依存整理、JUnit 5 移行、および mvnw ラッパー追加を実施する。",
+      "expected_impact": "コンパイルエラーと動的バージョン解決による非決定的ビルドを解消し、再現可能なビルド基盤を確立する。"
+    },
+    {
+      "priority": "P0",
+      "title": "/charge エンドポイントの POST 限定・認証認可保護・型安全 DTO バリデーション導入",
+      "category": "security",
+      "target_files": [
+        "src/main/java/com/example/billing/controller/BillingController.java"
+      ],
+      "related_rules": [
+        "common/security_vulnerability",
+        "common/security",
+        "java/typing",
+        "java/frameworks/spring_boot"
+      ],
+      "action": "@PostMapping(\"/charge\") へ変更し、Jakarta Bean Validation 付き record DTO (ChargeRequest / ChargeResponse) と Spring Security 認証フィルタを導入し、可変フィールド channel を廃止する。",
+      "expected_impact": "無認証課金リクエスト・不正ペイロード・並行リクエスト間の状態汚染を防止する。"
+    },
+    {
+      "priority": "P0",
+      "title": "CI ワークフロー（build.yml）の権限最小化と Action SHA 固定",
+      "category": "security",
+      "target_files": [
+        ".github/workflows/build.yml"
+      ],
+      "related_rules": [
+        "common/supply_chain",
+        "common/security"
+      ],
+      "action": "pull_request_target を pull_request に置換し、permissions: { contents: read } と actions/checkout の SHA 固定を適用する。",
+      "expected_impact": "OpenSSF Scorecard の Token-Permissions / Pinned-Dependencies / Dangerous-Workflow 違反を解消する。"
+    },
+    {
+      "priority": "P0",
+      "title": "CVE-2022-22965 解消のための Spring Boot 3.4.x BOM バージョン固定",
+      "category": "security",
+      "target_files": [
+        "pom.xml"
+      ],
+      "related_rules": [
+        "common/security_vulnerability",
+        "CVE-2022-22965",
+        "java/dependencies"
+      ],
+      "action": "pom.xml の spring-boot-starter-web:LATEST を廃止し、Spring Boot 3.4.x 親 POM / BOM による固定バージョンへアップグレードする。",
+      "expected_impact": "CVSS 9.8 の Spring4Shell 脆弱性判定を解消し、コンテナイメージの正常ビルドと OS 層 Trivy スキャンを可能にする。"
+    },
+    {
+      "priority": "P0",
+      "title": "GatewayClient からのハードコード秘密情報除去と外部シークレット注入化",
+      "category": "security",
+      "target_files": [
+        "src/main/java/com/example/billing/client/GatewayClient.java"
+      ],
+      "related_rules": [
+        "common/security"
+      ],
+      "action": "GATEWAY_SECRET 定数を削除し、環境変数または外部シークレットストアから起動時検証付きで注入するよう変更する。",
+      "expected_impact": "リポジトリ漏洩や逆コンパイルによる決済認証情報の流出を防止する。"
+    },
+    {
+      "priority": "P0",
+      "title": "GitHub Actions ワークフローの最小権限化と SHA ピン留め",
+      "category": "security",
+      "target_files": [
+        ".github/workflows/build.yml"
+      ],
+      "related_rules": [
+        "common/supply_chain",
+        "common/security"
+      ],
+      "action": "pull_request_target を通常の pull_request に置き換え、permissions: { contents: read } を宣言し、actions/checkout を不変コミット SHA に固定する。",
+      "expected_impact": "フォーク PR 経由の特権トークン悪用・任意コード実行リスクを排除する。"
+    },
+    {
+      "priority": "P1",
+      "title": "外部 HTTP クライアントのタイムアウト設定・Bean 再利用と構造化ログ・Actuator 導入",
+      "category": "architecture",
+      "target_files": [
+        "src/main/java/com/example/billing/client/GatewayClient.java",
+        "src/main/java/com/example/billing/service/BillingManager.java",
+        "pom.xml"
+      ],
+      "related_rules": [
+        "common/production_readiness",
+        "common/twelve_factor"
+      ],
+      "action": "タイムアウト付き RestClient/HttpClient Bean と @ConfigurationProperties を導入し、System.out/printStackTrace を SLF4J に置換、spring-boot-starter-actuator で readiness/liveness プローブを有効化する。",
+      "expected_impact": "下流ゲートウェイ遅延時のスレッド枯渇を防ぎ、本番運用に必要な可観測性と無停止デプロイ対応を実現する。"
+    },
+    {
+      "priority": "P1",
+      "title": "DAST ペネトレーションプローブ（CWE-306 / CWE-650 / CWE-20 / CWE-693）通過に向けた /charge 境界防御実装",
+      "category": "security",
+      "target_files": [
+        "src/main/java/com/example/billing/controller/BillingController.java",
+        "pom.xml"
+      ],
+      "related_rules": [
+        "common/security_vulnerability",
+        "CWE-306",
+        "CWE-650",
+        "CWE-20"
+      ],
+      "action": "コンテナビルド復旧後に .pni/pentests/examples/java/api_spring_messy/ の web_pentest を実行し、POST /charge への認証強制（401/403）、PUT/GET 拒否（405 Method Not Allowed）、不正 amountCents に対する 400 Bad Request 応答、および Spring Security デフォルト防御ヘッダ付与によって全プローブを通過させる。",
+      "expected_impact": "ライブ HTTP DAST プローブ（ベースライン＋アプリケーション固有テスト）の全件 PASS を達成し、課金 API の外部境界における認証バイパス・動詞改ざん・500 例外漏洩を防止する。"
+    },
+    {
+      "priority": "P1",
+      "title": "Dockerfile ハードニング（DS-0001 / DS-0002 / DS-0026 対応）",
+      "category": "security",
+      "target_files": [
+        "Dockerfile"
+      ],
+      "related_rules": [
+        "common/security_vulnerability",
+        "DS-0002",
+        "DS-0001",
+        "DS-0026"
+      ],
+      "action": "固定タグの eclipse-temurin:21-jre イメージ、非 root USER、および HEALTHCHECK 命令を備えたマルチステージ Dockerfile を実装する。",
+      "expected_impact": "Trivy IaC 検出不備（HIGH 1 / MEDIUM 1 / LOW 1）をすべてゼロにする。"
+    },
+    {
+      "priority": "P1",
+      "title": "マルチステージ・非 root Dockerfile と .dockerignore の整備",
+      "category": "security",
+      "target_files": [
+        "Dockerfile",
+        "pom.xml"
+      ],
+      "related_rules": [
+        "common/supply_chain",
+        "common/security"
+      ],
+      "action": "バージョン固定済みの eclipse-temurin イメージを用いたマルチステージビルドを構成し、spring-boot-maven-plugin で生成した実行可能 JAR を非 root USER で起動するよう修正する。",
+      "expected_impact": "コンテナ起動失敗（billing.jar 不在）を解消し、ベースイメージ脆弱性と root 権限リスクを大幅に低減する。"
+    },
+    {
+      "priority": "P1",
+      "title": "JUnit 5 + JaCoCo への移行と BillingManager / BillingController の単体・境界テスト実装",
+      "category": "testing",
+      "target_files": [
+        "src/test/java/com/example/billing/BillingManagerTest.java",
+        "pom.xml"
+      ],
+      "related_rules": [
+        "java/testing"
+      ],
+      "action": "spring-boot-starter-test (JUnit Jupiter) と jacoco-maven-plugin を導入し、パッケージ階層をミラーリングした上で税率計算・リトライ上限・不正入力の検証テストを実装する。",
+      "expected_impact": "文字列 == 比較バグや未定義メソッド等の回帰欠陥を CI で自動検知し、80% 以上の実測カバレッジを達成する。"
+    },
+    {
+      "priority": "P1",
+      "title": "Raw ジェネリクスと旧式 Date/SimpleDateFormat/Vector のモダン Java 型への刷新",
+      "category": "typing",
+      "target_files": [
+        "src/main/java/com/example/billing/util/LegacyDateHelper.java",
+        "src/main/java/com/example/billing/client/GatewayClient.java",
+        "src/main/java/com/example/billing/service/BillingManager.java"
+      ],
+      "related_rules": [
+        "java/typing",
+        "java/frameworks/spring_boot",
+        "java/code_quality"
+      ],
+      "action": "Map/List/Vector の Raw 型をすべて型パラメータ化し、SimpleDateFormat/Date をスレッドセーフな java.time.DateTimeFormatter/Instant に置換、import 順序と Javadoc を整備する。",
+      "expected_impact": "コンパイル時型安全性を 100% に引き上げ、日時フォーマッタのスレッド競合リスクを除去する。"
+    },
+    {
+      "priority": "P2",
+      "title": "README 拡充およびガバナンス設定ファイル（.gitignore / Dependabot / SECURITY.md）の追加",
+      "category": "documentation",
+      "target_files": [
+        "README.md"
+      ],
+      "related_rules": [
+        "common/documentation",
+        "common/git_workflow",
+        "common/supply_chain"
+      ],
+      "action": "README.md にシステム概要・環境変数・API 仕様・開発コマンドを追記し、.gitignore、SECURITY.md、LICENSE、.github/dependabot.yml を整備する。",
+      "expected_impact": "開発者オンボーディング体験と継続的な脆弱性検知体制を確立する。"
+    }
+  ],
+  "report_hints": [
+    "7軸レーダーチャートで全軸が推奨基準80点を大きく下回るレガシー負債プロファイルを可視化する",
+    "ClassDiagram + HeatmapOverlay で BillingManager / GatewayClient / BillingController の高リスク集中と双方向循環依存を強調する",
+    "コンテナ動的検証（RV-01〜RV-04）および隔離ループバック DAST（web_pentest SEC-06: status=error, 15.74s）のビルド起因ブロック連鎖を図解する",
+    "CVE-2022-22965 (CVSS 9.8)、Dockerfile DS-0001/0002/0026、ハードコード秘密情報、無認証 ANY /charge（CWE-306/CWE-650/CWE-20）および .pni/pentests/ 準備状況を統合提示する"
+  ],
+  "summary": "legacy-billing (examples/java/api_spring_messy) の総合健全性スコアは 23/100 (Grade D) と診断された。Java 1.8 指定と spring-boot-starter-web:LATEST のバイトコード不整合（class version 61.0 vs 52.0）および未定義メソッド呼び出しによりビルドが破綻しており、コンテナ動的検証（RV-01〜RV-04）および隔離ループバック DAST（web_pentest: status=error, 15.74s）がすべてブロックされている。さらに CRITICAL 脆弱性 CVE-2022-22965 (CVSS 9.8)、ハードコードされた API シークレット、無認証・メソッド無制限・未検証入力の ANY /charge 課金エンドポイント（CWE-306/650/20）、特権 pull_request_target CI、Controller-Service 循環依存、String == 比較バグ、アサーション0件の JUnit 4 テストなど、本番運用前に抜本的な P0 改修が不可欠である。"
+}

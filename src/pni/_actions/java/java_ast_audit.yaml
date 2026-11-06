@@ -1,0 +1,21 @@
+id: java_ast_audit
+name: Java AST, Imports, Generics, Javadoc, Quality & Framework Audit
+description: Parse Java AST via ast-grep-py to extract exact import order, Javadoc/@param sync, generics safety, cognitive complexity, bug idioms, JUnit test-AST, and Spring/JDK framework metrics.
+rules:
+  - common/architecture
+  - common/maintainability
+  - common/security
+  - common/security_vulnerability
+  - java/code_quality
+  - java/typing
+  - java/frameworks/spring_boot
+primitives:
+  - type: ast_analyze
+    name: Extract Deterministic Java AST & Framework Metrics
+    with:
+      lang: "java"
+  - type: ai_interpret
+    name: Interpret Java AST Facts & Evaluate Quality/Generics/Imports/Security
+    prompt: |
+      Inspect the deterministic AstFacts (`import_hygiene_coverage_pct`, `unsorted_imports`, `wildcard_imports`, `type_safety_coverage_pct`, `type_safety_issues`, `weak_type_usages`, `docstring_coverage_pct`, `missing_docstrings`, `empty_docstrings`, `doc_signature_mismatches`, `complex_functions`, `excessive_parameters`, `bug_risk_idioms`, `circular_dependencies`, `framework_issues`, `modernization_hints`, `missing_io_timeouts`, `scattered_env_access`, `unstructured_logging`, `hardcoded_secrets`, `dangerous_sinks`, `api_endpoints`).
+      Read the flagged `.java` files to evaluate package layering (`common/architecture`), SIG maintainability (`common/maintainability`), code security, CWE sinks & API boundaries (`common/security`, `common/security_vulnerability`), Javadoc & immutability (`java/code_quality`), generic type safety (`java/typing`), and Spring/JDK hygiene (`java/frameworks/spring_boot`).

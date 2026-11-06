@@ -1,0 +1,23 @@
+id: php_ast_audit
+name: PHP AST, Strict Types, Superglobals, Security Sinks & Framework Audit
+description: Parse PHP & mixed HTML/PHP CSTs via ast-grep-py to extract use/include hygiene, strict_types & type hints, PHPDoc sync, superglobal coupling, CWE dangerous sinks, API/WP endpoints, and Laravel/WordPress framework issues.
+rules:
+  - common/architecture
+  - common/maintainability
+  - common/security
+  - common/security_vulnerability
+  - php/code_quality
+  - php/typing
+  - php/modern_stack
+  - php/frameworks/laravel
+  - php/frameworks/wordpress
+primitives:
+  - type: ast_analyze
+    name: Extract Deterministic PHP AST, CWE Sinks & Framework Metrics
+    with:
+      lang: "php"
+  - type: ai_interpret
+    name: Interpret PHP AST Facts & Evaluate Quality, Strict Types, Sinks & Frameworks
+    prompt: |
+      Inspect the deterministic AstFacts (`import_hygiene_coverage_pct`, `unsorted_imports`, `late_imports`, `type_safety_coverage_pct`, `type_safety_issues`, `weak_type_usages`, `unscoped_type_ignores`, `docstring_coverage_pct`, `missing_docstrings`, `doc_signature_mismatches`, `complex_functions`, `excessive_parameters`, `global_state_usages`, `bug_risk_idioms`, `circular_dependencies`, `unused_dependencies`, `undeclared_dependencies`, `framework_issues`, `modernization_hints`, `missing_io_timeouts`, `scattered_env_access`, `unstructured_logging`, `hardcoded_secrets`, `dangerous_sinks`, `api_endpoints`).
+      Read the flagged `.php` files to evaluate layering (`common/architecture`), SIG maintainability (`common/maintainability`), CWE sinks (SQLi, XSS, LFI, Command Injection, `unserialize`, `md5` + `==` type juggling) & HTTP/REST/AJAX attack surface (`common/security`, `common/security_vulnerability`), PSR-12 & superglobal decoupling (`php/code_quality`), `declare(strict_types=1)` & native types (`php/typing`), PHP 8.2+ idioms (`php/modern_stack`), and applicable framework rules (`php/frameworks/laravel`, `php/frameworks/wordpress`).

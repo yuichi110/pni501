@@ -1,0 +1,3 @@
+#!/usr/bin/env sh
+# Maven Wrapper bootstrap stub for reproducible build version pinning
+exec mvn "$@"

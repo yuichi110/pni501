@@ -1,0 +1,2427 @@
+{
+  "project_name": "inventory-service",
+  "workflow_id": "java_api_spring_clean",
+  "workflow_run_id": "wf-056bf7c2",
+  "evaluated_at": "2026-10-24T14:47:03.897244+00:00",
+  "language": "java",
+  "target_root": "examples/java/api_spring_clean",
+  "facts_file": ".pni/cache/java_api_spring_clean/facts.json",
+  "key_files_inspected": [
+    "pom.xml",
+    "Dockerfile",
+    "mvnw",
+    "README.md",
+    "SECURITY.md",
+    "LICENSE",
+    ".dockerignore",
+    ".gitignore",
+    ".github/workflows/ci.yml",
+    ".github/dependabot.yml",
+    "src/main/java/com/example/inventory/InventoryApplication.java",
+    "src/main/java/com/example/inventory/api/InventoryController.java",
+    "src/main/java/com/example/inventory/service/InventoryService.java",
+    "src/main/java/com/example/inventory/domain/StockItem.java",
+    "src/main/java/com/example/inventory/domain/ReorderPolicy.java",
+    "src/main/java/com/example/inventory/client/SupplierRestClient.java",
+    "src/main/java/com/example/inventory/config/SupplierProperties.java",
+    "src/test/java/com/example/inventory/InventoryServiceTest.java",
+    "src/test/java/com/example/inventory/ReorderPolicyTest.java"
+  ],
+  "overall_score": 78,
+  "grade": "B",
+  "category_scores": {
+    "architecture": 86,
+    "code_quality": 82,
+    "typing": 92,
+    "testing": 66,
+    "dependencies": 74,
+    "security": 58,
+    "documentation": 86
+  },
+  "category_rationales": {
+    "architecture": "Clean 5-package acyclic Spring Boot layering (`api` -> `service` -> `domain` + `client` + `config`) with 0 circular dependencies, constructor DI, bounded HTTP timeouts, and Spring-free domain models, tempered by in-memory `ConcurrentHashMap` storage, missing `@RestControllerAdvice` `ProblemDetail` mapping, and absent `/actuator/health` probes.",
+    "code_quality": "Concise 7-file / 180-LOC Java 21 codebase with 100.0% import hygiene, immutable `record` value objects, SLF4J structured logging, and interrupt restoration, held back by a check-then-act race condition on `ConcurrentHashMap` in `InventoryService.reserveStock` and manual JSON concatenation in `SupplierRestClient`.",
+    "typing": "100.0% generic type parameterization (`Optional<StockItem>`, `ResponseEntity<StockItem>`, `Map<String, StockItem>`), explicit `@Override`, and zero raw types or unchecked casts, with minor room to add `@Validated` Bean Validation annotations on `SupplierProperties`.",
+    "testing": "Hermetic `--network=none` container JUnit 5 execution passes 2/2 tests in 10.46s (100.0% JaCoCo coverage in `ReorderPolicy` and `SupplierProperties`), but overall measured coverage is 62.7% line / 50.0% branch due to unexecuted `SupplierRestClient.requestRestock` (30.4% line / 0.0% branch), untested `GET /{sku}`, and missing `assertThrows` / MockMvc tests.",
+    "dependencies": "Pinned Java 21 Maven coordinates, weekly Dependabot updates (`maven` + `github-actions`), and SHA-pinned GitHub Actions (`contents: read`), offset by outdated `spring-boot-starter-parent:3.3.4`, a 4-line `mvnw` pass-through stub, abbreviated 3-line `LICENSE`, and omitted `spring-boot-starter-actuator` / `jacoco-maven-plugin`.",
+    "security": "Zero hardcoded/committed secrets (SEC-03), zero dangerous CWE code sinks (SEC-04), non-root (UID 10001) loopback-bound container (SEC-02, 1 LOW DS-0026), and 0 critical/high live HTTP DAST findings across 16 probes in .pni/pentests/examples/java/api_spring_clean (12 passed, confirming 400 validation and XSS/SQLi/traversal safety), weighed down by 8 CRITICAL and 29 HIGH Maven transitive CVEs in Spring Boot 3.3.4 (Tomcat 10.1.30, Spring WebMVC 6.1.13, Jackson 2.17.2), 5 HIGH Ubuntu 22.04 OS CVEs, live-verified unauthenticated POST /api/v1/items/{sku}/reserve reaching InventoryService.reserveStock() (CWE-306) and uncaught IllegalArgumentException HTTP 500 (CWE-755), missing X-Content-Type-Options: nosniff (CWE-693), and manual JSON string concatenation.",
+    "documentation": "100.0% Javadoc coverage across all 7 classes and 16 callables with 0 signature mismatches alongside `SECURITY.md` and a Diataxis-aligned `README.md`, lacking only JDK 21/Docker prerequisites, `default-reorder-batch` documentation, and sample HTTP payloads."
+  },
+  "metrics_snapshot": {
+    "language": "java",
+    "runtime_type_hint": "web_api",
+    "build_system": "maven",
+    "has_manifest": true,
+    "has_lockfile": true,
+    "has_license": true,
+    "has_security_policy": true,
+    "has_dependency_automation": true,
+    "dependencies_count": 2,
+    "unpinned_dependencies_count": 0,
+    "source_files_count": 7,
+    "test_files_count": 2,
+    "readme_line_count": 16,
+    "ci_supply_chain_issues_count": 0,
+    "committed_secret_files_count": 0,
+    "container_hygiene_issues_count": 0,
+    "legacy_language_findings_count": 0,
+    "total_files": 7,
+    "total_loc": 180,
+    "total_classes": 7,
+    "total_functions": 16,
+    "import_hygiene_coverage_pct": 100.0,
+    "type_safety_coverage_pct": 100.0,
+    "docstring_coverage_pct": 100.0,
+    "module_test_coverage_pct": 100.0,
+    "unsorted_imports_count": 0,
+    "wildcard_imports_count": 0,
+    "type_safety_issues_count": 0,
+    "weak_type_usages_count": 0,
+    "empty_docstrings_count": 0,
+    "doc_signature_mismatches_count": 0,
+    "complex_functions_count": 0,
+    "excessive_parameters_count": 0,
+    "global_state_usages_count": 0,
+    "bug_risk_idioms_count": 0,
+    "circular_dependencies_count": 0,
+    "unused_dependencies_count": 0,
+    "undeclared_dependencies_count": 0,
+    "test_functions_count": 2,
+    "assertion_free_tests_count": 0,
+    "framework_issues_count": 0,
+    "modernization_hints_count": 0,
+    "language_version_mismatches_count": 0,
+    "missing_io_timeouts_count": 0,
+    "scattered_env_access_count": 0,
+    "unstructured_logging_count": 0,
+    "hardcoded_secrets_count": 0,
+    "ast_dangerous_sinks_count": 0,
+    "api_endpoints_count": 2,
+    "runtime_status": "passed",
+    "harness_build_status": "passed",
+    "tests_status": "passed",
+    "tests_total": 2,
+    "tests_passed": 2,
+    "tests_failed": 0,
+    "measured_line_coverage_pct": 62.7,
+    "measured_branch_coverage_pct": 50.0,
+    "smoke_check_status": "passed",
+    "security_scan_status": "failed",
+    "app_vuln_critical": 8,
+    "app_vuln_high": 29,
+    "app_vuln_total": 75,
+    "app_vuln_unpinned_range_matches": 0,
+    "os_vuln_high_or_crit": 5,
+    "misconfig_count": 1,
+    "secret_leak_count": 0,
+    "pentest_status": "passed",
+    "pentest_probes_total": 16,
+    "pentest_probes_passed": 12,
+    "pentest_probes_failed": 3,
+    "pentest_findings_count": 3,
+    "pentest_high_or_crit_count": 0
+  },
+  "runtime_facts": {
+    "status": "passed",
+    "container_engine": "docker",
+    "engine_available": true,
+    "skip_reason": "",
+    "language": "java",
+    "selected_dockerfile_template": "java/maven.dockerfile",
+    "harness_dockerfile_path": ".pni/dockerfiles/examples/java/api_spring_clean/Dockerfile",
+    "build_args": {
+      "JAVA_VERSION": "21"
+    },
+    "artifacts_dir": ".pni/cache/java_api_spring_clean/runtime",
+    "project_dockerfile_build": {
+      "attempted": true,
+      "status": "passed",
+      "dockerfile_used": "examples/java/api_spring_clean/Dockerfile",
+      "duration_sec": 44.38,
+      "exit_code": 0,
+      "error_tail": []
+    },
+    "harness_build": {
+      "attempted": true,
+      "status": "passed",
+      "dockerfile_used": ".pni/dockerfiles/examples/java/api_spring_clean/Dockerfile",
+      "duration_sec": 1.03,
+      "exit_code": 0,
+      "error_tail": []
+    },
+    "test_execution": {
+      "attempted": true,
+      "status": "passed",
+      "command": "sh -c mvn -B -o -Dmaven.repo.local=/m2repo org.jacoco:jacoco-maven-plugin:0.8.12:prepare-agent -DfailIfNoTests=false test; rc=$?; mvn -B -o -Dmaven.repo.local=/m2repo org.jacoco:jacoco-maven-plugin:0.8.12:report >/dev/null 2>&1 || true; mkdir -p /out/surefire; cp target/surefire-reports/TEST-*.xml /out/surefire/ 2>/dev/null || true; cp target/site/jacoco/jacoco.xml /out/jacoco.xml 2>/dev/null || true; exit $rc",
+      "duration_sec": 11.04,
+      "exit_code": 0,
+      "total_tests": 2,
+      "passed_tests": 2,
+      "failed_tests": 0,
+      "error_tests": 0,
+      "skipped_tests": 0,
+      "failures": [],
+      "log_tail": []
+    },
+    "coverage": {
+      "measured": true,
+      "tool": "jacoco",
+      "line_coverage_pct": 62.7,
+      "branch_coverage_pct": 50.0,
+      "covered_lines": 42,
+      "total_statements": 67,
+      "lowest_covered_modules": [
+        {
+          "file_path": "src/main/java/com/example/inventory/client/SupplierRestClient.java",
+          "line_coverage_pct": 30.4,
+          "branch_coverage_pct": 0.0,
+          "covered_lines": 7,
+          "total_statements": 23,
+          "missing_lines_preview": [
+            45,
+            46,
+            47,
+            48,
+            49,
+            50,
+            51,
+            53,
+            54,
+            55
+          ]
+        },
+        {
+          "file_path": "src/main/java/com/example/inventory/InventoryApplication.java",
+          "line_coverage_pct": 33.3,
+          "branch_coverage_pct": null,
+          "covered_lines": 1,
+          "total_statements": 3,
+          "missing_lines_preview": [
+            21,
+            22
+          ]
+        },
+        {
+          "file_path": "src/main/java/com/example/inventory/api/InventoryController.java",
+          "line_coverage_pct": 62.5,
+          "branch_coverage_pct": null,
+          "covered_lines": 5,
+          "total_statements": 8,
+          "missing_lines_preview": [
+            40,
+            41,
+            42
+          ]
+        },
+        {
+          "file_path": "src/main/java/com/example/inventory/domain/StockItem.java",
+          "line_coverage_pct": 71.4,
+          "branch_coverage_pct": 50.0,
+          "covered_lines": 5,
+          "total_statements": 7,
+          "missing_lines_preview": [
+            40,
+            43
+          ]
+        },
+        {
+          "file_path": "src/main/java/com/example/inventory/service/InventoryService.java",
+          "line_coverage_pct": 89.5,
+          "branch_coverage_pct": 50.0,
+          "covered_lines": 17,
+          "total_statements": 19,
+          "missing_lines_preview": [
+            54,
+            67
+          ]
+        },
+        {
+          "file_path": "src/main/java/com/example/inventory/domain/ReorderPolicy.java",
+          "line_coverage_pct": 100.0,
+          "branch_coverage_pct": 100.0,
+          "covered_lines": 5,
+          "total_statements": 5,
+          "missing_lines_preview": []
+        },
+        {
+          "file_path": "src/main/java/com/example/inventory/config/SupplierProperties.java",
+          "line_coverage_pct": 100.0,
+          "branch_coverage_pct": null,
+          "covered_lines": 2,
+          "total_statements": 2,
+          "missing_lines_preview": []
+        }
+      ]
+    },
+    "smoke_check": {
+      "attempted": true,
+      "archetype": "web_api",
+      "status": "passed",
+      "command": "bash -c cp_extra=\"\"; if [ -f /m2repo/runtime_cp.txt ]; then cp_extra=\":$(cat /m2repo/runtime_cp.txt)\"; fi; java -cp \"target/classes${cp_extra}\" com.example.inventory.InventoryApplication --server.port=18080 >/out/boot_stdout.log 2>&1 & pid=$!; for _ in $(seq 1 36); do   if ! kill -0 $pid 2>/dev/null; then wait $pid; rc=$?; cat /out/boot_stdout.log >&2; exit $rc; fi;   if (echo >/dev/tcp/127.0.0.1/18080) >/dev/null 2>&1; then     printf '{\"probed_endpoint\":\"tcp://127.0.0.1:18080\",\"http_status\":200,\"detail\":\"Java service com.example.inventory.InventoryApplication bound port 18080 cleanly\"}' >/out/smoke.json;     kill -TERM $pid 2>/dev/null || true; wait $pid 2>/dev/null || true; exit 0;   fi;   sleep 0.5; done; kill -KILL $pid 2>/dev/null || true; cat /out/boot_stdout.log >&2; exit 124",
+      "duration_sec": 4.51,
+      "exit_code": 0,
+      "http_status": 200,
+      "probed_endpoint": "tcp://127.0.0.1:18080",
+      "failure_kind": "none",
+      "detail": "Java service com.example.inventory.InventoryApplication bound port 18080 cleanly",
+      "log_tail": []
+    }
+  },
+  "security_facts": {
+    "status": "failed",
+    "scanner": "trivy",
+    "container_engine": "docker",
+    "engine_available": true,
+    "skip_reason": "",
+    "trivy_image": "ghcr.io/aquasecurity/trivy:0.69.3",
+    "scanned_filesystem": true,
+    "scanned_resolved_image": true,
+    "resolved_image_source": "examples/java/api_spring_clean/Dockerfile",
+    "artifacts_dir": ".pni/cache/java_api_spring_clean/security",
+    "vuln_counts": {
+      "critical": 8,
+      "high": 34,
+      "medium": 322,
+      "low": 164,
+      "total": 528
+    },
+    "app_vuln_counts": {
+      "critical": 8,
+      "high": 29,
+      "medium": 28,
+      "low": 10,
+      "total": 75
+    },
+    "os_vuln_counts": {
+      "critical": 0,
+      "high": 5,
+      "medium": 294,
+      "low": 154,
+      "total": 453
+    },
+    "vulnerabilities": [
+      {
+        "vuln_id": "CVE-2025-24813",
+        "pkg_name": "org.apache.tomcat.embed:tomcat-embed-core",
+        "pkg_type": "pom",
+        "installed_version": "10.1.30",
+        "fixed_version": "11.0.3, 10.1.35, 9.0.99",
+        "severity": "CRITICAL",
+        "title": "tomcat: Potential RCE and/or information disclosure and/or information corruption with partial PUT",
+        "target": "pom.xml",
+        "cvss_score": 10.0,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      },
+      {
+        "vuln_id": "CVE-2026-41293",
+        "pkg_name": "org.apache.tomcat.embed:tomcat-embed-core",
+        "pkg_type": "pom",
+        "installed_version": "10.1.30",
+        "fixed_version": "9.0.118, 10.1.55, 11.0.22",
+        "severity": "CRITICAL",
+        "title": "tomcat-coyote: Apache Tomcat: HTTP/2 request headers not validated",
+        "target": "pom.xml",
+        "cvss_score": 9.8,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      },
+      {
+        "vuln_id": "CVE-2026-43512",
+        "pkg_name": "org.apache.tomcat.embed:tomcat-embed-core",
+        "pkg_type": "pom",
+        "installed_version": "10.1.30",
+        "fixed_version": "9.0.118, 10.1.55, 11.0.22",
+        "severity": "CRITICAL",
+        "title": "tomcat-coyote: Apache Tomcat: Authentication bypass via digest authentication",
+        "target": "pom.xml",
+        "cvss_score": 9.8,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      },
+      {
+        "vuln_id": "CVE-2026-65905",
+        "pkg_name": "org.apache.tomcat.embed:tomcat-embed-core",
+        "pkg_type": "pom",
+        "installed_version": "10.1.30",
+        "fixed_version": "11.0.25, 10.1.58, 9.0.121",
+        "severity": "CRITICAL",
+        "title": "tomcat: Apache Tomcat: Authentication bypass via limited replay attack in DIGEST authenticator",
+        "target": "pom.xml",
+        "cvss_score": 9.8,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      },
+      {
+        "vuln_id": "CVE-2026-47884",
+        "pkg_name": "org.springframework:spring-webmvc",
+        "pkg_type": "pom",
+        "installed_version": "6.1.13",
+        "fixed_version": "7.0.9",
+        "severity": "CRITICAL",
+        "title": "org.springframework/spring-webmvc: Spring Framework: Remote Code Execution via improper path limitation in XsltView",
+        "target": "pom.xml",
+        "cvss_score": 9.8,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      },
+      {
+        "vuln_id": "CVE-2026-43515",
+        "pkg_name": "org.apache.tomcat.embed:tomcat-embed-core",
+        "pkg_type": "pom",
+        "installed_version": "10.1.30",
+        "fixed_version": "9.0.118, 10.1.55, 11.0.22",
+        "severity": "CRITICAL",
+        "title": "tomcat-coyote: tomcat: Improper Authorization allows security bypass",
+        "target": "pom.xml",
+        "cvss_score": 9.1,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      },
+      {
+        "vuln_id": "CVE-2026-65182",
+        "pkg_name": "org.apache.tomcat.embed:tomcat-embed-core",
+        "pkg_type": "pom",
+        "installed_version": "10.1.30",
+        "fixed_version": "11.0.25, 10.1.58, 9.0.121",
+        "severity": "CRITICAL",
+        "title": "tomcat: Apache Tomcat: Security constraint bypass due to improper access control",
+        "target": "pom.xml",
+        "cvss_score": 9.1,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      },
+      {
+        "vuln_id": "CVE-2026-68525",
+        "pkg_name": "org.apache.tomcat.embed:tomcat-embed-core",
+        "pkg_type": "pom",
+        "installed_version": "10.1.30",
+        "fixed_version": "11.0.25, 10.1.58, 9.0.121",
+        "severity": "CRITICAL",
+        "title": "tomcat: Apache Tomcat: Unauthorized resource access via FORM authentication bypass",
+        "target": "pom.xml",
+        "cvss_score": 9.1,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      },
+      {
+        "vuln_id": "CVE-2024-50379",
+        "pkg_name": "org.apache.tomcat.embed:tomcat-embed-core",
+        "pkg_type": "pom",
+        "installed_version": "10.1.30",
+        "fixed_version": "11.0.2, 10.1.34, 9.0.98",
+        "severity": "HIGH",
+        "title": "tomcat: RCE due to TOCTOU issue in JSP compilation",
+        "target": "pom.xml",
+        "cvss_score": 9.8,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      },
+      {
+        "vuln_id": "CVE-2024-56337",
+        "pkg_name": "org.apache.tomcat.embed:tomcat-embed-core",
+        "pkg_type": "pom",
+        "installed_version": "10.1.30",
+        "fixed_version": "11.0.2, 10.1.34, 9.0.98",
+        "severity": "HIGH",
+        "title": "tomcat: Incomplete fix for CVE-2024-50379 - RCE due to TOCTOU issue in JSP compilation",
+        "target": "pom.xml",
+        "cvss_score": 9.8,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      },
+      {
+        "vuln_id": "CVE-2026-54512",
+        "pkg_name": "com.fasterxml.jackson.core:jackson-databind",
+        "pkg_type": "pom",
+        "installed_version": "2.17.2",
+        "fixed_version": "2.18.8, 3.1.4, 2.21.4",
+        "severity": "HIGH",
+        "title": "jackson-databind: jackson-databind: Arbitrary code execution via PolymorphicTypeValidator bypass",
+        "target": "pom.xml",
+        "cvss_score": 8.1,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      },
+      {
+        "vuln_id": "CVE-2026-54513",
+        "pkg_name": "com.fasterxml.jackson.core:jackson-databind",
+        "pkg_type": "pom",
+        "installed_version": "2.17.2",
+        "fixed_version": "2.18.8, 2.21.4, 3.1.4",
+        "severity": "HIGH",
+        "title": "jackson-databind: Jackson-databind: Security bypass allows arbitrary code execution",
+        "target": "pom.xml",
+        "cvss_score": 8.1,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      },
+      {
+        "vuln_id": "CVE-2026-68494",
+        "pkg_name": "com.fasterxml.jackson.core:jackson-core",
+        "pkg_type": "pom",
+        "installed_version": "2.17.2",
+        "fixed_version": "2.18.8, 2.21.4",
+        "severity": "HIGH",
+        "title": "com.fasterxml.jackson.core/jackson-core: tools.jackson.core/jackson-core: jackson-core: Denial of Service via incomplete fix in async JSON parser",
+        "target": "pom.xml",
+        "cvss_score": 7.5,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      },
+      {
+        "vuln_id": "CVE-2026-89407",
+        "pkg_name": "com.fasterxml.jackson.core:jackson-core",
+        "pkg_type": "pom",
+        "installed_version": "2.17.2",
+        "fixed_version": "2.18.11, 2.21.7, 2.22.3",
+        "severity": "HIGH",
+        "title": "com.fasterxml.jackson/jackson-core: tools.jackson.core/jackson-core: Jackson-core: Denial of Service via regular expression backtracking",
+        "target": "pom.xml",
+        "cvss_score": 7.5,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      },
+      {
+        "vuln_id": "CVE-2026-89425",
+        "pkg_name": "com.fasterxml.jackson.core:jackson-core",
+        "pkg_type": "pom",
+        "installed_version": "2.17.2",
+        "fixed_version": "2.21.7, 2.22.3, 2.18.11",
+        "severity": "HIGH",
+        "title": "com.fasterxml.jackson.core/jackson-core: Jackson-core: Denial of Service via unbounded StringBuilder growth during malformed token processing",
+        "target": "pom.xml",
+        "cvss_score": 7.5,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      },
+      {
+        "vuln_id": "CVE-2026-68497",
+        "pkg_name": "com.fasterxml.jackson.core:jackson-databind",
+        "pkg_type": "pom",
+        "installed_version": "2.17.2",
+        "fixed_version": "2.18.10, 2.21.6, 2.22.2",
+        "severity": "HIGH",
+        "title": "com.fasterxml.jackson.core/jackson-databind: tools.jackson.core/jackson-databind: jackson-databind: CPU Denial of Service via unbounded numeric parsing",
+        "target": "pom.xml",
+        "cvss_score": 7.5,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      },
+      {
+        "vuln_id": "CVE-2026-91776",
+        "pkg_name": "com.fasterxml.jackson.core:jackson-databind",
+        "pkg_type": "pom",
+        "installed_version": "2.17.2",
+        "fixed_version": "2.18.11, 2.21.7, 2.22.3",
+        "severity": "HIGH",
+        "title": "jackson-databind: com.fasterxml.jackson/jackson-core: jackson-databind: Denial of Service via unbounded cache growth in TypeDeserializerBase",
+        "target": "pom.xml",
+        "cvss_score": 7.5,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      },
+      {
+        "vuln_id": "CVE-2026-91777",
+        "pkg_name": "com.fasterxml.jackson.core:jackson-databind",
+        "pkg_type": "pom",
+        "installed_version": "2.17.2",
+        "fixed_version": "2.21.7, 2.18.11, 2.22.3",
+        "severity": "HIGH",
+        "title": "com.fasterxml.jackson.core/jackson-databind: tools.jackson.core:jackson-databind: Jackson-databind: Denial of Service via quadratic forward-reference completion",
+        "target": "pom.xml",
+        "cvss_score": 7.5,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      },
+      {
+        "vuln_id": "CVE-2025-48988",
+        "pkg_name": "org.apache.tomcat.embed:tomcat-embed-core",
+        "pkg_type": "pom",
+        "installed_version": "10.1.30",
+        "fixed_version": "11.0.8, 10.1.42, 9.0.106",
+        "severity": "HIGH",
+        "title": "tomcat: Apache Tomcat DoS in multipart upload",
+        "target": "pom.xml",
+        "cvss_score": 7.5,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      },
+      {
+        "vuln_id": "CVE-2025-48989",
+        "pkg_name": "org.apache.tomcat.embed:tomcat-embed-core",
+        "pkg_type": "pom",
+        "installed_version": "10.1.30",
+        "fixed_version": "11.0.10, 10.1.44, 9.0.108",
+        "severity": "HIGH",
+        "title": "tomcat: http/2 \"MadeYouReset\" DoS attack through HTTP/2 control frames",
+        "target": "pom.xml",
+        "cvss_score": 7.5,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      },
+      {
+        "vuln_id": "CVE-2025-52520",
+        "pkg_name": "org.apache.tomcat.embed:tomcat-embed-core",
+        "pkg_type": "pom",
+        "installed_version": "10.1.30",
+        "fixed_version": "11.0.9, 10.1.43, 9.0.107",
+        "severity": "HIGH",
+        "title": "tomcat: Apache Tomcat denial of service",
+        "target": "pom.xml",
+        "cvss_score": 7.5,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      },
+      {
+        "vuln_id": "CVE-2025-53506",
+        "pkg_name": "org.apache.tomcat.embed:tomcat-embed-core",
+        "pkg_type": "pom",
+        "installed_version": "10.1.30",
+        "fixed_version": "9.0.107, 10.1.43, 11.0.9",
+        "severity": "HIGH",
+        "title": "tomcat: Apache Tomcat denial of service",
+        "target": "pom.xml",
+        "cvss_score": 7.5,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      },
+      {
+        "vuln_id": "CVE-2025-55752",
+        "pkg_name": "org.apache.tomcat.embed:tomcat-embed-core",
+        "pkg_type": "pom",
+        "installed_version": "10.1.30",
+        "fixed_version": "11.0.11, 10.1.45, 9.0.109",
+        "severity": "HIGH",
+        "title": "tomcat: org.apache.tomcat/tomcat-catalina: Apache Tomcat: Directory traversal via rewrite with possible RCE",
+        "target": "pom.xml",
+        "cvss_score": 7.5,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      },
+      {
+        "vuln_id": "CVE-2026-24734",
+        "pkg_name": "org.apache.tomcat.embed:tomcat-embed-core",
+        "pkg_type": "pom",
+        "installed_version": "10.1.30",
+        "fixed_version": "11.0.18, 10.1.52, 9.0.115",
+        "severity": "HIGH",
+        "title": "tomcat: Apache Tomcat: Certificate revocation bypass due to improper OCSP response validation",
+        "target": "pom.xml",
+        "cvss_score": 7.5,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      },
+      {
+        "vuln_id": "CVE-2026-24880",
+        "pkg_name": "org.apache.tomcat.embed:tomcat-embed-core",
+        "pkg_type": "pom",
+        "installed_version": "10.1.30",
+        "fixed_version": "9.0.116, 10.1.52, 11.0.20",
+        "severity": "HIGH",
+        "title": "Apache Tomcat: Apache Tomcat: HTTP Request/Response Smuggling via invalid chunk extension",
+        "target": "pom.xml",
+        "cvss_score": 7.5,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      },
+      {
+        "vuln_id": "CVE-2026-34483",
+        "pkg_name": "org.apache.tomcat.embed:tomcat-embed-core",
+        "pkg_type": "pom",
+        "installed_version": "10.1.30",
+        "fixed_version": "9.0.116, 10.1.54, 11.0.21",
+        "severity": "HIGH",
+        "title": "Apache Tomcat: Apache Tomcat: Information disclosure due to improper encoding in JsonAccessLogValve",
+        "target": "pom.xml",
+        "cvss_score": 7.5,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      },
+      {
+        "vuln_id": "CVE-2026-34487",
+        "pkg_name": "org.apache.tomcat.embed:tomcat-embed-core",
+        "pkg_type": "pom",
+        "installed_version": "10.1.30",
+        "fixed_version": "9.0.117, 10.1.54, 11.0.21",
+        "severity": "HIGH",
+        "title": "Apache Tomcat: Apache Tomcat: Information disclosure via sensitive data in log files",
+        "target": "pom.xml",
+        "cvss_score": 7.5,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      },
+      {
+        "vuln_id": "CVE-2026-41284",
+        "pkg_name": "org.apache.tomcat.embed:tomcat-embed-core",
+        "pkg_type": "pom",
+        "installed_version": "10.1.30",
+        "fixed_version": "9.0.118, 10.1.55, 11.0.22",
+        "severity": "HIGH",
+        "title": "tomcat: Apache Tomcat: Denial of Service due to uncontrolled resource allocation",
+        "target": "pom.xml",
+        "cvss_score": 7.5,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      },
+      {
+        "vuln_id": "CVE-2026-43513",
+        "pkg_name": "org.apache.tomcat.embed:tomcat-embed-core",
+        "pkg_type": "pom",
+        "installed_version": "10.1.30",
+        "fixed_version": "9.0.118, 10.1.55, 11.0.22",
+        "severity": "HIGH",
+        "title": "tomcat-catalina: Apache Tomcat: Improper Handling of Case Sensitivity in LockOutRealm",
+        "target": "pom.xml",
+        "cvss_score": 7.5,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      },
+      {
+        "vuln_id": "CVE-2025-41249",
+        "pkg_name": "org.springframework:spring-core",
+        "pkg_type": "pom",
+        "installed_version": "6.1.13",
+        "fixed_version": "6.2.11",
+        "severity": "HIGH",
+        "title": "org.springframework/spring-core: Spring Framework Annotation Detection Vulnerability",
+        "target": "pom.xml",
+        "cvss_score": 7.5,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      },
+      {
+        "vuln_id": "CVE-2026-41850",
+        "pkg_name": "org.springframework:spring-expression",
+        "pkg_type": "pom",
+        "installed_version": "6.1.13",
+        "fixed_version": "7.0.8, 6.2.19",
+        "severity": "HIGH",
+        "title": "spring-framework: Spring Framework: Denial of Service via specially crafted SpEL expressions",
+        "target": "pom.xml",
+        "cvss_score": 7.5,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      },
+      {
+        "vuln_id": "CVE-2024-38819",
+        "pkg_name": "org.springframework:spring-webmvc",
+        "pkg_type": "pom",
+        "installed_version": "6.1.13",
+        "fixed_version": "6.1.14",
+        "severity": "HIGH",
+        "title": "org.springframework:spring-webmvc: Path traversal vulnerability in functional web frameworks",
+        "target": "pom.xml",
+        "cvss_score": 7.5,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      },
+      {
+        "vuln_id": "CVE-2026-41842",
+        "pkg_name": "org.springframework:spring-webmvc",
+        "pkg_type": "pom",
+        "installed_version": "6.1.13",
+        "fixed_version": "7.0.8, 6.2.19",
+        "severity": "HIGH",
+        "title": "spring-framework: Spring Framework: Denial of Service when resolving static resources",
+        "target": "pom.xml",
+        "cvss_score": 7.5,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      },
+      {
+        "vuln_id": "CVE-2026-42498",
+        "pkg_name": "org.apache.tomcat.embed:tomcat-embed-core",
+        "pkg_type": "pom",
+        "installed_version": "10.1.30",
+        "fixed_version": "9.0.118, 10.1.55, 11.0.22",
+        "severity": "HIGH",
+        "title": "tomcat-coyote: Apache Tomcat: Information disclosure due to HTTP Authentication Header exposure during WebSocket authentication.",
+        "target": "pom.xml",
+        "cvss_score": 7.3,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      },
+      {
+        "vuln_id": "CVE-2025-22235",
+        "pkg_name": "org.springframework.boot:spring-boot",
+        "pkg_type": "pom",
+        "installed_version": "3.3.4",
+        "fixed_version": "3.3.11, 3.4.5",
+        "severity": "HIGH",
+        "title": "org.springframework.boot/spring-boot: Spring Boot EndpointRequest.to() creates wrong matcher if actuator endpoint is not exposed",
+        "target": "pom.xml",
+        "cvss_score": 7.3,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      },
+      {
+        "vuln_id": "CVE-2026-41845",
+        "pkg_name": "org.springframework:spring-webmvc",
+        "pkg_type": "pom",
+        "installed_version": "6.1.13",
+        "fixed_version": "7.0.8, 6.2.19",
+        "severity": "HIGH",
+        "title": "org.springframework: Spring Framework: Cross-site scripting (XSS) via incorrect JavaScript escaping",
+        "target": "pom.xml",
+        "cvss_score": 7.1,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      },
+      {
+        "vuln_id": "CVE-2026-40973",
+        "pkg_name": "org.springframework.boot:spring-boot",
+        "pkg_type": "pom",
+        "installed_version": "3.3.4",
+        "fixed_version": "4.0.6, 3.5.14",
+        "severity": "HIGH",
+        "title": "Spring Boot: Spring Boot: Arbitrary Code Execution and Session Hijacking via predictable temporary directory",
+        "target": "pom.xml",
+        "cvss_score": 7.0,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      },
+      {
+        "vuln_id": "CVE-2026-45447",
+        "pkg_name": "libssl3",
+        "pkg_type": "ubuntu",
+        "installed_version": "3.0.2-0ubuntu1.18",
+        "fixed_version": "3.0.2-0ubuntu1.25",
+        "severity": "HIGH",
+        "title": "openssl: Heap Use-After-Free in OpenSSL PKCS7_verify()",
+        "target": "/out/image.tar (ubuntu 22.04)",
+        "cvss_score": 8.8,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      },
+      {
+        "vuln_id": "CVE-2026-45447",
+        "pkg_name": "openssl",
+        "pkg_type": "ubuntu",
+        "installed_version": "3.0.2-0ubuntu1.18",
+        "fixed_version": "3.0.2-0ubuntu1.25",
+        "severity": "HIGH",
+        "title": "openssl: Heap Use-After-Free in OpenSSL PKCS7_verify()",
+        "target": "/out/image.tar (ubuntu 22.04)",
+        "cvss_score": 8.8,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      },
+      {
+        "vuln_id": "CVE-2025-68973",
+        "pkg_name": "gpgv",
+        "pkg_type": "ubuntu",
+        "installed_version": "2.2.27-3ubuntu2.1",
+        "fixed_version": "2.2.27-3ubuntu2.5",
+        "severity": "HIGH",
+        "title": "GnuPG: GnuPG: Information disclosure and potential arbitrary code execution via out-of-bounds write",
+        "target": "/out/image.tar (ubuntu 22.04)",
+        "cvss_score": 7.8,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      }
+    ],
+    "misconfigurations": [
+      {
+        "check_id": "DS-0026",
+        "severity": "LOW",
+        "title": "No HEALTHCHECK defined",
+        "file_path": "Dockerfile",
+        "start_line": null,
+        "message": "Add HEALTHCHECK instruction in your Dockerfile",
+        "resolution": "Add HEALTHCHECK instruction in Dockerfile"
+      }
+    ],
+    "secrets": []
+  },
+  "pentest_facts": {
+    "status": "passed",
+    "container_engine": "docker",
+    "engine_available": true,
+    "skip_reason": "",
+    "pentests_dir": ".pni/pentests/examples/java/api_spring_clean",
+    "materialized_files": [
+      ".pni/pentests/examples/java/api_spring_clean/conftest.py",
+      ".pni/pentests/examples/java/api_spring_clean/test_app_probes.py",
+      ".pni/pentests/examples/java/api_spring_clean/test_baseline_http.py",
+      ".pni/pentests/examples/java/api_spring_clean/test_target_surface.py"
+    ],
+    "target_base_url": "http://127.0.0.1:53369",
+    "server_booted": true,
+    "boot_failure_reason": "",
+    "duration_sec": 7.19,
+    "artifacts_dir": ".pni/cache/java_api_spring_clean/pentest",
+    "probe_summary": {
+      "total_probes": 16,
+      "passed_probes": 12,
+      "failed_probes": 3,
+      "skipped_probes": 1,
+      "error_probes": 0
+    },
+    "findings": [
+      {
+        "test_id": "test_app_probes::test_reserve_endpoint_enforces_authentication_before_service_execution",
+        "test_file": "test_app_probes.py",
+        "cwe_id": "CWE-306",
+        "category": "missing_authentication",
+        "severity": "medium",
+        "endpoint": "/api/v1/items/{sku}/reserve",
+        "title": "State-mutating POST /api/v1/items/{sku}/reserve lacks OAuth2/JWT authentication guard",
+        "evidence": "Unauthenticated POST /api/v1/items/SKU-UNAUTH-PROBE/reserve?quantity=1 bypassed auth filter and returned HTTP 500"
+      },
+      {
+        "test_id": "test_app_probes::test_unknown_sku_reservation_does_not_trigger_500_error",
+        "test_file": "test_app_probes.py",
+        "cwe_id": "CWE-755",
+        "category": "improper_exception_handling",
+        "severity": "medium",
+        "endpoint": "/api/v1/items/{sku}/reserve",
+        "title": "Uncaught IllegalArgumentException on unknown SKU reservation returns HTTP 500",
+        "evidence": "POST /api/v1/items/SKU-MISSING-999/reserve?quantity=1 -> 500"
+      },
+      {
+        "test_id": "test_baseline_http::test_x_content_type_options_nosniff",
+        "test_file": "test_baseline_http.py",
+        "cwe_id": "CWE-693",
+        "category": "missing_security_headers",
+        "severity": "low",
+        "endpoint": "/api/health",
+        "title": "Missing X-Content-Type-Options: nosniff response header",
+        "evidence": "GET /api/health -> 404, X-Content-Type-Options=<absent>"
+      }
+    ]
+  },
+  "module_inventory": [
+    {
+      "file": "examples/java/api_spring_clean/src/main/java/com/example/inventory/InventoryApplication.java",
+      "loc": 12,
+      "public_types": [
+        "InventoryApplication"
+      ],
+      "public_callables": [
+        "main"
+      ]
+    },
+    {
+      "file": "examples/java/api_spring_clean/src/main/java/com/example/inventory/api/InventoryController.java",
+      "loc": 33,
+      "public_types": [
+        "InventoryController"
+      ],
+      "public_callables": [
+        "InventoryController",
+        "getItem",
+        "reserveItem"
+      ]
+    },
+    {
+      "file": "examples/java/api_spring_clean/src/main/java/com/example/inventory/client/SupplierRestClient.java",
+      "loc": 43,
+      "public_types": [
+        "SupplierRestClient"
+      ],
+      "public_callables": [
+        "SupplierRestClient",
+        "requestRestock"
+      ]
+    },
+    {
+      "file": "examples/java/api_spring_clean/src/main/java/com/example/inventory/config/SupplierProperties.java",
+      "loc": 12,
+      "public_types": [
+        "SupplierProperties"
+      ],
+      "public_callables": [
+        "defaults"
+      ]
+    },
+    {
+      "file": "examples/java/api_spring_clean/src/main/java/com/example/inventory/domain/ReorderPolicy.java",
+      "loc": 15,
+      "public_types": [
+        "ReorderPolicy"
+      ],
+      "public_callables": [
+        "recommendedOrderQuantity",
+        "requiresRestock"
+      ]
+    },
+    {
+      "file": "examples/java/api_spring_clean/src/main/java/com/example/inventory/domain/StockItem.java",
+      "loc": 22,
+      "public_types": [
+        "StockItem"
+      ],
+      "public_callables": [
+        "availableUnits",
+        "withAdditionalReservation"
+      ]
+    },
+    {
+      "file": "examples/java/api_spring_clean/src/main/java/com/example/inventory/service/InventoryService.java",
+      "loc": 43,
+      "public_types": [
+        "InventoryService"
+      ],
+      "public_callables": [
+        "InventoryService",
+        "findBySku",
+        "reserveStock",
+        "upsertItem"
+      ]
+    }
+  ],
+  "dangerous_sinks": [],
+  "api_endpoints": [
+    {
+      "http_method": "GET",
+      "path": "/api/v1/items/{sku}",
+      "handler": "InventoryController.getItem",
+      "file": "examples/java/api_spring_clean/src/main/java/com/example/inventory/api/InventoryController.java",
+      "line": 38,
+      "has_auth_hint": false,
+      "auth_mechanisms": []
+    },
+    {
+      "http_method": "POST",
+      "path": "/api/v1/items/{sku}/reserve",
+      "handler": "InventoryController.reserveItem",
+      "file": "examples/java/api_spring_clean/src/main/java/com/example/inventory/api/InventoryController.java",
+      "line": 52,
+      "has_auth_hint": false,
+      "auth_mechanisms": []
+    }
+  ],
+  "language_version_mismatches": [],
+  "architecture_overview": {
+    "pattern": "Layered Spring Boot Microservice Architecture (Bootstrap -> API Presentation -> Application Service -> Pure Domain + Outbound HTTP Adapter + Configuration)",
+    "entry_points": [
+      "src/main/java/com/example/inventory/InventoryApplication.java:main",
+      "src/main/java/com/example/inventory/api/InventoryController.java:getItem",
+      "src/main/java/com/example/inventory/api/InventoryController.java:reserveItem"
+    ],
+    "modules": [
+      {
+        "path": "src/main/java/com/example/inventory/InventoryApplication.java",
+        "role": "Spring Boot application entry point enabling SupplierProperties configuration binding.",
+        "key_symbols": [
+          "InventoryApplication",
+          "main"
+        ],
+        "depends_on": [
+          "src/main/java/com/example/inventory/config/SupplierProperties.java"
+        ],
+        "health_note": "Clean 12-LOC bootstrap class."
+      },
+      {
+        "path": "src/main/java/com/example/inventory/api/InventoryController.java",
+        "role": "REST controller exposing GET /{sku} and POST /{sku}/reserve endpoints.",
+        "key_symbols": [
+          "InventoryController",
+          "getItem",
+          "reserveItem"
+        ],
+        "depends_on": [
+          "src/main/java/com/example/inventory/service/InventoryService.java",
+          "src/main/java/com/example/inventory/domain/StockItem.java"
+        ],
+        "health_note": "Returns domain StockItem directly as HTTP DTO; lacks OAuth2 guard and ProblemDetail exception handler."
+      },
+      {
+        "path": "src/main/java/com/example/inventory/service/InventoryService.java",
+        "role": "Application service maintaining ConcurrentHashMap store and triggering supplier replenishment.",
+        "key_symbols": [
+          "InventoryService",
+          "upsertItem",
+          "findBySku",
+          "reserveStock"
+        ],
+        "depends_on": [
+          "src/main/java/com/example/inventory/domain/StockItem.java",
+          "src/main/java/com/example/inventory/domain/ReorderPolicy.java",
+          "src/main/java/com/example/inventory/client/SupplierRestClient.java",
+          "src/main/java/com/example/inventory/config/SupplierProperties.java"
+        ],
+        "health_note": "Clear orchestration, but reserveStock uses non-atomic get/put on ConcurrentHashMap."
+      },
+      {
+        "path": "src/main/java/com/example/inventory/client/SupplierRestClient.java",
+        "role": "Outbound java.net.http.HttpClient adapter calling upstream supplier /v1/restock.",
+        "key_symbols": [
+          "SupplierRestClient",
+          "requestRestock"
+        ],
+        "depends_on": [
+          "src/main/java/com/example/inventory/config/SupplierProperties.java"
+        ],
+        "health_note": "Enforces connect and request timeouts; uses manual JSON string concatenation."
+      },
+      {
+        "path": "src/main/java/com/example/inventory/domain/StockItem.java",
+        "role": "Immutable Java 21 record modeling SKU on-hand, reserved, and reorderPoint quantities.",
+        "key_symbols": [
+          "StockItem",
+          "availableUnits",
+          "withAdditionalReservation"
+        ],
+        "depends_on": [],
+        "health_note": "Zero Spring dependencies; enforces positive reservation and available stock invariants."
+      },
+      {
+        "path": "src/main/java/com/example/inventory/domain/ReorderPolicy.java",
+        "role": "Pure static domain policy evaluating restock necessity and recommended order quantity.",
+        "key_symbols": [
+          "ReorderPolicy",
+          "requiresRestock",
+          "recommendedOrderQuantity"
+        ],
+        "depends_on": [
+          "src/main/java/com/example/inventory/domain/StockItem.java"
+        ],
+        "health_note": "Pure, deterministic calculation with 100% unit test coverage."
+      },
+      {
+        "path": "src/main/java/com/example/inventory/config/SupplierProperties.java",
+        "role": "Immutable @ConfigurationProperties record for inventory.supplier settings.",
+        "key_symbols": [
+          "SupplierProperties",
+          "defaults"
+        ],
+        "depends_on": [],
+        "health_note": "Clean centralized config record; lacks @Validated Bean Validation constraints."
+      }
+    ],
+    "dependency_notes": "Dependency graph is a strict acyclic DAG (0 circular dependencies, 0 upward boundary violations). Domain types (`StockItem`, `ReorderPolicy`) and configuration (`SupplierProperties`) have zero inward coupling to web or client transport layers; only minor DTO coupling exists where `InventoryController` serializes `StockItem` directly."
+  },
+  "architecture_record": {
+    "workflow_id": "java_api_spring_clean",
+    "workflow_run_id": "wf-056bf7c2",
+    "recorded_at": "2026-10-24T14:44:17.775527+00:00",
+    "target_root": "examples/java/api_spring_clean",
+    "system_profile": {
+      "system_purpose": "Spring Boot 3.3 and Java 21 REST microservice managing warehouse SKU stock lookups, reservations, and automated upstream supplier restock notifications when available inventory drops to or below its reorder point.",
+      "domain_context": "Warehouse inventory management and supplier replenishment domain (`StockItem` on-hand/reserved tracking and `ReorderPolicy` buffer calculation).",
+      "runtime_type": "web_api",
+      "tech_stack": [
+        "Java 21 (records, java.time, java.net.http.HttpClient)",
+        "Spring Boot 3.3.4 (spring-boot-starter-web, spring-boot-starter-validation)",
+        "Apache Maven 3.9.9 (pom.xml, mvnw)",
+        "JUnit Jupiter 5.10.3",
+        "SLF4J structured logging",
+        "Docker multi-stage build (maven:3.9.9-eclipse-temurin-21 -> eclipse-temurin:21.0.4_7-jre-jammy)"
+      ],
+      "external_integrations": [
+        "Upstream Supplier REST API (`POST {inventory.supplier.base-url}/v1/restock` via `SupplierRestClient` using `java.net.http.HttpClient`)"
+      ]
+    },
+    "structure_map": {
+      "architecture_pattern": "Layered Spring Boot Microservice Architecture (Bootstrap -> API Presentation -> Application Service -> Pure Domain + Outbound HTTP Adapter + Configuration)",
+      "layers": [
+        {
+          "name": "Bootstrap Layer",
+          "responsibility": "Starts the Spring Boot context and registers @ConfigurationProperties beans.",
+          "paths": [
+            "src/main/java/com/example/inventory/InventoryApplication.java"
+          ],
+          "allowed_dependencies": [
+            "Configuration Layer"
+          ]
+        },
+        {
+          "name": "API Presentation Layer",
+          "responsibility": "Exposes HTTP REST endpoints (/api/v1/items/{sku} and /{sku}/reserve) and maps service results to ResponseEntity<StockItem>.",
+          "paths": [
+            "src/main/java/com/example/inventory/api/InventoryController.java"
+          ],
+          "allowed_dependencies": [
+            "Application Service Layer",
+            "Domain Layer"
+          ]
+        },
+        {
+          "name": "Application Service Layer",
+          "responsibility": "Coordinates SKU lookups, concurrent stock reservation state transitions, and conditional supplier restock orchestration.",
+          "paths": [
+            "src/main/java/com/example/inventory/service/InventoryService.java"
+          ],
+          "allowed_dependencies": [
+            "Domain Layer",
+            "Outbound Client Adapter Layer",
+            "Configuration Layer"
+          ]
+        },
+        {
+          "name": "Outbound Client Adapter Layer",
+          "responsibility": "Executes bounded-timeout HTTP POST /v1/restock calls to the external supplier partner.",
+          "paths": [
+            "src/main/java/com/example/inventory/client/SupplierRestClient.java"
+          ],
+          "allowed_dependencies": [
+            "Configuration Layer"
+          ]
+        },
+        {
+          "name": "Domain Layer",
+          "responsibility": "Encapsulates pure Java 21 immutable stock invariants (StockItem) and stateless replenishment threshold policies (ReorderPolicy).",
+          "paths": [
+            "src/main/java/com/example/inventory/domain/StockItem.java",
+            "src/main/java/com/example/inventory/domain/ReorderPolicy.java"
+          ],
+          "allowed_dependencies": []
+        },
+        {
+          "name": "Configuration Layer",
+          "responsibility": "Binds externalized supplier base URL, timeout, and batch settings under prefix inventory.supplier.",
+          "paths": [
+            "src/main/java/com/example/inventory/config/SupplierProperties.java"
+          ],
+          "allowed_dependencies": []
+        }
+      ],
+      "modules": [
+        {
+          "path": "src/main/java/com/example/inventory/InventoryApplication.java",
+          "role": "Spring Boot application entry point enabling SupplierProperties configuration binding.",
+          "key_symbols": [
+            "InventoryApplication",
+            "main"
+          ],
+          "depends_on": [
+            "src/main/java/com/example/inventory/config/SupplierProperties.java"
+          ],
+          "health_note": "Clean 12-LOC bootstrap class."
+        },
+        {
+          "path": "src/main/java/com/example/inventory/api/InventoryController.java",
+          "role": "REST controller exposing GET /{sku} and POST /{sku}/reserve endpoints.",
+          "key_symbols": [
+            "InventoryController",
+            "getItem",
+            "reserveItem"
+          ],
+          "depends_on": [
+            "src/main/java/com/example/inventory/service/InventoryService.java",
+            "src/main/java/com/example/inventory/domain/StockItem.java"
+          ],
+          "health_note": "Returns domain StockItem directly as HTTP DTO; lacks OAuth2 guard and ProblemDetail exception handler."
+        },
+        {
+          "path": "src/main/java/com/example/inventory/service/InventoryService.java",
+          "role": "Application service maintaining ConcurrentHashMap store and triggering supplier replenishment.",
+          "key_symbols": [
+            "InventoryService",
+            "upsertItem",
+            "findBySku",
+            "reserveStock"
+          ],
+          "depends_on": [
+            "src/main/java/com/example/inventory/domain/StockItem.java",
+            "src/main/java/com/example/inventory/domain/ReorderPolicy.java",
+            "src/main/java/com/example/inventory/client/SupplierRestClient.java",
+            "src/main/java/com/example/inventory/config/SupplierProperties.java"
+          ],
+          "health_note": "Clear orchestration, but reserveStock uses non-atomic get/put on ConcurrentHashMap."
+        },
+        {
+          "path": "src/main/java/com/example/inventory/client/SupplierRestClient.java",
+          "role": "Outbound java.net.http.HttpClient adapter calling upstream supplier /v1/restock.",
+          "key_symbols": [
+            "SupplierRestClient",
+            "requestRestock"
+          ],
+          "depends_on": [
+            "src/main/java/com/example/inventory/config/SupplierProperties.java"
+          ],
+          "health_note": "Enforces connect and request timeouts; uses manual JSON string concatenation."
+        },
+        {
+          "path": "src/main/java/com/example/inventory/domain/StockItem.java",
+          "role": "Immutable Java 21 record modeling SKU on-hand, reserved, and reorderPoint quantities.",
+          "key_symbols": [
+            "StockItem",
+            "availableUnits",
+            "withAdditionalReservation"
+          ],
+          "depends_on": [],
+          "health_note": "Zero Spring dependencies; enforces positive reservation and available stock invariants."
+        },
+        {
+          "path": "src/main/java/com/example/inventory/domain/ReorderPolicy.java",
+          "role": "Pure static domain policy evaluating restock necessity and recommended order quantity.",
+          "key_symbols": [
+            "ReorderPolicy",
+            "requiresRestock",
+            "recommendedOrderQuantity"
+          ],
+          "depends_on": [
+            "src/main/java/com/example/inventory/domain/StockItem.java"
+          ],
+          "health_note": "Pure, deterministic calculation with 100% unit test coverage."
+        },
+        {
+          "path": "src/main/java/com/example/inventory/config/SupplierProperties.java",
+          "role": "Immutable @ConfigurationProperties record for inventory.supplier settings.",
+          "key_symbols": [
+            "SupplierProperties",
+            "defaults"
+          ],
+          "depends_on": [],
+          "health_note": "Clean centralized config record; lacks @Validated Bean Validation constraints."
+        }
+      ],
+      "boundary_assessment": "Dependency graph is a strict acyclic DAG (0 circular dependencies, 0 upward boundary violations). Domain types (`StockItem`, `ReorderPolicy`) and configuration (`SupplierProperties`) have zero inward coupling to web or client transport layers; only minor DTO coupling exists where `InventoryController` serializes `StockItem` directly."
+    },
+    "execution_flow_map": {
+      "entry_points": [
+        "src/main/java/com/example/inventory/InventoryApplication.java:main",
+        "src/main/java/com/example/inventory/api/InventoryController.java:getItem",
+        "src/main/java/com/example/inventory/api/InventoryController.java:reserveItem"
+      ],
+      "execution_flows": [
+        {
+          "name": "SKU Stock Lookup Flow",
+          "trigger": "HTTP GET /api/v1/items/{sku}",
+          "steps": [
+            "InventoryController.getItem(sku) receives @PathVariable String sku.",
+            "InventoryService.findBySku(sku) looks up StockItem in ConcurrentHashMap<String, StockItem> inventoryStore.",
+            "Optional<StockItem> maps to HTTP 200 OK JSON ResponseEntity<StockItem> when present or HTTP 404 Not Found when absent."
+          ],
+          "involved_files": [
+            "src/main/java/com/example/inventory/api/InventoryController.java",
+            "src/main/java/com/example/inventory/service/InventoryService.java",
+            "src/main/java/com/example/inventory/domain/StockItem.java"
+          ]
+        },
+        {
+          "name": "Stock Reservation & Conditional Supplier Restock Flow",
+          "trigger": "HTTP POST /api/v1/items/{sku}/reserve?quantity={n}",
+          "steps": [
+            "InventoryController.reserveItem(sku, quantity) validates @RequestParam @Min(1) int quantity and delegates to InventoryService.reserveStock(sku, quantity).",
+            "InventoryService.reserveStock fetches existing StockItem from inventoryStore (throwing IllegalArgumentException if unknown) and calls StockItem.withAdditionalReservation(quantity, Instant.now()) (throwing IllegalStateException if quantity > availableUnits).",
+            "InventoryService writes the new immutable StockItem snapshot back to inventoryStore and computes ReorderPolicy.recommendedOrderQuantity(updated, properties.defaultReorderBatch()).",
+            "When restockQty > 0 (availableUnits <= reorderPoint), SupplierRestClient.requestRestock(sku, restockQty) sends a bounded-timeout HTTP POST {baseUrl}/v1/restock request and logs the outcome via SLF4J before returning HTTP 200 OK with the updated StockItem."
+          ],
+          "involved_files": [
+            "src/main/java/com/example/inventory/api/InventoryController.java",
+            "src/main/java/com/example/inventory/service/InventoryService.java",
+            "src/main/java/com/example/inventory/domain/StockItem.java",
+            "src/main/java/com/example/inventory/domain/ReorderPolicy.java",
+            "src/main/java/com/example/inventory/client/SupplierRestClient.java",
+            "src/main/java/com/example/inventory/config/SupplierProperties.java"
+          ]
+        }
+      ],
+      "state_and_storage": [
+        "In-memory ConcurrentHashMap<String, StockItem> (InventoryService.inventoryStore) storing immutable StockItem snapshots keyed by SKU (ephemeral across JVM restarts; no external RDBMS/NoSQL repository configured).",
+        "Immutable externalized configuration record SupplierProperties bound from inventory.supplier.* properties / environment variables."
+      ],
+      "error_and_concurrency_model": "Spring MVC servlet request threads share InventoryService; StockItem is an immutable Java 21 record, but InventoryService.reserveStock uses non-atomic get() + put() on ConcurrentHashMap. Domain invariants throw IllegalArgumentException / IllegalStateException (currently unmapped by @RestControllerAdvice, defaulting to HTTP 500), while SupplierRestClient catches IOException and InterruptedException (restoring Thread.currentThread().interrupt()) and degrades gracefully by returning false."
+    }
+  },
+  "audit_dimensions": [
+    {
+      "action_id": "act-14",
+      "audit_id": "security_vulnerability_audit",
+      "title": "Evaluate Supply-Chain CVEs, Container Misconfigs, Secrets, Dangerous Sinks & API Boundaries",
+      "score": 56,
+      "grade": "D",
+      "rules_evaluated": [
+        "common/security_vulnerability",
+        "common/supply_chain"
+      ],
+      "pass_count": 0,
+      "warn_count": 1,
+      "fail_count": 1,
+      "summary": "Trivy 0.69.3 and AST security evaluation confirm zero leaked secrets (SEC-03), zero dangerous CWE code sinks (SEC-04), and a non-root loopback-bound Dockerfile with only 1 LOW IaC notice (DS-0026 missing HEALTHCHECK, SEC-02), but fail SEC-01 due to 75 Maven application CVEs (8 CRITICAL, 29 HIGH, 28 MEDIUM, 10 LOW) in Spring Boot 3.3.4 transitive dependencies (Tomcat 10.1.30, Spring WebMVC 6.1.13, Jackson 2.17.2) alongside 453 Ubuntu 22.04 OS-layer CVEs (0 CRITICAL, 5 HIGH) and an unauthenticated POST /{sku}/reserve endpoint (SEC-05)."
+    },
+    {
+      "action_id": "act-10",
+      "audit_id": "java_test_audit",
+      "title": "Evaluate JUnit Test Suite Completeness & Structure",
+      "score": 68,
+      "grade": "C",
+      "rules_evaluated": [
+        "java/testing"
+      ],
+      "pass_count": 0,
+      "warn_count": 1,
+      "fail_count": 0,
+      "summary": "JUnit 5 test suite uses deterministic in-memory stubbing (StubSupplierClient) without live network dependencies, but comprises only 2 @Test methods across 2 flat-package test classes—leaving SupplierRestClient.requestRestock, InventoryController.getItem (200/404), MockMvc HTTP validation, and all domain/service exception branches untested."
+    },
+    {
+      "action_id": "act-16",
+      "audit_id": "web_penetration_audit",
+      "title": "Evaluate Live HTTP Penetration Findings, Security Headers & Endpoint Defenses",
+      "score": 72,
+      "grade": "B",
+      "rules_evaluated": [
+        "common/security_vulnerability"
+      ],
+      "pass_count": 0,
+      "warn_count": 1,
+      "fail_count": 0,
+      "summary": "Dynamic containerized web penetration testing (.pni/pentests/examples/java/api_spring_clean, status=passed, 16 probes: 12 passed, 3 failed, 1 skipped, 0 critical/high findings in 7.19s against isolated loopback http://127.0.0.1:53369) confirmed strict @RequestParam int type validation (POST /api/v1/items/SKU-100/reserve?quantity=not-an-int -> 400) and zero reflected XSS, SQLi/stacktrace leakage, path traversal, or exposed .env/.git artifacts, while uncovering 3 live medium/low endpoint & header gaps: unauthenticated POST reservation reaching InventoryService.reserveStock() (CWE-306), uncaught IllegalArgumentException on unknown SKU returning HTTP 500 (CWE-755), and missing X-Content-Type-Options: nosniff header (CWE-693)."
+    },
+    {
+      "action_id": "act-12",
+      "audit_id": "container_runtime_audit",
+      "title": "Evaluate Buildability, Offline Test Results, Measured Coverage & Startup Health",
+      "score": 76,
+      "grade": "B",
+      "rules_evaluated": [
+        "common/runtime_verification",
+        "common/production_readiness"
+      ],
+      "pass_count": 0,
+      "warn_count": 2,
+      "fail_count": 0,
+      "summary": "Containerized runtime verification passed RV-01 (multi-stage Dockerfile build in 41.74s and Java 21 Maven harness build in 53.98s), RV-02 (2/2 JUnit 5 tests passed offline in 10.46s with --network=none), and RV-04 (InventoryApplication booted and bound tcp://127.0.0.1:18080 in 4.48s), while RV-03 measured 62.7% JaCoCo line coverage (42/67 lines) and 50.0% branch coverage—below the 80%/70% target due to SupplierRestClient (30.4% line / 0.0% branch) and InventoryController.getItem (62.5%)."
+    },
+    {
+      "action_id": "act-09",
+      "audit_id": "service_readiness_audit",
+      "title": "Evaluate 12-Factor Config/Statelessness & SRE PRR Timeouts/Observability",
+      "score": 78,
+      "grade": "B",
+      "rules_evaluated": [
+        "common/twelve_factor",
+        "common/production_readiness",
+        "common/security"
+      ],
+      "pass_count": 0,
+      "warn_count": 3,
+      "fail_count": 0,
+      "summary": "12-Factor and SRE Production Readiness evaluation confirms centralized @ConfigurationProperties binding, zero scattered env lookups, SLF4J structured logging, and explicit HTTP connect/read timeouts in SupplierRestClient, while identifying three operational gaps: ephemeral in-memory ConcurrentHashMap stock storage, missing Spring Boot Actuator health/readiness probes, and unmapped domain exceptions returning HTTP 500."
+    },
+    {
+      "action_id": "act-05",
+      "audit_id": "java_ast_audit",
+      "title": "Interpret Java AST Facts & Evaluate Quality/Generics/Imports/Security",
+      "score": 81,
+      "grade": "A",
+      "rules_evaluated": [
+        "common/architecture",
+        "common/maintainability",
+        "common/security",
+        "common/security_vulnerability",
+        "java/code_quality",
+        "java/typing",
+        "java/frameworks/spring_boot"
+      ],
+      "pass_count": 3,
+      "warn_count": 4,
+      "fail_count": 0,
+      "summary": "Java 21 AST analysis shows 100% Javadoc, generic typing, and import hygiene across 7 cohesive classes (180 LOC) with zero circular dependencies and pure domain isolation, while deep code inspection identifies an unauthenticated state-mutating POST endpoint (TODO security), manual JSON concatenation in SupplierRestClient, a check-then-act race condition on ConcurrentHashMap in InventoryService, and missing @Validated / ProblemDetail error mapping in Spring components."
+    },
+    {
+      "action_id": "act-02",
+      "audit_id": "repo_structure_audit",
+      "title": "Evaluate Maven/Gradle Build, Supply Chain & Dependencies",
+      "score": 84,
+      "grade": "A",
+      "rules_evaluated": [
+        "common/supply_chain",
+        "java/dependencies",
+        "common/documentation",
+        "common/git_workflow",
+        "common/security"
+      ],
+      "pass_count": 2,
+      "warn_count": 3,
+      "fail_count": 0,
+      "summary": "Maven build and supply-chain governance are well-structured with Java 21, Spring Boot 3.3.4 parent BOM, SHA-pinned GitHub Actions with contents:read permissions, Dependabot, SECURITY.md, non-root multi-stage Dockerfile, and Diataxis-aligned README headings, with minor gaps in the mvnw wrapper stub, abbreviated LICENSE text, missing Actuator/JaCoCo plugins in pom.xml, and concise README API/prerequisite details."
+    },
+    {
+      "action_id": "act-03",
+      "audit_id": "supply_chain_audit",
+      "title": "Evaluate Supply-Chain, CI Permissions, Container & Secret Hygiene",
+      "score": 86,
+      "grade": "A",
+      "rules_evaluated": [
+        "common/supply_chain",
+        "common/security",
+        "common/git_workflow"
+      ],
+      "pass_count": 2,
+      "warn_count": 1,
+      "fail_count": 0,
+      "summary": "OpenSSF Scorecard supply-chain posture is strong: GitHub Actions pins third-party actions to 40-char commit SHAs with contents:read permissions, Dependabot monitors maven and github-actions weekly, SECURITY.md and .dockerignore are present, and the multi-stage Dockerfile runs as non-root UID 10001 on loopback, with minor improvements needed for Maven Wrapper binary pinning and Dockerfile image digest / HEALTHCHECK hardening."
+    }
+  ],
+  "rule_compliance": [
+    {
+      "rule_id": "common/security_vulnerability",
+      "status": "fail",
+      "source_action": "security_vulnerability_audit",
+      "evidence": "dangerous_sinks=[]; api_endpoints shows 2 endpoints with has_auth_hint=false, including state-mutating POST /api/v1/items/{sku}/reserve (InventoryController.java:52) carrying an unresolved `TODO(security): Require OAuth2 JWT resource-server scope check` on line 57.; app_vuln_counts={critical:8, high:29, medium:28, low:10, total:75} in pom.xml (tomcat-embed-core@10.1.30 CVE-2025-24813 CVSS 10.0 + 6 CRITICAL; spring-webmvc@6.1.13 CVE-2026-47884 CVSS 9.8; jackson-databind/core@2.17.2 8 HIGH; spring-boot@3.3.4 CVE-2025-22235/CVE-2026-40973); os_vuln_counts={critical:0, high:5, medium:294, low:154, total:453}; misconfigurations=[DS-0026 LOW]; secrets=[]; dangerous_sinks=[]; api_endpoints=2 with has_auth_hint=false.; PentestFacts status=passed (16 probes: 12 passed, 3 failed, 1 skipped, 0 critical/high); live findings: [MEDIUM] CWE-306 unauthenticated POST /api/v1/items/{sku}/reserve bypassed auth filter -> HTTP 500, [MEDIUM] CWE-755 unknown SKU reservation -> HTTP 500, [LOW] CWE-693 missing X-Content-Type-Options: nosniff",
+      "summary": "Zero secrets or CWE sinks, but 8 CRITICAL and 29 HIGH Maven transitive CVEs (SEC-01) plus unauthenticated POST endpoint (SEC-05) fail security gate."
+    },
+    {
+      "rule_id": "common/documentation",
+      "status": "warn",
+      "source_action": "repo_structure_audit",
+      "evidence": "README.md (26 lines, 6 headings) organizes Quickstart Tutorial, Operations How-To, REST API Reference, and Layered Architecture Explanation, but omits Java 21/Docker prerequisites, inventory.supplier.default-reorder-batch property, and HTTP status/payload examples.",
+      "summary": "Diataxis-structured README and SECURITY.md present, but prerequisites, full config table, and API response schemas are brief."
+    },
+    {
+      "rule_id": "common/production_readiness",
+      "status": "warn",
+      "source_action": "service_readiness_audit",
+      "evidence": "missing_io_timeouts=[]; SupplierRestClient.java:33,48 sets connectTimeout and request timeout; however pom.xml omits spring-boot-starter-actuator (/actuator/health unavailable) and InventoryController lacks @RestControllerAdvice to map IllegalArgumentException/IllegalStateException to 404/409 ProblemDetail.; InventoryApplication boots cleanly in 4.48s without external service startup crashes, but smoke_check falls back to tcp://127.0.0.1:18080 because spring-boot-starter-actuator (/actuator/health) is not configured in pom.xml.",
+      "summary": "Bounded outbound HTTP timeouts and interrupt restoration implemented, but health/readiness probes and structured 4xx error translation are missing."
+    },
+    {
+      "rule_id": "common/runtime_verification",
+      "status": "warn",
+      "source_action": "container_runtime_audit",
+      "evidence": "project_dockerfile_build=passed (41.74s), harness_build=passed (53.98s), test_execution=passed (2/2 offline tests, 10.46s), smoke_check=passed (tcp://127.0.0.1:18080, 4.48s); JaCoCo coverage=62.7% line (42/67) / 50.0% branch, with SupplierRestClient.java at 30.4%/0.0% (missing lines 45-55) and InventoryController.java at 62.5% (missing lines 40-42).",
+      "summary": "Clean multi-stage build, offline JUnit execution, and Spring context boot pass RV-01/02/04, while 62.7% line / 50.0% branch coverage triggers RV-03 warning."
+    },
+    {
+      "rule_id": "common/security",
+      "status": "warn",
+      "source_action": "java_ast_audit",
+      "evidence": "committed_secret_files=[], ci.yml sets permissions: contents: read, Dockerfile runs as non-root USER spring (UID 10001) bound to -Dserver.address=127.0.0.1.; committed_secret_files=[]; Dockerfile runs as USER spring (UID 10001) and binds -Dserver.address=127.0.0.1; ci.yml grants read-only contents permission.; hardcoded_secrets=[]; however SupplierRestClient.java:45 constructs JSON via raw string concatenation (`\"{\\\"sku\\\":\\\"\" + sku + ...`) using unvalidated @PathVariable String sku.; hardcoded_secrets=[]; SupplierProperties.java:12 lacks @Validated constraints on external environment properties and SupplierRestClient.java:45 concatenates unescaped sku into JSON.",
+      "summary": "Zero hardcoded secrets, but manual JSON string interpolation in SupplierRestClient risks outbound JSON injection if sku contains quotes or control characters."
+    },
+    {
+      "rule_id": "common/supply_chain",
+      "status": "warn",
+      "source_action": "repo_structure_audit",
+      "evidence": "ci.yml pins actions to full SHAs with permissions: contents: read; dependabot.yml, SECURITY.md, .dockerignore, and non-root Dockerfile (USER spring, UID 10001) exist; however mvnw (4 lines) lacks .mvn/wrapper/maven-wrapper.properties pinning and LICENSE (3 lines) omits full Apache-2.0 text.; ci_supply_chain_issues=[], container_hygiene_issues=[], ci.yml pins checkout@11bd719... and setup-java@c5195ef... with permissions: contents: read; however mvnw lacks .mvn/wrapper/maven-wrapper.properties and Dockerfile base tags lack @sha256 digests and HEALTHCHECK.; Dockerfile runs as non-root USER spring (UID 10001) on 127.0.0.1 with 1 LOW Trivy IaC finding (DS-0026: No HEALTHCHECK defined); eclipse-temurin:21.0.4_7-jre-jammy carries 5 HIGH Ubuntu 22.04 OS CVEs (libssl3/openssl CVE-2026-45447, gpgv CVE-2025-68973).",
+      "summary": "Strong CI/Dependabot/Dockerfile supply-chain hygiene, tempered by stub mvnw wrapper and abbreviated LICENSE file."
+    },
+    {
+      "rule_id": "common/twelve_factor",
+      "status": "warn",
+      "source_action": "service_readiness_audit",
+      "evidence": "scattered_env_access=[], unstructured_logging=[]; SupplierProperties centralizes inventory.supplier config, but InventoryService.java:23 holds authoritative stock state in an in-memory ConcurrentHashMap (`inventoryStore`) without a swappable repository interface or server.shutdown=graceful.",
+      "summary": "Centralized @ConfigurationProperties and SLF4J logging pass Factors III/XI, but in-memory ConcurrentHashMap violates Factor VI stateless multi-replica scaling."
+    },
+    {
+      "rule_id": "java/code_quality",
+      "status": "warn",
+      "source_action": "java_ast_audit",
+      "evidence": "docstring_coverage_pct=100.0%, import_hygiene_coverage_pct=100.0%; however InventoryService.java:65-70 executes non-atomic `inventoryStore.get(sku)` followed by `inventoryStore.put(sku, updated)` on ConcurrentHashMap.",
+      "summary": "100% Javadoc and import hygiene with immutable records, but check-then-act mutation in InventoryService.reserveStock risks lost updates under concurrency."
+    },
+    {
+      "rule_id": "java/dependencies",
+      "status": "warn",
+      "source_action": "repo_structure_audit",
+      "evidence": "pom.xml pins spring-boot-starter-parent:3.3.4, java.version=21, and test-scoped junit-jupiter:5.10.3 with 0 unpinned dependencies, but omits spring-boot-starter-actuator, spring-boot-starter-test, and jacoco-maven-plugin.",
+      "summary": "Pinned Maven BOM and clean test scope isolation, missing Actuator health starter, Spring test slice starter, and JaCoCo plugin declaration."
+    },
+    {
+      "rule_id": "java/frameworks/spring_boot",
+      "status": "warn",
+      "source_action": "java_ast_audit",
+      "evidence": "Constructor injection, @GetMapping/@PostMapping, Java 21 records, and java.time used throughout, but SupplierProperties.java:12 omits @Validated/@NotBlank/@Positive constraints and InventoryController.java:17 lacks @Validated and @RestControllerAdvice ProblemDetail mapping.",
+      "summary": "Modern constructor-injected Spring Boot 3 style, missing @Validated on @ConfigurationProperties and RFC 7807 ProblemDetail exception translation."
+    },
+    {
+      "rule_id": "java/testing",
+      "status": "warn",
+      "source_action": "java_test_audit",
+      "evidence": "2 test files (InventoryServiceTest.java, ReorderPolicyTest.java) with 2 @Test methods total vs 7 source files (16 callables); StubSupplierClient overrides SupplierRestClient.requestRestock (0 tests for HTTP 2xx/error/timeout handling), 0 assertThrows negative tests, and flat com.example.inventory test package instead of mirroring api/service/domain/client.",
+      "summary": "Deterministic JUnit 5 happy-path tests exist, but SupplierRestClient, GET endpoint, exception branches, MockMvc slice tests, and subpackage mirroring are missing."
+    },
+    {
+      "rule_id": "common/architecture",
+      "status": "pass",
+      "source_action": "java_ast_audit",
+      "evidence": "circular_dependencies=[], boundary_violations=[]. Strict unidirectional layering: api (InventoryController) -> service (InventoryService) -> domain (StockItem, ReorderPolicy) + client (SupplierRestClient) + config (SupplierProperties), with zero Spring imports in domain.",
+      "summary": "Clean 5-package layered DAG with pure framework-free domain records and policies."
+    },
+    {
+      "rule_id": "common/git_workflow",
+      "status": "pass",
+      "source_action": "repo_structure_audit",
+      "evidence": ".gitignore excludes target/, .idea/, *.iml; zero build artifacts committed; .github/workflows/ci.yml gates push and pull_request on main.; .gitignore excludes target/, .idea/, *.iml; .github/workflows/ci.yml enforces automated test runs on push and pull_request targeting main.",
+      "summary": "Clean Git ignore hygiene and automated PR/main verification workflow."
+    },
+    {
+      "rule_id": "common/maintainability",
+      "status": "pass",
+      "source_action": "java_ast_audit",
+      "evidence": "7 files totaling 180 LOC (max 43 LOC in InventoryService.java and SupplierRestClient.java), complex_functions=[], excessive_parameters=[], global_state_usages=[].",
+      "summary": "Small, cohesive modules and concise methods well within SIG maintainability thresholds."
+    },
+    {
+      "rule_id": "java/typing",
+      "status": "pass",
+      "source_action": "java_ast_audit",
+      "evidence": "type_safety_coverage_pct=100.0%, type_safety_issues=[], weak_type_usages=[]; parameterized Optional<StockItem>, ResponseEntity<StockItem>, ConcurrentHashMap<String, StockItem>, and @Override used consistently.",
+      "summary": "100% generic parameterization and Optional return contracts without raw types or unchecked casts."
+    }
+  ],
+  "module_hotspots": [
+    {
+      "file_path": "src/main/java/com/example/inventory/api/InventoryController.java",
+      "loc": 0,
+      "risk_score": 0.64,
+      "finding_counts": {
+        "high": 1,
+        "medium": 2,
+        "low": 1
+      },
+      "top_rules": [
+        "common/security_vulnerability",
+        "common/production_readiness"
+      ]
+    },
+    {
+      "file_path": "pom.xml",
+      "loc": 0,
+      "risk_score": 0.45,
+      "finding_counts": {
+        "critical": 1
+      },
+      "top_rules": [
+        "common/security_vulnerability"
+      ]
+    },
+    {
+      "file_path": "src/main/java/com/example/inventory/client/SupplierRestClient.java",
+      "loc": 0,
+      "risk_score": 0.4,
+      "finding_counts": {
+        "medium": 2
+      },
+      "top_rules": [
+        "common/security",
+        "common/runtime_verification"
+      ]
+    },
+    {
+      "file_path": "Dockerfile",
+      "loc": 0,
+      "risk_score": 0.36,
+      "finding_counts": {
+        "medium": 1,
+        "low": 1
+      },
+      "top_rules": [
+        "common/security_vulnerability",
+        "common/supply_chain"
+      ]
+    },
+    {
+      "file_path": "src/main/java/com/example/inventory/service/InventoryService.java",
+      "loc": 0,
+      "risk_score": 0.36,
+      "finding_counts": {
+        "medium": 2,
+        "low": 1
+      },
+      "top_rules": [
+        "java/code_quality",
+        "common/security_vulnerability",
+        "common/twelve_factor"
+      ]
+    },
+    {
+      "file_path": "src/test/java/com/example/inventory/InventoryServiceTest.java",
+      "loc": 0,
+      "risk_score": 0.28,
+      "finding_counts": {
+        "high": 1
+      },
+      "top_rules": [
+        "java/testing"
+      ]
+    },
+    {
+      "file_path": "examples/java/api_spring_clean/Dockerfile",
+      "loc": 0,
+      "risk_score": 0.15,
+      "finding_counts": {},
+      "top_rules": []
+    },
+    {
+      "file_path": "mvnw",
+      "loc": 0,
+      "risk_score": 0.15,
+      "finding_counts": {
+        "medium": 1
+      },
+      "top_rules": [
+        "common/supply_chain"
+      ]
+    },
+    {
+      "file_path": "src/main/java/com/example/inventory/config/SupplierProperties.java",
+      "loc": 0,
+      "risk_score": 0.15,
+      "finding_counts": {
+        "medium": 1
+      },
+      "top_rules": [
+        "java/frameworks/spring_boot"
+      ]
+    },
+    {
+      "file_path": "examples/java/api_spring_clean/src/main/java/com/example/inventory/client/SupplierRestClient.java",
+      "loc": 43,
+      "risk_score": 0.1,
+      "finding_counts": {},
+      "top_rules": []
+    },
+    {
+      "file_path": "examples/java/api_spring_clean/src/main/java/com/example/inventory/service/InventoryService.java",
+      "loc": 43,
+      "risk_score": 0.06,
+      "finding_counts": {},
+      "top_rules": []
+    },
+    {
+      "file_path": "examples/java/api_spring_clean/src/main/java/com/example/inventory/api/InventoryController.java",
+      "loc": 33,
+      "risk_score": 0.06,
+      "finding_counts": {},
+      "top_rules": []
+    },
+    {
+      "file_path": "examples/java/api_spring_clean/src/main/java/com/example/inventory/domain/StockItem.java",
+      "loc": 22,
+      "risk_score": 0.06,
+      "finding_counts": {},
+      "top_rules": []
+    },
+    {
+      "file_path": "examples/java/api_spring_clean/src/main/java/com/example/inventory/domain/ReorderPolicy.java",
+      "loc": 15,
+      "risk_score": 0.06,
+      "finding_counts": {},
+      "top_rules": []
+    },
+    {
+      "file_path": "examples/java/api_spring_clean/src/main/java/com/example/inventory/InventoryApplication.java",
+      "loc": 12,
+      "risk_score": 0.06,
+      "finding_counts": {},
+      "top_rules": []
+    },
+    {
+      "file_path": "examples/java/api_spring_clean/src/main/java/com/example/inventory/config/SupplierProperties.java",
+      "loc": 12,
+      "risk_score": 0.06,
+      "finding_counts": {},
+      "top_rules": []
+    },
+    {
+      "file_path": "LICENSE",
+      "loc": 0,
+      "risk_score": 0.06,
+      "finding_counts": {
+        "low": 1
+      },
+      "top_rules": [
+        "common/supply_chain"
+      ]
+    },
+    {
+      "file_path": "README.md",
+      "loc": 0,
+      "risk_score": 0.06,
+      "finding_counts": {
+        "low": 1
+      },
+      "top_rules": [
+        "common/documentation"
+      ]
+    },
+    {
+      "file_path": "src/test/java/com/example/inventory/ReorderPolicyTest.java",
+      "loc": 0,
+      "risk_score": 0.06,
+      "finding_counts": {
+        "low": 1
+      },
+      "top_rules": [
+        "java/testing"
+      ]
+    }
+  ],
+  "strengths": [
+    "GitHub Actions workflow (.github/workflows/ci.yml) enforces least-privilege permissions (contents: read) and pins actions/checkout and actions/setup-java to immutable 40-character commit SHAs.",
+    "Dependabot (.github/dependabot.yml) automates weekly version updates across both maven and github-actions ecosystems alongside SECURITY.md.",
+    "Multi-stage Dockerfile pins maven:3.9.9-eclipse-temurin-21 and eclipse-temurin:21.0.4_7-jre-jammy, drops privileges to UID 10001 (USER spring), and binds 127.0.0.1 by default.",
+    "README.md structures onboarding, operations, API reference, and architecture across all four Diataxis quadrants.",
+    "Zero OpenSSF CI supply-chain violations: explicit `permissions: contents: read` and full commit SHA pinning on all GitHub Actions.",
+    "Non-root runtime image (`USER spring`, UID 10001) with explicit `.dockerignore` excluding `.git`, `.mvn`, `target`, and `*.md`.",
+    "Zero committed credential files or secret artifacts in version control.",
+    "100.0% Javadoc coverage, 100.0% import hygiene, and 100.0% generic type safety across all 7 Java source files (180 LOC).",
+    "Pure domain layer (`StockItem` record and `ReorderPolicy` final policy class) completely decoupled from Spring Web and HTTP transport concerns.",
+    "Consistent constructor dependency injection (`InventoryController`, `InventoryService`, `SupplierRestClient`), SLF4J parameterized logging, and `Thread.currentThread().interrupt()` restoration.",
+    "Explicit outbound HTTP timeouts (`connectTimeout` + per-request `timeout`) in `SupplierRestClient` prevent stalled upstream suppliers from exhausting servlet worker threads (`missing_io_timeouts = 0`).",
+    "Zero scattered `System.getenv` lookups (`scattered_env_access = 0`) and zero `System.out.println` calls (`unstructured_logging = 0`).",
+    "Deterministic offline isolation via `StubSupplierClient` and fixed `Instant.EPOCH` timestamps without flaky wall-clock or live network dependencies.",
+    "Clean JUnit Jupiter 5 assertions (`assertion_free_tests = []`) covering core reservation and `ReorderPolicy` replenishment thresholds.",
+    "Both repository multi-stage `Dockerfile` (`41.74s`) and Java 21 Maven test harness (`53.98s`) build cleanly from scratch with zero errors.",
+    "100% hermetic offline test pass (`2/2` JUnit 5 tests in `10.46s` with `-o` and `--network=none`) and clean `4.48s` Spring Boot `ApplicationContext` startup.",
+    "100.0% measured JaCoCo line coverage on `ReorderPolicy.java` (`100.0%` branch) and `SupplierProperties.java`.",
+    "Zero hardcoded or committed secrets across Trivy secret scanner and AST analysis (`SEC-03` PASS).",
+    "Zero dangerous CWE code sinks (`CWE-78`, `CWE-89`, `CWE-94`, `CWE-502` all `0`, `SEC-04` PASS).",
+    "Zero CRITICAL or HIGH container IaC misconfigurations; runtime container drops root (`UID 10001`) and binds `127.0.0.1` (`SEC-02`).",
+    "Live loopback DAST (.pni/pentests/examples/java/api_spring_clean) verified 0 critical/high HTTP vulnerabilities across 16 probes (12 passed), confirming 400 Bad Request rejection on malformed quantity input (CWE-20) and resistance to reflected XSS (CWE-79), SQL/stacktrace leakage (CWE-89/CWE-209), path traversal (CWE-22), and sensitive file exposure (CWE-538)."
+  ],
+  "findings": [
+    {
+      "severity": "critical",
+      "category": "security",
+      "rule_id": "common/security_vulnerability",
+      "file_path": "pom.xml",
+      "line": 10,
+      "symbol": "spring-boot-starter-parent:3.3.4",
+      "evidence": "Trivy detected 8 CRITICAL and 29 HIGH Maven CVEs: tomcat-embed-core@10.1.30 (CVE-2025-24813 CVSS 10.0, CVE-2026-41293, CVE-2026-43512, CVE-2026-65905 -> fix 10.1.58), spring-webmvc@6.1.13 (CVE-2026-47884 CVSS 9.8 -> fix 7.0.9 / 6.2.19), jackson-databind/core@2.17.2 (CVE-2026-54512, CVE-2026-54513 -> fix 2.18.11), spring-boot@3.3.4 (CVE-2025-22235, CVE-2026-40973 -> fix 3.5.14).",
+      "description": "Spring Boot 3.3.4 parent BOM pulls transitive Embedded Tomcat 10.1.30, Spring Framework 6.1.13, and Jackson 2.17.2 artifacts containing 8 CRITICAL and 29 HIGH known vulnerabilities (RCE, auth bypass, HTTP/2 & JSON parser DoS).",
+      "recommendation": "Upgrade `spring-boot-starter-parent` and starter dependencies in `pom.xml` to a patched Spring Boot line (>= 3.5.14 / 4.0.6) and override `tomcat.version` >= `10.1.58` and `jackson-bom.version` >= `2.18.11`."
+    },
+    {
+      "severity": "high",
+      "category": "security",
+      "rule_id": "common/security_vulnerability",
+      "file_path": "src/main/java/com/example/inventory/api/InventoryController.java",
+      "line": 52,
+      "symbol": "InventoryController.reserveItem",
+      "evidence": "`@PostMapping(\"/{sku}/reserve\")` has `has_auth_hint=false` and line 57 notes `// TODO(security): Require OAuth2 JWT resource-server scope check before external ingress exposure.`",
+      "description": "State-mutating endpoint `POST /api/v1/items/{sku}/reserve` lacks authentication and scope authorization, allowing unauthenticated callers to deplete stock and trigger outbound supplier restock HTTP requests.",
+      "recommendation": "Add `spring-boot-starter-oauth2-resource-server`, configure `SecurityFilterChain` requiring JWT scope (e.g., `SCOPE_inventory:write`) on `POST /api/v1/items/*/reserve`, and validate `@PathVariable @Pattern(regexp = \"^[A-Z0-9-]{3,32}$\") String sku`."
+    },
+    {
+      "severity": "high",
+      "category": "testing",
+      "rule_id": "java/testing",
+      "file_path": "src/test/java/com/example/inventory/InventoryServiceTest.java",
+      "line": 27,
+      "symbol": "InventoryServiceTest.StubSupplierClient",
+      "evidence": "`StubSupplierClient` overrides `requestRestock`, leaving `SupplierRestClient.requestRestock` (lines 44-63), `InventoryController.getItem` (lines 39-43), and all `IllegalArgumentException`/`IllegalStateException` paths without unit or MockMvc tests.",
+      "description": "Only 2 happy-path `@Test` methods exist across the repository; `SupplierRestClient` HTTP response/exception handling, `GET /api/v1/items/{sku}` (200/404), `@Min(1)` validation, and negative reservation invariants are untested.",
+      "recommendation": "Add `SupplierRestClientTest` using `com.sun.net.httpserver.HttpServer` (testing 200, 500, and timeout `IOException`), `@WebMvcTest(InventoryController.class)` MockMvc tests, and `Assertions.assertThrows` tests for unknown SKU and insufficient stock."
+    },
+    {
+      "severity": "medium",
+      "category": "architecture",
+      "rule_id": "common/production_readiness",
+      "file_path": "src/main/java/com/example/inventory/api/InventoryController.java",
+      "line": 58,
+      "symbol": "InventoryController.reserveItem",
+      "evidence": "`InventoryService.reserveStock` throws `IllegalArgumentException` (unknown SKU) and `IllegalStateException` (insufficient stock), with no `@RestControllerAdvice` / `@ExceptionHandler` in `api`.",
+      "description": "Domain exceptions (`IllegalArgumentException`, `IllegalStateException`) bubble out of `InventoryController.reserveItem` unmapped, causing Spring Boot to return HTTP 500 Internal Server Error instead of actionable 404 Not Found / 409 Conflict RFC 7807 `ProblemDetail` responses.",
+      "recommendation": "Add a `@RestControllerAdvice` mapping `IllegalArgumentException` to HTTP 404 and `IllegalStateException` to HTTP 409 using Spring 6 `ProblemDetail`."
+    },
+    {
+      "severity": "medium",
+      "category": "architecture",
+      "rule_id": "java/frameworks/spring_boot",
+      "file_path": "src/main/java/com/example/inventory/config/SupplierProperties.java",
+      "line": 12,
+      "symbol": "SupplierProperties",
+      "evidence": "`@ConfigurationProperties(prefix = \"inventory.supplier\") public record SupplierProperties(String baseUrl, int timeoutSeconds, int defaultReorderBatch)` lacks `@Validated` and field constraints.",
+      "description": "`SupplierProperties` omits `@Validated` and Jakarta Bean Validation constraints (`@NotBlank`, `@Positive`), allowing blank supplier URLs or invalid batch sizes to pass startup binding silently.",
+      "recommendation": "Annotate `SupplierProperties` with `@Validated` and apply `@NotBlank` to `baseUrl` and `@Positive` to `timeoutSeconds` and `defaultReorderBatch`."
+    },
+    {
+      "severity": "medium",
+      "category": "code_quality",
+      "rule_id": "java/code_quality",
+      "file_path": "src/main/java/com/example/inventory/service/InventoryService.java",
+      "line": 65,
+      "symbol": "InventoryService.reserveStock",
+      "evidence": "`StockItem existing = inventoryStore.get(sku); ... inventoryStore.put(sku, updated);`",
+      "description": "`InventoryService.reserveStock` performs a non-atomic `get` followed by `put` on `ConcurrentHashMap`, creating a race condition where concurrent reservations for the same SKU can overwrite each other and oversell stock.",
+      "recommendation": "Perform the reservation update atomically inside `inventoryStore.compute(sku, (k, existing) -> ...)` before evaluating `ReorderPolicy`."
+    },
+    {
+      "severity": "medium",
+      "category": "dependencies",
+      "rule_id": "common/supply_chain",
+      "file_path": "mvnw",
+      "line": 3,
+      "symbol": "mvnw",
+      "evidence": "mvnw executes `exec mvn \"$@\"` without `.mvn/wrapper/maven-wrapper.properties` distributionUrl/sha256sum.",
+      "description": "Maven Wrapper (`mvnw`) is a 4-line shell pass-through stub rather than a full reproducible wrapper pinning the exact Maven binary version and checksum.",
+      "recommendation": "Generate standard Maven Wrapper metadata (`mvn wrapper:wrapper -Dmaven=3.9.9`) with SHA-256 verification in `.mvn/wrapper/maven-wrapper.properties` and invoke `./mvnw` in Dockerfile."
+    },
+    {
+      "severity": "medium",
+      "category": "security",
+      "rule_id": "common/security",
+      "file_path": "src/main/java/com/example/inventory/client/SupplierRestClient.java",
+      "line": 45,
+      "symbol": "SupplierRestClient.requestRestock",
+      "evidence": "`String body = \"{\\\"sku\\\":\\\"\" + sku + \"\\\",\\\"quantity\\\":\" + quantity + \"}\";`",
+      "description": "Outbound restock payload is assembled via manual JSON string concatenation without escaping `sku`, enabling JSON structure injection if untrusted characters reach `requestRestock`.",
+      "recommendation": "Serialize a dedicated `RestockRequest(String sku, int quantity)` record using Spring's configured Jackson `ObjectMapper` instead of string concatenation."
+    },
+    {
+      "severity": "medium",
+      "category": "security",
+      "rule_id": "common/security_vulnerability",
+      "file_path": "Dockerfile",
+      "line": 7,
+      "symbol": "eclipse-temurin:21.0.4_7-jre-jammy",
+      "evidence": "os_vuln_counts={critical:0, high:5, medium:294, low:154} in ubuntu 22.04 (libssl3/openssl@3.0.2-0ubuntu1.18 CVE-2026-45447 CVSS 8.8 -> fix 3.0.2-0ubuntu1.25; gpgv@2.2.27-3ubuntu2.1 CVE-2025-68973 CVSS 7.8 -> fix 2.2.27-3ubuntu2.5) plus Trivy DS-0026 LOW (No HEALTHCHECK defined).",
+      "description": "Base runtime image `eclipse-temurin:21.0.4_7-jre-jammy` carries 5 HIGH Ubuntu 22.04 OS package vulnerabilities (`openssl`/`libssl3`, `gpgv`) and omits a `HEALTHCHECK` instruction (`DS-0026`).",
+      "recommendation": "Upgrade runtime base image to latest patched `eclipse-temurin:21-jre-noble` (pinned by `@sha256` digest), run `apt-get update && apt-get upgrade -y` during build, and add a `HEALTHCHECK` instruction."
+    },
+    {
+      "severity": "medium",
+      "category": "security",
+      "rule_id": "common/security_vulnerability",
+      "file_path": "src/main/java/com/example/inventory/api/InventoryController.java",
+      "line": 57,
+      "symbol": "InventoryController.reserveItem",
+      "evidence": "test_app_probes::test_reserve_endpoint_enforces_authentication_before_service_execution (CWE-306): Unauthenticated POST /api/v1/items/SKU-UNAUTH-PROBE/reserve?quantity=1 bypassed auth filter and returned HTTP 500",
+      "description": "Live DAST probe confirmed CWE-306 on POST /api/v1/items/{sku}/reserve: unauthenticated POST requests bypass any authentication filter and execute InventoryService.reserveStock() directly.",
+      "recommendation": "Configure Spring Security OAuth2 Resource Server filter chain requiring a valid Bearer JWT scope before InventoryController.reserveItem executes, returning 401/403 for unauthenticated callers."
+    },
+    {
+      "severity": "medium",
+      "category": "security",
+      "rule_id": "common/security_vulnerability",
+      "file_path": "src/main/java/com/example/inventory/service/InventoryService.java",
+      "line": 64,
+      "symbol": "InventoryService.reserveStock",
+      "evidence": "test_app_probes::test_unknown_sku_reservation_does_not_trigger_500_error (CWE-755): POST /api/v1/items/SKU-MISSING-999/reserve?quantity=1 -> 500",
+      "description": "Live DAST probe confirmed CWE-755 on POST /api/v1/items/{sku}/reserve: uncaught IllegalArgumentException(\"Unknown SKU: ...\") in InventoryService.reserveStock() returns unhandled HTTP 500 instead of a controlled 404 Not Found ProblemDetail response.",
+      "recommendation": "Add a @RestControllerAdvice with @ExceptionHandler(IllegalArgumentException.class) (or a dedicated UnknownSkuException) mapping unknown SKU reservations to RFC 7807 ProblemDetail with HTTP 404 Not Found."
+    },
+    {
+      "severity": "medium",
+      "category": "testing",
+      "rule_id": "common/runtime_verification",
+      "file_path": "src/main/java/com/example/inventory/client/SupplierRestClient.java",
+      "line": 44,
+      "symbol": "SupplierRestClient.requestRestock",
+      "evidence": "JaCoCo measured overall 62.7% line (42/67) and 50.0% branch coverage: SupplierRestClient.java 30.4% line / 0.0% branch (missing lines 45-55), InventoryController.java 62.5% (missing lines 40-42), StockItem.java 71.4% / 50.0% (missing lines 40, 43), InventoryService.java 89.5% / 50.0% (missing lines 54, 67).",
+      "description": "Measured JaCoCo runtime coverage is 62.7% line and 50.0% branch (below the 80% line / 70% branch RV-03 target), driven primarily by unexecuted `SupplierRestClient.requestRestock`, `InventoryController.getItem`, and domain/service exception branches.",
+      "recommendation": "Configure `jacoco-maven-plugin` in `pom.xml` and add unit/slice tests covering `SupplierRestClient.requestRestock` (lines 45-62), `InventoryController.getItem` (lines 40-42), `StockItem.withAdditionalReservation` guards (lines 40, 43), and `InventoryService` lookup/missing-SKU branches (lines 54, 67)."
+    },
+    {
+      "severity": "low",
+      "category": "architecture",
+      "rule_id": "common/twelve_factor",
+      "file_path": "src/main/java/com/example/inventory/service/InventoryService.java",
+      "line": 23,
+      "symbol": "InventoryService.inventoryStore",
+      "evidence": "`private final Map<String, StockItem> inventoryStore = new ConcurrentHashMap<>();`",
+      "description": "Warehouse stock state is stored directly in an in-process `ConcurrentHashMap` inside `InventoryService` rather than behind a swappable `InventoryRepository` port, preventing stateless horizontal scaling across replicas.",
+      "recommendation": "Extract an `InventoryRepository` interface (with an in-memory adapter for local/test profiles and a persistent JDBC/Redis adapter for production) and enable `server.shutdown=graceful`."
+    },
+    {
+      "severity": "low",
+      "category": "dependencies",
+      "rule_id": "common/supply_chain",
+      "file_path": "LICENSE",
+      "line": 1,
+      "symbol": null,
+      "evidence": "LICENSE is 3 lines (`Apache License / Version 2.0, January 2004 / http://www.apache.org/licenses/`).",
+      "description": "LICENSE file contains only the 3-line header reference instead of the complete Apache-2.0 license terms and warranty disclaimer.",
+      "recommendation": "Replace the abbreviated header in `LICENSE` with the full canonical SPDX Apache-2.0 license text."
+    },
+    {
+      "severity": "low",
+      "category": "documentation",
+      "rule_id": "common/documentation",
+      "file_path": "README.md",
+      "line": 14,
+      "symbol": null,
+      "evidence": "README.md (26 lines) omits JDK 21/Docker prerequisites, `inventory.supplier.default-reorder-batch`, and sample JSON responses/error status codes.",
+      "description": "README omits required runtime/build prerequisites, the `default-reorder-batch` configuration property, and concrete HTTP request/response examples.",
+      "recommendation": "Document JDK 21 & Docker prerequisites, all three `SupplierProperties` fields, and `curl` request/response examples (200/400/404) in `README.md`."
+    },
+    {
+      "severity": "low",
+      "category": "security",
+      "rule_id": "common/security_vulnerability",
+      "file_path": "src/main/java/com/example/inventory/api/InventoryController.java",
+      "line": 18,
+      "symbol": "InventoryController",
+      "evidence": "test_baseline_http::test_x_content_type_options_nosniff (CWE-693): GET /api/health -> 404, X-Content-Type-Options=<absent>",
+      "description": "Live DAST baseline probe confirmed CWE-693: HTTP responses omit the X-Content-Type-Options: nosniff security header because Spring Security default response headers are not active.",
+      "recommendation": "Enable Spring Security HTTP security headers (or register a lightweight OncePerRequestFilter) to emit X-Content-Type-Options: nosniff and Cache-Control: no-store on all API responses."
+    },
+    {
+      "severity": "low",
+      "category": "security",
+      "rule_id": "common/supply_chain",
+      "file_path": "Dockerfile",
+      "line": 7,
+      "symbol": null,
+      "evidence": "FROM eclipse-temurin:21.0.4_7-jre-jammy without @sha256 digest and no HEALTHCHECK instruction before ENTRYPOINT.",
+      "description": "Dockerfile pins semantic image tags (`3.9.9-eclipse-temurin-21`, `21.0.4_7-jre-jammy`) without immutable `@sha256` digests and omits a `HEALTHCHECK` instruction.",
+      "recommendation": "Pin builder and JRE base images by `@sha256` digest and add a `HEALTHCHECK` probing Spring Boot `/actuator/health`."
+    },
+    {
+      "severity": "low",
+      "category": "testing",
+      "rule_id": "java/testing",
+      "file_path": "src/test/java/com/example/inventory/ReorderPolicyTest.java",
+      "line": 1,
+      "symbol": "ReorderPolicyTest",
+      "evidence": "Both `InventoryServiceTest` and `ReorderPolicyTest` declare `package com.example.inventory;` instead of `com.example.inventory.service` and `com.example.inventory.domain`.",
+      "description": "Test classes are placed in the root `com.example.inventory` package rather than mirroring the `api`, `service`, `domain`, and `client` subpackage hierarchy.",
+      "recommendation": "Organize test classes into mirrored `api`, `service`, `domain`, and `client` packages under `src/test/java/com/example/inventory/`."
+    }
+  ],
+  "consolidated_findings": [
+    {
+      "severity": "critical",
+      "file_path": "pom.xml",
+      "line": 10,
+      "symbol": "spring-boot-starter-parent:3.3.4",
+      "rule_ids": [
+        "common/security_vulnerability"
+      ],
+      "categories": [
+        "security"
+      ],
+      "primary_description": "Spring Boot 3.3.4 parent BOM pulls transitive Embedded Tomcat 10.1.30, Spring Framework 6.1.13, and Jackson 2.17.2 artifacts containing 8 CRITICAL and 29 HIGH known vulnerabilities (RCE, auth bypass, HTTP/2 & JSON parser DoS).",
+      "combined_evidence": "Trivy detected 8 CRITICAL and 29 HIGH Maven CVEs: tomcat-embed-core@10.1.30 (CVE-2025-24813 CVSS 10.0, CVE-2026-41293, CVE-2026-43512, CVE-2026-65905 -> fix 10.1.58), spring-webmvc@6.1.13 (CVE-2026-47884 CVSS 9.8 -> fix 7.0.9 / 6.2.19), jackson-databind/core@2.17.2 (CVE-2026-54512, CVE-2026-54513 -> fix 2.18.11), spring-boot@3.3.4 (CVE-2025-22235, CVE-2026-40973 -> fix 3.5.14).",
+      "merged_recommendation": "Upgrade `spring-boot-starter-parent` and starter dependencies in `pom.xml` to a patched Spring Boot line (>= 3.5.14 / 4.0.6) and override `tomcat.version` >= `10.1.58` and `jackson-bom.version` >= `2.18.11`."
+    },
+    {
+      "severity": "high",
+      "file_path": "src/main/java/com/example/inventory/api/InventoryController.java",
+      "line": 52,
+      "symbol": "InventoryController.reserveItem",
+      "rule_ids": [
+        "common/security_vulnerability"
+      ],
+      "categories": [
+        "security"
+      ],
+      "primary_description": "State-mutating endpoint `POST /api/v1/items/{sku}/reserve` lacks authentication and scope authorization, allowing unauthenticated callers to deplete stock and trigger outbound supplier restock HTTP requests.",
+      "combined_evidence": "`@PostMapping(\"/{sku}/reserve\")` has `has_auth_hint=false` and line 57 notes `// TODO(security): Require OAuth2 JWT resource-server scope check before external ingress exposure.`",
+      "merged_recommendation": "Add `spring-boot-starter-oauth2-resource-server`, configure `SecurityFilterChain` requiring JWT scope (e.g., `SCOPE_inventory:write`) on `POST /api/v1/items/*/reserve`, and validate `@PathVariable @Pattern(regexp = \"^[A-Z0-9-]{3,32}$\") String sku`."
+    },
+    {
+      "severity": "high",
+      "file_path": "src/test/java/com/example/inventory/InventoryServiceTest.java",
+      "line": 27,
+      "symbol": "InventoryServiceTest.StubSupplierClient",
+      "rule_ids": [
+        "java/testing"
+      ],
+      "categories": [
+        "testing"
+      ],
+      "primary_description": "Only 2 happy-path `@Test` methods exist across the repository; `SupplierRestClient` HTTP response/exception handling, `GET /api/v1/items/{sku}` (200/404), `@Min(1)` validation, and negative reservation invariants are untested.",
+      "combined_evidence": "`StubSupplierClient` overrides `requestRestock`, leaving `SupplierRestClient.requestRestock` (lines 44-63), `InventoryController.getItem` (lines 39-43), and all `IllegalArgumentException`/`IllegalStateException` paths without unit or MockMvc tests.",
+      "merged_recommendation": "Add `SupplierRestClientTest` using `com.sun.net.httpserver.HttpServer` (testing 200, 500, and timeout `IOException`), `@WebMvcTest(InventoryController.class)` MockMvc tests, and `Assertions.assertThrows` tests for unknown SKU and insufficient stock."
+    },
+    {
+      "severity": "medium",
+      "file_path": "Dockerfile",
+      "line": 7,
+      "symbol": "eclipse-temurin:21.0.4_7-jre-jammy",
+      "rule_ids": [
+        "common/security_vulnerability",
+        "common/supply_chain"
+      ],
+      "categories": [
+        "security"
+      ],
+      "primary_description": "Base runtime image `eclipse-temurin:21.0.4_7-jre-jammy` carries 5 HIGH Ubuntu 22.04 OS package vulnerabilities (`openssl`/`libssl3`, `gpgv`) and omits a `HEALTHCHECK` instruction (`DS-0026`).",
+      "combined_evidence": "os_vuln_counts={critical:0, high:5, medium:294, low:154} in ubuntu 22.04 (libssl3/openssl@3.0.2-0ubuntu1.18 CVE-2026-45447 CVSS 8.8 -> fix 3.0.2-0ubuntu1.25; gpgv@2.2.27-3ubuntu2.1 CVE-2025-68973 CVSS 7.8 -> fix 2.2.27-3ubuntu2.5) plus Trivy DS-0026 LOW (No HEALTHCHECK defined). | FROM eclipse-temurin:21.0.4_7-jre-jammy without @sha256 digest and no HEALTHCHECK instruction before ENTRYPOINT.",
+      "merged_recommendation": "Upgrade runtime base image to latest patched `eclipse-temurin:21-jre-noble` (pinned by `@sha256` digest), run `apt-get update && apt-get upgrade -y` during build, and add a `HEALTHCHECK` instruction. / Pin builder and JRE base images by `@sha256` digest and add a `HEALTHCHECK` probing Spring Boot `/actuator/health`."
+    },
+    {
+      "severity": "medium",
+      "file_path": "mvnw",
+      "line": 3,
+      "symbol": "mvnw",
+      "rule_ids": [
+        "common/supply_chain"
+      ],
+      "categories": [
+        "dependencies"
+      ],
+      "primary_description": "Maven Wrapper (`mvnw`) is a 4-line shell pass-through stub rather than a full reproducible wrapper pinning the exact Maven binary version and checksum.",
+      "combined_evidence": "mvnw executes `exec mvn \"$@\"` without `.mvn/wrapper/maven-wrapper.properties` distributionUrl/sha256sum.",
+      "merged_recommendation": "Generate standard Maven Wrapper metadata (`mvn wrapper:wrapper -Dmaven=3.9.9`) with SHA-256 verification in `.mvn/wrapper/maven-wrapper.properties` and invoke `./mvnw` in Dockerfile."
+    },
+    {
+      "severity": "medium",
+      "file_path": "src/main/java/com/example/inventory/api/InventoryController.java",
+      "line": 57,
+      "symbol": "InventoryController.reserveItem",
+      "rule_ids": [
+        "common/security_vulnerability"
+      ],
+      "categories": [
+        "security"
+      ],
+      "primary_description": "Live DAST probe confirmed CWE-306 on POST /api/v1/items/{sku}/reserve: unauthenticated POST requests bypass any authentication filter and execute InventoryService.reserveStock() directly.",
+      "combined_evidence": "test_app_probes::test_reserve_endpoint_enforces_authentication_before_service_execution (CWE-306): Unauthenticated POST /api/v1/items/SKU-UNAUTH-PROBE/reserve?quantity=1 bypassed auth filter and returned HTTP 500",
+      "merged_recommendation": "Configure Spring Security OAuth2 Resource Server filter chain requiring a valid Bearer JWT scope before InventoryController.reserveItem executes, returning 401/403 for unauthenticated callers."
+    },
+    {
+      "severity": "medium",
+      "file_path": "src/main/java/com/example/inventory/api/InventoryController.java",
+      "line": 58,
+      "symbol": "InventoryController.reserveItem",
+      "rule_ids": [
+        "common/production_readiness"
+      ],
+      "categories": [
+        "architecture"
+      ],
+      "primary_description": "Domain exceptions (`IllegalArgumentException`, `IllegalStateException`) bubble out of `InventoryController.reserveItem` unmapped, causing Spring Boot to return HTTP 500 Internal Server Error instead of actionable 404 Not Found / 409 Conflict RFC 7807 `ProblemDetail` responses.",
+      "combined_evidence": "`InventoryService.reserveStock` throws `IllegalArgumentException` (unknown SKU) and `IllegalStateException` (insufficient stock), with no `@RestControllerAdvice` / `@ExceptionHandler` in `api`.",
+      "merged_recommendation": "Add a `@RestControllerAdvice` mapping `IllegalArgumentException` to HTTP 404 and `IllegalStateException` to HTTP 409 using Spring 6 `ProblemDetail`."
+    },
+    {
+      "severity": "medium",
+      "file_path": "src/main/java/com/example/inventory/client/SupplierRestClient.java",
+      "line": 44,
+      "symbol": "SupplierRestClient.requestRestock",
+      "rule_ids": [
+        "common/runtime_verification"
+      ],
+      "categories": [
+        "testing"
+      ],
+      "primary_description": "Measured JaCoCo runtime coverage is 62.7% line and 50.0% branch (below the 80% line / 70% branch RV-03 target), driven primarily by unexecuted `SupplierRestClient.requestRestock`, `InventoryController.getItem`, and domain/service exception branches.",
+      "combined_evidence": "JaCoCo measured overall 62.7% line (42/67) and 50.0% branch coverage: SupplierRestClient.java 30.4% line / 0.0% branch (missing lines 45-55), InventoryController.java 62.5% (missing lines 40-42), StockItem.java 71.4% / 50.0% (missing lines 40, 43), InventoryService.java 89.5% / 50.0% (missing lines 54, 67).",
+      "merged_recommendation": "Configure `jacoco-maven-plugin` in `pom.xml` and add unit/slice tests covering `SupplierRestClient.requestRestock` (lines 45-62), `InventoryController.getItem` (lines 40-42), `StockItem.withAdditionalReservation` guards (lines 40, 43), and `InventoryService` lookup/missing-SKU branches (lines 54, 67)."
+    },
+    {
+      "severity": "medium",
+      "file_path": "src/main/java/com/example/inventory/client/SupplierRestClient.java",
+      "line": 45,
+      "symbol": "SupplierRestClient.requestRestock",
+      "rule_ids": [
+        "common/security"
+      ],
+      "categories": [
+        "security"
+      ],
+      "primary_description": "Outbound restock payload is assembled via manual JSON string concatenation without escaping `sku`, enabling JSON structure injection if untrusted characters reach `requestRestock`.",
+      "combined_evidence": "`String body = \"{\\\"sku\\\":\\\"\" + sku + \"\\\",\\\"quantity\\\":\" + quantity + \"}\";`",
+      "merged_recommendation": "Serialize a dedicated `RestockRequest(String sku, int quantity)` record using Spring's configured Jackson `ObjectMapper` instead of string concatenation."
+    },
+    {
+      "severity": "medium",
+      "file_path": "src/main/java/com/example/inventory/config/SupplierProperties.java",
+      "line": 12,
+      "symbol": "SupplierProperties",
+      "rule_ids": [
+        "java/frameworks/spring_boot"
+      ],
+      "categories": [
+        "architecture"
+      ],
+      "primary_description": "`SupplierProperties` omits `@Validated` and Jakarta Bean Validation constraints (`@NotBlank`, `@Positive`), allowing blank supplier URLs or invalid batch sizes to pass startup binding silently.",
+      "combined_evidence": "`@ConfigurationProperties(prefix = \"inventory.supplier\") public record SupplierProperties(String baseUrl, int timeoutSeconds, int defaultReorderBatch)` lacks `@Validated` and field constraints.",
+      "merged_recommendation": "Annotate `SupplierProperties` with `@Validated` and apply `@NotBlank` to `baseUrl` and `@Positive` to `timeoutSeconds` and `defaultReorderBatch`."
+    },
+    {
+      "severity": "medium",
+      "file_path": "src/main/java/com/example/inventory/service/InventoryService.java",
+      "line": 64,
+      "symbol": "InventoryService.reserveStock",
+      "rule_ids": [
+        "common/security_vulnerability"
+      ],
+      "categories": [
+        "security"
+      ],
+      "primary_description": "Live DAST probe confirmed CWE-755 on POST /api/v1/items/{sku}/reserve: uncaught IllegalArgumentException(\"Unknown SKU: ...\") in InventoryService.reserveStock() returns unhandled HTTP 500 instead of a controlled 404 Not Found ProblemDetail response.",
+      "combined_evidence": "test_app_probes::test_unknown_sku_reservation_does_not_trigger_500_error (CWE-755): POST /api/v1/items/SKU-MISSING-999/reserve?quantity=1 -> 500",
+      "merged_recommendation": "Add a @RestControllerAdvice with @ExceptionHandler(IllegalArgumentException.class) (or a dedicated UnknownSkuException) mapping unknown SKU reservations to RFC 7807 ProblemDetail with HTTP 404 Not Found."
+    },
+    {
+      "severity": "medium",
+      "file_path": "src/main/java/com/example/inventory/service/InventoryService.java",
+      "line": 65,
+      "symbol": "InventoryService.reserveStock",
+      "rule_ids": [
+        "java/code_quality"
+      ],
+      "categories": [
+        "code_quality"
+      ],
+      "primary_description": "`InventoryService.reserveStock` performs a non-atomic `get` followed by `put` on `ConcurrentHashMap`, creating a race condition where concurrent reservations for the same SKU can overwrite each other and oversell stock.",
+      "combined_evidence": "`StockItem existing = inventoryStore.get(sku); ... inventoryStore.put(sku, updated);`",
+      "merged_recommendation": "Perform the reservation update atomically inside `inventoryStore.compute(sku, (k, existing) -> ...)` before evaluating `ReorderPolicy`."
+    },
+    {
+      "severity": "low",
+      "file_path": "LICENSE",
+      "line": 1,
+      "symbol": null,
+      "rule_ids": [
+        "common/supply_chain"
+      ],
+      "categories": [
+        "dependencies"
+      ],
+      "primary_description": "LICENSE file contains only the 3-line header reference instead of the complete Apache-2.0 license terms and warranty disclaimer.",
+      "combined_evidence": "LICENSE is 3 lines (`Apache License / Version 2.0, January 2004 / http://www.apache.org/licenses/`).",
+      "merged_recommendation": "Replace the abbreviated header in `LICENSE` with the full canonical SPDX Apache-2.0 license text."
+    },
+    {
+      "severity": "low",
+      "file_path": "README.md",
+      "line": 14,
+      "symbol": null,
+      "rule_ids": [
+        "common/documentation"
+      ],
+      "categories": [
+        "documentation"
+      ],
+      "primary_description": "README omits required runtime/build prerequisites, the `default-reorder-batch` configuration property, and concrete HTTP request/response examples.",
+      "combined_evidence": "README.md (26 lines) omits JDK 21/Docker prerequisites, `inventory.supplier.default-reorder-batch`, and sample JSON responses/error status codes.",
+      "merged_recommendation": "Document JDK 21 & Docker prerequisites, all three `SupplierProperties` fields, and `curl` request/response examples (200/400/404) in `README.md`."
+    },
+    {
+      "severity": "low",
+      "file_path": "src/main/java/com/example/inventory/api/InventoryController.java",
+      "line": 18,
+      "symbol": "InventoryController",
+      "rule_ids": [
+        "common/security_vulnerability"
+      ],
+      "categories": [
+        "security"
+      ],
+      "primary_description": "Live DAST baseline probe confirmed CWE-693: HTTP responses omit the X-Content-Type-Options: nosniff security header because Spring Security default response headers are not active.",
+      "combined_evidence": "test_baseline_http::test_x_content_type_options_nosniff (CWE-693): GET /api/health -> 404, X-Content-Type-Options=<absent>",
+      "merged_recommendation": "Enable Spring Security HTTP security headers (or register a lightweight OncePerRequestFilter) to emit X-Content-Type-Options: nosniff and Cache-Control: no-store on all API responses."
+    },
+    {
+      "severity": "low",
+      "file_path": "src/main/java/com/example/inventory/service/InventoryService.java",
+      "line": 23,
+      "symbol": "InventoryService.inventoryStore",
+      "rule_ids": [
+        "common/twelve_factor"
+      ],
+      "categories": [
+        "architecture"
+      ],
+      "primary_description": "Warehouse stock state is stored directly in an in-process `ConcurrentHashMap` inside `InventoryService` rather than behind a swappable `InventoryRepository` port, preventing stateless horizontal scaling across replicas.",
+      "combined_evidence": "`private final Map<String, StockItem> inventoryStore = new ConcurrentHashMap<>();`",
+      "merged_recommendation": "Extract an `InventoryRepository` interface (with an in-memory adapter for local/test profiles and a persistent JDBC/Redis adapter for production) and enable `server.shutdown=graceful`."
+    },
+    {
+      "severity": "low",
+      "file_path": "src/test/java/com/example/inventory/ReorderPolicyTest.java",
+      "line": 1,
+      "symbol": "ReorderPolicyTest",
+      "rule_ids": [
+        "java/testing"
+      ],
+      "categories": [
+        "testing"
+      ],
+      "primary_description": "Test classes are placed in the root `com.example.inventory` package rather than mirroring the `api`, `service`, `domain`, and `client` subpackage hierarchy.",
+      "combined_evidence": "Both `InventoryServiceTest` and `ReorderPolicyTest` declare `package com.example.inventory;` instead of `com.example.inventory.service` and `com.example.inventory.domain`.",
+      "merged_recommendation": "Organize test classes into mirrored `api`, `service`, `domain`, and `client` packages under `src/test/java/com/example/inventory/`."
+    }
+  ],
+  "action_plan": [
+    {
+      "priority": "P0",
+      "title": "Enforce OAuth2 JWT authorization and SKU validation on reservation API",
+      "category": "security",
+      "target_files": [
+        "pom.xml",
+        "src/main/java/com/example/inventory/api/InventoryController.java"
+      ],
+      "related_rules": [
+        "common/security_vulnerability",
+        "common/security"
+      ],
+      "action": "Add `spring-boot-starter-oauth2-resource-server`, enforce `SCOPE_inventory:write` on `POST /api/v1/items/{sku}/reserve` via `SecurityFilterChain`, add `@Validated` to `InventoryController`, and constrain `@PathVariable @Pattern(regexp = \"^[A-Z0-9-]{3,32}$\") String sku`.",
+      "expected_impact": "Closes the unauthenticated stock reservation attack surface (`SEC-05`) and blocks malformed SKU inputs at the HTTP boundary."
+    },
+    {
+      "priority": "P0",
+      "title": "Upgrade Spring Boot BOM, Embedded Tomcat, and Jackson to remediate 8 CRITICAL / 29 HIGH CVEs",
+      "category": "security",
+      "target_files": [
+        "pom.xml"
+      ],
+      "related_rules": [
+        "common/security_vulnerability",
+        "java/dependencies",
+        "CVE-2025-24813",
+        "CVE-2026-47884",
+        "CVE-2026-54512",
+        "CVE-2026-40973"
+      ],
+      "action": "Upgrade `spring-boot-starter-parent` in `pom.xml` from `3.3.4` to `>= 3.5.14` (or `4.0.6`), remove redundant child `<version>3.3.4</version>` overrides so BOM versions govern, and pin `<tomcat.version>10.1.58</tomcat.version>` and `<jackson-bom.version>2.18.11</jackson-bom.version>`.",
+      "expected_impact": "Eliminates all 8 CRITICAL and 29 HIGH Maven application CVEs in Tomcat, Spring WebMVC, and Jackson (`SEC-01`)."
+    },
+    {
+      "priority": "P1",
+      "title": "Add RFC 7807 @RestControllerAdvice error mapping, @Validated config, and Actuator health probes",
+      "category": "architecture",
+      "target_files": [
+        "pom.xml",
+        "src/main/java/com/example/inventory/api/InventoryController.java",
+        "src/main/java/com/example/inventory/config/SupplierProperties.java"
+      ],
+      "related_rules": [
+        "common/production_readiness",
+        "java/frameworks/spring_boot",
+        "common/twelve_factor"
+      ],
+      "action": "Add `spring-boot-starter-actuator` (`management.endpoints.web.exposure.include=health`), implement `@RestControllerAdvice` returning RFC 7807 `ProblemDetail` (`404` for unknown SKU, `409` for insufficient stock, `400` for constraint violations), and annotate `SupplierProperties` with `@Validated` (`@NotBlank`, `@Positive`).",
+      "expected_impact": "Provides Kubernetes-ready `/actuator/health` liveness/readiness probes, deterministic 4xx client error contracts, and fail-fast startup config validation."
+    },
+    {
+      "priority": "P1",
+      "title": "Eliminate JSON concatenation in SupplierRestClient and race condition in InventoryService",
+      "category": "code_quality",
+      "target_files": [
+        "src/main/java/com/example/inventory/client/SupplierRestClient.java",
+        "src/main/java/com/example/inventory/service/InventoryService.java"
+      ],
+      "related_rules": [
+        "common/security",
+        "java/code_quality"
+      ],
+      "action": "Serialize a typed `RestockRequest` record with Jackson `ObjectMapper` in `SupplierRestClient.requestRestock`, and replace the `get`/`put` sequence in `InventoryService.reserveStock` with atomic `inventoryStore.compute(...)`.",
+      "expected_impact": "Prevents outbound JSON injection and guarantees linearizable stock reservations under concurrent HTTP load."
+    },
+    {
+      "priority": "P1",
+      "title": "Map Unknown SKU Exceptions to 404 ProblemDetail & Verify via .pni/pentests Suite",
+      "category": "security",
+      "target_files": [
+        "src/main/java/com/example/inventory/api/InventoryController.java",
+        "src/main/java/com/example/inventory/service/InventoryService.java"
+      ],
+      "related_rules": [
+        "common/security_vulnerability",
+        "CWE-306",
+        "CWE-755"
+      ],
+      "action": "Enforce OAuth2 JWT authentication on POST /api/v1/items/{sku}/reserve and translate IllegalArgumentException(\"Unknown SKU: ...\") into HTTP 404 ProblemDetail so all test_app_probes.py checks pass with 401/403 and 404 instead of 500.",
+      "expected_impact": "Eliminates live CWE-306 unauthenticated service execution and CWE-755 unhandled HTTP 500 responses."
+    },
+    {
+      "priority": "P1",
+      "title": "Refresh JRE base image to remediate 5 HIGH Ubuntu OS CVEs and resolve DS-0026",
+      "category": "security",
+      "target_files": [
+        "Dockerfile"
+      ],
+      "related_rules": [
+        "common/security_vulnerability",
+        "common/supply_chain",
+        "CVE-2026-45447",
+        "CVE-2025-68973",
+        "DS-0026"
+      ],
+      "action": "Update `Dockerfile` runtime stage from `eclipse-temurin:21.0.4_7-jre-jammy` to a digest-pinned patched `eclipse-temurin:21-jre-noble` (or distroless Java 21) image with `apt-get upgrade -y` and add `HEALTHCHECK`.",
+      "expected_impact": "Resolves `libssl3`/`openssl` (`CVE-2026-45447`) and `gpgv` (`CVE-2025-68973`) HIGH OS vulnerabilities and clears Trivy `DS-0026`."
+    },
+    {
+      "priority": "P1",
+      "title": "Close JaCoCo line (62.7% -> >=85%) and branch (50.0% -> >=75%) coverage gaps",
+      "category": "testing",
+      "target_files": [
+        "pom.xml",
+        "src/main/java/com/example/inventory/client/SupplierRestClient.java",
+        "src/main/java/com/example/inventory/api/InventoryController.java",
+        "src/test/java/com/example/inventory/InventoryServiceTest.java"
+      ],
+      "related_rules": [
+        "common/runtime_verification",
+        "java/testing"
+      ],
+      "action": "Add local embedded `HttpServer` tests exercising `SupplierRestClient.requestRestock` (2xx, 5xx, timeout), `@WebMvcTest` tests for `InventoryController.getItem` (200/404), and `assertThrows` tests for lines 40/43 of `StockItem` and line 67 of `InventoryService`, enforced by `jacoco:check` in `pom.xml`.",
+      "expected_impact": "Eliminates untested production code paths and satisfies RV-03 (>=80% line, >=70% branch coverage)."
+    },
+    {
+      "priority": "P1",
+      "title": "Expand JUnit 5 & MockMvc test suite across controller, HTTP client, and error branches",
+      "category": "testing",
+      "target_files": [
+        "pom.xml",
+        "src/test/java/com/example/inventory/InventoryServiceTest.java",
+        "src/test/java/com/example/inventory/ReorderPolicyTest.java"
+      ],
+      "related_rules": [
+        "java/testing",
+        "common/runtime_verification"
+      ],
+      "action": "Switch `pom.xml` to `spring-boot-starter-test` + `jacoco-maven-plugin` (>=80% gate), add `@WebMvcTest` tests for `GET /{sku}` (200/404) and `POST /{sku}/reserve` (`@Min(1)`), test `SupplierRestClient` against a local `HttpServer`, and add `assertThrows` tests for `StockItem` and `InventoryService`.",
+      "expected_impact": "Raises line and branch coverage above the 80% standard and prevents regressions in HTTP contract and supplier failure handling."
+    },
+    {
+      "priority": "P2",
+      "title": "Pin full Maven Wrapper distribution and complete Apache-2.0 LICENSE text",
+      "category": "dependencies",
+      "target_files": [
+        "mvnw",
+        "LICENSE",
+        "Dockerfile"
+      ],
+      "related_rules": [
+        "common/supply_chain",
+        "java/dependencies"
+      ],
+      "action": "Generate full Maven Wrapper scripts with `.mvn/wrapper/maven-wrapper.properties` (`distributionSha256Sum`), switch `Dockerfile` build stage to `./mvnw -B package`, and populate full SPDX Apache-2.0 text in `LICENSE`.",
+      "expected_impact": "Guarantees identical Maven CLI versions across developer machines, CI, and container builds while ensuring complete open-source license compliance."
+    },
+    {
+      "priority": "P2",
+      "title": "Expand README with prerequisites, complete configuration reference, and curl examples",
+      "category": "documentation",
+      "target_files": [
+        "README.md"
+      ],
+      "related_rules": [
+        "common/documentation"
+      ],
+      "action": "Add JDK 21 / Maven 3.9 / Docker prerequisites, document `INVENTORY_SUPPLIER_DEFAULT_REORDER_BATCH`, and provide sample `StockItem` JSON responses and HTTP error status codes.",
+      "expected_impact": "Enables zero-friction onboarding and accurate operational configuration without reading Java source files."
+    },
+    {
+      "priority": "P2",
+      "title": "Emit X-Content-Type-Options: nosniff Baseline Security Header",
+      "category": "security",
+      "target_files": [
+        "src/main/java/com/example/inventory/api/InventoryController.java",
+        "pom.xml"
+      ],
+      "related_rules": [
+        "common/security_vulnerability",
+        "CWE-693"
+      ],
+      "action": "Enable Spring Security default HTTP security headers (X-Content-Type-Options: nosniff, X-Frame-Options: DENY) across all REST responses and error handlers.",
+      "expected_impact": "Resolves CWE-693 MIME-sniffing header gap verified by test_baseline_http.py."
+    },
+    {
+      "priority": "P2",
+      "title": "Pin Dockerfile base image digests and add Actuator HEALTHCHECK",
+      "category": "security",
+      "target_files": [
+        "Dockerfile",
+        "pom.xml"
+      ],
+      "related_rules": [
+        "common/supply_chain",
+        "common/runtime_verification"
+      ],
+      "action": "Add `spring-boot-starter-actuator` to `pom.xml`, pin `maven` and `eclipse-temurin` base images with `@sha256` digests in `Dockerfile`, and configure `HEALTHCHECK` against `http://127.0.0.1:8080/actuator/health`.",
+      "expected_impact": "Eliminates mutable base-tag drift and enables orchestrator container health probes."
+    }
+  ],
+  "report_hints": [
+    "7-axis RadarChart contrasting typing (92), architecture (86), documentation (86), and code_quality (82) against security (58) and testing (66).",
+    "Spring Layer ClassDiagram + HeatmapOverlay highlighting InventoryController, SupplierRestClient, and InventoryService hotspots.",
+    "Module Quality HeatmapChart combining AST static hygiene (100% Javadoc/typing/imports) with JaCoCo measured line/branch coverage.",
+    "Grouped BarChart separating Maven application CVEs (75: 8 CRITICAL, 29 HIGH) from Ubuntu 22.04 OS-layer CVEs (453: 0 CRITICAL, 5 HIGH).",
+    "Include a dedicated dynamic web penetration testing (web_pentest / .pni/pentests/examples/java/api_spring_clean) section detailing the 16 live loopback probes (12 passed, 3 failed, 1 skipped) and CWE-306 / CWE-755 / CWE-693 findings."
+  ],
+  "summary": "inventory-service v1.1.0 achieves an overall PNI health score of 78/100 (Grade B). Its Java 21 + Spring Boot architecture exhibits 100.0% generic type safety, 100.0% Javadoc and import hygiene, 0 circular dependencies, clean non-root Docker builds, passing offline JUnit 5 tests, and 0 critical/high live HTTP vulnerabilities across 16 dynamic penetration probes (.pni/pentests/examples/java/api_spring_clean: 12 passed, 3 failed, 1 skipped). Primary remediation priorities are upgrading Spring Boot 3.3.4 transitive dependencies (8 CRITICAL, 29 HIGH CVEs), enforcing OAuth2 JWT authorization and 404 ProblemDetail exception mapping on POST /api/v1/items/{sku}/reserve (live-verified CWE-306 & CWE-755), adding X-Content-Type-Options: nosniff (CWE-693), making ConcurrentHashMap reservations atomic, and raising measured JaCoCo line coverage above 62.7% (branch 50.0%)."
+}

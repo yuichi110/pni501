@@ -1,0 +1,58 @@
+id: py_api_fastapi_clean
+category: audit
+name: Sample Audit - Python Clean FastAPI Service (order-dispatch)
+description: Evaluate examples/python/api_fastapi_clean against FastAPI idioms, 12-Factor config, SRE PRR readiness, hardened Docker, and OpenSSF supply chain.
+
+targets:
+  root: "examples/python/api_fastapi_clean"
+  source:
+    - "src"
+  tests:
+    - "tests"
+  docs:
+    - "README.md"
+
+steps:
+  - id: repo_and_deps
+    uses: repo_structure_audit
+
+  - id: supply_chain
+    uses: supply_chain_audit
+
+  - id: ast_and_quality
+    uses: python_ast_audit
+    rules:
+      - python/frameworks/fastapi
+
+  - id: arch_recording
+    uses: architecture_analysis
+
+  - id: service_readiness
+    uses: service_readiness_audit
+
+  - id: test_health
+    uses: python_test_audit
+
+  - id: runtime_verification
+    uses: container_runtime_audit
+
+  - id: security_audit
+    uses: security_vulnerability_audit
+
+  - id: web_pentest
+    uses: web_penetration_audit
+
+  - id: output_score
+    uses: emit_score
+    with:
+      output_dir: "reports/python"
+      target: "api_fastapi_clean"
+
+  - id: create_report
+    uses: write_drawlib_report
+    with:
+      src_dir: "reports_src/python"
+      output_dir: "reports/python"
+      target: "api_fastapi_clean"
+      lang: "ja"
+      style: "google"

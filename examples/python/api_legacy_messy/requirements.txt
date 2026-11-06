@@ -1,0 +1,8 @@
+fastapi
+flask
+pydantic
+requests
+pyyaml
+urllib3
+flake8
+black

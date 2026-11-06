@@ -1,0 +1,22 @@
+id: quick_check
+category: audit
+name: Quick Health Check (Python)
+description: Fast deterministic Python AST and repository check followed by AI interpretation and score output.
+
+targets:
+  source:
+    - "src"
+  tests:
+    - "tests"
+  docs:
+    - "README.md"
+
+steps:
+  - id: repo_and_deps
+    uses: repo_structure_audit
+
+  - id: ast_and_quality
+    uses: python_ast_audit
+
+  - id: output_score
+    uses: emit_score

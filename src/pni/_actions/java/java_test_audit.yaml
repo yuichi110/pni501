@@ -1,0 +1,10 @@
+id: java_test_audit
+name: Java JUnit Testing Standards Audit
+description: Evaluate JUnit test suite package mirror layout, isolation, and boundary coverage against java/testing standards.
+rules:
+  - java/testing
+primitives:
+  - type: ai_interpret
+    name: Evaluate JUnit Test Suite Completeness & Structure
+    prompt: |
+      Compare `source_files_count` vs `test_files_count` from ProjectFacts and inspect `src/test/java/` to verify package mirror layout (`*Test.java`), JUnit 5 usage, deterministic test isolation, and boundary coverage according to `java/testing`.

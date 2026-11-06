@@ -1,0 +1,2883 @@
+{
+  "project_name": "legacy-order-hub",
+  "workflow_id": "py_api_legacy_messy",
+  "workflow_run_id": "wf-fe76f694",
+  "evaluated_at": "2026-10-24T15:06:19.148437+00:00",
+  "language": "python",
+  "target_root": "examples/python/api_legacy_messy",
+  "facts_file": ".pni/cache/py_api_legacy_messy/facts.json",
+  "key_files_inspected": [
+    "Dockerfile",
+    "README.md",
+    "requirements.txt",
+    "setup.py",
+    ".github/workflows/deploy.yml",
+    "config/service_account_dummy.json",
+    "scripts/legacy_sync.sh",
+    "order_app/__init__.py",
+    "order_app/constants.py",
+    "order_app/schemas.py",
+    "order_app/api/handlers.py",
+    "order_app/services/processor.py",
+    "order_app/domain/pricing.py",
+    "order_app/infra/gateway.py",
+    "order_app/infra/_internal.py",
+    "tests/test_orders.py"
+  ],
+  "overall_score": 20,
+  "grade": "D",
+  "category_scores": {
+    "architecture": 22,
+    "code_quality": 24,
+    "typing": 26,
+    "testing": 12,
+    "dependencies": 18,
+    "security": 12,
+    "documentation": 28
+  },
+  "category_rationales": {
+    "architecture": "Nominal 4-subpackage directory split (api, services, domain, infra) is undermined by a 3-node circular dependency (handlers -> processor -> pricing -> handlers), upward domain-to-API import of ACTIVE_PROMO_CODES, private cross-layer import of infra._internal, dual FastAPI + Flask instantiation with unmounted /legacy/health, global ORDER_STATE_CACHE, /tmp spool file checks, and a 106-LOC Bash batch sync script.",
+    "code_quality": "process_order_batch exhibits cognitive complexity 44 (58 lines, 16 branches, 8 parameters > 6), mutable default tags=[], bare except: and silent except Exception: pass; gateway.py uses wildcard import (from math import *) and blocks the async event loop with time.sleep(1) and timeout-less requests.post(); 3 unstructured print() calls remain across modules.",
+    "typing": "44.4% AST type coverage with no py.typed marker; process_order_batch lacks all 9 parameter/return annotations, HTTP handlers omit return annotations, schemas rely on List[Dict[str, Any]], and unscoped # type: ignore on LegacyOrderPayload.legacy_flag = True crashes startup under Pydantic v2 with PydanticUserError.",
+    "testing": "Single 2-line test function (test_currency_smoke) contains zero assertions; measured pytest-cov line coverage is 6.6% (7/106 statements, covering only constants.py) with 0.0% branch coverage across all 6 core runtime modules, completely missing the fatal ASGI startup crash.",
+    "dependencies": "Legacy setup.py + unpinned requirements.txt (8/8 unpinned, zero lockfiles) bundles dev tools (flake8, black) and unused urllib3 into runtime installs while omitting runtime-required uvicorn (Dockerfile CMD) and imported boto3 (gateway.py), with no LICENSE, SECURITY.md, .gitignore, or Dependabot.",
+    "security": "Critical multi-layer static and dynamic exposure: 7 Python package CVEs (4 HIGH: setuptools@70.3.0 CVE-2025-47273, urllib3@2.7.0 CVE-2026-97687 & CVE-2026-97689, msgpack@1.1.2 GHSA-6v7p-g79w-8964; 2 MEDIUM; 1 LOW), 3,554 Debian 13.7 OS CVEs (24 CRITICAL, 436 HIGH) from mutable FROM python:latest running as root (DS-0002, DS-0001, DS-0026), CWE-502 yaml.load() and CWE-78 subprocess.run(shell=True) sinks, hardcoded WEBHOOK_SIGNING_SECRET + committed service_account_dummy.json, privileged pull_request_target CI workflow, unauthenticated POST /orders, and dynamic web_pentest boot failure (status='error', server_booted=false on http://127.0.0.1:54305 in 3.52s: 'For further information visit https://errors.pydantic.dev/2.14/u/model-field-missing-annotation') blocking the staged .pni/pentests/examples/python/api_legacy_messy/ DAST gate (CWE-306 & CWE-20).",
+    "documentation": "README.md is a 2-line stub lacking architecture, prerequisites, configuration, API examples, and test commands; AST docstring coverage is 40.9% with 12 missing docstrings, 1 TODO placeholder in gateway.py, and 1 stale parameter docstring mismatch in pricing.py."
+  },
+  "metrics_snapshot": {
+    "language": "python",
+    "runtime_type_hint": "web_api",
+    "build_system": "pip",
+    "has_manifest": true,
+    "has_lockfile": false,
+    "has_license": false,
+    "has_security_policy": false,
+    "has_dependency_automation": false,
+    "has_type_marker": false,
+    "dependencies_count": 8,
+    "unpinned_dependencies_count": 8,
+    "source_files_count": 12,
+    "test_files_count": 1,
+    "readme_line_count": 2,
+    "ci_supply_chain_issues_count": 3,
+    "committed_secret_files_count": 1,
+    "container_hygiene_issues_count": 3,
+    "legacy_language_findings_count": 1,
+    "total_files": 12,
+    "total_loc": 149,
+    "total_classes": 2,
+    "total_functions": 9,
+    "import_hygiene_coverage_pct": 75.0,
+    "type_safety_coverage_pct": 44.4,
+    "docstring_coverage_pct": 40.9,
+    "module_test_coverage_pct": 100.0,
+    "unsorted_imports_count": 4,
+    "wildcard_imports_count": 1,
+    "type_safety_issues_count": 7,
+    "weak_type_usages_count": 1,
+    "empty_docstrings_count": 1,
+    "doc_signature_mismatches_count": 1,
+    "complex_functions_count": 1,
+    "excessive_parameters_count": 1,
+    "global_state_usages_count": 1,
+    "bug_risk_idioms_count": 5,
+    "circular_dependencies_count": 3,
+    "unused_dependencies_count": 3,
+    "undeclared_dependencies_count": 1,
+    "test_functions_count": 1,
+    "assertion_free_tests_count": 1,
+    "framework_issues_count": 3,
+    "modernization_hints_count": 7,
+    "language_version_mismatches_count": 0,
+    "missing_io_timeouts_count": 1,
+    "scattered_env_access_count": 1,
+    "unstructured_logging_count": 3,
+    "hardcoded_secrets_count": 1,
+    "ast_dangerous_sinks_count": 2,
+    "api_endpoints_count": 2,
+    "runtime_status": "failed",
+    "harness_build_status": "passed",
+    "tests_status": "passed",
+    "tests_total": 1,
+    "tests_passed": 1,
+    "tests_failed": 0,
+    "measured_line_coverage_pct": 6.6,
+    "measured_branch_coverage_pct": 0.0,
+    "smoke_check_status": "failed",
+    "security_scan_status": "failed",
+    "app_vuln_critical": 0,
+    "app_vuln_high": 4,
+    "app_vuln_total": 7,
+    "app_vuln_unpinned_range_matches": 0,
+    "os_vuln_high_or_crit": 460,
+    "misconfig_count": 3,
+    "secret_leak_count": 0,
+    "pentest_status": "error",
+    "pentest_probes_total": 0,
+    "pentest_probes_passed": 0,
+    "pentest_probes_failed": 0,
+    "pentest_findings_count": 0,
+    "pentest_high_or_crit_count": 0
+  },
+  "runtime_facts": {
+    "status": "failed",
+    "container_engine": "docker",
+    "engine_available": true,
+    "skip_reason": "",
+    "language": "python",
+    "selected_dockerfile_template": "python/pip.dockerfile",
+    "harness_dockerfile_path": ".pni/dockerfiles/examples/python/api_legacy_messy/Dockerfile",
+    "build_args": {
+      "PYTHON_VERSION": "3.12"
+    },
+    "artifacts_dir": ".pni/cache/py_api_legacy_messy/runtime",
+    "project_dockerfile_build": {
+      "attempted": true,
+      "status": "passed",
+      "dockerfile_used": "examples/python/api_legacy_messy/Dockerfile",
+      "duration_sec": 1.0,
+      "exit_code": 0,
+      "error_tail": []
+    },
+    "harness_build": {
+      "attempted": true,
+      "status": "passed",
+      "dockerfile_used": ".pni/dockerfiles/examples/python/api_legacy_messy/Dockerfile",
+      "duration_sec": 0.96,
+      "exit_code": 0,
+      "error_tail": []
+    },
+    "test_execution": {
+      "attempted": true,
+      "status": "passed",
+      "command": "pytest -o junit_family=xunit2 --junitxml=/out/junit.xml",
+      "duration_sec": 2.13,
+      "exit_code": 0,
+      "total_tests": 1,
+      "passed_tests": 1,
+      "failed_tests": 0,
+      "error_tests": 0,
+      "skipped_tests": 0,
+      "failures": [],
+      "log_tail": []
+    },
+    "coverage": {
+      "measured": true,
+      "tool": "pytest-cov",
+      "line_coverage_pct": 6.6,
+      "branch_coverage_pct": 0.0,
+      "covered_lines": 7,
+      "total_statements": 106,
+      "lowest_covered_modules": [
+        {
+          "file_path": "order_app/services/processor.py",
+          "line_coverage_pct": 0.0,
+          "branch_coverage_pct": 0.0,
+          "covered_lines": 0,
+          "total_statements": 45,
+          "missing_lines_preview": [
+            1,
+            2,
+            3,
+            5,
+            7,
+            8,
+            11,
+            22,
+            24,
+            25
+          ]
+        },
+        {
+          "file_path": "order_app/api/handlers.py",
+          "line_coverage_pct": 0.0,
+          "branch_coverage_pct": null,
+          "covered_lines": 0,
+          "total_statements": 17,
+          "missing_lines_preview": [
+            1,
+            2,
+            4,
+            5,
+            7,
+            8,
+            9,
+            12,
+            13,
+            14
+          ]
+        },
+        {
+          "file_path": "order_app/schemas.py",
+          "line_coverage_pct": 0.0,
+          "branch_coverage_pct": null,
+          "covered_lines": 0,
+          "total_statements": 12,
+          "missing_lines_preview": [
+            1,
+            2,
+            5,
+            6,
+            7,
+            8,
+            9,
+            11,
+            12,
+            14
+          ]
+        },
+        {
+          "file_path": "order_app/infra/gateway.py",
+          "line_coverage_pct": 0.0,
+          "branch_coverage_pct": null,
+          "covered_lines": 0,
+          "total_statements": 10,
+          "missing_lines_preview": [
+            1,
+            2,
+            3,
+            4,
+            7,
+            9,
+            10,
+            11,
+            12,
+            13
+          ]
+        },
+        {
+          "file_path": "order_app/domain/pricing.py",
+          "line_coverage_pct": 0.0,
+          "branch_coverage_pct": 0.0,
+          "covered_lines": 0,
+          "total_statements": 9,
+          "missing_lines_preview": [
+            3,
+            4,
+            5,
+            8,
+            18,
+            19,
+            20,
+            21,
+            22
+          ]
+        },
+        {
+          "file_path": "order_app/infra/_internal.py",
+          "line_coverage_pct": 0.0,
+          "branch_coverage_pct": 0.0,
+          "covered_lines": 0,
+          "total_statements": 6,
+          "missing_lines_preview": [
+            1,
+            4,
+            5,
+            6,
+            7,
+            8
+          ]
+        },
+        {
+          "file_path": "order_app/constants.py",
+          "line_coverage_pct": 100.0,
+          "branch_coverage_pct": null,
+          "covered_lines": 7,
+          "total_statements": 7,
+          "missing_lines_preview": []
+        },
+        {
+          "file_path": "order_app/__init__.py",
+          "line_coverage_pct": 100.0,
+          "branch_coverage_pct": null,
+          "covered_lines": 0,
+          "total_statements": 0,
+          "missing_lines_preview": []
+        },
+        {
+          "file_path": "order_app/api/__init__.py",
+          "line_coverage_pct": 100.0,
+          "branch_coverage_pct": null,
+          "covered_lines": 0,
+          "total_statements": 0,
+          "missing_lines_preview": []
+        },
+        {
+          "file_path": "order_app/domain/__init__.py",
+          "line_coverage_pct": 100.0,
+          "branch_coverage_pct": null,
+          "covered_lines": 0,
+          "total_statements": 0,
+          "missing_lines_preview": []
+        },
+        {
+          "file_path": "order_app/infra/__init__.py",
+          "line_coverage_pct": 100.0,
+          "branch_coverage_pct": null,
+          "covered_lines": 0,
+          "total_statements": 0,
+          "missing_lines_preview": []
+        },
+        {
+          "file_path": "order_app/services/__init__.py",
+          "line_coverage_pct": 100.0,
+          "branch_coverage_pct": null,
+          "covered_lines": 0,
+          "total_statements": 0,
+          "missing_lines_preview": []
+        }
+      ]
+    },
+    "smoke_check": {
+      "attempted": true,
+      "archetype": "web_api",
+      "status": "failed",
+      "command": "python -c import importlib, json, pathlib; mod = importlib.import_module('order_app.api.handlers'); factory = getattr(mod, 'create_app', None); app = getattr(mod, 'app', None) or (factory() if callable(factory) else None); assert app is not None, 'No app or create_app() found'; paths = ('/healthz', '/health', '/api/v1/health', '/openapi.json', '/'); status, hit = None, None\nif callable(getattr(app, 'test_client', None)):\n    c = app.test_client()\n    for p in paths:\n        r = c.get(p)\n        status, hit = r.status_code, p\n        if r.status_code < 400: break\nelse:\n    from fastapi.testclient import TestClient\n    with TestClient(app) as c:\n        for p in paths:\n            r = c.get(p)\n            status, hit = r.status_code, p\n            if r.status_code < 400: break\nassert status is not None and status < 500, f'Unexpected status {status} on {hit}'; pathlib.Path('/out/smoke.json').write_text(json.dumps({'probed_endpoint': hit, 'http_status': status, 'detail': f'ASGI/WSGI app order_app.api.handlers booted cleanly ({hit} -> {status})'}))",
+      "duration_sec": 1.92,
+      "exit_code": 1,
+      "http_status": null,
+      "probed_endpoint": null,
+      "failure_kind": "import_or_di_error",
+      "detail": "For further information visit https://errors.pydantic.dev/2.14/u/model-field-missing-annotation",
+      "log_tail": [
+        "           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^",
+        "  File \"<frozen importlib._bootstrap>\", line 1387, in _gcd_import",
+        "  File \"<frozen importlib._bootstrap>\", line 1360, in _find_and_load",
+        "  File \"<frozen importlib._bootstrap>\", line 1331, in _find_and_load_unlocked",
+        "  File \"<frozen importlib._bootstrap>\", line 935, in _load_unlocked",
+        "  File \"<frozen importlib._bootstrap_external>\", line 999, in exec_module",
+        "  File \"<frozen importlib._bootstrap>\", line 488, in _call_with_frames_removed",
+        "  File \"/workspace/order_app/api/handlers.py\", line 4, in <module>",
+        "    from order_app.schemas import LegacyOrderPayload",
+        "  File \"/workspace/order_app/schemas.py\", line 5, in <module>",
+        "    class LegacyOrderPayload(BaseModel):",
+        "  File \"/opt/pni-venv/lib/python3.12/site-packages/pydantic/_internal/_model_construction.py\", line 217, in __new__",
+        "    set_model_fields(cls, config_wrapper=config_wrapper, ns_resolver=ns_resolver, namespace_info=namespace_info)",
+        "  File \"/opt/pni-venv/lib/python3.12/site-packages/pydantic/_internal/_model_construction.py\", line 543, in set_model_fields",
+        "    fields, pydantic_extra_info, class_vars, private_attributes = collect_model_fields(",
+        "                                                                  ^^^^^^^^^^^^^^^^^^^^^",
+        "  File \"/opt/pni-venv/lib/python3.12/site-packages/pydantic/_internal/_fields.py\", line 365, in collect_model_fields",
+        "    raise PydanticUserError(",
+        "pydantic.errors.PydanticUserError: A non-annotated attribute was detected: `legacy_flag = True`. All model fields require a type annotation; if `legacy_flag` is not meant to be a field, you may be able to resolve this error by annotating it as a `ClassVar` or updating `model_config['ignored_types']`.",
+        "For further information visit https://errors.pydantic.dev/2.14/u/model-field-missing-annotation"
+      ]
+    }
+  },
+  "security_facts": {
+    "status": "failed",
+    "scanner": "trivy",
+    "container_engine": "docker",
+    "engine_available": true,
+    "skip_reason": "",
+    "trivy_image": "ghcr.io/aquasecurity/trivy:0.69.3",
+    "scanned_filesystem": true,
+    "scanned_resolved_image": true,
+    "resolved_image_source": "examples/python/api_legacy_messy/Dockerfile",
+    "artifacts_dir": ".pni/cache/py_api_legacy_messy/security",
+    "vuln_counts": {
+      "critical": 24,
+      "high": 440,
+      "medium": 1310,
+      "low": 1655,
+      "total": 3561
+    },
+    "app_vuln_counts": {
+      "critical": 0,
+      "high": 4,
+      "medium": 2,
+      "low": 1,
+      "total": 7
+    },
+    "os_vuln_counts": {
+      "critical": 24,
+      "high": 436,
+      "medium": 1308,
+      "low": 1654,
+      "total": 3554
+    },
+    "vulnerabilities": [
+      {
+        "vuln_id": "CVE-2026-85746",
+        "pkg_name": "libmariadb-dev",
+        "pkg_type": "debian",
+        "installed_version": "1:11.8.6-0+deb13u1",
+        "fixed_version": "",
+        "severity": "CRITICAL",
+        "title": "MariaDB server is a community developed fork of MySQL server. From 10. ...",
+        "target": "/out/image.tar (debian 13.7)",
+        "cvss_score": 10.0,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      },
+      {
+        "vuln_id": "CVE-2026-92262",
+        "pkg_name": "libmariadb-dev",
+        "pkg_type": "debian",
+        "installed_version": "1:11.8.6-0+deb13u1",
+        "fixed_version": "",
+        "severity": "CRITICAL",
+        "title": "MariaDB server is a community developed fork of MySQL server. From 10. ...",
+        "target": "/out/image.tar (debian 13.7)",
+        "cvss_score": 10.0,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      },
+      {
+        "vuln_id": "CVE-2026-85746",
+        "pkg_name": "libmariadb-dev-compat",
+        "pkg_type": "debian",
+        "installed_version": "1:11.8.6-0+deb13u1",
+        "fixed_version": "",
+        "severity": "CRITICAL",
+        "title": "MariaDB server is a community developed fork of MySQL server. From 10. ...",
+        "target": "/out/image.tar (debian 13.7)",
+        "cvss_score": 10.0,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      },
+      {
+        "vuln_id": "CVE-2026-92262",
+        "pkg_name": "libmariadb-dev-compat",
+        "pkg_type": "debian",
+        "installed_version": "1:11.8.6-0+deb13u1",
+        "fixed_version": "",
+        "severity": "CRITICAL",
+        "title": "MariaDB server is a community developed fork of MySQL server. From 10. ...",
+        "target": "/out/image.tar (debian 13.7)",
+        "cvss_score": 10.0,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      },
+      {
+        "vuln_id": "CVE-2026-85746",
+        "pkg_name": "libmariadb3",
+        "pkg_type": "debian",
+        "installed_version": "1:11.8.6-0+deb13u1",
+        "fixed_version": "",
+        "severity": "CRITICAL",
+        "title": "MariaDB server is a community developed fork of MySQL server. From 10. ...",
+        "target": "/out/image.tar (debian 13.7)",
+        "cvss_score": 10.0,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      },
+      {
+        "vuln_id": "CVE-2026-92262",
+        "pkg_name": "libmariadb3",
+        "pkg_type": "debian",
+        "installed_version": "1:11.8.6-0+deb13u1",
+        "fixed_version": "",
+        "severity": "CRITICAL",
+        "title": "MariaDB server is a community developed fork of MySQL server. From 10. ...",
+        "target": "/out/image.tar (debian 13.7)",
+        "cvss_score": 10.0,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      },
+      {
+        "vuln_id": "CVE-2026-85746",
+        "pkg_name": "mariadb-common",
+        "pkg_type": "debian",
+        "installed_version": "1:11.8.6-0+deb13u1",
+        "fixed_version": "",
+        "severity": "CRITICAL",
+        "title": "MariaDB server is a community developed fork of MySQL server. From 10. ...",
+        "target": "/out/image.tar (debian 13.7)",
+        "cvss_score": 10.0,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      },
+      {
+        "vuln_id": "CVE-2026-92262",
+        "pkg_name": "mariadb-common",
+        "pkg_type": "debian",
+        "installed_version": "1:11.8.6-0+deb13u1",
+        "fixed_version": "",
+        "severity": "CRITICAL",
+        "title": "MariaDB server is a community developed fork of MySQL server. From 10. ...",
+        "target": "/out/image.tar (debian 13.7)",
+        "cvss_score": 10.0,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      },
+      {
+        "vuln_id": "CVE-2026-49261",
+        "pkg_name": "libmariadb-dev",
+        "pkg_type": "debian",
+        "installed_version": "1:11.8.6-0+deb13u1",
+        "fixed_version": "",
+        "severity": "CRITICAL",
+        "title": "mariadb: MariaDB Server: Arbitrary code execution via wsrep_notify_cmd",
+        "target": "/out/image.tar (debian 13.7)",
+        "cvss_score": 9.8,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      },
+      {
+        "vuln_id": "CVE-2026-49261",
+        "pkg_name": "libmariadb-dev-compat",
+        "pkg_type": "debian",
+        "installed_version": "1:11.8.6-0+deb13u1",
+        "fixed_version": "",
+        "severity": "CRITICAL",
+        "title": "mariadb: MariaDB Server: Arbitrary code execution via wsrep_notify_cmd",
+        "target": "/out/image.tar (debian 13.7)",
+        "cvss_score": 9.8,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      },
+      {
+        "vuln_id": "CVE-2026-49261",
+        "pkg_name": "libmariadb3",
+        "pkg_type": "debian",
+        "installed_version": "1:11.8.6-0+deb13u1",
+        "fixed_version": "",
+        "severity": "CRITICAL",
+        "title": "mariadb: MariaDB Server: Arbitrary code execution via wsrep_notify_cmd",
+        "target": "/out/image.tar (debian 13.7)",
+        "cvss_score": 9.8,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      },
+      {
+        "vuln_id": "CVE-2026-42217",
+        "pkg_name": "libopenexr-3-1-30",
+        "pkg_type": "debian",
+        "installed_version": "3.1.13-2",
+        "fixed_version": "",
+        "severity": "CRITICAL",
+        "title": "OpenEXR: OpenEXR: Information disclosure via malformed EXR image file processing",
+        "target": "/out/image.tar (debian 13.7)",
+        "cvss_score": 9.8,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      },
+      {
+        "vuln_id": "CVE-2026-42217",
+        "pkg_name": "libopenexr-dev",
+        "pkg_type": "debian",
+        "installed_version": "3.1.13-2",
+        "fixed_version": "",
+        "severity": "CRITICAL",
+        "title": "OpenEXR: OpenEXR: Information disclosure via malformed EXR image file processing",
+        "target": "/out/image.tar (debian 13.7)",
+        "cvss_score": 9.8,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      },
+      {
+        "vuln_id": "CVE-2026-6653",
+        "pkg_name": "libxml2",
+        "pkg_type": "debian",
+        "installed_version": "2.12.7+dfsg+really2.9.14-2.1+deb13u3",
+        "fixed_version": "",
+        "severity": "CRITICAL",
+        "title": "libxml2: mingw-libxml2: libxml2: Denial of Service via crafted XML input due to use-after-free",
+        "target": "/out/image.tar (debian 13.7)",
+        "cvss_score": 9.8,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      },
+      {
+        "vuln_id": "CVE-2026-6653",
+        "pkg_name": "libxml2-dev",
+        "pkg_type": "debian",
+        "installed_version": "2.12.7+dfsg+really2.9.14-2.1+deb13u3",
+        "fixed_version": "",
+        "severity": "CRITICAL",
+        "title": "libxml2: mingw-libxml2: libxml2: Denial of Service via crafted XML input due to use-after-free",
+        "target": "/out/image.tar (debian 13.7)",
+        "cvss_score": 9.8,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      },
+      {
+        "vuln_id": "CVE-2026-49261",
+        "pkg_name": "mariadb-common",
+        "pkg_type": "debian",
+        "installed_version": "1:11.8.6-0+deb13u1",
+        "fixed_version": "",
+        "severity": "CRITICAL",
+        "title": "mariadb: MariaDB Server: Arbitrary code execution via wsrep_notify_cmd",
+        "target": "/out/image.tar (debian 13.7)",
+        "cvss_score": 9.8,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      },
+      {
+        "vuln_id": "CVE-2026-60002",
+        "pkg_name": "openssh-client",
+        "pkg_type": "debian",
+        "installed_version": "1:10.0p1-7+deb13u4",
+        "fixed_version": "",
+        "severity": "CRITICAL",
+        "title": "openssh: OpenSSH: Use-after-free vulnerability during host key re-exchange on the client side",
+        "target": "/out/image.tar (debian 13.7)",
+        "cvss_score": 9.4,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      },
+      {
+        "vuln_id": "CVE-2026-44172",
+        "pkg_name": "libmariadb-dev",
+        "pkg_type": "debian",
+        "installed_version": "1:11.8.6-0+deb13u1",
+        "fixed_version": "",
+        "severity": "CRITICAL",
+        "title": "mariadb: MariaDB server: SQL injection vulnerability via improper handling of big5 character set with mysql_real_escape_string()",
+        "target": "/out/image.tar (debian 13.7)",
+        "cvss_score": 9.1,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      },
+      {
+        "vuln_id": "CVE-2026-44172",
+        "pkg_name": "libmariadb-dev-compat",
+        "pkg_type": "debian",
+        "installed_version": "1:11.8.6-0+deb13u1",
+        "fixed_version": "",
+        "severity": "CRITICAL",
+        "title": "mariadb: MariaDB server: SQL injection vulnerability via improper handling of big5 character set with mysql_real_escape_string()",
+        "target": "/out/image.tar (debian 13.7)",
+        "cvss_score": 9.1,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      },
+      {
+        "vuln_id": "CVE-2026-44172",
+        "pkg_name": "libmariadb3",
+        "pkg_type": "debian",
+        "installed_version": "1:11.8.6-0+deb13u1",
+        "fixed_version": "",
+        "severity": "CRITICAL",
+        "title": "mariadb: MariaDB server: SQL injection vulnerability via improper handling of big5 character set with mysql_real_escape_string()",
+        "target": "/out/image.tar (debian 13.7)",
+        "cvss_score": 9.1,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      },
+      {
+        "vuln_id": "CVE-2026-42216",
+        "pkg_name": "libopenexr-3-1-30",
+        "pkg_type": "debian",
+        "installed_version": "3.1.13-2",
+        "fixed_version": "",
+        "severity": "CRITICAL",
+        "title": "OpenEXR: OpenEXR: Information disclosure and denial of service via malformed EXR files",
+        "target": "/out/image.tar (debian 13.7)",
+        "cvss_score": 9.1,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      },
+      {
+        "vuln_id": "CVE-2026-42216",
+        "pkg_name": "libopenexr-dev",
+        "pkg_type": "debian",
+        "installed_version": "3.1.13-2",
+        "fixed_version": "",
+        "severity": "CRITICAL",
+        "title": "OpenEXR: OpenEXR: Information disclosure and denial of service via malformed EXR files",
+        "target": "/out/image.tar (debian 13.7)",
+        "cvss_score": 9.1,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      },
+      {
+        "vuln_id": "CVE-2026-44172",
+        "pkg_name": "mariadb-common",
+        "pkg_type": "debian",
+        "installed_version": "1:11.8.6-0+deb13u1",
+        "fixed_version": "",
+        "severity": "CRITICAL",
+        "title": "mariadb: MariaDB server: SQL injection vulnerability via improper handling of big5 character set with mysql_real_escape_string()",
+        "target": "/out/image.tar (debian 13.7)",
+        "cvss_score": 9.1,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      },
+      {
+        "vuln_id": "CVE-2026-93221",
+        "pkg_name": "linux-libc-dev",
+        "pkg_type": "debian",
+        "installed_version": "6.12.113-1",
+        "fixed_version": "",
+        "severity": "CRITICAL",
+        "title": "In the Linux kernel, the following vulnerability has been resolved:  n ...",
+        "target": "/out/image.tar (debian 13.7)",
+        "cvss_score": null,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      },
+      {
+        "vuln_id": "CVE-2025-47273",
+        "pkg_name": "setuptools",
+        "pkg_type": "python-pkg",
+        "installed_version": "70.3.0",
+        "fixed_version": "78.1.1",
+        "severity": "HIGH",
+        "title": "setuptools: Path Traversal Vulnerability in setuptools PackageIndex",
+        "target": "Python",
+        "cvss_score": 8.8,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      },
+      {
+        "vuln_id": "CVE-2026-97687",
+        "pkg_name": "urllib3",
+        "pkg_type": "python-pkg",
+        "installed_version": "2.7.0",
+        "fixed_version": "2.8.0",
+        "severity": "HIGH",
+        "title": "urllib3: urllib3: Traffic interception via HTTPS proxy TLS configuration override",
+        "target": "Python",
+        "cvss_score": 8.1,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      },
+      {
+        "vuln_id": "GHSA-6v7p-g79w-8964",
+        "pkg_name": "msgpack",
+        "pkg_type": "python-pkg",
+        "installed_version": "1.1.2",
+        "fixed_version": "1.2.1",
+        "severity": "HIGH",
+        "title": "MessagePack for Python: Out-of-bounds read / crash on Unpacker reuse after a caught error",
+        "target": "Python",
+        "cvss_score": 7.5,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      },
+      {
+        "vuln_id": "CVE-2026-97689",
+        "pkg_name": "urllib3",
+        "pkg_type": "python-pkg",
+        "installed_version": "2.7.0",
+        "fixed_version": "2.8.0",
+        "severity": "HIGH",
+        "title": "urllib3: urllib3: Denial of Service via unbounded memory allocation in chunk parser",
+        "target": "Python",
+        "cvss_score": 7.5,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      },
+      {
+        "vuln_id": "CVE-2019-19814",
+        "pkg_name": "linux-libc-dev",
+        "pkg_type": "debian",
+        "installed_version": "6.12.113-1",
+        "fixed_version": "",
+        "severity": "HIGH",
+        "title": "kernel: out-of-bounds write in __remove_dirty_segment in fs/f2fs/segment.c",
+        "target": "/out/image.tar (debian 13.7)",
+        "cvss_score": 9.3,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      },
+      {
+        "vuln_id": "CVE-2026-48163",
+        "pkg_name": "libmariadb-dev",
+        "pkg_type": "debian",
+        "installed_version": "1:11.8.6-0+deb13u1",
+        "fixed_version": "",
+        "severity": "HIGH",
+        "title": "mariadb: Arbitrary code execution via improper parameter validation during SST",
+        "target": "/out/image.tar (debian 13.7)",
+        "cvss_score": 9.1,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      },
+      {
+        "vuln_id": "CVE-2026-48165",
+        "pkg_name": "libmariadb-dev",
+        "pkg_type": "debian",
+        "installed_version": "1:11.8.6-0+deb13u1",
+        "fixed_version": "",
+        "severity": "HIGH",
+        "title": "mariadb: Arbitrary code execution via global system variable manipulation by a high-privileged user",
+        "target": "/out/image.tar (debian 13.7)",
+        "cvss_score": 9.1,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      },
+      {
+        "vuln_id": "CVE-2026-48163",
+        "pkg_name": "libmariadb-dev-compat",
+        "pkg_type": "debian",
+        "installed_version": "1:11.8.6-0+deb13u1",
+        "fixed_version": "",
+        "severity": "HIGH",
+        "title": "mariadb: Arbitrary code execution via improper parameter validation during SST",
+        "target": "/out/image.tar (debian 13.7)",
+        "cvss_score": 9.1,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      },
+      {
+        "vuln_id": "CVE-2026-48165",
+        "pkg_name": "libmariadb-dev-compat",
+        "pkg_type": "debian",
+        "installed_version": "1:11.8.6-0+deb13u1",
+        "fixed_version": "",
+        "severity": "HIGH",
+        "title": "mariadb: Arbitrary code execution via global system variable manipulation by a high-privileged user",
+        "target": "/out/image.tar (debian 13.7)",
+        "cvss_score": 9.1,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      },
+      {
+        "vuln_id": "CVE-2026-48163",
+        "pkg_name": "libmariadb3",
+        "pkg_type": "debian",
+        "installed_version": "1:11.8.6-0+deb13u1",
+        "fixed_version": "",
+        "severity": "HIGH",
+        "title": "mariadb: Arbitrary code execution via improper parameter validation during SST",
+        "target": "/out/image.tar (debian 13.7)",
+        "cvss_score": 9.1,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      },
+      {
+        "vuln_id": "CVE-2026-48165",
+        "pkg_name": "libmariadb3",
+        "pkg_type": "debian",
+        "installed_version": "1:11.8.6-0+deb13u1",
+        "fixed_version": "",
+        "severity": "HIGH",
+        "title": "mariadb: Arbitrary code execution via global system variable manipulation by a high-privileged user",
+        "target": "/out/image.tar (debian 13.7)",
+        "cvss_score": 9.1,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      },
+      {
+        "vuln_id": "CVE-2026-48163",
+        "pkg_name": "mariadb-common",
+        "pkg_type": "debian",
+        "installed_version": "1:11.8.6-0+deb13u1",
+        "fixed_version": "",
+        "severity": "HIGH",
+        "title": "mariadb: Arbitrary code execution via improper parameter validation during SST",
+        "target": "/out/image.tar (debian 13.7)",
+        "cvss_score": 9.1,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      },
+      {
+        "vuln_id": "CVE-2026-48165",
+        "pkg_name": "mariadb-common",
+        "pkg_type": "debian",
+        "installed_version": "1:11.8.6-0+deb13u1",
+        "fixed_version": "",
+        "severity": "HIGH",
+        "title": "mariadb: Arbitrary code execution via global system variable manipulation by a high-privileged user",
+        "target": "/out/image.tar (debian 13.7)",
+        "cvss_score": 9.1,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      },
+      {
+        "vuln_id": "CVE-2026-97380",
+        "pkg_name": "libmariadb-dev",
+        "pkg_type": "debian",
+        "installed_version": "1:11.8.6-0+deb13u1",
+        "fixed_version": "",
+        "severity": "HIGH",
+        "title": "mariadb: mariadb: Privilege escalation via empty password in GRANT PROXY statement",
+        "target": "/out/image.tar (debian 13.7)",
+        "cvss_score": 8.8,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      },
+      {
+        "vuln_id": "CVE-2026-97380",
+        "pkg_name": "libmariadb-dev-compat",
+        "pkg_type": "debian",
+        "installed_version": "1:11.8.6-0+deb13u1",
+        "fixed_version": "",
+        "severity": "HIGH",
+        "title": "mariadb: mariadb: Privilege escalation via empty password in GRANT PROXY statement",
+        "target": "/out/image.tar (debian 13.7)",
+        "cvss_score": 8.8,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      },
+      {
+        "vuln_id": "CVE-2026-97380",
+        "pkg_name": "libmariadb3",
+        "pkg_type": "debian",
+        "installed_version": "1:11.8.6-0+deb13u1",
+        "fixed_version": "",
+        "severity": "HIGH",
+        "title": "mariadb: mariadb: Privilege escalation via empty password in GRANT PROXY statement",
+        "target": "/out/image.tar (debian 13.7)",
+        "cvss_score": 8.8,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      }
+    ],
+    "misconfigurations": [
+      {
+        "check_id": "DS-0002",
+        "severity": "HIGH",
+        "title": "Image user should not be 'root'",
+        "file_path": "Dockerfile",
+        "start_line": null,
+        "message": "Specify at least 1 USER command in Dockerfile with non-root user as argument",
+        "resolution": "Add 'USER <non root user name>' line to the Dockerfile"
+      },
+      {
+        "check_id": "DS-0001",
+        "severity": "MEDIUM",
+        "title": "':latest' tag used",
+        "file_path": "Dockerfile",
+        "start_line": 1,
+        "message": "Specify a tag in the 'FROM' statement for image 'python'",
+        "resolution": "Add a tag to the image in the 'FROM' statement"
+      },
+      {
+        "check_id": "DS-0026",
+        "severity": "LOW",
+        "title": "No HEALTHCHECK defined",
+        "file_path": "Dockerfile",
+        "start_line": null,
+        "message": "Add HEALTHCHECK instruction in your Dockerfile",
+        "resolution": "Add HEALTHCHECK instruction in Dockerfile"
+      }
+    ],
+    "secrets": []
+  },
+  "pentest_facts": {
+    "status": "error",
+    "container_engine": "docker",
+    "engine_available": true,
+    "skip_reason": "",
+    "pentests_dir": ".pni/pentests/examples/python/api_legacy_messy",
+    "materialized_files": [
+      ".pni/pentests/examples/python/api_legacy_messy/conftest.py",
+      ".pni/pentests/examples/python/api_legacy_messy/test_app_probes.py",
+      ".pni/pentests/examples/python/api_legacy_messy/test_baseline_http.py",
+      ".pni/pentests/examples/python/api_legacy_messy/test_target_surface.py"
+    ],
+    "target_base_url": "http://127.0.0.1:54305",
+    "server_booted": false,
+    "boot_failure_reason": "For further information visit https://errors.pydantic.dev/2.14/u/model-field-missing-annotation",
+    "duration_sec": 3.52,
+    "artifacts_dir": ".pni/cache/py_api_legacy_messy/pentest",
+    "probe_summary": {
+      "total_probes": 0,
+      "passed_probes": 0,
+      "failed_probes": 0,
+      "skipped_probes": 0,
+      "error_probes": 0
+    },
+    "findings": []
+  },
+  "module_inventory": [
+    {
+      "file": "examples/python/api_legacy_messy/order_app/__init__.py",
+      "loc": 1,
+      "public_types": [],
+      "public_callables": []
+    },
+    {
+      "file": "examples/python/api_legacy_messy/order_app/api/__init__.py",
+      "loc": 1,
+      "public_types": [],
+      "public_callables": []
+    },
+    {
+      "file": "examples/python/api_legacy_messy/order_app/api/handlers.py",
+      "loc": 25,
+      "public_types": [],
+      "public_callables": [
+        "init_cache",
+        "submit_orders",
+        "legacy_health"
+      ]
+    },
+    {
+      "file": "examples/python/api_legacy_messy/order_app/constants.py",
+      "loc": 14,
+      "public_types": [],
+      "public_callables": [
+        "is_supported_currency"
+      ]
+    },
+    {
+      "file": "examples/python/api_legacy_messy/order_app/domain/__init__.py",
+      "loc": 1,
+      "public_types": [],
+      "public_callables": []
+    },
+    {
+      "file": "examples/python/api_legacy_messy/order_app/domain/pricing.py",
+      "loc": 17,
+      "public_types": [],
+      "public_callables": [
+        "calculate_legacy_total"
+      ]
+    },
+    {
+      "file": "examples/python/api_legacy_messy/order_app/infra/__init__.py",
+      "loc": 1,
+      "public_types": [],
+      "public_callables": []
+    },
+    {
+      "file": "examples/python/api_legacy_messy/order_app/infra/_internal.py",
+      "loc": 6,
+      "public_types": [],
+      "public_callables": []
+    },
+    {
+      "file": "examples/python/api_legacy_messy/order_app/infra/gateway.py",
+      "loc": 11,
+      "public_types": [],
+      "public_callables": [
+        "notify_partner_webhook"
+      ]
+    },
+    {
+      "file": "examples/python/api_legacy_messy/order_app/schemas.py",
+      "loc": 12,
+      "public_types": [
+        "Config",
+        "LegacyOrderPayload"
+      ],
+      "public_callables": []
+    },
+    {
+      "file": "examples/python/api_legacy_messy/order_app/services/__init__.py",
+      "loc": 1,
+      "public_types": [],
+      "public_callables": []
+    },
+    {
+      "file": "examples/python/api_legacy_messy/order_app/services/processor.py",
+      "loc": 59,
+      "public_types": [],
+      "public_callables": [
+        "process_order_batch"
+      ]
+    }
+  ],
+  "dangerous_sinks": [
+    {
+      "category": "unsafe_deserialization",
+      "cwe_id": "CWE-502",
+      "severity": "high",
+      "file": "examples/python/api_legacy_messy/order_app/services/processor.py",
+      "line": 30,
+      "symbol": "yaml.load",
+      "detail": "Unsafe deserialization via 'yaml.load(...)'"
+    },
+    {
+      "category": "command_injection",
+      "cwe_id": "CWE-78",
+      "severity": "high",
+      "file": "examples/python/api_legacy_messy/order_app/services/processor.py",
+      "line": 63,
+      "symbol": "subprocess.run",
+      "detail": "Shell command execution via 'subprocess.run' — pass argument list with shell=False"
+    }
+  ],
+  "api_endpoints": [
+    {
+      "http_method": "GET",
+      "path": "/legacy/health",
+      "handler": "legacy_health",
+      "file": "examples/python/api_legacy_messy/order_app/api/handlers.py",
+      "line": 32,
+      "has_auth_hint": false,
+      "auth_mechanisms": []
+    },
+    {
+      "http_method": "POST",
+      "path": "/orders",
+      "handler": "submit_orders",
+      "file": "examples/python/api_legacy_messy/order_app/api/handlers.py",
+      "line": 18,
+      "has_auth_hint": false,
+      "auth_mechanisms": []
+    }
+  ],
+  "language_version_mismatches": [],
+  "architecture_overview": {
+    "pattern": "Degraded Layered Web Service (API / Services / Domain / Infra) with Cyclic Imports, Dual Web Frameworks & Sideband Bash Sync",
+    "entry_points": [
+      "order_app/api/handlers.py:app",
+      "order_app/api/handlers.py:submit_orders",
+      "order_app/api/handlers.py:legacy_flask",
+      "scripts/legacy_sync.sh",
+      "Dockerfile",
+      ".github/workflows/deploy.yml"
+    ],
+    "modules": [
+      {
+        "path": "order_app/api/handlers.py",
+        "role": "FastAPI POST /orders endpoint, startup event, misplaced ACTIVE_PROMO_CODES, and unmounted Flask /legacy/health route.",
+        "key_symbols": [
+          "app",
+          "legacy_flask",
+          "ACTIVE_PROMO_CODES",
+          "init_cache",
+          "submit_orders",
+          "legacy_health"
+        ],
+        "depends_on": [
+          "order_app/schemas.py",
+          "order_app/services/processor.py"
+        ],
+        "health_note": "Crashes at import due to schemas.py PydanticUserError; unauthenticated POST /orders; unmounted Flask health check."
+      },
+      {
+        "path": "order_app/schemas.py",
+        "role": "Pydantic request model for incoming order payloads.",
+        "key_symbols": [
+          "LegacyOrderPayload",
+          "check_customer"
+        ],
+        "depends_on": [],
+        "health_note": "Unannotated legacy_flag = True (# type: ignore) raises fatal PydanticUserError under Pydantic v2; deprecated @validator and Config.orm_mode."
+      },
+      {
+        "path": "order_app/services/processor.py",
+        "role": "Core batch order processor with YAML override parsing, regional hold tagging, and shell notifications.",
+        "key_symbols": [
+          "ORDER_STATE_CACHE",
+          "WEBHOOK_SIGNING_SECRET",
+          "process_order_batch"
+        ],
+        "depends_on": [
+          "order_app/domain/pricing.py"
+        ],
+        "health_note": "Primary risk hotspot: cognitive=44, 8 untyped params, mutable tags=[], global ORDER_STATE_CACHE, hardcoded secret, CWE-502 yaml.load, CWE-78 shell=True."
+      },
+      {
+        "path": "order_app/domain/pricing.py",
+        "role": "Order total calculation with handling fees, promo discounts, and tax.",
+        "key_symbols": [
+          "calculate_legacy_total"
+        ],
+        "depends_on": [
+          "order_app/api/handlers.py",
+          "order_app/constants.py",
+          "order_app/infra/_internal.py"
+        ],
+        "health_note": "Closes 3-module import cycle via api.handlers, reaches into private infra._internal, uses float for money, and has stale docstring Args."
+      },
+      {
+        "path": "order_app/infra/gateway.py",
+        "role": "Outbound partner webhook notifier (unreferenced).",
+        "key_symbols": [
+          "notify_partner_webhook"
+        ],
+        "depends_on": [],
+        "health_note": "Wildcard math import, undeclared boto3 import, blocking time.sleep(1) and timeout-less requests.post inside async def."
+      },
+      {
+        "path": "order_app/infra/_internal.py",
+        "role": "Internal handling fee helper checking /tmp/order_spool/fees.dat.",
+        "key_symbols": [
+          "_compute_handling_fee"
+        ],
+        "depends_on": [],
+        "health_note": "Couples domain pricing to local /tmp filesystem state."
+      },
+      {
+        "path": "order_app/constants.py",
+        "role": "Typed currency/tax constants and currency validation helper.",
+        "key_symbols": [
+          "SUPPORTED_CURRENCIES",
+          "DEFAULT_TAX_RATE",
+          "MAX_BATCH_ITEMS",
+          "is_supported_currency"
+        ],
+        "depends_on": [],
+        "health_note": "Cleanest module in repository: 100% typed with Final, accurate docstring, 100% statement coverage."
+      },
+      {
+        "path": "scripts/legacy_sync.sh",
+        "role": "106-LOC Bash CSV archive sync script run by GitHub Actions.",
+        "key_symbols": [
+          "check_stage",
+          "normalize_csv_row",
+          "reconcile_ledger",
+          "rotate_archives",
+          "emit_metrics",
+          "run_retry_loop"
+        ],
+        "depends_on": [],
+        "health_note": "Oversized shell script writing to /var/tmp/order_batches, invoked via unsafe pull_request_target workflow."
+      }
+    ],
+    "dependency_notes": "Circular import cycle order_app.api.handlers -> order_app.services.processor -> order_app.domain.pricing -> order_app.api.handlers plus private bypass order_app.domain.pricing -> order_app.infra._internal. External manifest declares 8 unpinned packages (including unused flake8, black, urllib3) while omitting uvicorn and boto3."
+  },
+  "architecture_record": {
+    "workflow_id": "py_api_legacy_messy",
+    "workflow_run_id": "wf-fe76f694",
+    "recorded_at": "2026-10-24T15:03:03.421852+00:00",
+    "target_root": "examples/python/api_legacy_messy",
+    "system_profile": {
+      "system_purpose": "Legacy Order Hub — an internal HTTP order batch processing service and CSV synchronization utility that accepts customer order payloads, computes totals with promotional discounts, handling fees, and tax, and records batch state.",
+      "domain_context": "Internal order management and batch processing across regions (US, EU, ap-northeast-1) and currencies (USD, JPY, EUR), supporting promotional coupon codes, handling fee rules, tax calculation, and CSV batch archive rotation.",
+      "runtime_type": "web_api",
+      "tech_stack": [
+        "Python",
+        "FastAPI",
+        "Flask",
+        "Pydantic",
+        "Uvicorn",
+        "Requests",
+        "PyYAML",
+        "urllib3",
+        "boto3 (imported in gateway.py, undeclared in requirements.txt)",
+        "setuptools (setup.py)",
+        "Bash (scripts/legacy_sync.sh)",
+        "Docker (python:latest)",
+        "GitHub Actions (.github/workflows/deploy.yml)"
+      ],
+      "external_integrations": [
+        "Outbound HTTP partner webhooks via requests.post in order_app/infra/gateway.py",
+        "Local filesystem fee spool /tmp/order_spool/fees.dat in order_app/infra/_internal.py",
+        "Local CSV batch spool /var/tmp/order_batches in scripts/legacy_sync.sh",
+        "Placeholder service account fixture config/service_account_dummy.json"
+      ]
+    },
+    "structure_map": {
+      "architecture_pattern": "Nominal Layered Web Service (API / Services / Domain / Infra) degraded by cyclic dependencies, layer inversion, dual web frameworks, and sideband Bash batch scripts",
+      "layers": [
+        {
+          "name": "API / Presentation Layer",
+          "responsibility": "HTTP request handling, payload deserialization, and health endpoints (co-hosting FastAPI and legacy Flask apps).",
+          "paths": [
+            "order_app/api/handlers.py",
+            "order_app/schemas.py"
+          ],
+          "allowed_dependencies": [
+            "Application Services Layer",
+            "Shared Core & Constants"
+          ]
+        },
+        {
+          "name": "Application Services Layer",
+          "responsibility": "Order batch orchestration, YAML override parsing, regional hold tagging, and shell notification dispatch.",
+          "paths": [
+            "order_app/services/processor.py"
+          ],
+          "allowed_dependencies": [
+            "Domain Layer",
+            "Infrastructure Layer",
+            "Shared Core & Constants"
+          ]
+        },
+        {
+          "name": "Domain Layer",
+          "responsibility": "Order total calculation including promotional coupon discounts, handling fees, and tax.",
+          "paths": [
+            "order_app/domain/pricing.py"
+          ],
+          "allowed_dependencies": [
+            "Shared Core & Constants"
+          ]
+        },
+        {
+          "name": "Infrastructure & Batch Scripts Layer",
+          "responsibility": "Outbound partner webhook HTTP calls, local spool handling fee lookup, and legacy CSV batch sync shell automation.",
+          "paths": [
+            "order_app/infra/gateway.py",
+            "order_app/infra/_internal.py",
+            "scripts/legacy_sync.sh"
+          ],
+          "allowed_dependencies": [
+            "Shared Core & Constants"
+          ]
+        },
+        {
+          "name": "Shared Core & Constants",
+          "responsibility": "Canonical currency codes, tax rate, batch size constants, and currency validation helper.",
+          "paths": [
+            "order_app/constants.py",
+            "order_app/__init__.py"
+          ],
+          "allowed_dependencies": []
+        }
+      ],
+      "modules": [
+        {
+          "path": "order_app/api/handlers.py",
+          "role": "FastAPI and Flask HTTP entrypoints (POST /orders, GET /legacy/health) plus misplaced ACTIVE_PROMO_CODES constant.",
+          "key_symbols": [
+            "app",
+            "legacy_flask",
+            "ACTIVE_PROMO_CODES",
+            "init_cache",
+            "submit_orders",
+            "legacy_health"
+          ],
+          "depends_on": [
+            "order_app/schemas.py",
+            "order_app/services/processor.py"
+          ],
+          "health_note": "Co-hosts FastAPI and Flask in one module, leaks domain constant ACTIVE_PROMO_CODES into API layer, uses deprecated @app.on_event('startup'), and exposes unauthenticated endpoints."
+        },
+        {
+          "path": "order_app/schemas.py",
+          "role": "Pydantic request model for incoming order payloads.",
+          "key_symbols": [
+            "LegacyOrderPayload",
+            "check_customer"
+          ],
+          "depends_on": [],
+          "health_note": "Uses deprecated Pydantic v1 @validator and Config.orm_mode, mutable dict default, untyped Any payloads, and # type: ignore."
+        },
+        {
+          "path": "order_app/services/processor.py",
+          "role": "Batch order processor handling status filtering, pricing invocation, state caching, YAML overrides, and shell notifications.",
+          "key_symbols": [
+            "ORDER_STATE_CACHE",
+            "WEBHOOK_SIGNING_SECRET",
+            "process_order_batch"
+          ],
+          "depends_on": [
+            "order_app/domain/pricing.py"
+          ],
+          "health_note": "Critical hotspot: zero type hints, 8 parameters with mutable default tags=[], global ORDER_STATE_CACHE, hardcoded secret, CWE-502 yaml.load(), CWE-78 subprocess.run(shell=True), and bare except."
+        },
+        {
+          "path": "order_app/domain/pricing.py",
+          "role": "Calculates gross order total, handling fee, promo discount, and tax.",
+          "key_symbols": [
+            "calculate_legacy_total"
+          ],
+          "depends_on": [
+            "order_app/api/handlers.py",
+            "order_app/constants.py",
+            "order_app/infra/_internal.py"
+          ],
+          "health_note": "Violates layer hierarchy and creates a 3-module import cycle (handlers -> processor -> pricing -> handlers), reaches into private infra._internal, uses float for money, and has stale docstring args."
+        },
+        {
+          "path": "order_app/infra/_internal.py",
+          "role": "Internal helper computing handling fees with hidden /tmp/order_spool/fees.dat check.",
+          "key_symbols": [
+            "_compute_handling_fee"
+          ],
+          "depends_on": [],
+          "health_note": "Private module imported directly by domain/pricing.py; couples domain math to /tmp filesystem state."
+        },
+        {
+          "path": "order_app/infra/gateway.py",
+          "role": "Async partner webhook notifier (currently dead/unreferenced by API/service flow).",
+          "key_symbols": [
+            "notify_partner_webhook"
+          ],
+          "depends_on": [],
+          "health_note": "Uses wildcard import (from math import *), imports undeclared boto3, blocks async event loop with time.sleep(1) and synchronous requests.post without timeout, and has TODO docstring."
+        },
+        {
+          "path": "order_app/constants.py",
+          "role": "Canonical currency/tax constants and currency validation utility.",
+          "key_symbols": [
+            "SUPPORTED_CURRENCIES",
+            "DEFAULT_TAX_RATE",
+            "MAX_BATCH_ITEMS",
+            "is_supported_currency"
+          ],
+          "depends_on": [],
+          "health_note": "Well-typed with Final annotations and accurate docstring; only module touched by tests."
+        },
+        {
+          "path": "scripts/legacy_sync.sh",
+          "role": "Standalone Bash batch directory initializer and CSV archive rotator invoked by GitHub Actions.",
+          "key_symbols": [
+            "check_stage",
+            "normalize_csv_row",
+            "reconcile_ledger",
+            "rotate_archives",
+            "emit_metrics",
+            "run_retry_loop"
+          ],
+          "depends_on": [],
+          "health_note": "Writes to /var/tmp/order_batches, lacks set -u / pipefail, contains dead functions (normalize_csv_row, reconcile_ledger), and is triggered via unsafe pull_request_target workflow."
+        },
+        {
+          "path": "tests/test_orders.py",
+          "role": "Minimal smoke test file.",
+          "key_symbols": [
+            "test_currency_smoke"
+          ],
+          "depends_on": [
+            "order_app/constants.py"
+          ],
+          "health_note": "Contains a single assertion-free call to is_supported_currency('usd'); zero coverage of API, service, domain, or infra logic."
+        }
+      ],
+      "boundary_assessment": "Severe boundary erosion: (1) Cyclic dependency & upward layer inversion where order_app/domain/pricing.py imports order_app/api/handlers.py to read ACTIVE_PROMO_CODES, closing the cycle handlers -> processor -> pricing -> handlers; (2) Private encapsulation breach & downward layer bypass where domain/pricing.py directly imports _compute_handling_fee from order_app/infra/_internal.py, coupling pure pricing calculation to /tmp filesystem state; (3) Presentation layer contamination hosting both FastAPI and Flask apps in handlers.py; (4) Dead/disconnected infrastructure module order_app/infra/gateway.py with undeclared boto3 dependency."
+    },
+    "execution_flow_map": {
+      "entry_points": [
+        "order_app/api/handlers.py:app",
+        "order_app/api/handlers.py:submit_orders",
+        "order_app/api/handlers.py:init_cache",
+        "order_app/api/handlers.py:legacy_flask",
+        "order_app/api/handlers.py:legacy_health",
+        "scripts/legacy_sync.sh",
+        "Dockerfile",
+        ".github/workflows/deploy.yml"
+      ],
+      "execution_flows": [
+        {
+          "name": "Order Batch Submission, Pricing & In-Memory State Caching",
+          "trigger": "HTTP POST /orders with JSON LegacyOrderPayload body",
+          "steps": [
+            "1. FastAPI deserializes JSON via LegacyOrderPayload (Pydantic v1 @validator strips customer_id; items remain untyped List[Dict[str, Any]]).",
+            "2. async def submit_orders() synchronously calls process_order_batch('batch-default', [{'items': payload.items, 'status': 'new'}], 'US', 'USD', False, False, '') while dropping customer_id and metadata.",
+            "3. process_order_batch() optionally parses override_yaml via unsafe yaml.load() (CWE-502), iterates orders, and appends regional hold tags onto mutable default list tags=[].",
+            "4. calculate_legacy_total() sums float item prices/quantities, checks /tmp/order_spool/fees.dat via _compute_handling_fee(), checks handlers.ACTIVE_PROMO_CODES (circular import), and applies 10% DEFAULT_TAX_RATE.",
+            "5. If notify_shell is True, executes subprocess.run(f'echo batch {batch_id} done', shell=True) (CWE-78), writes JSON summary into global ORDER_STATE_CACHE[batch_id], and returns {'accepted': accepted}."
+          ],
+          "involved_files": [
+            "order_app/api/handlers.py",
+            "order_app/schemas.py",
+            "order_app/services/processor.py",
+            "order_app/domain/pricing.py",
+            "order_app/infra/_internal.py",
+            "order_app/constants.py"
+          ]
+        },
+        {
+          "name": "Legacy Flask Health Endpoint & FastAPI Startup Hook",
+          "trigger": "ASGI startup (@app.on_event('startup')) or WSGI HTTP GET /legacy/health",
+          "steps": [
+            "1. On FastAPI ASGI startup, deprecated @app.on_event('startup') runs init_cache() which prints 'Booting legacy FastAPI app' to stdout.",
+            "2. Separately, legacy_flask = Flask(__name__) defines GET /legacy/health returning jsonify({'ok': True}), though Dockerfile only boots Uvicorn against order_app.api.handlers:app."
+          ],
+          "involved_files": [
+            "order_app/api/handlers.py",
+            "Dockerfile"
+          ]
+        },
+        {
+          "name": "CI/CD Pull Request Batch Synchronization Script",
+          "trigger": "GitHub Actions pull_request_target (opened, synchronize) running bash scripts/legacy_sync.sh",
+          "steps": [
+            "1. .github/workflows/deploy.yml triggers on pull_request_target, checks out actions/checkout@main, and executes bash scripts/legacy_sync.sh.",
+            "2. legacy_sync.sh creates /var/tmp/order_batches/{incoming,processed,deadletter,reports} and configures stage concurrency.",
+            "3. run_retry_loop() invokes rotate_archives() to move *.csv files from incoming/ to processed/ and writes summary.txt metrics."
+          ],
+          "involved_files": [
+            ".github/workflows/deploy.yml",
+            "scripts/legacy_sync.sh"
+          ]
+        }
+      ],
+      "state_and_storage": [
+        "Process-global mutable dictionary ORDER_STATE_CACHE in order_app/services/processor.py storing serialized JSON strings keyed by batch_id without eviction or synchronization.",
+        "Function-signature mutable default list tags=[] on process_order_batch() in order_app/services/processor.py accumulating tags across requests.",
+        "Local filesystem fee flag file /tmp/order_spool/fees.dat checked synchronously via os.path.exists() in order_app/infra/_internal.py.",
+        "Local filesystem batch spool /var/tmp/order_batches/{incoming,processed,deadletter,reports} mutated by scripts/legacy_sync.sh."
+      ],
+      "error_and_concurrency_model": "Unsafe mixed async/sync execution: async def submit_orders() invokes synchronous CPU/filesystem work directly on the event loop, while unreferenced async def notify_partner_webhook() in order_app/infra/gateway.py calls blocking time.sleep(1) and synchronous requests.post() without a timeout. Error handling relies on anti-patterns: bare 'except:' around yaml.load() and 'except Exception: pass' around subprocess.run(shell=True) silently swallow failures, and global ORDER_STATE_CACHE plus mutable default tags=[] cause cross-request state corruption."
+    }
+  },
+  "audit_dimensions": [
+    {
+      "action_id": "act-16",
+      "audit_id": "web_penetration_audit",
+      "title": "Evaluate Live HTTP Penetration Findings, Security Headers & Endpoint Defenses",
+      "score": 10,
+      "grade": "D",
+      "rules_evaluated": [
+        "common/security_vulnerability"
+      ],
+      "pass_count": 0,
+      "warn_count": 0,
+      "fail_count": 1,
+      "summary": "Dynamic isolated loopback HTTP penetration testing (web_pentest, 3.52s against http://127.0.0.1:54305) terminated with status='error' and server_booted=false (boot_failure_reason: 'For further information visit https://errors.pydantic.dev/2.14/u/model-field-missing-annotation'). When booting the project Dockerfile image, Python/ASGI import crashed immediately on unannotated LegacyOrderPayload.legacy_flag = True  # type: ignore (order_app/schemas.py:9) under unpinned Pydantic v2, dynamically confirming 100% live HTTP unavailability and blocking runtime execution (0/0 probes run) of the 4-file DAST suite in .pni/pentests/examples/python/api_legacy_messy/ (test_app_probes.py targeting CWE-306 unauthenticated POST /orders and CWE-20 untyped items 500 error, plus test_baseline_http.py and test_target_surface.py)."
+    },
+    {
+      "action_id": "act-14",
+      "audit_id": "security_vulnerability_audit",
+      "title": "Evaluate Supply-Chain CVEs, Container Misconfigs, Secrets, Dangerous Sinks & API Boundaries",
+      "score": 12,
+      "grade": "D",
+      "rules_evaluated": [
+        "common/security_vulnerability",
+        "common/supply_chain"
+      ],
+      "pass_count": 0,
+      "warn_count": 0,
+      "fail_count": 2,
+      "summary": "Holistic security and vulnerability audit fails critically (score: 12/100): Trivy detected 7 Python package CVEs (4 HIGH: setuptools@70.3.0 CVE-2025-47273, urllib3@2.7.0 CVE-2026-97687 & CVE-2026-97689, msgpack@1.1.2 GHSA-6v7p-g79w-8964; 2 MEDIUM; 1 LOW) and 3,554 Debian 13.7 OS CVEs (24 CRITICAL, 436 HIGH) caused by bloated FROM python:latest, alongside 3 Dockerfile misconfigurations (DS-0002 root user, DS-0001 :latest tag, DS-0026 missing HEALTHCHECK), hardcoded WEBHOOK_SIGNING_SECRET, committed config/service_account_dummy.json, CWE-502 yaml.load() and CWE-78 subprocess.run(shell=True) sinks, privileged pull_request_target CI, and unauthenticated POST /orders."
+    },
+    {
+      "action_id": "act-10",
+      "audit_id": "python_test_audit",
+      "title": "Evaluate Test Suite Completeness & Structure",
+      "score": 12,
+      "grade": "D",
+      "rules_evaluated": [
+        "python/testing"
+      ],
+      "pass_count": 0,
+      "warn_count": 0,
+      "fail_count": 1,
+      "summary": "Test suite audit fails critically (score: 12/100): only 1 test file (tests/test_orders.py) exists across 12 source files, its sole function test_currency_smoke() contains zero assertions (assertion-free smoke call), pytest is omitted from project manifests, and 0% of API handlers, Pydantic schemas, batch processing branches, pricing rules, and infrastructure adapters are tested."
+    },
+    {
+      "action_id": "act-06",
+      "audit_id": "supply_chain_audit",
+      "title": "Evaluate Supply-Chain, CI Permissions, Container & Secret Hygiene",
+      "score": 14,
+      "grade": "D",
+      "rules_evaluated": [
+        "common/supply_chain",
+        "common/security",
+        "common/git_workflow"
+      ],
+      "pass_count": 0,
+      "warn_count": 1,
+      "fail_count": 2,
+      "summary": "OpenSSF supply-chain and secret hygiene audit fails critically (score: 14/100): zero lockfiles, 8/8 unpinned dependencies, privileged pull_request_target workflow without GITHUB_TOKEN permissions pinning mutable actions/checkout@main, root python:latest Dockerfile without .dockerignore, hardcoded sk_live_* token in order_app/services/processor.py, committed service_account_dummy.json, and absence of LICENSE, SECURITY.md, and Dependabot/Renovate."
+    },
+    {
+      "action_id": "act-09",
+      "audit_id": "service_readiness_audit",
+      "title": "Evaluate 12-Factor Config/Statelessness & SRE PRR Timeouts/Observability",
+      "score": 16,
+      "grade": "D",
+      "rules_evaluated": [
+        "common/twelve_factor",
+        "common/production_readiness",
+        "common/security"
+      ],
+      "pass_count": 0,
+      "warn_count": 0,
+      "fail_count": 3,
+      "summary": "12-Factor and SRE Production Readiness evaluation fails (score: 16/100): scattered os.getenv() and hardcoded secret instead of centralized settings, stateful process globals (ORDER_STATE_CACHE, tags=[]) and /tmp filesystem coupling, unstructured print() logging, synchronous requests.post() without timeout inside async def, bare except blocks hiding failures, and a broken health probe registered on an unmounted Flask instance rather than the FastAPI ASGI app."
+    },
+    {
+      "action_id": "act-05",
+      "audit_id": "repo_structure_audit",
+      "title": "Evaluate Repository Structure, Supply Chain & Dependencies",
+      "score": 18,
+      "grade": "D",
+      "rules_evaluated": [
+        "common/supply_chain",
+        "python/dependencies",
+        "common/documentation",
+        "common/git_workflow",
+        "common/security"
+      ],
+      "pass_count": 0,
+      "warn_count": 1,
+      "fail_count": 4,
+      "summary": "Repository structure, dependency management, CI/CD governance, and container hygiene exhibit severe supply-chain and operational risks: legacy setup.py + unpinned requirements.txt without pyproject.toml or uv.lock, undeclared runtime imports (uvicorn, boto3) alongside dev tools (flake8, black), a privileged pull_request_target workflow referencing mutable @main, a root python:latest Dockerfile without .dockerignore, a committed service_account_dummy.json file, missing .gitignore/LICENSE/SECURITY.md, and a 2-line stub README.md."
+    },
+    {
+      "action_id": "act-12",
+      "audit_id": "container_runtime_audit",
+      "title": "Evaluate Buildability, Offline Test Results, Measured Coverage & Startup Health",
+      "score": 18,
+      "grade": "D",
+      "rules_evaluated": [
+        "common/runtime_verification",
+        "common/production_readiness"
+      ],
+      "pass_count": 0,
+      "warn_count": 0,
+      "fail_count": 2,
+      "summary": "Containerized runtime verification fails critically (score: 18/100): although Dockerfile build (93.14s), harness build (50.97s), and the 1-test offline pytest run (1.98s) exited 0, real measured coverage is 6.6% line (7/106 statements) and 0.0% branch across 6 core modules at 0.0%, and ASGI startup smoke_check crashes immediately on import with PydanticUserError because unpinned pydantic resolves to v2 and rejects unannotated LegacyOrderPayload.legacy_flag = True (# type: ignore) in order_app/schemas.py:9."
+    },
+    {
+      "action_id": "act-08",
+      "audit_id": "python_ast_audit",
+      "title": "Interpret Python AST Facts & Evaluate Quality/Typing/Imports/Security",
+      "score": 22,
+      "grade": "D",
+      "rules_evaluated": [
+        "common/architecture",
+        "common/maintainability",
+        "common/security",
+        "common/security_vulnerability",
+        "python/code_quality",
+        "python/typing",
+        "python/modern_stack"
+      ],
+      "pass_count": 0,
+      "warn_count": 0,
+      "fail_count": 7,
+      "summary": "Python AST & framework audit uncovers deep structural, maintainability, typing, and security defects (score: 22/100): a 3-module circular import and layer inversion (pricing -> handlers -> processor -> pricing), private infra._internal coupling, a cognitive-complexity-44 8-parameter batch processor with mutable default tags=[] and global ORDER_STATE_CACHE, 44.4% type coverage with unscoped # type: ignore, 40.9% docstring coverage with stale Args mismatches, Pydantic v1 / FastAPI @on_event / Flask legacy debt, event-loop-blocking I/O without timeouts, CWE-502 yaml.load(), CWE-78 subprocess.run(shell=True), hardcoded WEBHOOK_SIGNING_SECRET, and unauthenticated POST /orders."
+    }
+  ],
+  "rule_compliance": [
+    {
+      "rule_id": "common/architecture",
+      "status": "fail",
+      "source_action": "python_ast_audit",
+      "evidence": "circular_dependencies=3 (handlers -> processor -> pricing -> handlers); boundary_violations=2 (domain.pricing -> api.handlers, domain.pricing -> infra._internal); FastAPI + Flask co-hosted in order_app/api/handlers.py.",
+      "summary": "Domain layer imports API handlers (cyclic dependency) and private infra._internal helper, violating strict downward layering and SoC."
+    },
+    {
+      "rule_id": "common/documentation",
+      "status": "fail",
+      "source_action": "repo_structure_audit",
+      "evidence": "README.md has 2 non-empty lines and 1 heading ('# Legacy Order Hub'); docs_inventory=['README.md']; scripts/legacy_sync.sh (106 LOC) has zero usage documentation.",
+      "summary": "README.md is a minimal 2-line stub lacking architecture, installation, configuration, API contract, and testing sections."
+    },
+    {
+      "rule_id": "common/maintainability",
+      "status": "fail",
+      "source_action": "python_ast_audit",
+      "evidence": "process_order_batch (processor.py:11): length=58, branches=16, cognitive=44, params=8 (>6); global ORDER_STATE_CACHE; tags=[]; bare except: (line 31); except Exception: pass (line 64); requests.post missing timeout + blocking inside async def (gateway.py:9-11).",
+      "summary": "High cognitive complexity, 8-parameter signature, global/default-arg state mutation, swallowed exceptions, and blocking sync I/O inside async functions."
+    },
+    {
+      "rule_id": "common/production_readiness",
+      "status": "fail",
+      "source_action": "service_readiness_audit",
+      "evidence": "missing_io_timeouts=1 (requests.post at gateway.py:11 without timeout=); blocking time.sleep(1) + requests.post inside async def; FastAPI app has no /healthz route (/legacy/health is bound to unmounted legacy_flask); bare except: (processor.py:31) and except Exception: pass (processor.py:64); uvicorn missing from requirements.txt.; importing order_app.api.handlers crashes with pydantic.errors.PydanticUserError at order_app/schemas.py:9; Dockerfile CMD invokes 'uvicorn' which is omitted from requirements.txt; FastAPI app defines no /healthz endpoint.",
+      "summary": "Lacks outbound HTTP timeouts, event-loop safety, functional FastAPI health/readiness probes, declared ASGI server dependency, and observable error handling."
+    },
+    {
+      "rule_id": "common/runtime_verification",
+      "status": "fail",
+      "source_action": "container_runtime_audit",
+      "evidence": "RuntimeFacts.status='failed'; project_dockerfile_build=passed (93.14s), harness_build=passed (50.97s), test_execution=passed (1/1 in 1.98s), but coverage: line_coverage_pct=6.6% (7/106), branch_coverage_pct=0.0% (0.0% in processor.py, handlers.py, schemas.py, gateway.py, pricing.py, _internal.py); smoke_check=failed (exit_code=1, import_or_di_error: PydanticUserError on LegacyOrderPayload.legacy_flag = True at order_app/schemas.py:9).",
+      "summary": "Fails RV-03 (6.6% line / 0.0% branch coverage) and RV-04 (ASGI app fails to import/boot due to Pydantic v2 crash on unannotated schema attribute)."
+    },
+    {
+      "rule_id": "common/security",
+      "status": "fail",
+      "source_action": "repo_structure_audit",
+      "evidence": "committed_secret_files=['config/service_account_dummy.json']; Dockerfile COPY . . copies config/ into root container; .github/workflows/deploy.yml uses pull_request_target.; WEBHOOK_SIGNING_SECRET = 'sk_live_EXAMPLE_DUMMY_TOKEN_998877665544' in order_app/services/processor.py:8; committed_secret_files=['config/service_account_dummy.json']; root container in Dockerfile.; hardcoded_secrets=1 (WEBHOOK_SIGNING_SECRET at processor.py:8); yaml.load() without SafeLoader (processor.py:30); subprocess.run(..., shell=True) (processor.py:63); untyped List[Dict[str, Any]] boundary schema (schemas.py:7).; WEBHOOK_SIGNING_SECRET hardcoded in processor.py:8; shell=True subprocess in processor.py:63; unbounded requests.post(endpoint) in gateway.py:11.",
+      "summary": "Credential fixture committed to config/, copied into a root container image without .dockerignore, alongside privileged pull_request_target CI execution."
+    },
+    {
+      "rule_id": "common/security_vulnerability",
+      "status": "fail",
+      "source_action": "python_ast_audit",
+      "evidence": "dangerous_sinks=2: CWE-502 yaml.load (processor.py:30) and CWE-78 subprocess.run shell=True (processor.py:63); api_endpoints=2 unauthenticated (POST /orders at handlers.py:18, GET /legacy/health at handlers.py:32, has_auth_hint=false).; SEC-01: app_vuln_counts={critical:0, high:4, medium:2, low:1, total:7} (setuptools@70.3.0 CVE-2025-47273->78.1.1, urllib3@2.7.0 CVE-2026-97687/CVE-2026-97689->2.8.0, msgpack@1.1.2 GHSA-6v7p-g79w-8964->1.2.1) & os_vuln_counts={critical:24, high:436, medium:1308, low:1654, total:3554} in python:latest (debian 13.7); SEC-02: DS-0002 (HIGH root user), DS-0001 (MED :latest), DS-0026 (LOW no HEALTHCHECK); SEC-03: WEBHOOK_SIGNING_SECRET in processor.py:8 & config/service_account_dummy.json; SEC-04: CWE-502 yaml.load (processor.py:30) & CWE-78 subprocess.run shell=True (processor.py:63); SEC-05: unauthenticated POST /orders (handlers.py:18).; PentestFacts.status='error', server_booted=false, target_base_url='http://127.0.0.1:54305', duration_sec=3.52, boot_failure_reason='For further information visit https://errors.pydantic.dev/2.14/u/model-field-missing-annotation': live container HTTP boot crashed on LegacyOrderPayload.legacy_flag = True (order_app/schemas.py:9), causing total service unavailability and preventing dynamic verification of the staged DAST suite in .pni/pentests/examples/python/api_legacy_messy/ (test_app_probes.py CWE-306 & CWE-20, test_baseline_http.py, test_target_surface.py).",
+      "summary": "Exposes high-severity CWE-502 and CWE-78 sinks in order processing alongside unauthenticated state-mutating POST /orders endpoint."
+    },
+    {
+      "rule_id": "common/supply_chain",
+      "status": "fail",
+      "source_action": "repo_structure_audit",
+      "evidence": "lockfiles=[], unpinned_dependencies=['fastapi','flask','pydantic','requests','pyyaml','urllib3','flake8','black']; .github/workflows/deploy.yml uses pull_request_target + actions/checkout@main without permissions:; Dockerfile uses python:latest as root without .dockerignore; LICENSE=False, SECURITY.md=False, dependency_automation=False.; lockfiles=[], unpinned_dependencies=8/8; .github/workflows/deploy.yml uses pull_request_target + actions/checkout@main + missing permissions:; Dockerfile uses FROM python:latest + root UID 0 + missing .dockerignore; LICENSE=False, SECURITY.md=False, dependency_automation=False.; Dockerfile FROM python:latest pulls full Debian build toolchain (libmariadb-dev, libopenexr-dev, libxml2-dev) yielding 3,554 OS CVEs; requirements.txt unpinned (8/8) with unused urllib3/flake8/black; .github/workflows/deploy.yml uses pull_request_target + actions/checkout@main.",
+      "summary": "Fails OpenSSF supply-chain baselines across dependency locking, CI token permissions, action pinning, container hygiene, and repository governance."
+    },
+    {
+      "rule_id": "common/twelve_factor",
+      "status": "fail",
+      "source_action": "service_readiness_audit",
+      "evidence": "scattered_env_access=1 (os.getenv('LEGACY_GATEWAY_MODE') at processor.py:24); global ORDER_STATE_CACHE (processor.py:21) + tags=[] (processor.py:19) + /tmp/order_spool/fees.dat (_internal.py:5); unstructured_logging=3 print() calls; deprecated @app.on_event('startup') without shutdown lifecycle.",
+      "summary": "Violates 12-Factor Config (III), Backing Services (IV), Stateless Processes (VI), Disposability (IX), and Logs (XI)."
+    },
+    {
+      "rule_id": "python/code_quality",
+      "status": "fail",
+      "source_action": "python_ast_audit",
+      "evidence": "docstring_coverage_pct=40.9%, missing_docstrings=12, empty_docstrings=1 (gateway.py:7 'TODO'), doc_signature_mismatches=1 (pricing.py:8 raw_items/discount_pct), unstructured print()=3.",
+      "summary": "Low docstring coverage (40.9%), misleading stale Args in pricing.py, TODO stub docstring in gateway.py, and print() debugging."
+    },
+    {
+      "rule_id": "python/dependencies",
+      "status": "fail",
+      "source_action": "repo_structure_audit",
+      "evidence": "manifests=['requirements.txt', 'setup.py'] (no pyproject.toml or uv.lock); dev tools flake8/black mixed into runtime requirements.txt; uvicorn (Dockerfile:6) and boto3 (order_app/infra/gateway.py:4) are omitted from requirements.txt.",
+      "summary": "Lacks PEP 621 pyproject.toml and uv.lock, mixes dev/runtime packages, co-declares FastAPI + Flask, and omits imported/runtime packages."
+    },
+    {
+      "rule_id": "python/modern_stack",
+      "status": "fail",
+      "source_action": "python_ast_audit",
+      "evidence": "import_hygiene_coverage_pct=75.0%, unsorted_imports=4, wildcard_imports=1 (from math import *), late_imports=1 (import json), undeclared boto3, unused ['black','flake8','urllib3'], Pydantic v1 @validator/Config, FastAPI @app.on_event, os.path.",
+      "summary": "Widespread legacy Python/framework debt: wildcard and in-function imports, undeclared boto3, Pydantic v1 validators, deprecated FastAPI startup event, and redundant Flask app."
+    },
+    {
+      "rule_id": "python/testing",
+      "status": "fail",
+      "source_action": "python_test_audit",
+      "evidence": "source_files_count=12 vs test_files_count=1 (tests/test_orders.py); test_functions_count=1; assertion_free_tests=1 (test_currency_smoke calls is_supported_currency('usd') with no assert); zero mirror test modules for api/handlers.py, schemas.py, services/processor.py, domain/pricing.py, infra/gateway.py, infra/_internal.py.",
+      "summary": "Single assertion-free test leaves core HTTP routes, 16-branch batch processor, pricing calculation, and webhook client completely unverified."
+    },
+    {
+      "rule_id": "python/typing",
+      "status": "fail",
+      "source_action": "python_ast_audit",
+      "evidence": "type_safety_coverage_pct=44.4%, type_safety_issues=7 (process_order_batch has 0/9 annotations), weak_type_usages=1 (gateway.py:7 dict), unscoped_type_ignores=1 (schemas.py:9), Any in schemas.py:7.",
+      "summary": "Less than half of symbols are typed (44.4%), core batch processor is completely untyped, and schemas rely on Any and unscoped # type: ignore."
+    },
+    {
+      "rule_id": "common/git_workflow",
+      "status": "warn",
+      "source_action": "repo_structure_audit",
+      "evidence": "has_gitignore=False; .github/workflows/deploy.yml runs scripts/legacy_sync.sh on pull_request_target without lint/type/test CI verification.; has_gitignore=False; .github/workflows/deploy.yml runs deploy sync script on pull_request_target instead of read-only PR verification.",
+      "summary": "Missing local .gitignore and automated PR quality gates (lint, typecheck, pytest) on pull requests."
+    }
+  ],
+  "module_hotspots": [
+    {
+      "file_path": "Dockerfile",
+      "loc": 0,
+      "risk_score": 1.0,
+      "finding_counts": {
+        "critical": 1,
+        "high": 3
+      },
+      "top_rules": [
+        "common/security_vulnerability",
+        "common/production_readiness",
+        "common/supply_chain"
+      ]
+    },
+    {
+      "file_path": "order_app/api/handlers.py",
+      "loc": 0,
+      "risk_score": 1.0,
+      "finding_counts": {
+        "high": 3
+      },
+      "top_rules": [
+        "common/production_readiness",
+        "common/security_vulnerability"
+      ]
+    },
+    {
+      "file_path": "order_app/schemas.py",
+      "loc": 0,
+      "risk_score": 1.0,
+      "finding_counts": {
+        "critical": 2,
+        "medium": 1
+      },
+      "top_rules": [
+        "common/security_vulnerability",
+        "common/runtime_verification",
+        "python/typing"
+      ]
+    },
+    {
+      "file_path": "order_app/services/processor.py",
+      "loc": 0,
+      "risk_score": 1.0,
+      "finding_counts": {
+        "critical": 2,
+        "high": 2,
+        "medium": 1
+      },
+      "top_rules": [
+        "common/security",
+        "common/security_vulnerability",
+        "common/twelve_factor",
+        "common/maintainability"
+      ]
+    },
+    {
+      "file_path": "examples/python/api_legacy_messy/order_app/services/processor.py",
+      "loc": 59,
+      "risk_score": 0.91,
+      "finding_counts": {},
+      "top_rules": []
+    },
+    {
+      "file_path": "tests/test_orders.py",
+      "loc": 0,
+      "risk_score": 0.9,
+      "finding_counts": {
+        "critical": 2
+      },
+      "top_rules": [
+        "common/runtime_verification",
+        "python/testing"
+      ]
+    },
+    {
+      "file_path": "requirements.txt",
+      "loc": 0,
+      "risk_score": 0.84,
+      "finding_counts": {
+        "high": 3
+      },
+      "top_rules": [
+        "common/supply_chain",
+        "python/dependencies",
+        "common/security_vulnerability"
+      ]
+    },
+    {
+      "file_path": "order_app/infra/gateway.py",
+      "loc": 0,
+      "risk_score": 0.72,
+      "finding_counts": {
+        "high": 2
+      },
+      "top_rules": [
+        "common/production_readiness",
+        "python/modern_stack"
+      ]
+    },
+    {
+      "file_path": "order_app/domain/pricing.py",
+      "loc": 0,
+      "risk_score": 0.5,
+      "finding_counts": {
+        "high": 1,
+        "low": 1
+      },
+      "top_rules": [
+        "common/architecture",
+        "python/code_quality"
+      ]
+    },
+    {
+      "file_path": ".github/workflows/deploy.yml",
+      "loc": 0,
+      "risk_score": 0.45,
+      "finding_counts": {
+        "critical": 1
+      },
+      "top_rules": [
+        "common/supply_chain"
+      ]
+    },
+    {
+      "file_path": "examples/python/api_legacy_messy/Dockerfile",
+      "loc": 0,
+      "risk_score": 0.3,
+      "finding_counts": {},
+      "top_rules": []
+    },
+    {
+      "file_path": "examples/python/api_legacy_messy/order_app/api/handlers.py",
+      "loc": 25,
+      "risk_score": 0.16,
+      "finding_counts": {},
+      "top_rules": []
+    },
+    {
+      "file_path": "examples/python/api_legacy_messy/order_app/domain/pricing.py",
+      "loc": 17,
+      "risk_score": 0.16,
+      "finding_counts": {},
+      "top_rules": []
+    },
+    {
+      "file_path": "examples/python/api_legacy_messy/order_app/schemas.py",
+      "loc": 12,
+      "risk_score": 0.16,
+      "finding_counts": {},
+      "top_rules": []
+    },
+    {
+      "file_path": "examples/python/api_legacy_messy/order_app/infra/gateway.py",
+      "loc": 11,
+      "risk_score": 0.16,
+      "finding_counts": {},
+      "top_rules": []
+    },
+    {
+      "file_path": "examples/python/api_legacy_messy/order_app/infra/_internal.py",
+      "loc": 6,
+      "risk_score": 0.16,
+      "finding_counts": {},
+      "top_rules": []
+    },
+    {
+      "file_path": "README.md",
+      "loc": 0,
+      "risk_score": 0.15,
+      "finding_counts": {
+        "medium": 1
+      },
+      "top_rules": [
+        "common/documentation"
+      ]
+    },
+    {
+      "file_path": "config/service_account_dummy.json",
+      "loc": 0,
+      "risk_score": 0.15,
+      "finding_counts": {
+        "medium": 1
+      },
+      "top_rules": [
+        "common/security"
+      ]
+    },
+    {
+      "file_path": "scripts/legacy_sync.sh",
+      "loc": 0,
+      "risk_score": 0.15,
+      "finding_counts": {
+        "medium": 1
+      },
+      "top_rules": [
+        "common/supply_chain"
+      ]
+    },
+    {
+      "file_path": "examples/python/api_legacy_messy/order_app/constants.py",
+      "loc": 14,
+      "risk_score": 0.06,
+      "finding_counts": {},
+      "top_rules": []
+    },
+    {
+      "file_path": "examples/python/api_legacy_messy/order_app/__init__.py",
+      "loc": 1,
+      "risk_score": 0.06,
+      "finding_counts": {},
+      "top_rules": []
+    },
+    {
+      "file_path": "examples/python/api_legacy_messy/order_app/api/__init__.py",
+      "loc": 1,
+      "risk_score": 0.06,
+      "finding_counts": {},
+      "top_rules": []
+    },
+    {
+      "file_path": "examples/python/api_legacy_messy/order_app/domain/__init__.py",
+      "loc": 1,
+      "risk_score": 0.06,
+      "finding_counts": {},
+      "top_rules": []
+    },
+    {
+      "file_path": "examples/python/api_legacy_messy/order_app/infra/__init__.py",
+      "loc": 1,
+      "risk_score": 0.06,
+      "finding_counts": {},
+      "top_rules": []
+    },
+    {
+      "file_path": "examples/python/api_legacy_messy/order_app/services/__init__.py",
+      "loc": 1,
+      "risk_score": 0.06,
+      "finding_counts": {},
+      "top_rules": []
+    }
+  ],
+  "strengths": [
+    "Top-level package layout under order_app/ establishes recognizable subpackages (api/, services/, domain/, infra/) and a dedicated tests/ directory.",
+    "order_app/constants.py demonstrates clean typing.Final constants and a complete Google-style docstring.",
+    "CI workflow configuration is localized to a single small file (.github/workflows/deploy.yml), making remediation straightforward.",
+    "order_app/constants.py achieves 100% typing (Final annotations, PEP 563 future annotations) and accurate Google-style docstrings with zero external coupling.",
+    "Dockerfile exposes a standard non-privileged container port (EXPOSE 8000) and targets an explicit ASGI module path (order_app.api.handlers:app).",
+    "Repository includes a top-level tests/ directory with pytest-discoverable naming (tests/test_orders.py).",
+    "Container image and test harness build deterministically without native C-extension compilation errors, and order_app/constants.py reaches 100.0% statement coverage (7/7 lines).",
+    "Trivy filesystem secret scan detected zero live private keys or cloud OAuth refresh tokens outside the identified dummy fixture and hardcoded example constant.",
+    "Materialized 4-file DAST probe suite in .pni/pentests/examples/python/api_legacy_messy/ (test_app_probes.py, test_baseline_http.py, test_target_surface.py, conftest.py) provides an immediate post-fix dynamic HTTP verification gate for CWE-306 auth, CWE-20 schema validation, and security headers."
+  ],
+  "findings": [
+    {
+      "severity": "critical",
+      "category": "security",
+      "rule_id": "common/security",
+      "file_path": "order_app/services/processor.py",
+      "line": 8,
+      "symbol": "WEBHOOK_SIGNING_SECRET",
+      "evidence": "WEBHOOK_SIGNING_SECRET = \"sk_live_EXAMPLE_DUMMY_TOKEN_998877665544\"",
+      "description": "Hardcoded Stripe-style live signing secret literal in application service module.",
+      "recommendation": "Remove hardcoded secret literal immediately, rotate any exposed token, and load signing secrets via validated environment settings or a secret manager."
+    },
+    {
+      "severity": "critical",
+      "category": "security",
+      "rule_id": "common/security_vulnerability",
+      "file_path": "Dockerfile",
+      "line": 1,
+      "symbol": null,
+      "evidence": "FROM python:latest (Debian 13.7): os_vuln_counts={critical:24, high:436, medium:1308, low:1654, total:3554} (CVE-2026-85746, CVE-2026-92262 CVSS 10.0 in libmariadb*; CVE-2026-6653 in libxml2; CVE-2026-60002 in openssh-client); Trivy DS-0002 (HIGH root), DS-0001 (MEDIUM :latest), DS-0026 (LOW no HEALTHCHECK)",
+      "description": "Using full `FROM python:latest` pulls hundreds of unused OS `-dev` libraries (MariaDB, OpenEXR, XML2, SSH) introducing 24 CRITICAL and 436 HIGH OS CVEs while running the container as UID 0 (root).",
+      "recommendation": "Replace `FROM python:latest` with a digest-pinned minimal `python:3.12-slim` (or distroless) multi-stage image, run `apt-get upgrade`, switch to a non-root `USER appuser` (fixing DS-0002), and add `HEALTHCHECK` (fixing DS-0026)."
+    },
+    {
+      "severity": "critical",
+      "category": "security",
+      "rule_id": "common/security_vulnerability",
+      "file_path": "order_app/schemas.py",
+      "line": 9,
+      "symbol": "LegacyOrderPayload.legacy_flag",
+      "evidence": "PentestFacts(status='error', server_booted=false, target_base_url='http://127.0.0.1:54305', duration_sec=3.52, boot_failure_reason='For further information visit https://errors.pydantic.dev/2.14/u/model-field-missing-annotation'); legacy_flag = True  # type: ignore",
+      "description": "Live HTTP penetration test harness (web_pentest) failed at container boot with PentestFacts.status='error' and server_booted=false ('For further information visit https://errors.pydantic.dev/2.14/u/model-field-missing-annotation') because LegacyOrderPayload defines unannotated `legacy_flag = True  # type: ignore` under unpinned Pydantic v2, causing 100% dynamic HTTP unavailability and blocking all live DAST probes.",
+      "recommendation": "Add an explicit `legacy_flag: bool = True` annotation in `order_app/schemas.py`, pin `pydantic` and `uvicorn` in `requirements.txt`, and verify `server_booted=true` in `web_pentest`."
+    },
+    {
+      "severity": "critical",
+      "category": "security",
+      "rule_id": "common/security_vulnerability",
+      "file_path": "order_app/services/processor.py",
+      "line": 30,
+      "symbol": "process_order_batch",
+      "evidence": "extra_cfg = yaml.load(override_yaml) (CWE-502) and subprocess.run(f'echo batch {batch_id} done', shell=True) at line 63 (CWE-78)",
+      "description": "process_order_batch() contains both CWE-502 arbitrary object deserialization via unguarded yaml.load() and CWE-78 OS command injection via shell-interpolated batch_id.",
+      "recommendation": "Replace yaml.load() with yaml.safe_load() validated by a Pydantic model, and eliminate subprocess.run(..., shell=True) in favor of structured Python logging or argument-list invocation (shell=False)."
+    },
+    {
+      "severity": "critical",
+      "category": "security",
+      "rule_id": "common/supply_chain",
+      "file_path": ".github/workflows/deploy.yml",
+      "line": 4,
+      "symbol": "deploy",
+      "evidence": "on: pull_request_target (lines 4-5), uses: actions/checkout@main (line 11), missing permissions:, runs bash scripts/legacy_sync.sh (line 13)",
+      "description": "GitHub Actions workflow triggers on privileged pull_request_target without an explicit permissions: block and uses mutable actions/checkout@main.",
+      "recommendation": "Replace pull_request_target with pull_request for untrusted PR checks, add top-level 'permissions: contents: read', and pin actions/checkout and actions/setup-python to full 40-char commit SHAs."
+    },
+    {
+      "severity": "critical",
+      "category": "test_health",
+      "rule_id": "common/runtime_verification",
+      "file_path": "tests/test_orders.py",
+      "line": 4,
+      "symbol": "test_currency_smoke",
+      "evidence": "pytest-cov measured 6.6% line coverage (7/106 statements) and 0.0% branch coverage; processor.py (0/45), handlers.py (0/17), schemas.py (0/12), gateway.py (0/10), pricing.py (0/9), _internal.py (0/6) all at 0.0%",
+      "description": "Offline pytest passed 1/1 only because test_orders.py imports order_app.constants exclusively, leaving 93.4% of statements (99/106) and 100% of branches completely unexecuted—failing to detect the fatal startup crash in handlers.py/schemas.py.",
+      "recommendation": "Add FastAPI TestClient startup and endpoint tests (`GET /healthz`, `POST /orders`) plus unit tests for `pricing.py`, `processor.py`, and `gateway.py`, enforcing `--cov-fail-under=80` in CI."
+    },
+    {
+      "severity": "critical",
+      "category": "test_health",
+      "rule_id": "python/testing",
+      "file_path": "tests/test_orders.py",
+      "line": 4,
+      "symbol": "test_currency_smoke",
+      "evidence": "def test_currency_smoke(): is_supported_currency('usd') — no assert statement; 1 test across 12 source files",
+      "description": "The entire test suite consists of a single 2-line function with zero assertions, verifying no return values, edge cases, error paths, or HTTP/service behavior.",
+      "recommendation": "Add explicit assertions to test_orders.py and build a mirrored pytest suite (tests/api/test_handlers.py, tests/services/test_processor.py, tests/domain/test_pricing.py, tests/infra/test_gateway.py) using httpx.AsyncClient/TestClient and isolated fixtures targeting >=85% branch coverage."
+    },
+    {
+      "severity": "critical",
+      "category": "type_safety",
+      "rule_id": "common/runtime_verification",
+      "file_path": "order_app/schemas.py",
+      "line": 9,
+      "symbol": "LegacyOrderPayload",
+      "evidence": "smoke_check failed (exit_code=1): pydantic.errors.PydanticUserError: A non-annotated attribute was detected: `legacy_flag = True` when importing order_app.api.handlers",
+      "description": "Importing order_app.api.handlers crashes at startup under current unpinned Pydantic v2 because LegacyOrderPayload defines `legacy_flag = True  # type: ignore` without a type annotation or ClassVar.",
+      "recommendation": "Annotate `legacy_flag: bool = True` (or `ClassVar[bool] = True`), migrate `@validator` and `class Config: orm_mode = True` to Pydantic v2 `@field_validator` and `ConfigDict(from_attributes=True)`, and pin `pydantic>=2.7,<3` in `uv.lock`."
+    },
+    {
+      "severity": "high",
+      "category": "architecture",
+      "rule_id": "common/architecture",
+      "file_path": "order_app/domain/pricing.py",
+      "line": 3,
+      "symbol": "calculate_legacy_total",
+      "evidence": "from order_app.api import handlers; from order_app.infra._internal import _compute_handling_fee",
+      "description": "Domain pricing module imports upward from API layer (handlers.ACTIVE_PROMO_CODES) forming a 3-node circular dependency and reaches directly into private infra._internal (/tmp file check).",
+      "recommendation": "Move ACTIVE_PROMO_CODES to order_app/constants.py or domain models, inject fee rules via a clean domain policy/port, and switch monetary arithmetic from float to Decimal or integer cents."
+    },
+    {
+      "severity": "high",
+      "category": "architecture",
+      "rule_id": "common/production_readiness",
+      "file_path": "order_app/api/handlers.py",
+      "line": 31,
+      "symbol": "legacy_health",
+      "evidence": "@legacy_flask.route('/legacy/health') on Flask(__name__) while Dockerfile runs uvicorn order_app.api.handlers:app (FastAPI)",
+      "description": "Health check endpoint /legacy/health is registered on a standalone Flask object that Uvicorn never mounts, leaving the live FastAPI service with zero liveness/readiness probe (HTTP 404 on /legacy/health and /healthz).",
+      "recommendation": "Remove legacy_flask and register typed GET /healthz and GET /readyz endpoints directly on the FastAPI app alongside a Dockerfile HEALTHCHECK."
+    },
+    {
+      "severity": "high",
+      "category": "architecture",
+      "rule_id": "common/twelve_factor",
+      "file_path": "order_app/services/processor.py",
+      "line": 21,
+      "symbol": "ORDER_STATE_CACHE",
+      "evidence": "global ORDER_STATE_CACHE; tags=[]; os.getenv('LEGACY_GATEWAY_MODE', 'sync'); /tmp/order_spool/fees.dat in _internal.py:5",
+      "description": "Service embeds process-local mutable state (ORDER_STATE_CACHE, tags=[]) and local /tmp filesystem checks alongside scattered os.getenv() reads, breaking multi-replica stateless horizontal scaling.",
+      "recommendation": "Centralize all environment config in a pydantic-settings Settings class and externalize batch state and fee schedules into injected repository/cache ports."
+    },
+    {
+      "severity": "high",
+      "category": "code_quality",
+      "rule_id": "common/maintainability",
+      "file_path": "order_app/services/processor.py",
+      "line": 11,
+      "symbol": "process_order_batch",
+      "evidence": "params=8, tags=[], global ORDER_STATE_CACHE, cognitive=44, bare except: (line 31), except Exception: pass (line 64)",
+      "description": "process_order_batch() combines 8 untyped parameters, a cross-request bug via mutable default tags=[], thread-unsafe global ORDER_STATE_CACHE, cognitive complexity 44, and silent exception swallowing.",
+      "recommendation": "Encapsulate batch parameters in a frozen dataclass/Pydantic DTO, replace tags=[] with tuple/None default, inject a bounded repository instead of global ORDER_STATE_CACHE, decompose per-order validation helpers, and log specific exceptions."
+    },
+    {
+      "severity": "high",
+      "category": "code_quality",
+      "rule_id": "common/production_readiness",
+      "file_path": "order_app/infra/gateway.py",
+      "line": 11,
+      "symbol": "notify_partner_webhook",
+      "evidence": "resp = requests.post(endpoint, json=payload) preceded by time.sleep(1) inside async def",
+      "description": "Outbound partner webhook call omits timeout= (allowing hung sockets to stall workers indefinitely) and blocks the asyncio event loop.",
+      "recommendation": "Use httpx.AsyncClient(timeout=httpx.Timeout(5.0)) managed via FastAPI lifespan state with bounded retry/backoff and structured error logging."
+    },
+    {
+      "severity": "high",
+      "category": "code_quality",
+      "rule_id": "python/modern_stack",
+      "file_path": "order_app/infra/gateway.py",
+      "line": 7,
+      "symbol": "notify_partner_webhook",
+      "evidence": "from math import *; import boto3 (undeclared); time.sleep(1) and requests.post(endpoint, json=payload) without timeout inside async def",
+      "description": "Async webhook helper imports undeclared boto3 (causing ImportError if imported), pollutes namespace with wildcard math import, blocks the event loop with sync sleep/HTTP, and omits HTTP timeouts.",
+      "recommendation": "Remove wildcard math and unused boto3 imports, replace time.sleep/requests.post with httpx.AsyncClient(timeout=5.0), and document webhook error semantics."
+    },
+    {
+      "severity": "high",
+      "category": "dependencies",
+      "rule_id": "common/production_readiness",
+      "file_path": "Dockerfile",
+      "line": 6,
+      "symbol": null,
+      "evidence": "CMD [\"uvicorn\", \"order_app.api.handlers:app\", ...] while requirements.txt omits uvicorn",
+      "description": "Dockerfile entrypoint executes `uvicorn`, which is not declared in `requirements.txt` (relying solely on accidental transitive inclusion or failing with executable-not-found).",
+      "recommendation": "Explicitly declare `uvicorn[standard]` in runtime dependencies (`pyproject.toml` + `uv.lock`) and verify container startup via `HEALTHCHECK` against `GET /healthz`."
+    },
+    {
+      "severity": "high",
+      "category": "dependencies",
+      "rule_id": "common/supply_chain",
+      "file_path": "Dockerfile",
+      "line": 1,
+      "symbol": null,
+      "evidence": "FROM python:latest; COPY . .; missing USER and .dockerignore",
+      "description": "Mutable python:latest base image introduces massive OS package surface, runs process as root, and copies config/service_account_dummy.json into image layers.",
+      "recommendation": "Use a digest-pinned python:3.12-slim image, add a non-root USER appuser, and add .dockerignore excluding .git, .github, tests, and config/."
+    },
+    {
+      "severity": "high",
+      "category": "dependencies",
+      "rule_id": "common/supply_chain",
+      "file_path": "requirements.txt",
+      "line": 1,
+      "symbol": null,
+      "evidence": "8 unpinned packages in requirements.txt; zero lockfiles; LICENSE=False, SECURITY.md=False, dependabot=False",
+      "description": "Builds are non-reproducible due to unpinned transitive resolution and lack automated vulnerability monitoring or disclosure policy.",
+      "recommendation": "Adopt pyproject.toml + uv.lock, add .github/dependabot.yml for pip and github-actions ecosystems, and add LICENSE and SECURITY.md."
+    },
+    {
+      "severity": "high",
+      "category": "dependencies",
+      "rule_id": "python/dependencies",
+      "file_path": "requirements.txt",
+      "line": 1,
+      "symbol": null,
+      "evidence": "8 unpinned packages (fastapi, flask, pydantic, requests, pyyaml, urllib3, flake8, black); lockfiles=[]; uvicorn and boto3 missing",
+      "description": "All 8 dependencies in requirements.txt are unpinned without a lockfile, dev linters (flake8, black) are bundled into runtime installs, and uvicorn/boto3 are undeclared.",
+      "recommendation": "Migrate setup.py and requirements.txt to PEP 621 pyproject.toml + uv.lock, separate dev tools into [dependency-groups].dev, declare uvicorn explicitly, and remove unused flask/boto3."
+    },
+    {
+      "severity": "high",
+      "category": "security",
+      "rule_id": "common/security_vulnerability",
+      "file_path": "order_app/api/handlers.py",
+      "line": 17,
+      "symbol": "POST /orders",
+      "evidence": ".pni/pentests/examples/python/api_legacy_messy/test_app_probes.py (test_orders_endpoint_requires_authentication [CWE-306], test_orders_untyped_items_payload_does_not_trigger_500 [CWE-20]); probe_summary.total_probes=0 due to server_booted=false",
+      "description": "Dynamic HTTP security probes staged in `.pni/pentests/examples/python/api_legacy_messy/` (`test_app_probes.py`: CWE-306 unauthenticated `POST /orders` and CWE-20 untyped `items` HTTP 500 check, plus baseline header/CORS/sensitive-path and `/legacy/health` surface probes) recorded 0 executed probes because container startup failed prior to socket binding, leaving `POST /orders` dynamically unverified at runtime.",
+      "recommendation": "Enforce FastAPI authentication `Depends(...)` on `POST /orders`, replace `List[Dict[str, Any]]` with a typed `OrderItem(BaseModel)` schema returning `422` on malformed items, and enforce `.pni/pentests/examples/python/api_legacy_messy/` as a mandatory post-fix CI DAST gate."
+    },
+    {
+      "severity": "high",
+      "category": "security",
+      "rule_id": "common/security_vulnerability",
+      "file_path": "order_app/api/handlers.py",
+      "line": 18,
+      "symbol": "submit_orders",
+      "evidence": "@app.post('/orders') without auth dependency, missing response_model, accepting List[Dict[str, Any]] items and dropping customer_id/metadata",
+      "description": "State-mutating POST /orders endpoint lacks authentication/authorization dependencies, omits response_model typing, accepts arbitrary dict line items, and co-hosts dead legacy Flask routes.",
+      "recommendation": "Enforce FastAPI Security/Depends authentication on POST /orders, define strict typed OrderLineItem and OrderBatchResponse Pydantic v2 models, migrate @app.on_event to lifespan, and remove legacy_flask."
+    },
+    {
+      "severity": "high",
+      "category": "security",
+      "rule_id": "common/security_vulnerability",
+      "file_path": "requirements.txt",
+      "line": 6,
+      "symbol": "urllib3",
+      "evidence": "app_vuln_counts={high:4, medium:2, low:1}: urllib3@2.7.0 (CVE-2026-97687 CVSS 8.1, CVE-2026-97689 CVSS 7.5 -> 2.8.0), setuptools@70.3.0 (CVE-2025-47273 CVSS 8.8 -> 78.1.1), msgpack@1.1.2 (GHSA-6v7p-g79w-8964 CVSS 7.5 -> 1.2.1)",
+      "description": "Resolved Python environment contains 7 application-layer CVEs including 4 HIGH vulnerabilities in urllib3 (declared directly despite being unused in source), setuptools, and transitive msgpack (pulled by unused flake8/black/dev stack).",
+      "recommendation": "Remove unused urllib3, flake8, and black from runtime dependencies, lock urllib3>=2.8.0 in uv.lock, and use a multi-stage uv build that strips setuptools/pip from the runtime image."
+    },
+    {
+      "severity": "high",
+      "category": "security",
+      "rule_id": "common/supply_chain",
+      "file_path": "Dockerfile",
+      "line": 1,
+      "symbol": null,
+      "evidence": "FROM python:latest; COPY . .; no USER instruction; no .dockerignore",
+      "description": "Dockerfile builds from mutable python:latest, runs uvicorn as root (UID 0), and copies the entire repository (including config/service_account_dummy.json) without .dockerignore.",
+      "recommendation": "Pin a minimal Python slim base image with digest (e.g., python:3.12-slim@sha256:...), add a .dockerignore excluding .git/config/tests, create a non-root USER, and add HEALTHCHECK."
+    },
+    {
+      "severity": "medium",
+      "category": "architecture",
+      "rule_id": "common/supply_chain",
+      "file_path": "scripts/legacy_sync.sh",
+      "line": 1,
+      "symbol": null,
+      "evidence": "106 LOC Bash script mutating /var/tmp/order_batches without set -u or set -o pipefail",
+      "description": "Oversized legacy Bash script (106 LOC > 100 LOC threshold) performs CSV parsing, ledger reconciliation, and archive rotation without strict shell safety or unit tests.",
+      "recommendation": "Replace scripts/legacy_sync.sh with a typed, unit-tested Python CLI command (e.g., Typer) sharing order_app domain validation."
+    },
+    {
+      "severity": "medium",
+      "category": "code_quality",
+      "rule_id": "common/twelve_factor",
+      "file_path": "order_app/services/processor.py",
+      "line": 25,
+      "symbol": "process_order_batch",
+      "evidence": "print('Starting batch:', ...) in processor.py:25, handlers.py:14, gateway.py:10; bare except: in processor.py:31; except Exception: pass in processor.py:64",
+      "description": "Service emits unstructured stdout print() messages and silently discards YAML parsing and subprocess exceptions without log levels or trace context.",
+      "recommendation": "Configure structured stdlib logging (JSON/key-value) across all modules and log caught exceptions with exc_info and request/batch correlation IDs."
+    },
+    {
+      "severity": "medium",
+      "category": "documentation",
+      "rule_id": "common/documentation",
+      "file_path": "README.md",
+      "line": 1,
+      "symbol": null,
+      "evidence": "2 lines total ('# Legacy Order Hub' and single uvicorn startup sentence)",
+      "description": "README.md omits system overview, prerequisites, environment variables (LEGACY_GATEWAY_MODE), API endpoint specs, and test/lint execution instructions.",
+      "recommendation": "Expand README.md following Standard Readme & Diátaxis structure with architecture overview, local uv setup, API request/response examples, and test commands."
+    },
+    {
+      "severity": "medium",
+      "category": "security",
+      "rule_id": "common/security",
+      "file_path": "config/service_account_dummy.json",
+      "line": 1,
+      "symbol": null,
+      "evidence": "Committed credential-shaped file config/service_account_dummy.json in repository tree",
+      "description": "Service account JSON credential file resides in version-controlled config/ without .gitignore or secret-scanning exclusion controls.",
+      "recommendation": "Remove service account JSON files from version control, add credential patterns to .gitignore and .dockerignore, and inject credentials at runtime via Workload Identity or secret mounts."
+    },
+    {
+      "severity": "medium",
+      "category": "type_safety",
+      "rule_id": "python/typing",
+      "file_path": "order_app/schemas.py",
+      "line": 5,
+      "symbol": "LegacyOrderPayload",
+      "evidence": "items: List[Dict[str, Any]]; metadata: dict = {}; legacy_flag = True # type: ignore; Pydantic v1 Config & @validator",
+      "description": "Request schema uses deprecated Pydantic v1 idioms, suppresses type checking with unscoped # type: ignore, and leaves order items untyped as Dict[str, Any].",
+      "recommendation": "Upgrade LegacyOrderPayload to Pydantic v2 (model_config = ConfigDict(extra='forbid'), @field_validator, Field(default_factory=dict)), type OrderItem strictly, and remove # type: ignore."
+    },
+    {
+      "severity": "low",
+      "category": "documentation",
+      "rule_id": "python/code_quality",
+      "file_path": "order_app/domain/pricing.py",
+      "line": 8,
+      "symbol": "calculate_legacy_total",
+      "evidence": "Docstring lists raw_items and discount_pct instead of items and coupon_code; 12 missing docstrings across repo",
+      "description": "calculate_legacy_total() docstring documents non-existent parameters (raw_items, discount_pct), misleading maintainers and API consumers.",
+      "recommendation": "Synchronize Google-style docstrings with actual signatures across handlers.py, schemas.py, processor.py, pricing.py, and gateway.py."
+    }
+  ],
+  "consolidated_findings": [
+    {
+      "severity": "critical",
+      "file_path": ".github/workflows/deploy.yml",
+      "line": 4,
+      "symbol": "deploy",
+      "rule_ids": [
+        "common/supply_chain"
+      ],
+      "categories": [
+        "security"
+      ],
+      "primary_description": "GitHub Actions workflow triggers on privileged pull_request_target without an explicit permissions: block and uses mutable actions/checkout@main.",
+      "combined_evidence": "on: pull_request_target (lines 4-5), uses: actions/checkout@main (line 11), missing permissions:, runs bash scripts/legacy_sync.sh (line 13)",
+      "merged_recommendation": "Replace pull_request_target with pull_request for untrusted PR checks, add top-level 'permissions: contents: read', and pin actions/checkout and actions/setup-python to full 40-char commit SHAs."
+    },
+    {
+      "severity": "critical",
+      "file_path": "Dockerfile",
+      "line": 1,
+      "symbol": null,
+      "rule_ids": [
+        "common/security_vulnerability",
+        "common/supply_chain"
+      ],
+      "categories": [
+        "security",
+        "dependencies"
+      ],
+      "primary_description": "Using full `FROM python:latest` pulls hundreds of unused OS `-dev` libraries (MariaDB, OpenEXR, XML2, SSH) introducing 24 CRITICAL and 436 HIGH OS CVEs while running the container as UID 0 (root).",
+      "combined_evidence": "FROM python:latest (Debian 13.7): os_vuln_counts={critical:24, high:436, medium:1308, low:1654, total:3554} (CVE-2026-85746, CVE-2026-92262 CVSS 10.0 in libmariadb*; CVE-2026-6653 in libxml2; CVE-2026-60002 in openssh-client); Trivy DS-0002 (HIGH root), DS-0001 (MEDIUM :latest), DS-0026 (LOW no HEALTHCHECK) | FROM python:latest; COPY . .; missing USER and .dockerignore | FROM python:latest; COPY . .; no USER instruction; no .dockerignore",
+      "merged_recommendation": "Replace `FROM python:latest` with a digest-pinned minimal `python:3.12-slim` (or distroless) multi-stage image, run `apt-get upgrade`, switch to a non-root `USER appuser` (fixing DS-0002), and add `HEALTHCHECK` (fixing DS-0026). / Use a digest-pinned python:3.12-slim image, add a non-root USER appuser, and add .dockerignore excluding .git, .github, tests, and config/. / Pin a minimal Python slim base image with digest (e.g., python:3.12-slim@sha256:...), add a .dockerignore excluding .git/config/tests, create a non-root USER, and add HEALTHCHECK."
+    },
+    {
+      "severity": "critical",
+      "file_path": "order_app/schemas.py",
+      "line": 9,
+      "symbol": "LegacyOrderPayload.legacy_flag",
+      "rule_ids": [
+        "common/security_vulnerability",
+        "common/runtime_verification"
+      ],
+      "categories": [
+        "security",
+        "type_safety"
+      ],
+      "primary_description": "Live HTTP penetration test harness (web_pentest) failed at container boot with PentestFacts.status='error' and server_booted=false ('For further information visit https://errors.pydantic.dev/2.14/u/model-field-missing-annotation') because LegacyOrderPayload defines unannotated `legacy_flag = True  # type: ignore` under unpinned Pydantic v2, causing 100% dynamic HTTP unavailability and blocking all live DAST probes.",
+      "combined_evidence": "PentestFacts(status='error', server_booted=false, target_base_url='http://127.0.0.1:54305', duration_sec=3.52, boot_failure_reason='For further information visit https://errors.pydantic.dev/2.14/u/model-field-missing-annotation'); legacy_flag = True  # type: ignore | smoke_check failed (exit_code=1): pydantic.errors.PydanticUserError: A non-annotated attribute was detected: `legacy_flag = True` when importing order_app.api.handlers",
+      "merged_recommendation": "Add an explicit `legacy_flag: bool = True` annotation in `order_app/schemas.py`, pin `pydantic` and `uvicorn` in `requirements.txt`, and verify `server_booted=true` in `web_pentest`. / Annotate `legacy_flag: bool = True` (or `ClassVar[bool] = True`), migrate `@validator` and `class Config: orm_mode = True` to Pydantic v2 `@field_validator` and `ConfigDict(from_attributes=True)`, and pin `pydantic>=2.7,<3` in `uv.lock`."
+    },
+    {
+      "severity": "critical",
+      "file_path": "order_app/services/processor.py",
+      "line": 8,
+      "symbol": "WEBHOOK_SIGNING_SECRET",
+      "rule_ids": [
+        "common/security"
+      ],
+      "categories": [
+        "security"
+      ],
+      "primary_description": "Hardcoded Stripe-style live signing secret literal in application service module.",
+      "combined_evidence": "WEBHOOK_SIGNING_SECRET = \"sk_live_EXAMPLE_DUMMY_TOKEN_998877665544\"",
+      "merged_recommendation": "Remove hardcoded secret literal immediately, rotate any exposed token, and load signing secrets via validated environment settings or a secret manager."
+    },
+    {
+      "severity": "critical",
+      "file_path": "order_app/services/processor.py",
+      "line": 30,
+      "symbol": "process_order_batch",
+      "rule_ids": [
+        "common/security_vulnerability"
+      ],
+      "categories": [
+        "security"
+      ],
+      "primary_description": "process_order_batch() contains both CWE-502 arbitrary object deserialization via unguarded yaml.load() and CWE-78 OS command injection via shell-interpolated batch_id.",
+      "combined_evidence": "extra_cfg = yaml.load(override_yaml) (CWE-502) and subprocess.run(f'echo batch {batch_id} done', shell=True) at line 63 (CWE-78)",
+      "merged_recommendation": "Replace yaml.load() with yaml.safe_load() validated by a Pydantic model, and eliminate subprocess.run(..., shell=True) in favor of structured Python logging or argument-list invocation (shell=False)."
+    },
+    {
+      "severity": "critical",
+      "file_path": "tests/test_orders.py",
+      "line": 4,
+      "symbol": "test_currency_smoke",
+      "rule_ids": [
+        "common/runtime_verification",
+        "python/testing"
+      ],
+      "categories": [
+        "test_health"
+      ],
+      "primary_description": "Offline pytest passed 1/1 only because test_orders.py imports order_app.constants exclusively, leaving 93.4% of statements (99/106) and 100% of branches completely unexecuted—failing to detect the fatal startup crash in handlers.py/schemas.py.",
+      "combined_evidence": "pytest-cov measured 6.6% line coverage (7/106 statements) and 0.0% branch coverage; processor.py (0/45), handlers.py (0/17), schemas.py (0/12), gateway.py (0/10), pricing.py (0/9), _internal.py (0/6) all at 0.0% | def test_currency_smoke(): is_supported_currency('usd') — no assert statement; 1 test across 12 source files",
+      "merged_recommendation": "Add FastAPI TestClient startup and endpoint tests (`GET /healthz`, `POST /orders`) plus unit tests for `pricing.py`, `processor.py`, and `gateway.py`, enforcing `--cov-fail-under=80` in CI. / Add explicit assertions to test_orders.py and build a mirrored pytest suite (tests/api/test_handlers.py, tests/services/test_processor.py, tests/domain/test_pricing.py, tests/infra/test_gateway.py) using httpx.AsyncClient/TestClient and isolated fixtures targeting >=85% branch coverage."
+    },
+    {
+      "severity": "high",
+      "file_path": "Dockerfile",
+      "line": 6,
+      "symbol": null,
+      "rule_ids": [
+        "common/production_readiness"
+      ],
+      "categories": [
+        "dependencies"
+      ],
+      "primary_description": "Dockerfile entrypoint executes `uvicorn`, which is not declared in `requirements.txt` (relying solely on accidental transitive inclusion or failing with executable-not-found).",
+      "combined_evidence": "CMD [\"uvicorn\", \"order_app.api.handlers:app\", ...] while requirements.txt omits uvicorn",
+      "merged_recommendation": "Explicitly declare `uvicorn[standard]` in runtime dependencies (`pyproject.toml` + `uv.lock`) and verify container startup via `HEALTHCHECK` against `GET /healthz`."
+    },
+    {
+      "severity": "high",
+      "file_path": "order_app/api/handlers.py",
+      "line": 17,
+      "symbol": "POST /orders",
+      "rule_ids": [
+        "common/security_vulnerability"
+      ],
+      "categories": [
+        "security"
+      ],
+      "primary_description": "Dynamic HTTP security probes staged in `.pni/pentests/examples/python/api_legacy_messy/` (`test_app_probes.py`: CWE-306 unauthenticated `POST /orders` and CWE-20 untyped `items` HTTP 500 check, plus baseline header/CORS/sensitive-path and `/legacy/health` surface probes) recorded 0 executed probes because container startup failed prior to socket binding, leaving `POST /orders` dynamically unverified at runtime.",
+      "combined_evidence": ".pni/pentests/examples/python/api_legacy_messy/test_app_probes.py (test_orders_endpoint_requires_authentication [CWE-306], test_orders_untyped_items_payload_does_not_trigger_500 [CWE-20]); probe_summary.total_probes=0 due to server_booted=false",
+      "merged_recommendation": "Enforce FastAPI authentication `Depends(...)` on `POST /orders`, replace `List[Dict[str, Any]]` with a typed `OrderItem(BaseModel)` schema returning `422` on malformed items, and enforce `.pni/pentests/examples/python/api_legacy_messy/` as a mandatory post-fix CI DAST gate."
+    },
+    {
+      "severity": "high",
+      "file_path": "order_app/api/handlers.py",
+      "line": 18,
+      "symbol": "submit_orders",
+      "rule_ids": [
+        "common/security_vulnerability"
+      ],
+      "categories": [
+        "security"
+      ],
+      "primary_description": "State-mutating POST /orders endpoint lacks authentication/authorization dependencies, omits response_model typing, accepts arbitrary dict line items, and co-hosts dead legacy Flask routes.",
+      "combined_evidence": "@app.post('/orders') without auth dependency, missing response_model, accepting List[Dict[str, Any]] items and dropping customer_id/metadata",
+      "merged_recommendation": "Enforce FastAPI Security/Depends authentication on POST /orders, define strict typed OrderLineItem and OrderBatchResponse Pydantic v2 models, migrate @app.on_event to lifespan, and remove legacy_flask."
+    },
+    {
+      "severity": "high",
+      "file_path": "order_app/api/handlers.py",
+      "line": 31,
+      "symbol": "legacy_health",
+      "rule_ids": [
+        "common/production_readiness"
+      ],
+      "categories": [
+        "architecture"
+      ],
+      "primary_description": "Health check endpoint /legacy/health is registered on a standalone Flask object that Uvicorn never mounts, leaving the live FastAPI service with zero liveness/readiness probe (HTTP 404 on /legacy/health and /healthz).",
+      "combined_evidence": "@legacy_flask.route('/legacy/health') on Flask(__name__) while Dockerfile runs uvicorn order_app.api.handlers:app (FastAPI)",
+      "merged_recommendation": "Remove legacy_flask and register typed GET /healthz and GET /readyz endpoints directly on the FastAPI app alongside a Dockerfile HEALTHCHECK."
+    },
+    {
+      "severity": "high",
+      "file_path": "order_app/domain/pricing.py",
+      "line": 3,
+      "symbol": "calculate_legacy_total",
+      "rule_ids": [
+        "common/architecture"
+      ],
+      "categories": [
+        "architecture"
+      ],
+      "primary_description": "Domain pricing module imports upward from API layer (handlers.ACTIVE_PROMO_CODES) forming a 3-node circular dependency and reaches directly into private infra._internal (/tmp file check).",
+      "combined_evidence": "from order_app.api import handlers; from order_app.infra._internal import _compute_handling_fee",
+      "merged_recommendation": "Move ACTIVE_PROMO_CODES to order_app/constants.py or domain models, inject fee rules via a clean domain policy/port, and switch monetary arithmetic from float to Decimal or integer cents."
+    },
+    {
+      "severity": "high",
+      "file_path": "order_app/infra/gateway.py",
+      "line": 7,
+      "symbol": "notify_partner_webhook",
+      "rule_ids": [
+        "python/modern_stack"
+      ],
+      "categories": [
+        "code_quality"
+      ],
+      "primary_description": "Async webhook helper imports undeclared boto3 (causing ImportError if imported), pollutes namespace with wildcard math import, blocks the event loop with sync sleep/HTTP, and omits HTTP timeouts.",
+      "combined_evidence": "from math import *; import boto3 (undeclared); time.sleep(1) and requests.post(endpoint, json=payload) without timeout inside async def",
+      "merged_recommendation": "Remove wildcard math and unused boto3 imports, replace time.sleep/requests.post with httpx.AsyncClient(timeout=5.0), and document webhook error semantics."
+    },
+    {
+      "severity": "high",
+      "file_path": "order_app/infra/gateway.py",
+      "line": 11,
+      "symbol": "notify_partner_webhook",
+      "rule_ids": [
+        "common/production_readiness"
+      ],
+      "categories": [
+        "code_quality"
+      ],
+      "primary_description": "Outbound partner webhook call omits timeout= (allowing hung sockets to stall workers indefinitely) and blocks the asyncio event loop.",
+      "combined_evidence": "resp = requests.post(endpoint, json=payload) preceded by time.sleep(1) inside async def",
+      "merged_recommendation": "Use httpx.AsyncClient(timeout=httpx.Timeout(5.0)) managed via FastAPI lifespan state with bounded retry/backoff and structured error logging."
+    },
+    {
+      "severity": "high",
+      "file_path": "order_app/services/processor.py",
+      "line": 11,
+      "symbol": "process_order_batch",
+      "rule_ids": [
+        "common/maintainability"
+      ],
+      "categories": [
+        "code_quality"
+      ],
+      "primary_description": "process_order_batch() combines 8 untyped parameters, a cross-request bug via mutable default tags=[], thread-unsafe global ORDER_STATE_CACHE, cognitive complexity 44, and silent exception swallowing.",
+      "combined_evidence": "params=8, tags=[], global ORDER_STATE_CACHE, cognitive=44, bare except: (line 31), except Exception: pass (line 64)",
+      "merged_recommendation": "Encapsulate batch parameters in a frozen dataclass/Pydantic DTO, replace tags=[] with tuple/None default, inject a bounded repository instead of global ORDER_STATE_CACHE, decompose per-order validation helpers, and log specific exceptions."
+    },
+    {
+      "severity": "high",
+      "file_path": "order_app/services/processor.py",
+      "line": 21,
+      "symbol": "ORDER_STATE_CACHE",
+      "rule_ids": [
+        "common/twelve_factor"
+      ],
+      "categories": [
+        "architecture"
+      ],
+      "primary_description": "Service embeds process-local mutable state (ORDER_STATE_CACHE, tags=[]) and local /tmp filesystem checks alongside scattered os.getenv() reads, breaking multi-replica stateless horizontal scaling.",
+      "combined_evidence": "global ORDER_STATE_CACHE; tags=[]; os.getenv('LEGACY_GATEWAY_MODE', 'sync'); /tmp/order_spool/fees.dat in _internal.py:5",
+      "merged_recommendation": "Centralize all environment config in a pydantic-settings Settings class and externalize batch state and fee schedules into injected repository/cache ports."
+    },
+    {
+      "severity": "high",
+      "file_path": "requirements.txt",
+      "line": 1,
+      "symbol": null,
+      "rule_ids": [
+        "common/supply_chain",
+        "python/dependencies"
+      ],
+      "categories": [
+        "dependencies"
+      ],
+      "primary_description": "Builds are non-reproducible due to unpinned transitive resolution and lack automated vulnerability monitoring or disclosure policy.",
+      "combined_evidence": "8 unpinned packages in requirements.txt; zero lockfiles; LICENSE=False, SECURITY.md=False, dependabot=False | 8 unpinned packages (fastapi, flask, pydantic, requests, pyyaml, urllib3, flake8, black); lockfiles=[]; uvicorn and boto3 missing",
+      "merged_recommendation": "Adopt pyproject.toml + uv.lock, add .github/dependabot.yml for pip and github-actions ecosystems, and add LICENSE and SECURITY.md. / Migrate setup.py and requirements.txt to PEP 621 pyproject.toml + uv.lock, separate dev tools into [dependency-groups].dev, declare uvicorn explicitly, and remove unused flask/boto3."
+    },
+    {
+      "severity": "high",
+      "file_path": "requirements.txt",
+      "line": 6,
+      "symbol": "urllib3",
+      "rule_ids": [
+        "common/security_vulnerability"
+      ],
+      "categories": [
+        "security"
+      ],
+      "primary_description": "Resolved Python environment contains 7 application-layer CVEs including 4 HIGH vulnerabilities in urllib3 (declared directly despite being unused in source), setuptools, and transitive msgpack (pulled by unused flake8/black/dev stack).",
+      "combined_evidence": "app_vuln_counts={high:4, medium:2, low:1}: urllib3@2.7.0 (CVE-2026-97687 CVSS 8.1, CVE-2026-97689 CVSS 7.5 -> 2.8.0), setuptools@70.3.0 (CVE-2025-47273 CVSS 8.8 -> 78.1.1), msgpack@1.1.2 (GHSA-6v7p-g79w-8964 CVSS 7.5 -> 1.2.1)",
+      "merged_recommendation": "Remove unused urllib3, flake8, and black from runtime dependencies, lock urllib3>=2.8.0 in uv.lock, and use a multi-stage uv build that strips setuptools/pip from the runtime image."
+    },
+    {
+      "severity": "medium",
+      "file_path": "README.md",
+      "line": 1,
+      "symbol": null,
+      "rule_ids": [
+        "common/documentation"
+      ],
+      "categories": [
+        "documentation"
+      ],
+      "primary_description": "README.md omits system overview, prerequisites, environment variables (LEGACY_GATEWAY_MODE), API endpoint specs, and test/lint execution instructions.",
+      "combined_evidence": "2 lines total ('# Legacy Order Hub' and single uvicorn startup sentence)",
+      "merged_recommendation": "Expand README.md following Standard Readme & Diátaxis structure with architecture overview, local uv setup, API request/response examples, and test commands."
+    },
+    {
+      "severity": "medium",
+      "file_path": "config/service_account_dummy.json",
+      "line": 1,
+      "symbol": null,
+      "rule_ids": [
+        "common/security"
+      ],
+      "categories": [
+        "security"
+      ],
+      "primary_description": "Service account JSON credential file resides in version-controlled config/ without .gitignore or secret-scanning exclusion controls.",
+      "combined_evidence": "Committed credential-shaped file config/service_account_dummy.json in repository tree",
+      "merged_recommendation": "Remove service account JSON files from version control, add credential patterns to .gitignore and .dockerignore, and inject credentials at runtime via Workload Identity or secret mounts."
+    },
+    {
+      "severity": "medium",
+      "file_path": "order_app/schemas.py",
+      "line": 5,
+      "symbol": "LegacyOrderPayload",
+      "rule_ids": [
+        "python/typing"
+      ],
+      "categories": [
+        "type_safety"
+      ],
+      "primary_description": "Request schema uses deprecated Pydantic v1 idioms, suppresses type checking with unscoped # type: ignore, and leaves order items untyped as Dict[str, Any].",
+      "combined_evidence": "items: List[Dict[str, Any]]; metadata: dict = {}; legacy_flag = True # type: ignore; Pydantic v1 Config & @validator",
+      "merged_recommendation": "Upgrade LegacyOrderPayload to Pydantic v2 (model_config = ConfigDict(extra='forbid'), @field_validator, Field(default_factory=dict)), type OrderItem strictly, and remove # type: ignore."
+    },
+    {
+      "severity": "medium",
+      "file_path": "order_app/services/processor.py",
+      "line": 25,
+      "symbol": "process_order_batch",
+      "rule_ids": [
+        "common/twelve_factor"
+      ],
+      "categories": [
+        "code_quality"
+      ],
+      "primary_description": "Service emits unstructured stdout print() messages and silently discards YAML parsing and subprocess exceptions without log levels or trace context.",
+      "combined_evidence": "print('Starting batch:', ...) in processor.py:25, handlers.py:14, gateway.py:10; bare except: in processor.py:31; except Exception: pass in processor.py:64",
+      "merged_recommendation": "Configure structured stdlib logging (JSON/key-value) across all modules and log caught exceptions with exc_info and request/batch correlation IDs."
+    },
+    {
+      "severity": "medium",
+      "file_path": "scripts/legacy_sync.sh",
+      "line": 1,
+      "symbol": null,
+      "rule_ids": [
+        "common/supply_chain"
+      ],
+      "categories": [
+        "architecture"
+      ],
+      "primary_description": "Oversized legacy Bash script (106 LOC > 100 LOC threshold) performs CSV parsing, ledger reconciliation, and archive rotation without strict shell safety or unit tests.",
+      "combined_evidence": "106 LOC Bash script mutating /var/tmp/order_batches without set -u or set -o pipefail",
+      "merged_recommendation": "Replace scripts/legacy_sync.sh with a typed, unit-tested Python CLI command (e.g., Typer) sharing order_app domain validation."
+    },
+    {
+      "severity": "low",
+      "file_path": "order_app/domain/pricing.py",
+      "line": 8,
+      "symbol": "calculate_legacy_total",
+      "rule_ids": [
+        "python/code_quality"
+      ],
+      "categories": [
+        "documentation"
+      ],
+      "primary_description": "calculate_legacy_total() docstring documents non-existent parameters (raw_items, discount_pct), misleading maintainers and API consumers.",
+      "combined_evidence": "Docstring lists raw_items and discount_pct instead of items and coupon_code; 12 missing docstrings across repo",
+      "merged_recommendation": "Synchronize Google-style docstrings with actual signatures across handlers.py, schemas.py, processor.py, pricing.py, and gateway.py."
+    }
+  ],
+  "action_plan": [
+    {
+      "priority": "P0",
+      "title": "Eliminate Hardcoded Secret & Committed Credential File",
+      "category": "security",
+      "target_files": [
+        "order_app/services/processor.py",
+        "config/service_account_dummy.json"
+      ],
+      "related_rules": [
+        "common/security"
+      ],
+      "action": "Externalize WEBHOOK_SIGNING_SECRET in order_app/services/processor.py into typed environment configuration (pydantic-settings), delete config/service_account_dummy.json from git tracking, and enforce secret-scanning in CI.",
+      "expected_impact": "Removes embedded secrets from source code and container build contexts."
+    },
+    {
+      "priority": "P0",
+      "title": "Lock Down GitHub Actions Workflow & Container Build Hygiene",
+      "category": "security",
+      "target_files": [
+        ".github/workflows/deploy.yml",
+        "Dockerfile",
+        "config/service_account_dummy.json"
+      ],
+      "related_rules": [
+        "common/supply_chain",
+        "common/security"
+      ],
+      "action": "Change pull_request_target to pull_request, declare permissions: contents: read, pin GitHub Actions to commit SHAs, pin Dockerfile to python:3.12-slim with a non-root USER and .dockerignore, and purge config/service_account_dummy.json from versioned runtime contexts.",
+      "expected_impact": "Eliminates CI privilege-escalation vectors, prevents root container execution, and stops credential files from entering container images."
+    },
+    {
+      "priority": "P0",
+      "title": "Remediate CWE-502/CWE-78 Sinks, Mutable State Bugs & Unauthenticated API",
+      "category": "security",
+      "target_files": [
+        "order_app/services/processor.py",
+        "order_app/api/handlers.py",
+        "order_app/schemas.py"
+      ],
+      "related_rules": [
+        "common/security_vulnerability",
+        "common/security",
+        "common/maintainability"
+      ],
+      "action": "Replace yaml.load() with yaml.safe_load(), remove subprocess.run(..., shell=True), eliminate mutable default tags=[] and global ORDER_STATE_CACHE, enforce strict Pydantic v2 line-item validation, and add authentication dependencies on POST /orders.",
+      "expected_impact": "Eliminates remote code execution / command injection sinks, stops cross-request tag leakage, and secures the HTTP boundary."
+    },
+    {
+      "priority": "P0",
+      "title": "Restore live container HTTP boot and pass staged .pni/pentests DAST gate (CWE-306 / CWE-20)",
+      "category": "security",
+      "target_files": [
+        "order_app/schemas.py",
+        "order_app/api/handlers.py",
+        "requirements.txt"
+      ],
+      "related_rules": [
+        "common/security_vulnerability",
+        "CWE-306",
+        "CWE-20",
+        "CWE-693"
+      ],
+      "action": "Fix `LegacyOrderPayload.legacy_flag: bool = True` and typed `OrderItem` models in `order_app/schemas.py`, add pinned `uvicorn` to `requirements.txt`, enforce authentication and security headers on `order_app/api/handlers.py`, and re-execute `web_pentest` against `.pni/pentests/examples/python/api_legacy_messy/` (`test_app_probes.py`, `test_baseline_http.py`, `test_target_surface.py`).",
+      "expected_impact": "Restores `server_booted=true` for the containerized ASGI service and dynamically verifies authentication (`401`/`403` on unauthenticated `POST /orders`, CWE-306), strict `422` payload validation (CWE-20), and baseline HTTP security headers across all staged DAST probes."
+    },
+    {
+      "priority": "P0",
+      "title": "Upgrade Vulnerable Python Packages & Replace Bloated python:latest Root Image",
+      "category": "security",
+      "target_files": [
+        "Dockerfile",
+        "requirements.txt",
+        "setup.py"
+      ],
+      "related_rules": [
+        "common/security_vulnerability",
+        "common/supply_chain",
+        "CVE-2025-47273",
+        "CVE-2026-97687",
+        "CVE-2026-97689",
+        "GHSA-6v7p-g79w-8964",
+        "DS-0002",
+        "DS-0001",
+        "DS-0026"
+      ],
+      "action": "Adopt a multi-stage Dockerfile pinned to `python:3.12-slim` with non-root `USER`, `HEALTHCHECK`, and `.dockerignore`; lock runtime dependencies via `uv.lock` (`urllib3>=2.8.0`), drop unused `flake8`/`black`/`urllib3`, and exclude `setuptools`/`pip` from the final runtime stage.",
+      "expected_impact": "Eliminates all 4 HIGH Python CVEs, removes >90% of the 3,554 Debian `-dev` OS CVEs (including all MariaDB/OpenEXR CRITICALs), and resolves DS-0001/DS-0002/DS-0026."
+    },
+    {
+      "priority": "P0",
+      "title": "Build Assertion-Backed Mirror Test Suite for API, Processor & Pricing",
+      "category": "test_health",
+      "target_files": [
+        "tests/test_orders.py",
+        "order_app/api/handlers.py",
+        "order_app/services/processor.py",
+        "order_app/domain/pricing.py"
+      ],
+      "related_rules": [
+        "python/testing"
+      ],
+      "action": "Declare pytest, pytest-cov, and httpx in [dependency-groups].dev, fix test_currency_smoke assertions, and add unit/integration tests covering POST /orders validation, promo/fee/tax boundaries, hold/cancelled order branches, and error handling.",
+      "expected_impact": "Establishes regression safety before refactoring legacy circular imports and CWE security sinks, raising real assertion-backed coverage from near-zero to >=85%."
+    },
+    {
+      "priority": "P0",
+      "title": "Fix Fatal Startup PydanticUserError & Missing Uvicorn Entrypoint",
+      "category": "type_safety",
+      "target_files": [
+        "order_app/schemas.py",
+        "order_app/api/handlers.py",
+        "requirements.txt",
+        "Dockerfile"
+      ],
+      "related_rules": [
+        "common/runtime_verification",
+        "common/production_readiness"
+      ],
+      "action": "Fix unannotated `legacy_flag: bool = True` and Pydantic v1 deprecations in `order_app/schemas.py`, declare `uvicorn` in locked runtime dependencies, add `GET /healthz` on FastAPI `app`, and add an import/TestClient smoke test so startup regressions fail immediately.",
+      "expected_impact": "Restores clean ASGI application boot (`RV-04` PASS) and guarantees container entrypoint availability."
+    },
+    {
+      "priority": "P1",
+      "title": "Break Circular Dependency, Enforce Clean Layering & Complete Type Hints",
+      "category": "architecture",
+      "target_files": [
+        "order_app/domain/pricing.py",
+        "order_app/api/handlers.py",
+        "order_app/infra/_internal.py",
+        "order_app/infra/gateway.py",
+        "order_app/constants.py"
+      ],
+      "related_rules": [
+        "common/architecture",
+        "python/typing",
+        "python/modern_stack"
+      ],
+      "action": "Relocate ACTIVE_PROMO_CODES to order_app/constants.py, decouple pricing.py from api.handlers and infra._internal, remove Flask co-hosting and undeclared boto3, migrate gateway.py to httpx.AsyncClient with explicit timeout, and achieve 100% static type coverage.",
+      "expected_impact": "Restores a strict acyclic dependency graph (DAG), prevents event-loop stalls, and enables zero-error static type checking."
+    },
+    {
+      "priority": "P1",
+      "title": "Implement FastAPI Lifespan, /healthz Probe, Typed Settings & Async HTTP Timeouts",
+      "category": "architecture",
+      "target_files": [
+        "order_app/api/handlers.py",
+        "order_app/infra/gateway.py",
+        "order_app/services/processor.py",
+        "order_app/infra/_internal.py"
+      ],
+      "related_rules": [
+        "common/twelve_factor",
+        "common/production_readiness"
+      ],
+      "action": "Introduce a centralized pydantic-settings config module, migrate FastAPI startup/shutdown to an @asynccontextmanager lifespan, replace legacy_flask /legacy/health with FastAPI GET /healthz, replace print() and silent excepts with structured logging, and enforce explicit timeouts via httpx.AsyncClient.",
+      "expected_impact": "Enables stateless multi-worker deployment, reliable Kubernetes/Docker health probing, bounded outbound I/O latency, and structured production observability."
+    },
+    {
+      "priority": "P1",
+      "title": "Add OpenSSF Governance Files & Automated Dependency Updates",
+      "category": "dependencies",
+      "target_files": [
+        ".github/workflows/deploy.yml",
+        "requirements.txt"
+      ],
+      "related_rules": [
+        "common/supply_chain",
+        "common/git_workflow"
+      ],
+      "action": "Add .gitignore, LICENSE, SECURITY.md, and .github/dependabot.yml covering Python and GitHub Actions dependencies alongside SHA-pinned workflow steps.",
+      "expected_impact": "Raises OpenSSF Scorecard supply-chain posture and prevents silent drift onto vulnerable dependencies."
+    },
+    {
+      "priority": "P1",
+      "title": "Migrate to PEP 621 pyproject.toml + Deterministic uv.lock",
+      "category": "dependencies",
+      "target_files": [
+        "requirements.txt",
+        "setup.py"
+      ],
+      "related_rules": [
+        "python/dependencies",
+        "common/supply_chain"
+      ],
+      "action": "Replace setup.py and unpinned requirements.txt with pyproject.toml and uv.lock, declare uvicorn explicitly, remove redundant flask/boto3, move linters/test runners to [dependency-groups].dev, and add LICENSE, SECURITY.md, .gitignore, and Dependabot.",
+      "expected_impact": "Guarantees reproducible, auditable dependency installation and eliminates missing-runtime-dependency crashes."
+    },
+    {
+      "priority": "P1",
+      "title": "Eliminate 0.0% Coverage Blind Spots Across Core Modules (6.6% -> >=85%)",
+      "category": "test_health",
+      "target_files": [
+        "tests/test_orders.py",
+        "order_app/services/processor.py",
+        "order_app/domain/pricing.py",
+        "order_app/infra/gateway.py"
+      ],
+      "related_rules": [
+        "common/runtime_verification"
+      ],
+      "action": "Write isolated offline unit and ASGI tests covering all 6 zero-coverage modules (`processor.py` 45 stmts, `handlers.py` 17 stmts, `schemas.py` 12 stmts, `gateway.py` 10 stmts, `pricing.py` 9 stmts, `_internal.py` 6 stmts).",
+      "expected_impact": "Raises measured statement coverage from 6.6% (7/106) and branch coverage from 0.0% to >=85% / >=75%."
+    },
+    {
+      "priority": "P2",
+      "title": "Decompose Batch Processor Complexity & Fix Stale/Missing Docstrings",
+      "category": "code_quality",
+      "target_files": [
+        "order_app/services/processor.py",
+        "order_app/domain/pricing.py",
+        "order_app/api/handlers.py"
+      ],
+      "related_rules": [
+        "python/code_quality",
+        "common/maintainability"
+      ],
+      "action": "Refactor process_order_batch() (cognitive complexity 44 -> <15) into focused validation/pricing helpers using structured logging instead of print(), and add accurate Google-style docstrings across all public modules and functions.",
+      "expected_impact": "Cuts cognitive complexity by >65%, removes silent bare except blocks, and raises docstring accuracy to 100%."
+    },
+    {
+      "priority": "P2",
+      "title": "Modernize Batch Sync CLI & Author Standard README Documentation",
+      "category": "documentation",
+      "target_files": [
+        "README.md",
+        "scripts/legacy_sync.sh"
+      ],
+      "related_rules": [
+        "common/documentation",
+        "common/git_workflow"
+      ],
+      "action": "Port scripts/legacy_sync.sh (106 LOC Bash) into a typed Python CLI subcommand with unit tests, and expand README.md with architecture, setup, configuration, API endpoints, and development workflow docs.",
+      "expected_impact": "Improves onboarding clarity, eliminates fragile shell CSV parsing, and brings batch sync logic under automated Python test coverage."
+    }
+  ],
+  "report_hints": [
+    "Highlight how unpinned pydantic in requirements.txt + unscoped # type: ignore on LegacyOrderPayload.legacy_flag = True causes an immediate runtime PydanticUserError startup crash missed by the 6.6%-coverage assertion-free test.",
+    "Visualize the 3-node circular dependency (handlers -> processor -> pricing -> handlers) and private infra._internal bypass with HeatmapOverlay highlighting processor.py, Dockerfile, and schemas.py.",
+    "Contrast the 7 Python package CVEs (4 HIGH: setuptools, urllib3 x2, msgpack) against the 3,554 Debian 13.7 OS CVEs dragged in by FROM python:latest running as root (DS-0002).",
+    "Map CWE-502 (yaml.load) and CWE-78 (subprocess.run shell=True) sinks alongside unauthenticated POST /orders and pull_request_target CI exposure."
+  ],
+  "summary": "legacy-order-hub (examples/python/api_legacy_messy) scores 20/100 (Grade D), reflecting critical technical debt, runtime failure, and security exposure across every engineering dimension. Dynamically, both ASGI smoke verification and live container HTTP penetration testing (web_pentest, status='error', server_booted=false on http://127.0.0.1:54305 in 3.52s) crash at import with PydanticUserError on unannotated LegacyOrderPayload.legacy_flag = True under unpinned Pydantic v2 ('For further information visit https://errors.pydantic.dev/2.14/u/model-field-missing-annotation'), blocking live execution of the staged .pni/pentests/examples/python/api_legacy_messy/ DAST suite (CWE-306 & CWE-20) while its sole assertion-free unit test covers only 6.6% of statements (7/106, 0.0% branches). Architecturally and securely, the repository exhibits a 3-module circular import (handlers <-> processor <-> pricing), cognitive-complexity-44 batch logic with mutable default tags=[] and global ORDER_STATE_CACHE, CWE-502 yaml.load() and CWE-78 subprocess.run(shell=True) sinks, hardcoded/committed credentials, a privileged pull_request_target CI workflow, and a root python:latest container carrying 7 Python CVEs (4 HIGH) and 3,554 Debian OS CVEs (24 CRITICAL, 436 HIGH)."
+}

@@ -1,0 +1,38 @@
+id: php_legacy_shop_messy_migration
+category: migration
+based_on: php_legacy_shop_messy
+name: Migration Execution Plan - Legacy Procedural PHP Shop -> PHP 8.3 + Laravel 11 (Strangler Fig)
+description: Cross-stack Strangler Fig migration proposal for examples/php/legacy_shop_messy targeting PHP 8.3, Laravel 11 MVC + Service/Action boundaries, MySQL 8 PDO/Eloquent prepared statements, and Redis 7 session & cart externalization.
+
+steps:
+  - id: migration_intelligence_and_plan
+    uses: migration_proposal
+    with:
+      output_dir: "reports/php"
+      target: "legacy_shop_messy_migration"
+      migration_strategy: "strangler_fig"
+      api_compatibility: "strict"
+      bug_handling_policy: "ask_human"
+      codemod_tool: "rector"
+      brief: |
+        Target Stack & Infrastructure (Confirmed):
+          - Runtime & Framework: PHP 8.3 (`declare(strict_types=1)`) + Laravel 11 with Composer PSR-4 autoloading and PHPUnit 11 + PHPStan Level 6
+          - Database & Persistence: MySQL 8.0 via Laravel Eloquent / PDO prepared statements and versioned database migrations (eliminate raw `mysqli_query` SQLi and `global $LAST_DB_ERR`)
+          - Cache & Session State: Redis 7 backed Laravel Session & server-side `CartRepository` (replace insecure `unserialize($_COOKIE['shop_cart'])` and raw `$_SESSION` mutations)
+          - Outbound HTTP & Admin Jobs: Laravel `Http::timeout(5)` client with TLS verification (`CURLOPT_SSL_VERIFYPEER=true`) and queued Artisan `BackupDatabaseJob` via Symfony `Process` array args (eliminate `shell_exec`)
+          - Authentication Upgrade: Dual-verify transparent password hash upgrade (`bcrypt(md5($plain))` or rehash-on-login) replacing raw `md5()` and loose `==` magic-hash comparison (`0e462097...`)
+        Target Design Philosophy:
+          - Incremental **Strangler Fig** route-by-route cutover behind Nginx reverse proxy (`/products` -> `/cart` & `/` -> `/login` -> `/admin/backup`) into Modular Laravel Architecture (`Http/Controllers` + `Http/Requests` -> `Actions/UseCases` -> `Domain/Contracts` -> `Infrastructure/{Eloquent,Redis,Http}`).
+        Compatibility & Ambiguity Guardrails:
+          - Preserve existing URL paths and query parameter keys (`?q=`, `?cat=`) during Strangler Fig coexistence while neutralizing LFI (`?page=`), XSS (`?promo_html=`), and `?debug=1` raw `var_dump` leaks via Stakeholder Decision Log.
+        Confirmed Non-Goals:
+          - Do not introduce a separate React/Vue SPA or split microservices; render server-side escaped Blade templates first.
+
+  - id: compile_migration_report
+    uses: write_migration_report
+    with:
+      src_dir: "reports_src/php"
+      output_dir: "reports/php"
+      target: "legacy_shop_messy_migration"
+      lang: "ja"
+      style: "google"

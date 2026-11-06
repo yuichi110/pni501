@@ -1,0 +1,76 @@
+#!/bin/bash
+
+# Detect whether the script is being sourced or executed directly
+IS_SOURCED=0
+if [ -n "$ZSH_VERSION" ]; then
+  case $ZSH_EVAL_CONTEXT in *:file*) IS_SOURCED=1 ;; esac
+  SELF_PATH="${(%):-%x}"
+elif [ -n "$BASH_VERSION" ]; then
+  if [ "${BASH_SOURCE[0]}" != "$0" ]; then IS_SOURCED=1; fi
+  SELF_PATH="${BASH_SOURCE[0]}"
+else
+  SELF_PATH="$0"
+fi
+
+# Determine the absolute path of the directory containing this script.
+SCRIPT_DIR="$(cd "$(dirname "${SELF_PATH}")" && pwd)"
+
+# When sourced (e.g. `source ./pcli`), register shell autocompletion and alias, then return
+if [ "$IS_SOURCED" -eq 1 ]; then
+  if [ -n "$ZSH_VERSION" ]; then
+    autoload -Uz +X compinit && compinit -u 2>/dev/null || true
+    autoload -Uz +X bashcompinit && bashcompinit 2>/dev/null || true
+  fi
+
+  _pcli_completions() {
+    local candidates
+    candidates=$(
+      _PCLI_COMPLETE=complete \
+      COMP_WORDS="${COMP_WORDS[*]}" \
+      COMP_CWORD="${COMP_CWORD}" \
+      "${SCRIPT_DIR}/pcli"
+    )
+    COMPREPLY=( $(compgen -W "$candidates" -- "${COMP_WORDS[COMP_CWORD]}") )
+  }
+
+  complete -F _pcli_completions ./pcli
+  complete -F _pcli_completions "${SCRIPT_DIR}/pcli"
+  complete -F _pcli_completions pcli
+  alias pcli="${SCRIPT_DIR}/pcli"
+
+  echo "✓ pcli autocompletion & alias registered. You can now use './pcli <tab>' or 'pcli <tab>'."
+  return 0 2>/dev/null || exit 0
+fi
+
+# Add the root and src directories to PYTHONPATH to make tools.pcli and packages inside src/ importable.
+export PYTHONPATH="${SCRIPT_DIR}:${SCRIPT_DIR}/src${PYTHONPATH:+:$PYTHONPATH}"
+
+# Dynamic Autocomplete Gate
+# If _PCLI_COMPLETE environment variable is set, route execution directly
+# to the completion handler and bypass all other standard CLI execution logic.
+if [ -n "${_PCLI_COMPLETE}" ]; then
+  exec uv run python -m "tools.pcli.completion"
+fi
+
+# If no command is provided, or the user requests global help, delegate to the master launcher (tools/pcli/__main__.py)
+if [ $# -lt 1 ] || [ "$1" = "--help" ] || [ "$1" = "-h" ]; then
+  exec uv run python -m "tools.pcli" "$@"
+fi
+
+CLI_NAME="$1"
+CLI_MOD="${CLI_NAME//-/_}"
+shift
+
+# Check if the target toolset file or package exists inside tools/pcli/
+# Exclude base/system directories or module entrypoints
+if { [ ! -f "${SCRIPT_DIR}/tools/pcli/${CLI_MOD}.py" ] && [ ! -d "${SCRIPT_DIR}/tools/pcli/${CLI_MOD}" ]; } || \
+   [ "${CLI_MOD}" = "__init__" ] || \
+   [ "${CLI_MOD}" = "__main__" ] || \
+   [ "${CLI_MOD}" = "common" ] || \
+   [ "${CLI_MOD}" = "completion" ] || \
+   [[ "${CLI_MOD}" == _* ]]; then
+  exec uv run python -m "tools.pcli" --invalid-toolset "${CLI_NAME}"
+fi
+
+# Execute the target CLI script as a module under tools.pcli.*
+exec uv run python -m "tools.pcli.${CLI_MOD}" "$@"

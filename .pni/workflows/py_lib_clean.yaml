@@ -1,0 +1,50 @@
+id: py_lib_clean
+category: audit
+name: Sample Audit - Python Clean Library (metrics-kit)
+description: Evaluate examples/python/lib_clean against reusable library API purity, PEP 561 typing, Diátaxis docs, and supply-chain standards.
+
+targets:
+  root: "examples/python/lib_clean"
+  source:
+    - "src"
+  tests:
+    - "tests"
+  docs:
+    - "README.md"
+
+steps:
+  - id: repo_and_deps
+    uses: repo_structure_audit
+
+  - id: ast_and_quality
+    uses: python_ast_audit
+
+  - id: arch_recording
+    uses: architecture_analysis
+
+  - id: library_hygiene
+    uses: library_hygiene_audit
+
+  - id: test_health
+    uses: python_test_audit
+
+  - id: runtime_verification
+    uses: container_runtime_audit
+
+  - id: security_audit
+    uses: security_vulnerability_audit
+
+  - id: output_score
+    uses: emit_score
+    with:
+      output_dir: "reports/python"
+      target: "lib_clean"
+
+  - id: create_report
+    uses: write_drawlib_report
+    with:
+      src_dir: "reports_src/python"
+      output_dir: "reports/python"
+      target: "lib_clean"
+      lang: "ja"
+      style: "google"

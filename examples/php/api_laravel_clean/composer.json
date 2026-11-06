@@ -1,0 +1,30 @@
+{
+  "name": "acme/order-fulfillment-api",
+  "description": "Strict PHP 8.3 order fulfillment HTTP service with parameterized PDO persistence and HMAC verification.",
+  "version": "1.0.0",
+  "type": "project",
+  "license": "Apache-2.0",
+  "require": {
+    "php": "^8.3",
+    "ext-pdo": "*"
+  },
+  "require-dev": {
+    "laravel/pint": "^1.18",
+    "phpstan/phpstan": "^1.12",
+    "phpunit/phpunit": "^10.5"
+  },
+  "autoload": {
+    "psr-4": {
+      "App\\": "app/"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "Tests\\": "tests/"
+    }
+  },
+  "config": {
+    "optimize-autoloader": true,
+    "sort-packages": true
+  }
+}

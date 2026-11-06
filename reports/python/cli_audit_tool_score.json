@@ -1,0 +1,1659 @@
+{
+  "project_name": "logpulse",
+  "workflow_id": "py_cli_audit_tool",
+  "workflow_run_id": "wf-7f0bbfdb",
+  "evaluated_at": "2026-10-24T07:35:17.310642+00:00",
+  "language": "python",
+  "target_root": "examples/python/cli_audit_tool",
+  "facts_file": ".pni/cache/py_cli_audit_tool/facts.json",
+  "key_files_inspected": [
+    "pyproject.toml",
+    "uv.lock",
+    "README.md",
+    "LICENSE",
+    ".gitignore",
+    "src/logpulse/__init__.py",
+    "src/logpulse/models.py",
+    "src/logpulse/parser.py",
+    "src/logpulse/analyzer.py",
+    "src/logpulse/formatter.py",
+    "src/logpulse/cli.py",
+    "tests/test_parser.py",
+    "tests/test_analyzer.py"
+  ],
+  "overall_score": 77,
+  "grade": "B",
+  "category_scores": {
+    "architecture": 90,
+    "code_quality": 80,
+    "typing": 84,
+    "testing": 64,
+    "dependencies": 68,
+    "security": 78,
+    "documentation": 72
+  },
+  "category_rationales": {
+    "architecture": "Exemplary 4-layer acyclic pipeline (`cli` -> `parser`/`analyzer`/`formatter` -> `models`) with 0 circular dependencies, 0 boundary violations, and immutable `@dataclass(frozen=True)` domain models.",
+    "code_quality": "Concise low-complexity modules (207 total LOC, 100% import hygiene, strict stdout/stderr separation), tempered by single-command Typer `scan` subcommand collapse without `@app.callback()`, missing `--version`/`-h`, and eager `read_text()` without `OSError` exit-code-2 handling.",
+    "typing": "100.0% function parameter/return annotation coverage and modern Python 3.11+ generics, with minor deductions for `dict[str, Any]` in `formatter.py:report_to_dict`, missing `py.typed`, and absence of a static type checker (`ty`/`pyright`) in dev dependencies.",
+    "testing": "Hermetic `--network=none` container pytest suite passes 2/2 tests (100% coverage in `models.py` and `analyzer.py`), but overall measured coverage is 67.0% line / 33.3% branch due to 0.0% coverage in `cli.py` and 55.6% in `formatter.py`.",
+    "dependencies": "Clean PEP 621 `pyproject.toml` and minimal 2-package runtime footprint (`rich`, `typer`), held back by an unresolved 12-line `uv.lock` stub without transitive pins/hashes, missing Dependabot/CI automation, and a 2-line `LICENSE` stub.",
+    "security": "Strong code security posture (0 CRITICAL/HIGH Python app CVEs, 0 secrets, 0 IaC misconfigs, 0 CWE AST sinks, 0 HTTP routes), tempered by missing `SECURITY.md`, stub `uv.lock` blinding static fs SCA, 5 MEDIUM CVEs in container `pip@25.0.1` (fixed in `26.2.0`), and unvalidated `--min-level` CLI input.",
+    "documentation": "88.9% docstring coverage with zero signature mismatches and a clear Quickstart in `README.md`, lacking Standard Readme installation/testing sections, `--min-level`/`--fail-above` flag docs, and two docstrings in `formatter.py`."
+  },
+  "metrics_snapshot": {
+    "language": "python",
+    "runtime_type_hint": "cli",
+    "build_system": "uv",
+    "has_manifest": true,
+    "has_lockfile": true,
+    "has_license": true,
+    "has_security_policy": false,
+    "has_dependency_automation": false,
+    "has_type_marker": false,
+    "dependencies_count": 2,
+    "unpinned_dependencies_count": 0,
+    "source_files_count": 6,
+    "test_files_count": 2,
+    "readme_line_count": 10,
+    "ci_supply_chain_issues_count": 0,
+    "committed_secret_files_count": 0,
+    "container_hygiene_issues_count": 0,
+    "legacy_language_findings_count": 0,
+    "total_files": 6,
+    "total_loc": 207,
+    "total_classes": 4,
+    "total_functions": 8,
+    "import_hygiene_coverage_pct": 100.0,
+    "type_safety_coverage_pct": 100.0,
+    "docstring_coverage_pct": 88.9,
+    "module_test_coverage_pct": 100.0,
+    "unsorted_imports_count": 0,
+    "wildcard_imports_count": 0,
+    "type_safety_issues_count": 0,
+    "weak_type_usages_count": 1,
+    "empty_docstrings_count": 0,
+    "doc_signature_mismatches_count": 0,
+    "complex_functions_count": 0,
+    "excessive_parameters_count": 0,
+    "global_state_usages_count": 0,
+    "bug_risk_idioms_count": 0,
+    "circular_dependencies_count": 0,
+    "unused_dependencies_count": 0,
+    "undeclared_dependencies_count": 0,
+    "test_functions_count": 2,
+    "assertion_free_tests_count": 0,
+    "framework_issues_count": 0,
+    "modernization_hints_count": 0,
+    "missing_io_timeouts_count": 0,
+    "scattered_env_access_count": 0,
+    "unstructured_logging_count": 0,
+    "hardcoded_secrets_count": 0,
+    "ast_dangerous_sinks_count": 0,
+    "api_endpoints_count": 0,
+    "runtime_status": "passed",
+    "harness_build_status": "passed",
+    "tests_status": "passed",
+    "tests_total": 2,
+    "tests_passed": 2,
+    "tests_failed": 0,
+    "measured_line_coverage_pct": 67.0,
+    "measured_branch_coverage_pct": 33.3,
+    "smoke_check_status": "passed",
+    "security_scan_status": "passed",
+    "app_vuln_critical": 0,
+    "app_vuln_high": 0,
+    "app_vuln_total": 6,
+    "os_vuln_high_or_crit": 100,
+    "misconfig_count": 0,
+    "secret_leak_count": 0
+  },
+  "runtime_facts": {
+    "status": "passed",
+    "container_engine": "docker",
+    "engine_available": true,
+    "skip_reason": "",
+    "language": "python",
+    "selected_dockerfile_template": "python/uv.dockerfile",
+    "harness_dockerfile_path": ".pni/dockerfiles/examples/python/cli_audit_tool/Dockerfile",
+    "build_args": {
+      "PYTHON_VERSION": "3.12"
+    },
+    "artifacts_dir": ".pni/cache/py_cli_audit_tool/runtime",
+    "project_dockerfile_build": null,
+    "harness_build": {
+      "attempted": true,
+      "status": "passed",
+      "dockerfile_used": ".pni/dockerfiles/examples/python/cli_audit_tool/Dockerfile",
+      "duration_sec": 18.2,
+      "exit_code": 0,
+      "error_tail": []
+    },
+    "test_execution": {
+      "attempted": true,
+      "status": "passed",
+      "command": "pytest -o junit_family=xunit2 --junitxml=/out/junit.xml",
+      "duration_sec": 2.61,
+      "exit_code": 0,
+      "total_tests": 2,
+      "passed_tests": 2,
+      "failed_tests": 0,
+      "error_tests": 0,
+      "skipped_tests": 0,
+      "failures": [],
+      "log_tail": []
+    },
+    "coverage": {
+      "measured": true,
+      "tool": "pytest-cov",
+      "line_coverage_pct": 67.0,
+      "branch_coverage_pct": 33.3,
+      "covered_lines": 75,
+      "total_statements": 112,
+      "lowest_covered_modules": [
+        {
+          "file_path": "src/logpulse/cli.py",
+          "line_coverage_pct": 0.0,
+          "branch_coverage_pct": 0.0,
+          "covered_lines": 0,
+          "total_statements": 26,
+          "missing_lines_preview": [
+            3,
+            5,
+            6,
+            8,
+            9,
+            11,
+            12,
+            13,
+            15,
+            18
+          ]
+        },
+        {
+          "file_path": "src/logpulse/formatter.py",
+          "line_coverage_pct": 55.6,
+          "branch_coverage_pct": 0.0,
+          "covered_lines": 10,
+          "total_statements": 18,
+          "missing_lines_preview": [
+            43,
+            44,
+            45,
+            46,
+            47,
+            48,
+            49,
+            50
+          ]
+        },
+        {
+          "file_path": "src/logpulse/parser.py",
+          "line_coverage_pct": 87.5,
+          "branch_coverage_pct": 66.7,
+          "covered_lines": 21,
+          "total_statements": 24,
+          "missing_lines_preview": [
+            47,
+            54,
+            55
+          ]
+        },
+        {
+          "file_path": "src/logpulse/models.py",
+          "line_coverage_pct": 100.0,
+          "branch_coverage_pct": null,
+          "covered_lines": 27,
+          "total_statements": 27,
+          "missing_lines_preview": []
+        },
+        {
+          "file_path": "src/logpulse/analyzer.py",
+          "line_coverage_pct": 100.0,
+          "branch_coverage_pct": 100.0,
+          "covered_lines": 16,
+          "total_statements": 16,
+          "missing_lines_preview": []
+        },
+        {
+          "file_path": "src/logpulse/__init__.py",
+          "line_coverage_pct": 100.0,
+          "branch_coverage_pct": null,
+          "covered_lines": 1,
+          "total_statements": 1,
+          "missing_lines_preview": []
+        }
+      ]
+    },
+    "smoke_check": {
+      "attempted": true,
+      "archetype": "cli",
+      "status": "passed",
+      "command": "sh -c logpulse --help >/dev/null && printf '{\"detail\":\"CLI entrypoint logpulse --help exited 0\"}' >/out/smoke.json",
+      "duration_sec": 1.33,
+      "exit_code": 0,
+      "http_status": null,
+      "probed_endpoint": null,
+      "failure_kind": "none",
+      "detail": "CLI entrypoint logpulse --help exited 0",
+      "log_tail": []
+    }
+  },
+  "security_facts": {
+    "status": "passed",
+    "scanner": "trivy",
+    "container_engine": "docker",
+    "engine_available": true,
+    "skip_reason": "",
+    "trivy_image": "ghcr.io/aquasecurity/trivy:0.69.3",
+    "scanned_filesystem": true,
+    "scanned_resolved_image": true,
+    "resolved_image_source": ".pni/dockerfiles/examples/python/cli_audit_tool/Dockerfile",
+    "artifacts_dir": ".pni/cache/py_cli_audit_tool/security",
+    "vuln_counts": {
+      "critical": 9,
+      "high": 91,
+      "medium": 160,
+      "low": 137,
+      "total": 404
+    },
+    "app_vuln_counts": {
+      "critical": 0,
+      "high": 0,
+      "medium": 5,
+      "low": 1,
+      "total": 6
+    },
+    "os_vuln_counts": {
+      "critical": 9,
+      "high": 91,
+      "medium": 155,
+      "low": 136,
+      "total": 398
+    },
+    "vulnerabilities": [
+      {
+        "vuln_id": "CVE-2026-42010",
+        "pkg_name": "libgnutls30",
+        "pkg_type": "debian",
+        "installed_version": "3.7.9-2+deb12u5",
+        "fixed_version": "3.7.9-2+deb12u7",
+        "severity": "CRITICAL",
+        "title": "gnutls: gnutls: Authentication Bypass via NUL Character in Username",
+        "target": "/out/image.tar (debian 12.13)",
+        "cvss_score": 9.8
+      },
+      {
+        "vuln_id": "CVE-2026-31789",
+        "pkg_name": "libssl3",
+        "pkg_type": "debian",
+        "installed_version": "3.0.18-1~deb12u2",
+        "fixed_version": "3.0.19-1~deb12u2",
+        "severity": "CRITICAL",
+        "title": "openssl: OpenSSL: Heap buffer overflow on 32-bit systems from large X.509 certificate processing",
+        "target": "/out/image.tar (debian 12.13)",
+        "cvss_score": 9.8
+      },
+      {
+        "vuln_id": "CVE-2026-31789",
+        "pkg_name": "openssl",
+        "pkg_type": "debian",
+        "installed_version": "3.0.18-1~deb12u2",
+        "fixed_version": "3.0.19-1~deb12u2",
+        "severity": "CRITICAL",
+        "title": "openssl: OpenSSL: Heap buffer overflow on 32-bit systems from large X.509 certificate processing",
+        "target": "/out/image.tar (debian 12.13)",
+        "cvss_score": 9.8
+      },
+      {
+        "vuln_id": "CVE-2026-8376",
+        "pkg_name": "perl-base",
+        "pkg_type": "debian",
+        "installed_version": "5.36.0-7+deb12u3",
+        "fixed_version": "5.36.0-7+deb12u4",
+        "severity": "CRITICAL",
+        "title": "perl: Perl: Heap buffer overflow when compiling regular expressions on 32-bit builds",
+        "target": "/out/image.tar (debian 12.13)",
+        "cvss_score": 9.8
+      },
+      {
+        "vuln_id": "CVE-2023-45853",
+        "pkg_name": "zlib1g",
+        "pkg_type": "debian",
+        "installed_version": "1:1.2.13.dfsg-1",
+        "fixed_version": "",
+        "severity": "CRITICAL",
+        "title": "zlib: integer overflow and resultant heap-based buffer overflow in zipOpenNewFileInZip4_6",
+        "target": "/out/image.tar (debian 12.13)",
+        "cvss_score": 9.8
+      },
+      {
+        "vuln_id": "CVE-2026-33845",
+        "pkg_name": "libgnutls30",
+        "pkg_type": "debian",
+        "installed_version": "3.7.9-2+deb12u5",
+        "fixed_version": "3.7.9-2+deb12u7",
+        "severity": "CRITICAL",
+        "title": "gnutls: GnuTLS: Denial of Service via DTLS zero-length fragment",
+        "target": "/out/image.tar (debian 12.13)",
+        "cvss_score": 9.1
+      },
+      {
+        "vuln_id": "CVE-2025-7458",
+        "pkg_name": "libsqlite3-0",
+        "pkg_type": "debian",
+        "installed_version": "3.40.1-2+deb12u2",
+        "fixed_version": "",
+        "severity": "CRITICAL",
+        "title": "sqlite: SQLite integer overflow",
+        "target": "/out/image.tar (debian 12.13)",
+        "cvss_score": 9.1
+      },
+      {
+        "vuln_id": "CVE-2026-13221",
+        "pkg_name": "perl-base",
+        "pkg_type": "debian",
+        "installed_version": "5.36.0-7+deb12u3",
+        "fixed_version": "5.36.0-7+deb12u4",
+        "severity": "CRITICAL",
+        "title": "perl: Perl: Incorrect regular expression processing via large regular expressions",
+        "target": "/out/image.tar (debian 12.13)",
+        "cvss_score": 9.1
+      },
+      {
+        "vuln_id": "CVE-2026-42496",
+        "pkg_name": "perl-base",
+        "pkg_type": "debian",
+        "installed_version": "5.36.0-7+deb12u3",
+        "fixed_version": "5.36.0-7+deb12u4",
+        "severity": "CRITICAL",
+        "title": "perl-archive-tar: perl-archive-tar: Path traversal via crafted symlinks allows arbitrary file access",
+        "target": "/out/image.tar (debian 12.13)",
+        "cvss_score": 9.1
+      },
+      {
+        "vuln_id": "CVE-2026-45447",
+        "pkg_name": "libssl3",
+        "pkg_type": "debian",
+        "installed_version": "3.0.18-1~deb12u2",
+        "fixed_version": "3.0.20-1~deb12u2",
+        "severity": "HIGH",
+        "title": "openssl: Heap Use-After-Free in OpenSSL PKCS7_verify()",
+        "target": "/out/image.tar (debian 12.13)",
+        "cvss_score": 8.8
+      },
+      {
+        "vuln_id": "CVE-2026-16742",
+        "pkg_name": "libsystemd0",
+        "pkg_type": "debian",
+        "installed_version": "252.39-1~deb12u1",
+        "fixed_version": "",
+        "severity": "HIGH",
+        "title": "systemd: systemd-homed: Local privilege escalation via missing home-record signature verification",
+        "target": "/out/image.tar (debian 12.13)",
+        "cvss_score": 8.8
+      },
+      {
+        "vuln_id": "CVE-2026-16742",
+        "pkg_name": "libudev1",
+        "pkg_type": "debian",
+        "installed_version": "252.39-1~deb12u1",
+        "fixed_version": "",
+        "severity": "HIGH",
+        "title": "systemd: systemd-homed: Local privilege escalation via missing home-record signature verification",
+        "target": "/out/image.tar (debian 12.13)",
+        "cvss_score": 8.8
+      },
+      {
+        "vuln_id": "CVE-2026-45447",
+        "pkg_name": "openssl",
+        "pkg_type": "debian",
+        "installed_version": "3.0.18-1~deb12u2",
+        "fixed_version": "3.0.20-1~deb12u2",
+        "severity": "HIGH",
+        "title": "openssl: Heap Use-After-Free in OpenSSL PKCS7_verify()",
+        "target": "/out/image.tar (debian 12.13)",
+        "cvss_score": 8.8
+      },
+      {
+        "vuln_id": "CVE-2026-57432",
+        "pkg_name": "perl-base",
+        "pkg_type": "debian",
+        "installed_version": "5.36.0-7+deb12u3",
+        "fixed_version": "5.36.0-7+deb12u4",
+        "severity": "HIGH",
+        "title": "perl: Perl: Information disclosure via integer overflow in pack/unpack operations",
+        "target": "/out/image.tar (debian 12.13)",
+        "cvss_score": 8.4
+      },
+      {
+        "vuln_id": "CVE-2026-86145",
+        "pkg_name": "libpcre2-8-0",
+        "pkg_type": "debian",
+        "installed_version": "10.42-1",
+        "fixed_version": "10.42-1+deb12u1",
+        "severity": "HIGH",
+        "title": "pcre2: PCRE2: Out-of-bounds write allows arbitrary code execution via crafted regular expressions",
+        "target": "/out/image.tar (debian 12.13)",
+        "cvss_score": 8.2
+      },
+      {
+        "vuln_id": "CVE-2026-28387",
+        "pkg_name": "libssl3",
+        "pkg_type": "debian",
+        "installed_version": "3.0.18-1~deb12u2",
+        "fixed_version": "3.0.19-1~deb12u2",
+        "severity": "HIGH",
+        "title": "openssl: OpenSSL: Arbitrary code execution due to use-after-free in DANE TLSA authentication",
+        "target": "/out/image.tar (debian 12.13)",
+        "cvss_score": 8.1
+      },
+      {
+        "vuln_id": "CVE-2026-28387",
+        "pkg_name": "openssl",
+        "pkg_type": "debian",
+        "installed_version": "3.0.18-1~deb12u2",
+        "fixed_version": "3.0.19-1~deb12u2",
+        "severity": "HIGH",
+        "title": "openssl: OpenSSL: Arbitrary code execution due to use-after-free in DANE TLSA authentication",
+        "target": "/out/image.tar (debian 12.13)",
+        "cvss_score": 8.1
+      },
+      {
+        "vuln_id": "CVE-2026-53615",
+        "pkg_name": "bsdutils",
+        "pkg_type": "debian",
+        "installed_version": "1:2.38.1-5+deb12u3",
+        "fixed_version": "",
+        "severity": "HIGH",
+        "title": "util-linux: util-linux: Partition metadata compromise via integer overflow in DOS partition parser",
+        "target": "/out/image.tar (debian 12.13)",
+        "cvss_score": 8.0
+      },
+      {
+        "vuln_id": "CVE-2026-53615",
+        "pkg_name": "libblkid1",
+        "pkg_type": "debian",
+        "installed_version": "2.38.1-5+deb12u3",
+        "fixed_version": "",
+        "severity": "HIGH",
+        "title": "util-linux: util-linux: Partition metadata compromise via integer overflow in DOS partition parser",
+        "target": "/out/image.tar (debian 12.13)",
+        "cvss_score": 8.0
+      },
+      {
+        "vuln_id": "CVE-2026-53615",
+        "pkg_name": "libmount1",
+        "pkg_type": "debian",
+        "installed_version": "2.38.1-5+deb12u3",
+        "fixed_version": "",
+        "severity": "HIGH",
+        "title": "util-linux: util-linux: Partition metadata compromise via integer overflow in DOS partition parser",
+        "target": "/out/image.tar (debian 12.13)",
+        "cvss_score": 8.0
+      },
+      {
+        "vuln_id": "CVE-2026-53615",
+        "pkg_name": "libsmartcols1",
+        "pkg_type": "debian",
+        "installed_version": "2.38.1-5+deb12u3",
+        "fixed_version": "",
+        "severity": "HIGH",
+        "title": "util-linux: util-linux: Partition metadata compromise via integer overflow in DOS partition parser",
+        "target": "/out/image.tar (debian 12.13)",
+        "cvss_score": 8.0
+      },
+      {
+        "vuln_id": "CVE-2026-53615",
+        "pkg_name": "libuuid1",
+        "pkg_type": "debian",
+        "installed_version": "2.38.1-5+deb12u3",
+        "fixed_version": "",
+        "severity": "HIGH",
+        "title": "util-linux: util-linux: Partition metadata compromise via integer overflow in DOS partition parser",
+        "target": "/out/image.tar (debian 12.13)",
+        "cvss_score": 8.0
+      },
+      {
+        "vuln_id": "CVE-2026-53615",
+        "pkg_name": "mount",
+        "pkg_type": "debian",
+        "installed_version": "2.38.1-5+deb12u3",
+        "fixed_version": "",
+        "severity": "HIGH",
+        "title": "util-linux: util-linux: Partition metadata compromise via integer overflow in DOS partition parser",
+        "target": "/out/image.tar (debian 12.13)",
+        "cvss_score": 8.0
+      },
+      {
+        "vuln_id": "CVE-2026-53615",
+        "pkg_name": "util-linux",
+        "pkg_type": "debian",
+        "installed_version": "2.38.1-5+deb12u3",
+        "fixed_version": "",
+        "severity": "HIGH",
+        "title": "util-linux: util-linux: Partition metadata compromise via integer overflow in DOS partition parser",
+        "target": "/out/image.tar (debian 12.13)",
+        "cvss_score": 8.0
+      },
+      {
+        "vuln_id": "CVE-2026-53615",
+        "pkg_name": "util-linux-extra",
+        "pkg_type": "debian",
+        "installed_version": "2.38.1-5+deb12u3",
+        "fixed_version": "",
+        "severity": "HIGH",
+        "title": "util-linux: util-linux: Partition metadata compromise via integer overflow in DOS partition parser",
+        "target": "/out/image.tar (debian 12.13)",
+        "cvss_score": 8.0
+      },
+      {
+        "vuln_id": "CVE-2026-78408",
+        "pkg_name": "bsdutils",
+        "pkg_type": "debian",
+        "installed_version": "1:2.38.1-5+deb12u3",
+        "fixed_version": "",
+        "severity": "HIGH",
+        "title": "util-linux: util-linux: nsenter --join-cgroup leaks root cgroup migration authority",
+        "target": "/out/image.tar (debian 12.13)",
+        "cvss_score": 7.9
+      },
+      {
+        "vuln_id": "CVE-2026-78408",
+        "pkg_name": "libblkid1",
+        "pkg_type": "debian",
+        "installed_version": "2.38.1-5+deb12u3",
+        "fixed_version": "",
+        "severity": "HIGH",
+        "title": "util-linux: util-linux: nsenter --join-cgroup leaks root cgroup migration authority",
+        "target": "/out/image.tar (debian 12.13)",
+        "cvss_score": 7.9
+      },
+      {
+        "vuln_id": "CVE-2026-78408",
+        "pkg_name": "libmount1",
+        "pkg_type": "debian",
+        "installed_version": "2.38.1-5+deb12u3",
+        "fixed_version": "",
+        "severity": "HIGH",
+        "title": "util-linux: util-linux: nsenter --join-cgroup leaks root cgroup migration authority",
+        "target": "/out/image.tar (debian 12.13)",
+        "cvss_score": 7.9
+      },
+      {
+        "vuln_id": "CVE-2026-78408",
+        "pkg_name": "libsmartcols1",
+        "pkg_type": "debian",
+        "installed_version": "2.38.1-5+deb12u3",
+        "fixed_version": "",
+        "severity": "HIGH",
+        "title": "util-linux: util-linux: nsenter --join-cgroup leaks root cgroup migration authority",
+        "target": "/out/image.tar (debian 12.13)",
+        "cvss_score": 7.9
+      },
+      {
+        "vuln_id": "CVE-2026-78408",
+        "pkg_name": "libuuid1",
+        "pkg_type": "debian",
+        "installed_version": "2.38.1-5+deb12u3",
+        "fixed_version": "",
+        "severity": "HIGH",
+        "title": "util-linux: util-linux: nsenter --join-cgroup leaks root cgroup migration authority",
+        "target": "/out/image.tar (debian 12.13)",
+        "cvss_score": 7.9
+      },
+      {
+        "vuln_id": "CVE-2026-78408",
+        "pkg_name": "mount",
+        "pkg_type": "debian",
+        "installed_version": "2.38.1-5+deb12u3",
+        "fixed_version": "",
+        "severity": "HIGH",
+        "title": "util-linux: util-linux: nsenter --join-cgroup leaks root cgroup migration authority",
+        "target": "/out/image.tar (debian 12.13)",
+        "cvss_score": 7.9
+      },
+      {
+        "vuln_id": "CVE-2026-78408",
+        "pkg_name": "util-linux",
+        "pkg_type": "debian",
+        "installed_version": "2.38.1-5+deb12u3",
+        "fixed_version": "",
+        "severity": "HIGH",
+        "title": "util-linux: util-linux: nsenter --join-cgroup leaks root cgroup migration authority",
+        "target": "/out/image.tar (debian 12.13)",
+        "cvss_score": 7.9
+      },
+      {
+        "vuln_id": "CVE-2026-78408",
+        "pkg_name": "util-linux-extra",
+        "pkg_type": "debian",
+        "installed_version": "2.38.1-5+deb12u3",
+        "fixed_version": "",
+        "severity": "HIGH",
+        "title": "util-linux: util-linux: nsenter --join-cgroup leaks root cgroup migration authority",
+        "target": "/out/image.tar (debian 12.13)",
+        "cvss_score": 7.9
+      },
+      {
+        "vuln_id": "CVE-2026-76642",
+        "pkg_name": "bsdutils",
+        "pkg_type": "debian",
+        "installed_version": "1:2.38.1-5+deb12u3",
+        "fixed_version": "",
+        "severity": "HIGH",
+        "title": "util-linux: util-linux: failed external mount helper still runs privileged X-mount post-hooks",
+        "target": "/out/image.tar (debian 12.13)",
+        "cvss_score": 7.8
+      },
+      {
+        "vuln_id": "CVE-2026-78410",
+        "pkg_name": "bsdutils",
+        "pkg_type": "debian",
+        "installed_version": "1:2.38.1-5+deb12u3",
+        "fixed_version": "",
+        "severity": "HIGH",
+        "title": "util-linux: util-linux: restricted bind mounts do not pin the source, allowing X-mount.owner/group/mode redirection",
+        "target": "/out/image.tar (debian 12.13)",
+        "cvss_score": 7.8
+      },
+      {
+        "vuln_id": "CVE-2026-76642",
+        "pkg_name": "libblkid1",
+        "pkg_type": "debian",
+        "installed_version": "2.38.1-5+deb12u3",
+        "fixed_version": "",
+        "severity": "HIGH",
+        "title": "util-linux: util-linux: failed external mount helper still runs privileged X-mount post-hooks",
+        "target": "/out/image.tar (debian 12.13)",
+        "cvss_score": 7.8
+      },
+      {
+        "vuln_id": "CVE-2026-78410",
+        "pkg_name": "libblkid1",
+        "pkg_type": "debian",
+        "installed_version": "2.38.1-5+deb12u3",
+        "fixed_version": "",
+        "severity": "HIGH",
+        "title": "util-linux: util-linux: restricted bind mounts do not pin the source, allowing X-mount.owner/group/mode redirection",
+        "target": "/out/image.tar (debian 12.13)",
+        "cvss_score": 7.8
+      },
+      {
+        "vuln_id": "CVE-2026-76642",
+        "pkg_name": "libmount1",
+        "pkg_type": "debian",
+        "installed_version": "2.38.1-5+deb12u3",
+        "fixed_version": "",
+        "severity": "HIGH",
+        "title": "util-linux: util-linux: failed external mount helper still runs privileged X-mount post-hooks",
+        "target": "/out/image.tar (debian 12.13)",
+        "cvss_score": 7.8
+      },
+      {
+        "vuln_id": "CVE-2026-78410",
+        "pkg_name": "libmount1",
+        "pkg_type": "debian",
+        "installed_version": "2.38.1-5+deb12u3",
+        "fixed_version": "",
+        "severity": "HIGH",
+        "title": "util-linux: util-linux: restricted bind mounts do not pin the source, allowing X-mount.owner/group/mode redirection",
+        "target": "/out/image.tar (debian 12.13)",
+        "cvss_score": 7.8
+      },
+      {
+        "vuln_id": "CVE-2025-69720",
+        "pkg_name": "libncursesw6",
+        "pkg_type": "debian",
+        "installed_version": "6.4-4",
+        "fixed_version": "",
+        "severity": "HIGH",
+        "title": "ncurses: ncurses: Buffer overflow vulnerability may lead to arbitrary code execution.",
+        "target": "/out/image.tar (debian 12.13)",
+        "cvss_score": 7.8
+      }
+    ],
+    "misconfigurations": [],
+    "secrets": []
+  },
+  "module_inventory": [
+    {
+      "file": "examples/python/cli_audit_tool/src/logpulse/__init__.py",
+      "loc": 2,
+      "public_types": [],
+      "public_callables": []
+    },
+    {
+      "file": "examples/python/cli_audit_tool/src/logpulse/analyzer.py",
+      "loc": 48,
+      "public_types": [],
+      "public_callables": [
+        "normalize_signature",
+        "build_scan_report"
+      ]
+    },
+    {
+      "file": "examples/python/cli_audit_tool/src/logpulse/cli.py",
+      "loc": 35,
+      "public_types": [],
+      "public_callables": [
+        "scan_cmd"
+      ]
+    },
+    {
+      "file": "examples/python/cli_audit_tool/src/logpulse/formatter.py",
+      "loc": 38,
+      "public_types": [],
+      "public_callables": [
+        "report_to_dict",
+        "render_json_report",
+        "build_rich_table"
+      ]
+    },
+    {
+      "file": "examples/python/cli_audit_tool/src/logpulse/models.py",
+      "loc": 32,
+      "public_types": [
+        "LogEvent",
+        "ScanReport",
+        "SeverityLevel",
+        "SignatureGroup"
+      ],
+      "public_callables": []
+    },
+    {
+      "file": "examples/python/cli_audit_tool/src/logpulse/parser.py",
+      "loc": 52,
+      "public_types": [],
+      "public_callables": [
+        "parse_severity",
+        "parse_jsonl_lines"
+      ]
+    }
+  ],
+  "dangerous_sinks": [],
+  "api_endpoints": [],
+  "architecture_overview": {
+    "pattern": "Layered Pipeline CLI Architecture (Adapter -> Processing & Formatting -> Immutable Domain Core)",
+    "entry_points": [
+      "src/logpulse/cli.py:app",
+      "src/logpulse/cli.py:scan_cmd"
+    ],
+    "modules": [
+      {
+        "path": "src/logpulse/cli.py",
+        "role": "Typer CLI entry point (`app`, `scan_cmd`) handling flags, file I/O, stderr warnings, and exit codes.",
+        "key_symbols": [
+          "app",
+          "scan_cmd"
+        ],
+        "depends_on": [
+          "src/logpulse/parser.py",
+          "src/logpulse/analyzer.py",
+          "src/logpulse/formatter.py"
+        ],
+        "health_note": "Untested by unit suite; reads full file eagerly via read_text()."
+      },
+      {
+        "path": "src/logpulse/formatter.py",
+        "role": "Pure output formatters converting `ScanReport` into JSON strings or Rich `Table` objects.",
+        "key_symbols": [
+          "report_to_dict",
+          "render_json_report",
+          "build_rich_table"
+        ],
+        "depends_on": [
+          "src/logpulse/models.py"
+        ],
+        "health_note": "Two missing docstrings; `report_to_dict` returns `dict[str, Any]`; `build_rich_table` untested."
+      },
+      {
+        "path": "src/logpulse/analyzer.py",
+        "role": "Error signature normalization (`<N>`) and deterministic burst grouping engine.",
+        "key_symbols": [
+          "normalize_signature",
+          "build_scan_report"
+        ],
+        "depends_on": [
+          "src/logpulse/models.py"
+        ],
+        "health_note": "Pure, well-typed, and covered by unit tests."
+      },
+      {
+        "path": "src/logpulse/parser.py",
+        "role": "Fault-tolerant JSONL line parser and case-insensitive severity level normalizer.",
+        "key_symbols": [
+          "parse_severity",
+          "parse_jsonl_lines"
+        ],
+        "depends_on": [
+          "src/logpulse/models.py"
+        ],
+        "health_note": "Pure `Iterable[str]` streaming design; covered by unit tests."
+      },
+      {
+        "path": "src/logpulse/models.py",
+        "role": "Canonical single source of truth for immutable domain entities and severity ordering.",
+        "key_symbols": [
+          "SeverityLevel",
+          "LogEvent",
+          "SignatureGroup",
+          "ScanReport"
+        ],
+        "depends_on": [],
+        "health_note": "Zero external dependencies; frozen dataclasses prevent mutation bugs."
+      },
+      {
+        "path": "src/logpulse/__init__.py",
+        "role": "Package root marker with module docstring and future annotations.",
+        "key_symbols": [],
+        "depends_on": [],
+        "health_note": "Minimal and clean."
+      }
+    ],
+    "dependency_notes": "Strict downward dependency DAG verified by `internal_import_graph` with 0 circular dependencies and 0 boundary violations: `parser`, `analyzer`, and `formatter` are mutually decoupled siblings depending solely on `models`, while `cli` acts as the thin top-level orchestrator."
+  },
+  "architecture_record": {
+    "workflow_id": "py_cli_audit_tool",
+    "workflow_run_id": "wf-7f0bbfdb",
+    "recorded_at": "2026-10-24T07:30:48.728035+00:00",
+    "target_root": "examples/python/cli_audit_tool",
+    "system_profile": {
+      "system_purpose": "Structured JSONL application log triage and recurring error signature burst summarization CLI (`logpulse scan`) emitting human-readable Rich terminal tables or machine-parseable JSON summaries with CI threshold exit codes.",
+      "domain_context": "Observability, log diagnostics, and CI/CD operational triage for structured `.jsonl` application logs.",
+      "runtime_type": "cli",
+      "tech_stack": [
+        "Python >=3.11",
+        "uv / uv_build",
+        "Typer >=0.12.0",
+        "Rich >=13.7.0",
+        "pytest >=8.3.0",
+        "Ruff >=0.9.0"
+      ],
+      "external_integrations": [
+        "Local filesystem `.jsonl` input log files (`pathlib.Path`)",
+        "POSIX standard streams (`stdout` for table/JSON output, `stderr` for diagnostic errors and malformed-line warnings)"
+      ]
+    },
+    "structure_map": {
+      "architecture_pattern": "Layered Pipeline CLI Architecture (Adapter -> Processing & Formatting -> Immutable Domain Core)",
+      "layers": [
+        {
+          "name": "CLI Entry & Orchestration Layer",
+          "responsibility": "Parses Typer CLI arguments/options, manages stdout/stderr Rich Consoles, reads input `.jsonl` files, orchestrates parsing/analysis/rendering, and enforces exit codes 0, 1, and 2.",
+          "paths": [
+            "src/logpulse/cli.py",
+            "src/logpulse/__init__.py"
+          ],
+          "allowed_dependencies": [
+            "Presentation & Serialization Layer",
+            "Application Processing Layer",
+            "Domain Core Layer"
+          ]
+        },
+        {
+          "name": "Presentation & Serialization Layer",
+          "responsibility": "Transforms immutable `ScanReport` objects into structured JSON dictionaries/strings or human-readable Rich terminal `Table` instances without performing I/O.",
+          "paths": [
+            "src/logpulse/formatter.py"
+          ],
+          "allowed_dependencies": [
+            "Domain Core Layer"
+          ]
+        },
+        {
+          "name": "Application Processing Layer",
+          "responsibility": "Provides resilient line-by-line JSONL ingestion (`parser.py`) and regex-based numeric ID normalization plus frequency/severity signature ranking (`analyzer.py`).",
+          "paths": [
+            "src/logpulse/parser.py",
+            "src/logpulse/analyzer.py"
+          ],
+          "allowed_dependencies": [
+            "Domain Core Layer"
+          ]
+        },
+        {
+          "name": "Domain Core Layer",
+          "responsibility": "Defines ordered `SeverityLevel(IntEnum)` and frozen value dataclasses (`LogEvent`, `SignatureGroup`, `ScanReport`) with zero external dependencies.",
+          "paths": [
+            "src/logpulse/models.py"
+          ],
+          "allowed_dependencies": []
+        }
+      ],
+      "modules": [
+        {
+          "path": "src/logpulse/cli.py",
+          "role": "Typer CLI entry point (`app`, `scan_cmd`) handling flags, file I/O, stderr warnings, and exit codes.",
+          "key_symbols": [
+            "app",
+            "scan_cmd"
+          ],
+          "depends_on": [
+            "src/logpulse/parser.py",
+            "src/logpulse/analyzer.py",
+            "src/logpulse/formatter.py"
+          ],
+          "health_note": "Untested by unit suite; reads full file eagerly via read_text()."
+        },
+        {
+          "path": "src/logpulse/formatter.py",
+          "role": "Pure output formatters converting `ScanReport` into JSON strings or Rich `Table` objects.",
+          "key_symbols": [
+            "report_to_dict",
+            "render_json_report",
+            "build_rich_table"
+          ],
+          "depends_on": [
+            "src/logpulse/models.py"
+          ],
+          "health_note": "Two missing docstrings; `report_to_dict` returns `dict[str, Any]`; `build_rich_table` untested."
+        },
+        {
+          "path": "src/logpulse/analyzer.py",
+          "role": "Error signature normalization (`<N>`) and deterministic burst grouping engine.",
+          "key_symbols": [
+            "normalize_signature",
+            "build_scan_report"
+          ],
+          "depends_on": [
+            "src/logpulse/models.py"
+          ],
+          "health_note": "Pure, well-typed, and covered by unit tests."
+        },
+        {
+          "path": "src/logpulse/parser.py",
+          "role": "Fault-tolerant JSONL line parser and case-insensitive severity level normalizer.",
+          "key_symbols": [
+            "parse_severity",
+            "parse_jsonl_lines"
+          ],
+          "depends_on": [
+            "src/logpulse/models.py"
+          ],
+          "health_note": "Pure `Iterable[str]` streaming design; covered by unit tests."
+        },
+        {
+          "path": "src/logpulse/models.py",
+          "role": "Canonical single source of truth for immutable domain entities and severity ordering.",
+          "key_symbols": [
+            "SeverityLevel",
+            "LogEvent",
+            "SignatureGroup",
+            "ScanReport"
+          ],
+          "depends_on": [],
+          "health_note": "Zero external dependencies; frozen dataclasses prevent mutation bugs."
+        },
+        {
+          "path": "src/logpulse/__init__.py",
+          "role": "Package root marker with module docstring and future annotations.",
+          "key_symbols": [],
+          "depends_on": [],
+          "health_note": "Minimal and clean."
+        }
+      ],
+      "boundary_assessment": "Strict downward dependency DAG verified by `internal_import_graph` with 0 circular dependencies and 0 boundary violations: `parser`, `analyzer`, and `formatter` are mutually decoupled siblings depending solely on `models`, while `cli` acts as the thin top-level orchestrator."
+    },
+    "execution_flow_map": {
+      "entry_points": [
+        "src/logpulse/cli.py:app",
+        "src/logpulse/cli.py:scan_cmd"
+      ],
+      "execution_flows": [
+        {
+          "name": "CLI Log Scan & Burst Summarization (`logpulse scan`)",
+          "trigger": "CLI invocation `logpulse scan <log_file> [--min-level] [--format table|json] [--fail-above] [--no-color]`",
+          "steps": [
+            "1. CLI Argument & File Check (`cli.py:scan_cmd`): Instantiates stdout/stderr Rich Consoles (`no_color`), verifies `log_file.is_file()` (exits with code 2 on missing file), and loads UTF-8 lines.",
+            "2. Resilient JSONL Parsing (`parser.py:parse_jsonl_lines` & `parse_severity`): Parses each non-empty JSON object into immutable `LogEvent` instances (`models.py`), counting malformed JSON or non-dict rows as `skipped` and emitting a stderr warning if `skipped > 0`.",
+            "3. Signature Normalization & Ranking (`analyzer.py:build_scan_report` & `normalize_signature`): Filters events >= `min_level`, replaces numeric tokens (`\\b\\d+\\b`) with `<N>`, aggregates counts per `(signature, level)`, and ranks `SignatureGroup` items into an immutable `ScanReport`.",
+            "4. Output Formatting & Exit Gate (`formatter.py` & `cli.py`): Emits `render_json_report(report)` to stdout (`--format json`) or `build_rich_table(report)` via Rich Console (`--format table`), then exits with code 1 if `fail_above > 0` and `matched_events > fail_above` (otherwise 0)."
+          ],
+          "involved_files": [
+            "src/logpulse/cli.py",
+            "src/logpulse/parser.py",
+            "src/logpulse/analyzer.py",
+            "src/logpulse/formatter.py",
+            "src/logpulse/models.py"
+          ]
+        }
+      ],
+      "state_and_storage": [
+        "Stateless single-run CLI execution; no database, cache, or persistent mutable state.",
+        "In-memory immutable value objects (`LogEvent`, `SignatureGroup`, `ScanReport` in `src/logpulse/models.py`) and transient frequency dictionary (`buckets` in `src/logpulse/analyzer.py`)."
+      ],
+      "error_and_concurrency_model": "Single-threaded synchronous execution. Malformed JSONL lines are tolerated via `json.JSONDecodeError` / `isinstance(..., dict)` checks in `parser.py` and reported to `stderr`; missing input paths raise `typer.Exit(code=2)` and threshold breaches raise `typer.Exit(code=1)`, though `log_file.read_text()` lacks an explicit `OSError`/`UnicodeDecodeError` handler."
+    }
+  },
+  "audit_dimensions": [
+    {
+      "action_id": "act-09",
+      "audit_id": "python_test_audit",
+      "title": "Evaluate Test Suite Completeness & Structure",
+      "score": 62,
+      "grade": "C",
+      "rules_evaluated": [
+        "python/testing"
+      ],
+      "pass_count": 0,
+      "warn_count": 0,
+      "fail_count": 1,
+      "summary": "The pytest suite contains only 2 unit test functions across 2 files (`tests/test_parser.py`, `tests/test_analyzer.py`). While existing tests are deterministic, isolated, and assertion-backed, mirror test structure and boundary coverage are incomplete: `src/logpulse/cli.py` has zero `CliRunner` tests (leaving exit codes 0/1/2, `--fail-above`, and stderr warnings unverified) and `build_rich_table` in `src/logpulse/formatter.py` is untested."
+    },
+    {
+      "action_id": "act-02",
+      "audit_id": "repo_structure_audit",
+      "title": "Evaluate Repository Structure, Supply Chain & Dependencies",
+      "score": 68,
+      "grade": "C",
+      "rules_evaluated": [
+        "common/supply_chain",
+        "common/documentation",
+        "common/git_workflow",
+        "common/security",
+        "python/dependencies"
+      ],
+      "pass_count": 2,
+      "warn_count": 2,
+      "fail_count": 1,
+      "summary": "logpulse adopts a modern PEP 621 pyproject.toml with uv_build, Python >=3.11, and separated dev dependency groups, with zero committed secrets. However, repository supply-chain governance is incomplete: SECURITY.md, Dependabot/Renovate automation, and CI workflows are absent, uv.lock is an unresolved stub lacking transitive package pins/hashes, and README.md omits installation, testing commands, and several CLI flags."
+    },
+    {
+      "action_id": "act-11",
+      "audit_id": "container_runtime_audit",
+      "title": "Evaluate Buildability, Offline Test Results, Measured Coverage & Startup Health",
+      "score": 74,
+      "grade": "B",
+      "rules_evaluated": [
+        "common/runtime_verification",
+        "common/production_readiness"
+      ],
+      "pass_count": 0,
+      "warn_count": 2,
+      "fail_count": 0,
+      "summary": "Containerized runtime verification (`docker`, Python 3.12) passed clean image build (18.2s), hermetic `--network=none` pytest execution (2/2 passed in 2.61s), and CLI `--help` startup smoke check (1.33s). However, measured `pytest-cov` coverage is only 67.0% line (75/112 statements) and 33.3% branch, dragged down by 0.0% coverage in `src/logpulse/cli.py` (0/26 stmts) and 55.6% in `src/logpulse/formatter.py` (missing lines 43-50 in `build_rich_table`)."
+    },
+    {
+      "action_id": "act-08",
+      "audit_id": "cli_guidelines_audit",
+      "title": "Evaluate CLI Ergonomics, Streams, Exit Codes & Automation UX",
+      "score": 76,
+      "grade": "B",
+      "rules_evaluated": [
+        "common/cli_guidelines",
+        "common/documentation"
+      ],
+      "pass_count": 0,
+      "warn_count": 2,
+      "fail_count": 0,
+      "summary": "logpulse implements strong clig.dev stream hygiene (`stdout` for Rich/JSON payloads vs `stderr` for diagnostics), CI-friendly `--format json`, `--no-color`, and `--fail-above` exit codes (0/1/2). However, `src/logpulse/cli.py` lacks `--version` and `-h` short help flags, defines a single `@app.command(\"scan\")` without `@app.callback()` (which in Typer collapses the `scan` subcommand documented in README.md), lacks `stdin` (`-`) stream support, and dumps unhandled tracebacks on `OSError`/`UnicodeDecodeError`."
+    },
+    {
+      "action_id": "act-13",
+      "audit_id": "security_vulnerability_audit",
+      "title": "Evaluate Supply-Chain CVEs, Container Misconfigs, Secrets, Dangerous Sinks & API Boundaries",
+      "score": 78,
+      "grade": "B",
+      "rules_evaluated": [
+        "common/security_vulnerability",
+        "common/supply_chain"
+      ],
+      "pass_count": 0,
+      "warn_count": 1,
+      "fail_count": 1,
+      "summary": "Trivy container & filesystem security scanning (`trivy:0.69.3`) found 0 CRITICAL/HIGH application CVEs, 0 IaC misconfigurations, 0 leaked secrets, and 0 AST CWE sinks. Direct/transitive runtime libraries (`rich`, `typer`) have 0 CVEs; the 6 `python-pkg` CVEs (5 MEDIUM, 1 LOW) originate in the container image's bundled `pip@25.0.1` (fixed in `pip>=26.2.0`), while 398 OS-layer CVEs (9 CRITICAL, 91 HIGH) stem from the Debian 12.13 base image. Notably, `trivy_fs.json` confirmed that the stub `uv.lock` lists only `logpulse@0.2.1`, blinding static lockfile SCA unless full container resolution is run, and `SECURITY.md` + Dependabot remain absent."
+    },
+    {
+      "action_id": "act-04",
+      "audit_id": "python_ast_audit",
+      "title": "Interpret Python AST Facts & Evaluate Quality/Typing/Imports/Security",
+      "score": 86,
+      "grade": "A",
+      "rules_evaluated": [
+        "common/architecture",
+        "common/maintainability",
+        "common/security",
+        "common/security_vulnerability",
+        "python/code_quality",
+        "python/typing",
+        "python/modern_stack"
+      ],
+      "pass_count": 4,
+      "warn_count": 3,
+      "fail_count": 0,
+      "summary": "Python AST analysis confirms clean acyclic layering (0 circular dependencies across 6 modules / 207 LOC), 100% import hygiene, 100% function signature type coverage, and zero dangerous CWE code sinks or hardcoded secrets. Minor gaps exist in src/logpulse/formatter.py (two missing public docstrings reducing coverage to 88.9%, plus a dict[str, Any] return annotation), missing py.typed / static type-checker tooling, and boundary handling in src/logpulse/cli.py (eager read_text() memory load without OSError/UnicodeDecodeError exit-code-2 guard, and unvalidated min_level string input)."
+    }
+  ],
+  "rule_compliance": [
+    {
+      "rule_id": "common/supply_chain",
+      "status": "fail",
+      "source_action": "repo_structure_audit",
+      "evidence": "has_security_policy=false, has_dependency_automation=false, ci_workflows_found=[], and uv.lock (lines 1-12) lacks resolved versions and hashes for rich/typer.; trivy_fs.json resolved only 1 package (logpulse@0.2.1) from stub uv.lock; ProjectFacts has_security_policy=false, has_dependency_automation=false, ci_workflows_found=[].",
+      "summary": "Missing SECURITY.md, automated dependency updates, CI workflow governance, and full transitive lockfile hashes."
+    },
+    {
+      "rule_id": "python/testing",
+      "status": "fail",
+      "source_action": "python_test_audit",
+      "evidence": "test_files_count=2 vs source_files_count=6; test_functions_count=2. No tests exist for src/logpulse/cli.py (scan_cmd) or src/logpulse/formatter.py:build_rich_table, leaving CLI entry point and Rich table rendering at 0% coverage (below the 80% package target) and lacking src/ mirror layout.",
+      "summary": "Isolated pytest unit tests cover parser/analyzer happy paths, but complete absence of CLI and Rich formatter tests breaches the 80% coverage and mirror-layout standard."
+    },
+    {
+      "rule_id": "common/cli_guidelines",
+      "status": "warn",
+      "source_action": "cli_guidelines_audit",
+      "evidence": "src/logpulse/cli.py separates out_console (stdout) and err_console (stderr=True) and returns exit codes 0/1/2, but omits --version, -h alias, stdin ('-') support, OSError/UnicodeDecodeError recovery, and @app.callback() needed to preserve the `logpulse scan` subcommand in Typer.",
+      "summary": "Strong stdout/stderr separation and CI flags (--format json, --no-color, --fail-above), tempered by missing --version/-h, collapsed single-command Typer routing vs README, and unguarded read_text() tracebacks."
+    },
+    {
+      "rule_id": "common/documentation",
+      "status": "warn",
+      "source_action": "repo_structure_audit",
+      "evidence": "README.md has 10 non-blank lines with headings ['# logpulse', '## Quickstart', '## CLI Flags & Exit Codes'], omitting Installation, Development/Testing commands, and CLI flags --min-level / --fail-above.; README.md line 8 documents `uv run logpulse scan ./service.jsonl`, whereas single-command Typer without `@app.callback()` collapses `scan`, and README omits `--min-level`, `--fail-above`, and `--limit`.",
+      "summary": "Concise Quickstart present, but README lacks installation/testing sections and complete CLI flag reference."
+    },
+    {
+      "rule_id": "common/production_readiness",
+      "status": "warn",
+      "source_action": "container_runtime_audit",
+      "evidence": "missing_io_timeouts=[], bug_risk_idioms=[]; parser.py safely handles JSONDecodeError, but src/logpulse/cli.py:34 uses unguarded eager read_text(encoding='utf-8') that leaks raw stack traces on permission/encoding errors and allocates unbounded memory on multi-GB logs.",
+      "summary": "Zero external network timeout issues or silent exception swallowing, but file-read error propagation and memory boundedness in cli.py need hardening."
+    },
+    {
+      "rule_id": "common/runtime_verification",
+      "status": "warn",
+      "source_action": "container_runtime_audit",
+      "evidence": "harness_build=passed (18.2s), offline test_execution=passed (2/2), smoke_check=passed (logpulse --help exit 0), but coverage.line_coverage_pct=67.0% (75/112) and branch_coverage_pct=33.3% (cli.py=0.0%, formatter.py=55.6% missing lines 43-50, parser.py=87.5% missing lines 47,54,55).",
+      "summary": "Clean container build, offline tests, and CLI smoke boot pass RV-01/02/04, while RV-03 flags 67.0% line / 33.3% branch coverage (< 80% target)."
+    },
+    {
+      "rule_id": "common/security",
+      "status": "warn",
+      "source_action": "python_ast_audit",
+      "evidence": "committed_secret_files=[]; no .env, *.pem, or credential files committed in repository root.; hardcoded_secrets=[], bug_risk_idioms=[]; however src/logpulse/cli.py:21 accepts free-form min_level: str (silently defaulting typos to INFO) and line 34 calls log_file.read_text() eagerly without OSError/UnicodeDecodeError handling.",
+      "summary": "Zero unsafe execution idioms, but CLI boundary lacks strict enum validation on --min-level and streaming/read-error guards."
+    },
+    {
+      "rule_id": "common/security_vulnerability",
+      "status": "warn",
+      "source_action": "security_vulnerability_audit",
+      "evidence": "AstFacts: dangerous_sinks=[], hardcoded_secrets=[], api_endpoints=[].; app_vuln_counts={critical:0, high:0, medium:5, low:1, total:6} (all 6 in image pip@25.0.1 -> fixed in 26.2.0: CVE-2025-8869, CVE-2026-13346, CVE-2026-3219, CVE-2026-6357, CVE-2026-8643, CVE-2026-1703; 0 CVEs in rich/typer); os_vuln_counts={critical:9, high:91, total:398} in debian 12.13; misconfigurations=[]; secrets=[]; dangerous_sinks=[]; api_endpoints=[].",
+      "summary": "Zero CRITICAL/HIGH app CVEs, zero secrets, zero misconfigs, and zero CWE sinks; WARN per SEC-01 for 5 MEDIUM CVEs in container pip@25.0.1 (fix 26.2.0) and Debian base-image patches."
+    },
+    {
+      "rule_id": "python/code_quality",
+      "status": "warn",
+      "source_action": "python_ast_audit",
+      "evidence": "docstring_coverage_pct=88.9%; missing_docstrings at src/logpulse/formatter.py:13 (report_to_dict) and src/logpulse/formatter.py:30 (render_json_report).",
+      "summary": "Consistent PEP 8 naming and module structure, with two missing Google-style docstrings in formatter.py."
+    },
+    {
+      "rule_id": "python/dependencies",
+      "status": "warn",
+      "source_action": "repo_structure_audit",
+      "evidence": "pyproject.toml uses PEP 621 and [dependency-groups].dev (pytest>=8.3.0, ruff>=0.9.0), but uv.lock only records editable root package without pinned transitive dependencies and dev group lacks a static type checker.",
+      "summary": "Clean PEP 621 manifest and dev group separation, but uv.lock needs full resolution via `uv lock`."
+    },
+    {
+      "rule_id": "python/typing",
+      "status": "warn",
+      "source_action": "python_ast_audit",
+      "evidence": "type_safety_coverage_pct=100.0%, type_safety_issues=[], weak_type_usages=[src/logpulse/formatter.py:13 report_to_dict -> dict[str, Any]], has_type_marker=false.",
+      "summary": "100% parameter/return annotations, with one dict[str, Any] usage, missing py.typed marker, and no configured type checker in dev dependencies."
+    },
+    {
+      "rule_id": "common/architecture",
+      "status": "pass",
+      "source_action": "python_ast_audit",
+      "evidence": "circular_dependencies=[], boundary_violations=[]. Strict downward DAG: logpulse.cli -> {parser, analyzer, formatter} -> logpulse.models.",
+      "summary": "Clean 4-layer CLI separation of concerns with immutable dataclasses in models.py and zero cyclic dependencies."
+    },
+    {
+      "rule_id": "common/git_workflow",
+      "status": "pass",
+      "source_action": "repo_structure_audit",
+      "evidence": "has_gitignore=true (.gitignore excludes __pycache__/, .venv/, .pytest_cache/); no build artifacts or temporary files tracked.",
+      "summary": "Repository tracks clean source/test layout with .gitignore hygiene."
+    },
+    {
+      "rule_id": "common/maintainability",
+      "status": "pass",
+      "source_action": "python_ast_audit",
+      "evidence": "total_loc=207 across 6 files (max 52 LOC in parser.py), complex_functions=[], excessive_parameters=[], global_state_usages=[].",
+      "summary": "Concise, low-complexity functions with immutable frozen dataclasses and zero mutable global state."
+    },
+    {
+      "rule_id": "python/modern_stack",
+      "status": "pass",
+      "source_action": "python_ast_audit",
+      "evidence": "import_hygiene_coverage_pct=100.0%, unsorted_imports=[], wildcard_imports=[], unused_dependencies=[], undeclared_dependencies=[].",
+      "summary": "Exemplary Python 3.11+ syntax, pathlib usage, future annotations, and 100% deterministic import ordering."
+    }
+  ],
+  "module_hotspots": [
+    {
+      "file_path": "src/logpulse/cli.py",
+      "loc": 0,
+      "risk_score": 0.89,
+      "finding_counts": {
+        "high": 1,
+        "medium": 3
+      },
+      "top_rules": [
+        "python/testing",
+        "common/cli_guidelines",
+        "common/security",
+        "common/runtime_verification"
+      ]
+    },
+    {
+      "file_path": "uv.lock",
+      "loc": 0,
+      "risk_score": 0.28,
+      "finding_counts": {
+        "high": 1
+      },
+      "top_rules": [
+        "common/supply_chain"
+      ]
+    },
+    {
+      "file_path": "src/logpulse/formatter.py",
+      "loc": 0,
+      "risk_score": 0.27,
+      "finding_counts": {
+        "medium": 1,
+        "low": 2
+      },
+      "top_rules": [
+        "python/testing",
+        "python/code_quality",
+        "python/typing"
+      ]
+    },
+    {
+      "file_path": "examples/python/cli_audit_tool/src/logpulse/cli.py",
+      "loc": 35,
+      "risk_score": 0.16,
+      "finding_counts": {},
+      "top_rules": []
+    },
+    {
+      "file_path": ".",
+      "loc": 0,
+      "risk_score": 0.15,
+      "finding_counts": {
+        "medium": 1
+      },
+      "top_rules": [
+        "common/supply_chain"
+      ]
+    },
+    {
+      "file_path": "pyproject.toml",
+      "loc": 0,
+      "risk_score": 0.15,
+      "finding_counts": {
+        "medium": 1
+      },
+      "top_rules": [
+        "common/security_vulnerability"
+      ]
+    },
+    {
+      "file_path": "examples/python/cli_audit_tool/src/logpulse/parser.py",
+      "loc": 52,
+      "risk_score": 0.06,
+      "finding_counts": {},
+      "top_rules": []
+    },
+    {
+      "file_path": "examples/python/cli_audit_tool/src/logpulse/analyzer.py",
+      "loc": 48,
+      "risk_score": 0.06,
+      "finding_counts": {},
+      "top_rules": []
+    },
+    {
+      "file_path": "examples/python/cli_audit_tool/src/logpulse/formatter.py",
+      "loc": 38,
+      "risk_score": 0.06,
+      "finding_counts": {},
+      "top_rules": []
+    },
+    {
+      "file_path": "examples/python/cli_audit_tool/src/logpulse/models.py",
+      "loc": 32,
+      "risk_score": 0.06,
+      "finding_counts": {},
+      "top_rules": []
+    },
+    {
+      "file_path": "examples/python/cli_audit_tool/src/logpulse/__init__.py",
+      "loc": 2,
+      "risk_score": 0.06,
+      "finding_counts": {},
+      "top_rules": []
+    },
+    {
+      "file_path": "LICENSE",
+      "loc": 0,
+      "risk_score": 0.06,
+      "finding_counts": {
+        "low": 1
+      },
+      "top_rules": [
+        "common/supply_chain"
+      ]
+    },
+    {
+      "file_path": "README.md",
+      "loc": 0,
+      "risk_score": 0.06,
+      "finding_counts": {
+        "low": 1
+      },
+      "top_rules": [
+        "common/documentation"
+      ]
+    }
+  ],
+  "strengths": [
+    "Modern PEP 621 pyproject.toml using uv_build backend, Python >=3.11 constraint, and clean separation of runtime (rich, typer) vs [dependency-groups].dev dependencies.",
+    "Minimal runtime dependency footprint (only typer and rich) with zero unpinned wildcard dependencies and zero committed secret files.",
+    "Clean acyclic module graph (`cli` -> `parser`/`analyzer`/`formatter` -> `models`) with frozen dataclasses (`LogEvent`, `SignatureGroup`, `ScanReport`) and `SeverityLevel(IntEnum)`.",
+    "100.0% import hygiene, 100.0% function annotation coverage, zero complex functions, and zero dangerous CWE AST sinks.",
+    "Strict `stdout` vs `stderr` stream separation (`Console(stderr=True)` for errors/warnings and pure `print(render_json_report(...))` for `--format json`) keeps Unix pipelines clean.",
+    "Non-interactive CI ergonomics with `--format json`, `--no-color`, and threshold-driven exit code `1` (`--fail-above`).",
+    "Existing unit tests in `tests/test_parser.py` and `tests/test_analyzer.py` are fast, deterministic, offline-safe, and free of assertion-free test smells.",
+    "Clean reproducible container build (`python/uv.dockerfile`, 18.2s), 100% pass rate under `--network=none` offline test isolation, and clean `logpulse --help` CLI smoke boot (1.33s).",
+    "100.0% measured line coverage across `models.py` (27/27), `analyzer.py` (16/16, 100% branch), and `__init__.py` (1/1).",
+    "Zero CRITICAL or HIGH vulnerabilities in Python application dependencies (`rich`, `typer`, and transitive packages), zero leaked secrets (`Trivy` + AST), and zero dangerous CWE code sinks.",
+    "Minimal CLI attack surface (`0` HTTP endpoints, offline file processing with `json.loads` safe parser, no `eval`/`exec`/`subprocess`/`pickle`)."
+  ],
+  "findings": [
+    {
+      "severity": "high",
+      "category": "dependencies",
+      "rule_id": "common/supply_chain",
+      "file_path": "uv.lock",
+      "line": 4,
+      "symbol": null,
+      "evidence": "uv.lock contains only [[package]] name = \"logpulse\" without resolved [[package]] entries or SHA-256 hashes for rich, typer, click, or pygments.",
+      "description": "Incomplete lockfile stub prevents deterministic, hash-verified dependency installation and weakens dependency vulnerability scanning.",
+      "recommendation": "Regenerate a complete deterministic lockfile using `uv lock` and enforce `uv sync --locked` in CI."
+    },
+    {
+      "severity": "high",
+      "category": "testing",
+      "rule_id": "python/testing",
+      "file_path": "src/logpulse/cli.py",
+      "line": 18,
+      "symbol": "scan_cmd",
+      "evidence": "tests/ contains only test_parser.py and test_analyzer.py (2 tests total); zero tests invoke typer.testing.CliRunner against logpulse.cli:app.",
+      "description": "Entire CLI entry point (`scan_cmd`), including missing-file exit code 2, `--fail-above` exit code 1, stderr malformed-line warnings, and `--format table|json` switching, has zero automated test coverage.",
+      "recommendation": "Add `tests/test_cli.py` using `typer.testing.CliRunner` and `tmp_path` fixtures to test exit codes 0, 1, and 2, stdout/stderr separation, `--format json`, and `--no-color`."
+    },
+    {
+      "severity": "medium",
+      "category": "code_quality",
+      "rule_id": "common/cli_guidelines",
+      "file_path": "src/logpulse/cli.py",
+      "line": 15,
+      "symbol": "app",
+      "evidence": "app = typer.Typer(name=\"logpulse\", ..., no_args_is_help=True) followed by a single @app.command(\"scan\") without @app.callback(), --version, or context_settings={\"help_option_names\": [\"-h\", \"--help\"]}.",
+      "description": "Single `@app.command('scan')` without `@app.callback()` causes Typer to collapse `scan` into the root command (breaking `logpulse scan <file>` shown in README.md), and the CLI lacks `--version` and `-h` flags.",
+      "recommendation": "Add `@app.callback()` exposing `--version` (`importlib.metadata.version('logpulse')`) and configure `context_settings={'help_option_names': ['-h', '--help']}` on `typer.Typer` so both `logpulse --version` and `logpulse scan <file>` work as documented."
+    },
+    {
+      "severity": "medium",
+      "category": "code_quality",
+      "rule_id": "common/security",
+      "file_path": "src/logpulse/cli.py",
+      "line": 34,
+      "symbol": "scan_cmd",
+      "evidence": "lines = log_file.read_text(encoding=\"utf-8\").splitlines() loads entire file into RAM without try/except OSError or UnicodeDecodeError, and min_level: str (line 21) is not validated at the CLI boundary.",
+      "description": "scan_cmd reads entire log files eagerly into memory (risking OOM on large .jsonl files), fails to catch OSError/UnicodeDecodeError to emit documented exit code 2, and silently maps invalid --min-level values to INFO.",
+      "recommendation": "Stream `with log_file.open(encoding='utf-8', errors='replace') as fh:` directly into `parse_jsonl_lines(fh)` inside a `try/except OSError` block exiting with code 2, and constrain `--min-level` using an Enum/Literal choice."
+    },
+    {
+      "severity": "medium",
+      "category": "security",
+      "rule_id": "common/security_vulnerability",
+      "file_path": "pyproject.toml",
+      "line": 12,
+      "symbol": null,
+      "evidence": "SecurityFacts: app_vuln_counts={critical:0, high:0, medium:5, low:1} in container python-pkg pip@25.0.1 (CVE-2026-13346 -> 26.2.0, CVE-2026-8643 -> 26.1.2, CVE-2026-3219/CVE-2026-6357 -> 26.1, CVE-2025-8869 -> 25.3, CVE-2026-1703 -> 26.0); os_vuln_counts={critical:9, high:91} in debian 12.13 (libgnutls30 CVE-2026-42010, openssl CVE-2026-31789).",
+      "description": "Resolved Python runtime environment carries 5 MEDIUM and 1 LOW vulnerabilities in bundled `pip@25.0.1` alongside unpatched Debian 12.13 base-image packages when packaged into containers.",
+      "recommendation": "Upgrade or uninstall `pip` (`pip>=26.2.0` or pure `uv sync --no-dev` multi-stage runtime image without pip) and run `apt-get update && apt-get upgrade -y` or use distroless/chainguard Python base images when containerizing."
+    },
+    {
+      "severity": "medium",
+      "category": "security",
+      "rule_id": "common/supply_chain",
+      "file_path": ".",
+      "line": null,
+      "symbol": null,
+      "evidence": "ProjectFacts: has_security_policy=false, has_dependency_automation=false, ci_workflows_found=[].",
+      "description": "Repository lacks SECURITY.md vulnerability disclosure policy, automated dependency update configuration (Dependabot/Renovate), and least-privilege GitHub Actions CI workflows.",
+      "recommendation": "Add SECURITY.md, configure .github/dependabot.yml for uv/pip and github-actions ecosystems, and add a SHA-pinned CI workflow with `permissions: contents: read`."
+    },
+    {
+      "severity": "medium",
+      "category": "testing",
+      "rule_id": "common/runtime_verification",
+      "file_path": "src/logpulse/cli.py",
+      "line": 18,
+      "symbol": "scan_cmd",
+      "evidence": "RuntimeFacts.coverage: line_coverage_pct=67.0%, branch_coverage_pct=33.3%. Lowest modules: src/logpulse/cli.py (0.0% line, 0/26 stmts), src/logpulse/formatter.py (55.6% line, 0.0% branch, missing lines 43-50), src/logpulse/parser.py (87.5% line, missing lines 47, 54, 55).",
+      "description": "Measured container test coverage (67.0% line, 33.3% branch) falls below the 80% line / 70% branch RV-03 threshold due to unexercised CLI orchestration and Rich table formatting branches.",
+      "recommendation": "Add `CliRunner` tests covering `scan_cmd` branches (missing file exit 2, `--fail-above` exit 1, skipped-line warning, table vs JSON output) and unit tests for `build_rich_table` and non-dict/blank JSONL lines."
+    },
+    {
+      "severity": "medium",
+      "category": "testing",
+      "rule_id": "python/testing",
+      "file_path": "src/logpulse/formatter.py",
+      "line": 34,
+      "symbol": "build_rich_table",
+      "evidence": "tests/test_analyzer.py imports render_json_report only; build_rich_table in src/logpulse/formatter.py and non-dict JSON row branches in src/logpulse/parser.py:53 are never exercised.",
+      "description": "Rich table rendering (`build_rich_table`) and parser/analyzer boundary cases (non-object JSON primitives, blank lines, `limit` cap, severity tie-breaking) lack dedicated mirror unit tests.",
+      "recommendation": "Create `tests/test_formatter.py` covering `build_rich_table` column/row rendering and expand `tests/test_parser.py` and `tests/test_analyzer.py` with boundary and tie-breaker cases to exceed 85% line/branch coverage."
+    },
+    {
+      "severity": "low",
+      "category": "dependencies",
+      "rule_id": "common/supply_chain",
+      "file_path": "LICENSE",
+      "line": 1,
+      "symbol": null,
+      "evidence": "LICENSE contains 2 lines ('MIT License / Copyright (c) 2026 Example Contributors') without the standard MIT permission/warranty text.",
+      "description": "LICENSE file contains only a header stub rather than the full canonical MIT license text.",
+      "recommendation": "Include the complete SPDX MIT license text in LICENSE to ensure unambiguous open-source licensing compliance."
+    },
+    {
+      "severity": "low",
+      "category": "documentation",
+      "rule_id": "common/documentation",
+      "file_path": "README.md",
+      "line": 11,
+      "symbol": null,
+      "evidence": "README.md (16 lines) documents --format and --no-color, omitting --min-level/-l, --fail-above, installation prerequisites, and `uv run pytest` development instructions.",
+      "description": "README.md omits Standard Readme installation/development sections and leaves `--min-level` and `--fail-above` CLI flags undocumented.",
+      "recommendation": "Expand README.md with Installation/Prerequisites, complete CLI flag table (`--min-level`, `--fail-above`, `--format`, `--no-color`), and Development/Testing commands."
+    },
+    {
+      "severity": "low",
+      "category": "documentation",
+      "rule_id": "python/code_quality",
+      "file_path": "src/logpulse/formatter.py",
+      "line": 13,
+      "symbol": "report_to_dict",
+      "evidence": "AstFacts.missing_docstrings: report_to_dict (line 13) and render_json_report (line 30) in src/logpulse/formatter.py.",
+      "description": "Two public serialization functions in `formatter.py` lack Google-style docstrings, lowering docstring coverage to 88.9%.",
+      "recommendation": "Add concise Google-style docstrings with Args and Returns sections to `report_to_dict` and `render_json_report`."
+    },
+    {
+      "severity": "low",
+      "category": "typing",
+      "rule_id": "python/typing",
+      "file_path": "src/logpulse/formatter.py",
+      "line": 13,
+      "symbol": "report_to_dict",
+      "evidence": "def report_to_dict(report: ScanReport) -> dict[str, Any]: (also has_type_marker=false and no type checker in pyproject.toml).",
+      "description": "report_to_dict weakens return type safety with `dict[str, Any]`, the package omits PEP 561 `py.typed`, and `pyproject.toml` lacks a static type checker (`ty` or `pyright`) in dev dependencies.",
+      "recommendation": "Define `GroupDict` and `ScanReportDict` `TypedDict` classes for `report_to_dict`, add `src/logpulse/py.typed`, and add `ty` to `[dependency-groups].dev`."
+    }
+  ],
+  "action_plan": [
+    {
+      "priority": "P0",
+      "title": "Regenerate Full Deterministic uv.lock with Transitive Hashes",
+      "category": "dependencies",
+      "target_files": [
+        "uv.lock",
+        "pyproject.toml"
+      ],
+      "related_rules": [
+        "common/supply_chain",
+        "python/dependencies"
+      ],
+      "action": "Run `uv lock` to populate full resolved versions and SHA-256 wheel/sdist hashes for rich, typer, and all transitive dependencies, then verify reproducibility with `uv sync --locked`.",
+      "expected_impact": "Guarantees reproducible builds and enables accurate CVE scanning across the full transitive dependency tree."
+    },
+    {
+      "priority": "P0",
+      "title": "Add Comprehensive CliRunner Integration Tests and Formatter Mirror Suite",
+      "category": "testing",
+      "target_files": [
+        "src/logpulse/cli.py",
+        "src/logpulse/formatter.py",
+        "tests/test_parser.py",
+        "tests/test_analyzer.py"
+      ],
+      "related_rules": [
+        "python/testing",
+        "common/cli_guidelines"
+      ],
+      "action": "Create `tests/test_cli.py` using `typer.testing.CliRunner` to verify `logpulse scan` exit codes (`0`, `1`, `2`), `stdout` vs `stderr` separation, and `--format table|json`, plus `tests/test_formatter.py` for `build_rich_table` and edge-case tests in `test_parser.py`/`test_analyzer.py`.",
+      "expected_impact": "Raises measured package coverage from ~68% above 90% and prevents regressions in CLI subcommand routing and exit-code contracts."
+    },
+    {
+      "priority": "P1",
+      "title": "Add Typer @app.callback() with --version and -h Support to Preserve `scan` Subcommand",
+      "category": "code_quality",
+      "target_files": [
+        "src/logpulse/cli.py",
+        "README.md"
+      ],
+      "related_rules": [
+        "common/cli_guidelines",
+        "common/documentation"
+      ],
+      "action": "Define `@app.callback()` with a `--version` / `-V` eager option and set `context_settings={'help_option_names': ['-h', '--help']}` on `app = typer.Typer(...)`, plus support `-` (`sys.stdin`) for piped JSONL streams.",
+      "expected_impact": "Aligns actual CLI invocation with `README.md` (`logpulse scan ...`), satisfies `clig.dev` `--version`/`-h` discoverability, and enables Unix stdin pipelines."
+    },
+    {
+      "priority": "P1",
+      "title": "Stream Log Files Safely and Enforce Strict CLI Boundary Validation",
+      "category": "code_quality",
+      "target_files": [
+        "src/logpulse/cli.py"
+      ],
+      "related_rules": [
+        "common/security",
+        "common/maintainability"
+      ],
+      "action": "Replace `log_file.read_text().splitlines()` with a streaming `log_file.open('r', encoding='utf-8')` context manager wrapped in `try/except (OSError, UnicodeDecodeError)` raising `typer.Exit(code=2)`, and type `--min-level` with a validated `Choice`/`Enum`.",
+      "expected_impact": "Eliminates unbounded memory allocation on large logs, guarantees exit code 2 on unreadable files, and rejects invalid severity flags early."
+    },
+    {
+      "priority": "P1",
+      "title": "Establish Supply-Chain Governance (SECURITY.md, Dependabot, Least-Privilege CI)",
+      "category": "security",
+      "target_files": [
+        ".",
+        "pyproject.toml"
+      ],
+      "related_rules": [
+        "common/supply_chain"
+      ],
+      "action": "Create SECURITY.md for vulnerability disclosure, add .github/dependabot.yml for automated weekly dependency PRs, and add a GitHub Actions workflow with `permissions: contents: read` and SHA-pinned actions.",
+      "expected_impact": "Aligns repository governance with OpenSSF Scorecard standards for token permissions, pinned CI dependencies, and automated vulnerability remediation."
+    },
+    {
+      "priority": "P1",
+      "title": "Close Measured Line (67.0% -> >90%) and Branch (33.3% -> >85%) Coverage Gaps",
+      "category": "testing",
+      "target_files": [
+        "src/logpulse/cli.py",
+        "src/logpulse/formatter.py",
+        "src/logpulse/parser.py",
+        "tests/test_parser.py"
+      ],
+      "related_rules": [
+        "common/runtime_verification",
+        "python/testing"
+      ],
+      "action": "Exercise missing statements in `src/logpulse/cli.py` (all 26 statements), `src/logpulse/formatter.py` (lines 43-50 `build_rich_table`), and `src/logpulse/parser.py` (lines 47, 54-55 blank and non-dict rows) via `pytest-cov`.",
+      "expected_impact": "Brings both line and branch coverage comfortably above the RV-03 80% / 70% healthy gate."
+    },
+    {
+      "priority": "P2",
+      "title": "Complete Standard Readme Sections and Full CLI Flag Reference",
+      "category": "documentation",
+      "target_files": [
+        "README.md",
+        "LICENSE"
+      ],
+      "related_rules": [
+        "common/documentation",
+        "common/supply_chain"
+      ],
+      "action": "Document prerequisites, installation (`uv sync`), development/testing commands (`uv run pytest`, `uv run ruff check`), and all `logpulse scan` flags (`--min-level`, `--fail-above`, `--format`, `--no-color`) in README.md, and expand LICENSE with full MIT text.",
+      "expected_impact": "Provides accurate onboarding, CI usage reference, and unambiguous license terms."
+    },
+    {
+      "priority": "P2",
+      "title": "Harden Container Packaging by Upgrading/Pruning `pip` and Refreshing Base OS Layers",
+      "category": "security",
+      "target_files": [
+        "pyproject.toml",
+        "uv.lock"
+      ],
+      "related_rules": [
+        "common/security_vulnerability",
+        "CVE-2026-13346",
+        "CVE-2026-8643",
+        "CVE-2025-8869"
+      ],
+      "action": "Ensure any CI/container build environment upgrades `pip>=26.2.0` (or omits `pip` from final `uv` venv images) and refreshes Debian security updates (`libgnutls30>=3.7.9-2+deb12u7`, `openssl>=3.0.20-1~deb12u2`).",
+      "expected_impact": "Eliminates all 6 `python-pkg` CVEs in `pip` and mitigates critical OS base-image vulnerabilities."
+    },
+    {
+      "priority": "P2",
+      "title": "Eliminate Any Return Type, Add Docstrings, and Configure Static Type Checking",
+      "category": "typing",
+      "target_files": [
+        "src/logpulse/formatter.py",
+        "src/logpulse/__init__.py",
+        "pyproject.toml"
+      ],
+      "related_rules": [
+        "python/typing",
+        "python/code_quality"
+      ],
+      "action": "Replace `dict[str, Any]` in `report_to_dict` with `TypedDict` definitions, add Google-style docstrings to `report_to_dict` and `render_json_report`, add `py.typed`, and include `ty` in `[dependency-groups].dev`.",
+      "expected_impact": "Raises docstring coverage to 100%, removes all `Any` usages, and enforces static type verification in local and CI checks."
+    }
+  ],
+  "report_hints": [
+    "Highlight 7-axis balance radar showing strong Architecture (90) and Typing (84) contrasted against Testing (64) and Dependencies (68).",
+    "Render ClassDiagram of logpulse layers overlaid with HeatmapOverlay hotspots (cli.py and formatter.py).",
+    "Contrast measured pytest-cov per-module line/branch coverage (cli.py 0%, formatter.py 55.6%, parser.py 87.5%, models/analyzer 100%).",
+    "Distinguish 0 CVEs in logpulse runtime libraries (rich/typer) from 6 pip@25.0.1 CVEs and 398 Debian 12.13 OS layer CVEs, noting how stub uv.lock blinded trivy_fs.json."
+  ],
+  "summary": "logpulse (v0.2.1) achieves an overall PNI Software Health Score of 77/100 (Grade B). Its core architecture is clean, compact (207 LOC across 6 modules), strictly acyclic, and 100% type-annotated, passing containerized build, offline pytest, and CLI `--help` smoke verification with zero CRITICAL/HIGH Python dependency CVEs, zero secrets, and zero dangerous CWE code sinks. Primary remediation priorities are regenerating a complete hash-pinned `uv.lock` (P0), adding `CliRunner` and Rich formatter tests to lift measured coverage from 67.0% line / 33.3% branch above 85% (P0), preserving the `logpulse scan` subcommand and streaming file I/O safely in `cli.py` (P1), and establishing supply-chain governance (`SECURITY.md`, Dependabot, least-privilege CI) (P1)."
+}

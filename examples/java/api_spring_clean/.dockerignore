@@ -1,0 +1,4 @@
+.git
+.mvn
+target
+*.md

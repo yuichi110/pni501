@@ -1,0 +1,6 @@
+.git
+.github
+vendor
+tests
+.env
+*.sqlite

@@ -1,0 +1,19 @@
+id: repo_structure_audit
+name: Repository Structure & Build Manifest Audit (Java)
+description: Deterministically inspect Maven/Gradle build manifests, wrappers/lockfiles, and documentation, then have AI evaluate against rules.
+rules:
+  - common/supply_chain
+  - common/documentation
+  - common/git_workflow
+  - common/security
+  - java/dependencies
+primitives:
+  - type: project_inspect
+    name: Extract Java Build, Supply-Chain & Dependency Facts
+    with:
+      lang: "java"
+  - type: ai_interpret
+    name: Evaluate Maven/Gradle Build, Supply Chain & Dependencies
+    prompt: |
+      Review the deterministic ProjectFacts (`runtime_types`, `build_system`, `manifest_files`, `lockfiles_found`, `dependencies`, `unpinned_dependencies`, `dev_dependencies`, `has_license`, `has_security_policy`, `has_dependency_automation`, `ci_supply_chain_issues`, `committed_secret_files`, `container_hygiene_issues`, `readme_headings`, `docs_inventory`, `has_gitignore`).
+      Verify compliance with `common/supply_chain`, `java/dependencies`, `common/documentation`, `common/git_workflow`, and `common/security`.

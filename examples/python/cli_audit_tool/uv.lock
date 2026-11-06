@@ -1,0 +1,11 @@
+version = 1
+requires-python = ">=3.11"
+
+[[package]]
+name = "logpulse"
+version = "0.2.1"
+source = { editable = "." }
+dependencies = [
+    { name = "rich" },
+    { name = "typer" },
+]

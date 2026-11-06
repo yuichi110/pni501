@@ -1,0 +1,37 @@
+id: full_audit
+category: audit
+name: Full Project Health Audit & Report (Java)
+description: Deterministic Java AST/Maven/Gradle analysis, 3-aspect grounded architecture recording, AI rule interpretation, score emission, and drawlib report creation.
+
+targets:
+  source:
+    - "src/main/java"
+  tests:
+    - "src/test/java"
+  docs:
+    - "README.md"
+
+steps:
+  - id: repo_and_deps
+    uses: repo_structure_audit
+
+  - id: ast_and_quality
+    uses: java_ast_audit
+
+  - id: arch_recording
+    uses: architecture_analysis
+
+  - id: test_health
+    uses: java_test_audit
+
+  - id: runtime_verification
+    uses: container_runtime_audit
+
+  - id: security_audit
+    uses: security_vulnerability_audit
+
+  - id: output_score
+    uses: emit_score
+
+  - id: create_report
+    uses: write_drawlib_report

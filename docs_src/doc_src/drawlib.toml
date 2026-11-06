@@ -1,0 +1,18 @@
+[project]
+name = "doc"
+type = "doc"
+title = ""
+description = ""
+style = "google"
+
+[i18n]
+default_lang = "en"
+langs = ["en"]
+
+# [seo]
+# site_url = "https://example.com"
+# og_image = "_assets/ogp.png"
+# twitter_card = "summary_large_image"
+# sitemap = true
+# robots = true
+# llms_txt = true

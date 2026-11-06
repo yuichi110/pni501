@@ -1,0 +1,1773 @@
+{
+  "project_name": "Member Analytics Portal (wp_plugin_messy)",
+  "workflow_id": "php_wp_plugin_messy",
+  "workflow_run_id": "wf-31a8fefa",
+  "evaluated_at": "2026-10-24T09:20:09.804814+00:00",
+  "language": "php",
+  "target_root": "examples/php/wp_plugin_messy",
+  "facts_file": ".pni/cache/php_wp_plugin_messy/facts.json",
+  "key_files_inspected": [
+    "member-analytics-portal.php",
+    "includes/rest-endpoints.php",
+    "includes/ajax-handlers.php",
+    "admin/settings-page.php",
+    "README.md"
+  ],
+  "overall_score": 20,
+  "grade": "D",
+  "category_scores": {
+    "architecture": 24,
+    "code_quality": 26,
+    "typing": 12,
+    "testing": 18,
+    "dependencies": 22,
+    "security": 10,
+    "documentation": 22
+  },
+  "category_rationales": {
+    "architecture": "REST・AJAX・管理画面でファイル自体は4分割（計84 LOC、循環依存0件）されているが、クラス・名前空間が一切なく（total_classes=0）、7つのグローバル関数内で HTTP 入力・$wpdb 生 SQL・外部通信・HTML 描画が直結しており、全4ファイルで ABSPATH 直接アクセス防止ガードも欠落している。",
+    "code_quality": "個別関数は短く（認知的複雑度超過0件）PHP 8.2 での php -l 構文検証も通過するが、$_GET/$_POST 直参照（10箇所）と global $wpdb 結合（3箇所）、タイムアウト未設定かつエラー握り潰しの @file_get_contents、print_r デバッグ出力、<script> 直書き、テーブル接頭辞 wp_ ハードコードが品質を損なっている。",
+    "typing": "全4ファイルで declare(strict_types=1); が未宣言、全7関数で戻り値型・引数型宣言が欠落（type_safety_coverage_pct=0.0%、指摘11件）しており、PHPStan / Psalm による静的型検査も未導入である。",
+    "testing": "隔離 Docker コンテナ（PHP 8.2）での php -l 構文ゲート（0.80s）と WordPress 5フック登録スモークテスト（0.59s）は通過したものの、PHPUnit / WP_UnitTestCase のテストファイル・テスト関数が 0 件で実測カバレッジも未計測（measured=false）である。",
+    "dependencies": "サードパーティパッケージ未導入のためアプリ層 SCA CVE は 0 件だが、composer.json / composer.lock と PSR-4 オートローディングを持たない raw_php 構成で EOL 済みの Requires PHP: 7.4 を指定し、LICENSE・SECURITY.md・.gitignore・Dependabot・CI も全面欠落している。",
+    "security": "REST /export の permission_callback => '__return_true' による会員 PII 無認証漏洩、wp_ajax_nopriv_map_search_members 未認証 SQLi、wp_ajax_map_purge_logs と管理画面（capability 'read'）の Nonce/権限検証欠落、CWE-89 生 SQL 結合（3件）、CWE-79 未エスケープ XSS（4箇所）、Webhook 秘密鍵直書きが連鎖しており極めて危険である。",
+    "documentation": "member-analytics-portal.php にプラグインヘッダは存在するが、README.md は実質2行のみで前提条件・REST/AJAX/ショートコード仕様・権限モデル・テスト手順を欠き、公開7関数の PHPDoc カバレッジも 0.0% である。"
+  },
+  "metrics_snapshot": {
+    "language": "php",
+    "runtime_type_hint": "web_api",
+    "build_system": "raw_php",
+    "has_manifest": false,
+    "has_lockfile": false,
+    "has_license": false,
+    "has_security_policy": false,
+    "has_dependency_automation": false,
+    "dependencies_count": 0,
+    "unpinned_dependencies_count": 0,
+    "source_files_count": 4,
+    "test_files_count": 0,
+    "readme_line_count": 2,
+    "ci_supply_chain_issues_count": 0,
+    "committed_secret_files_count": 0,
+    "container_hygiene_issues_count": 0,
+    "legacy_language_findings_count": 0,
+    "total_files": 4,
+    "total_loc": 84,
+    "total_classes": 0,
+    "total_functions": 7,
+    "import_hygiene_coverage_pct": 75.0,
+    "type_safety_coverage_pct": 0.0,
+    "docstring_coverage_pct": 0.0,
+    "unsorted_imports_count": 0,
+    "wildcard_imports_count": 0,
+    "type_safety_issues_count": 11,
+    "weak_type_usages_count": 0,
+    "empty_docstrings_count": 0,
+    "doc_signature_mismatches_count": 0,
+    "complex_functions_count": 0,
+    "excessive_parameters_count": 0,
+    "global_state_usages_count": 13,
+    "bug_risk_idioms_count": 1,
+    "circular_dependencies_count": 0,
+    "unused_dependencies_count": 0,
+    "undeclared_dependencies_count": 0,
+    "test_functions_count": 0,
+    "assertion_free_tests_count": 0,
+    "framework_issues_count": 16,
+    "modernization_hints_count": 1,
+    "missing_io_timeouts_count": 1,
+    "scattered_env_access_count": 0,
+    "unstructured_logging_count": 1,
+    "hardcoded_secrets_count": 1,
+    "ast_dangerous_sinks_count": 5,
+    "api_endpoints_count": 5,
+    "runtime_status": "passed",
+    "harness_build_status": "passed",
+    "tests_status": "passed",
+    "tests_total": 0,
+    "tests_passed": 0,
+    "tests_failed": 0,
+    "smoke_check_status": "passed",
+    "security_scan_status": "passed",
+    "app_vuln_critical": 0,
+    "app_vuln_high": 0,
+    "app_vuln_total": 0,
+    "os_vuln_high_or_crit": 285,
+    "misconfig_count": 0,
+    "secret_leak_count": 0
+  },
+  "runtime_facts": {
+    "status": "passed",
+    "container_engine": "docker",
+    "engine_available": true,
+    "skip_reason": "",
+    "language": "php",
+    "selected_dockerfile_template": "php/raw.dockerfile",
+    "harness_dockerfile_path": ".pni/dockerfiles/examples/php/wp_plugin_messy/Dockerfile",
+    "build_args": {
+      "PHP_VERSION": "8.2"
+    },
+    "artifacts_dir": ".pni/cache/php_wp_plugin_messy/runtime",
+    "project_dockerfile_build": null,
+    "harness_build": {
+      "attempted": true,
+      "status": "passed",
+      "dockerfile_used": ".pni/dockerfiles/examples/php/wp_plugin_messy/Dockerfile",
+      "duration_sec": 60.24,
+      "exit_code": 0,
+      "error_tail": []
+    },
+    "test_execution": {
+      "attempted": true,
+      "status": "passed",
+      "command": "sh -c lint_fail=0; for p in $(find . -path '*/vendor' -prune -o \\( -name '*.php' -o -name '*.phtml' \\) -print 2>/dev/null); do   if ! php -l \"$p\" >/tmp/pni_lint_err.txt 2>&1; then     cat /tmp/pni_lint_err.txt >&2; lint_fail=1;   fi; done; if [ \"$lint_fail\" -ne 0 ]; then exit 1; fi; has_tests=0; for td in tests; do   if [ -d \"$td\" ] && [ -n \"$(find \"$td\" -name '*Test.php' -o -name '*_test.php' 2>/dev/null)\" ]; then     has_tests=1;   fi; done; if [ \"$has_tests\" -eq 1 ] && command -v phpunit >/dev/null 2>&1; then   cfg_flag=\"\";   if [ ! -f phpunit.xml ] && [ ! -f phpunit.xml.dist ]; then     printf '%s' '<phpunit><source><include><directory>.</directory></include><exclude><directory>vendor</directory><directory>tests</directory></exclude></source></phpunit>' >/tmp/pni_phpunit.xml;     cfg_flag=\"-c /tmp/pni_phpunit.xml\";   fi;   phpunit $cfg_flag -d pcov.enabled=1 -d pcov.directory=. --log-junit /out/junit.xml --coverage-clover /out/clover.xml tests;   exit $?; fi; echo 'PHP syntax gate (php -l) passed; no PHPUnit tests executed.'; exit 0",
+      "duration_sec": 0.8,
+      "exit_code": 0,
+      "total_tests": 0,
+      "passed_tests": 0,
+      "failed_tests": 0,
+      "error_tests": 0,
+      "skipped_tests": 0,
+      "failures": [],
+      "log_tail": []
+    },
+    "coverage": {
+      "measured": false,
+      "tool": "",
+      "line_coverage_pct": null,
+      "branch_coverage_pct": null,
+      "covered_lines": 0,
+      "total_statements": 0,
+      "lowest_covered_modules": []
+    },
+    "smoke_check": {
+      "attempted": true,
+      "archetype": "web_api",
+      "status": "passed",
+      "command": "php -r define('ABSPATH', '/workspace/'); $GLOBALS['__pni_wp_hooks'] = 0; function add_action($t, $c, $p=10, $a=1) { $GLOBALS['__pni_wp_hooks']++; return true; } function add_filter($t, $c, $p=10, $a=1) { $GLOBALS['__pni_wp_hooks']++; return true; } function add_shortcode($t, $c) { $GLOBALS['__pni_wp_hooks']++; return true; } function register_activation_hook($f, $c) { $GLOBALS['__pni_wp_hooks']++; } function register_deactivation_hook($f, $c) { $GLOBALS['__pni_wp_hooks']++; } function register_rest_route($n, $r, $a=[]) { $GLOBALS['__pni_wp_hooks']++; return true; } function plugin_dir_path($f) { return dirname($f) . '/'; } function plugin_dir_url($f) { return 'http://localhost/wp-content/plugins/plugin/'; } function is_admin() { return false; } function __($t, $d='default') { return $t; } require_once '/workspace/member-analytics-portal.php'; $n = $GLOBALS['__pni_wp_hooks']; file_put_contents('/out/smoke.json', json_encode(['probed_endpoint' => 'wp-plugin://member-analytics-portal.php', 'http_status' => 200, 'detail' => 'WordPress plugin member-analytics-portal.php loaded cleanly (' . $n . ' hooks registered)']));",
+      "duration_sec": 0.59,
+      "exit_code": 0,
+      "http_status": 200,
+      "probed_endpoint": "wp-plugin://member-analytics-portal.php",
+      "failure_kind": "none",
+      "detail": "WordPress plugin member-analytics-portal.php loaded cleanly (5 hooks registered)",
+      "log_tail": []
+    }
+  },
+  "security_facts": {
+    "status": "passed",
+    "scanner": "trivy",
+    "container_engine": "docker",
+    "engine_available": true,
+    "skip_reason": "",
+    "trivy_image": "ghcr.io/aquasecurity/trivy:0.69.3",
+    "scanned_filesystem": true,
+    "scanned_resolved_image": true,
+    "resolved_image_source": ".pni/dockerfiles/examples/php/wp_plugin_messy/Dockerfile",
+    "artifacts_dir": ".pni/cache/php_wp_plugin_messy/security",
+    "vuln_counts": {
+      "critical": 7,
+      "high": 278,
+      "medium": 1423,
+      "low": 1080,
+      "total": 2910
+    },
+    "app_vuln_counts": {
+      "critical": 0,
+      "high": 0,
+      "medium": 0,
+      "low": 0,
+      "total": 0
+    },
+    "os_vuln_counts": {
+      "critical": 7,
+      "high": 278,
+      "medium": 1423,
+      "low": 1080,
+      "total": 2910
+    },
+    "vulnerabilities": [
+      {
+        "vuln_id": "CVE-2026-6653",
+        "pkg_name": "libxml2",
+        "pkg_type": "debian",
+        "installed_version": "2.9.14+dfsg-1.3~deb12u6",
+        "fixed_version": "",
+        "severity": "CRITICAL",
+        "title": "libxml2: mingw-libxml2: libxml2: Denial of Service via crafted XML input due to use-after-free",
+        "target": "/out/image.tar (debian 12.15)",
+        "cvss_score": 9.8
+      },
+      {
+        "vuln_id": "CVE-2023-45853",
+        "pkg_name": "zlib1g",
+        "pkg_type": "debian",
+        "installed_version": "1:1.2.13.dfsg-1",
+        "fixed_version": "",
+        "severity": "CRITICAL",
+        "title": "zlib: integer overflow and resultant heap-based buffer overflow in zipOpenNewFileInZip4_6",
+        "target": "/out/image.tar (debian 12.15)",
+        "cvss_score": 9.8
+      },
+      {
+        "vuln_id": "CVE-2025-7458",
+        "pkg_name": "libsqlite3-0",
+        "pkg_type": "debian",
+        "installed_version": "3.40.1-2+deb12u2",
+        "fixed_version": "",
+        "severity": "CRITICAL",
+        "title": "sqlite: SQLite integer overflow",
+        "target": "/out/image.tar (debian 12.15)",
+        "cvss_score": 9.1
+      },
+      {
+        "vuln_id": "CVE-2025-7458",
+        "pkg_name": "libsqlite3-dev",
+        "pkg_type": "debian",
+        "installed_version": "3.40.1-2+deb12u2",
+        "fixed_version": "",
+        "severity": "CRITICAL",
+        "title": "sqlite: SQLite integer overflow",
+        "target": "/out/image.tar (debian 12.15)",
+        "cvss_score": 9.1
+      },
+      {
+        "vuln_id": "CVE-2026-90037",
+        "pkg_name": "linux-libc-dev",
+        "pkg_type": "debian",
+        "installed_version": "6.1.190-1",
+        "fixed_version": "",
+        "severity": "CRITICAL",
+        "title": "In the Linux kernel, the following vulnerability has been resolved:  N ...",
+        "target": "/out/image.tar (debian 12.15)",
+        "cvss_score": null
+      },
+      {
+        "vuln_id": "CVE-2026-93221",
+        "pkg_name": "linux-libc-dev",
+        "pkg_type": "debian",
+        "installed_version": "6.1.190-1",
+        "fixed_version": "",
+        "severity": "CRITICAL",
+        "title": "In the Linux kernel, the following vulnerability has been resolved:  n ...",
+        "target": "/out/image.tar (debian 12.15)",
+        "cvss_score": null
+      },
+      {
+        "vuln_id": "CVE-2026-98805",
+        "pkg_name": "linux-libc-dev",
+        "pkg_type": "debian",
+        "installed_version": "6.1.190-1",
+        "fixed_version": "",
+        "severity": "CRITICAL",
+        "title": "In the Linux kernel, the following vulnerability has been resolved:  t ...",
+        "target": "/out/image.tar (debian 12.15)",
+        "cvss_score": null
+      },
+      {
+        "vuln_id": "CVE-2019-19814",
+        "pkg_name": "linux-libc-dev",
+        "pkg_type": "debian",
+        "installed_version": "6.1.190-1",
+        "fixed_version": "",
+        "severity": "HIGH",
+        "title": "kernel: out-of-bounds write in __remove_dirty_segment in fs/f2fs/segment.c",
+        "target": "/out/image.tar (debian 12.15)",
+        "cvss_score": 9.3
+      },
+      {
+        "vuln_id": "CVE-2026-8927",
+        "pkg_name": "curl",
+        "pkg_type": "debian",
+        "installed_version": "7.88.1-10+deb12u15",
+        "fixed_version": "",
+        "severity": "HIGH",
+        "title": "curl: Information disclosure due to uncleared proxy authentication state",
+        "target": "/out/image.tar (debian 12.15)",
+        "cvss_score": 9.1
+      },
+      {
+        "vuln_id": "CVE-2026-8927",
+        "pkg_name": "libcurl4",
+        "pkg_type": "debian",
+        "installed_version": "7.88.1-10+deb12u15",
+        "fixed_version": "",
+        "severity": "HIGH",
+        "title": "curl: Information disclosure due to uncleared proxy authentication state",
+        "target": "/out/image.tar (debian 12.15)",
+        "cvss_score": 9.1
+      },
+      {
+        "vuln_id": "CVE-2025-68809",
+        "pkg_name": "linux-libc-dev",
+        "pkg_type": "debian",
+        "installed_version": "6.1.190-1",
+        "fixed_version": "",
+        "severity": "HIGH",
+        "title": "kernel: ksmbd: Remote race condition leads to data integrity issues and denial of service",
+        "target": "/out/image.tar (debian 12.15)",
+        "cvss_score": 9.1
+      },
+      {
+        "vuln_id": "CVE-2026-16742",
+        "pkg_name": "libsystemd0",
+        "pkg_type": "debian",
+        "installed_version": "252.39-1~deb12u2",
+        "fixed_version": "",
+        "severity": "HIGH",
+        "title": "systemd: systemd-homed: Local privilege escalation via missing home-record signature verification",
+        "target": "/out/image.tar (debian 12.15)",
+        "cvss_score": 8.8
+      },
+      {
+        "vuln_id": "CVE-2026-16742",
+        "pkg_name": "libudev1",
+        "pkg_type": "debian",
+        "installed_version": "252.39-1~deb12u2",
+        "fixed_version": "",
+        "severity": "HIGH",
+        "title": "systemd: systemd-homed: Local privilege escalation via missing home-record signature verification",
+        "target": "/out/image.tar (debian 12.15)",
+        "cvss_score": 8.8
+      },
+      {
+        "vuln_id": "CVE-2026-72130",
+        "pkg_name": "linux-libc-dev",
+        "pkg_type": "debian",
+        "installed_version": "6.1.190-1",
+        "fixed_version": "",
+        "severity": "HIGH",
+        "title": "kernel: nvmet-auth: reject short AUTH_RECEIVE buffers",
+        "target": "/out/image.tar (debian 12.15)",
+        "cvss_score": 8.8
+      },
+      {
+        "vuln_id": "CVE-2026-74752",
+        "pkg_name": "linux-libc-dev",
+        "pkg_type": "debian",
+        "installed_version": "6.1.190-1",
+        "fixed_version": "",
+        "severity": "HIGH",
+        "title": "kernel: sctp: validate cookie AUTH state before use",
+        "target": "/out/image.tar (debian 12.15)",
+        "cvss_score": 8.8
+      },
+      {
+        "vuln_id": "CVE-2026-89676",
+        "pkg_name": "linux-libc-dev",
+        "pkg_type": "debian",
+        "installed_version": "6.1.190-1",
+        "fixed_version": "",
+        "severity": "HIGH",
+        "title": "kernel: nfsd: fix stale s2s_cp_stateids IDR entry for async COPY",
+        "target": "/out/image.tar (debian 12.15)",
+        "cvss_score": 8.8
+      },
+      {
+        "vuln_id": "CVE-2026-98716",
+        "pkg_name": "linux-libc-dev",
+        "pkg_type": "debian",
+        "installed_version": "6.1.190-1",
+        "fixed_version": "",
+        "severity": "HIGH",
+        "title": "kernel: KVM: SVM: Use the active VMCB's MSR bitmap when checking if MSR is intercepted",
+        "target": "/out/image.tar (debian 12.15)",
+        "cvss_score": 8.8
+      },
+      {
+        "vuln_id": "CVE-2026-74860",
+        "pkg_name": "libxml2",
+        "pkg_type": "debian",
+        "installed_version": "2.9.14+dfsg-1.3~deb12u6",
+        "fixed_version": "",
+        "severity": "HIGH",
+        "title": "libxml2: double-free/UAF in libxml2 Python bindings",
+        "target": "/out/image.tar (debian 12.15)",
+        "cvss_score": 8.5
+      },
+      {
+        "vuln_id": "CVE-2026-98769",
+        "pkg_name": "linux-libc-dev",
+        "pkg_type": "debian",
+        "installed_version": "6.1.190-1",
+        "fixed_version": "",
+        "severity": "HIGH",
+        "title": "kernel: usb: gadget: f_uac1_legacy: validate bRequest index in generic_{set,get}_cmd",
+        "target": "/out/image.tar (debian 12.15)",
+        "cvss_score": 8.4
+      },
+      {
+        "vuln_id": "CVE-2026-98466",
+        "pkg_name": "linux-libc-dev",
+        "pkg_type": "debian",
+        "installed_version": "6.1.190-1",
+        "fixed_version": "",
+        "severity": "HIGH",
+        "title": "kernel: KVM: arm64: Transfer the hyp stack pages out of the host stage-2",
+        "target": "/out/image.tar (debian 12.15)",
+        "cvss_score": 8.2
+      },
+      {
+        "vuln_id": "CVE-2026-8286",
+        "pkg_name": "curl",
+        "pkg_type": "debian",
+        "installed_version": "7.88.1-10+deb12u15",
+        "fixed_version": "",
+        "severity": "HIGH",
+        "title": "curl: curl: Insecure connection establishment due to TLS configuration mismatch",
+        "target": "/out/image.tar (debian 12.15)",
+        "cvss_score": 8.1
+      },
+      {
+        "vuln_id": "CVE-2026-8458",
+        "pkg_name": "curl",
+        "pkg_type": "debian",
+        "installed_version": "7.88.1-10+deb12u15",
+        "fixed_version": "",
+        "severity": "HIGH",
+        "title": "curl: libcurl: Unauthorized connection reuse due to a logical error",
+        "target": "/out/image.tar (debian 12.15)",
+        "cvss_score": 8.1
+      },
+      {
+        "vuln_id": "CVE-2026-111497",
+        "pkg_name": "libbrotli1",
+        "pkg_type": "debian",
+        "installed_version": "1.0.9-2+b6",
+        "fixed_version": "1.0.9-2+deb12u1",
+        "severity": "HIGH",
+        "title": "brotli: Out-of-Bounds Write in Google Brotli Decoder",
+        "target": "/out/image.tar (debian 12.15)",
+        "cvss_score": 8.1
+      },
+      {
+        "vuln_id": "CVE-2026-8286",
+        "pkg_name": "libcurl4",
+        "pkg_type": "debian",
+        "installed_version": "7.88.1-10+deb12u15",
+        "fixed_version": "",
+        "severity": "HIGH",
+        "title": "curl: curl: Insecure connection establishment due to TLS configuration mismatch",
+        "target": "/out/image.tar (debian 12.15)",
+        "cvss_score": 8.1
+      },
+      {
+        "vuln_id": "CVE-2026-8458",
+        "pkg_name": "libcurl4",
+        "pkg_type": "debian",
+        "installed_version": "7.88.1-10+deb12u15",
+        "fixed_version": "",
+        "severity": "HIGH",
+        "title": "curl: libcurl: Unauthorized connection reuse due to a logical error",
+        "target": "/out/image.tar (debian 12.15)",
+        "cvss_score": 8.1
+      },
+      {
+        "vuln_id": "CVE-2026-89526",
+        "pkg_name": "linux-libc-dev",
+        "pkg_type": "debian",
+        "installed_version": "6.1.190-1",
+        "fixed_version": "",
+        "severity": "HIGH",
+        "title": "kernel: svcrdma: Validate Read chunk positions before reconstruction",
+        "target": "/out/image.tar (debian 12.15)",
+        "cvss_score": 8.1
+      },
+      {
+        "vuln_id": "CVE-2026-89631",
+        "pkg_name": "linux-libc-dev",
+        "pkg_type": "debian",
+        "installed_version": "6.1.190-1",
+        "fixed_version": "",
+        "severity": "HIGH",
+        "title": "kernel: smb: client: reject a tree connect response whose byte count is too small",
+        "target": "/out/image.tar (debian 12.15)",
+        "cvss_score": 8.1
+      },
+      {
+        "vuln_id": "CVE-2026-53615",
+        "pkg_name": "bsdutils",
+        "pkg_type": "debian",
+        "installed_version": "1:2.38.1-5+deb12u3",
+        "fixed_version": "",
+        "severity": "HIGH",
+        "title": "util-linux: util-linux: Partition metadata compromise via integer overflow in DOS partition parser",
+        "target": "/out/image.tar (debian 12.15)",
+        "cvss_score": 8.0
+      },
+      {
+        "vuln_id": "CVE-2026-53615",
+        "pkg_name": "libblkid1",
+        "pkg_type": "debian",
+        "installed_version": "2.38.1-5+deb12u3",
+        "fixed_version": "",
+        "severity": "HIGH",
+        "title": "util-linux: util-linux: Partition metadata compromise via integer overflow in DOS partition parser",
+        "target": "/out/image.tar (debian 12.15)",
+        "cvss_score": 8.0
+      },
+      {
+        "vuln_id": "CVE-2026-53615",
+        "pkg_name": "libmount1",
+        "pkg_type": "debian",
+        "installed_version": "2.38.1-5+deb12u3",
+        "fixed_version": "",
+        "severity": "HIGH",
+        "title": "util-linux: util-linux: Partition metadata compromise via integer overflow in DOS partition parser",
+        "target": "/out/image.tar (debian 12.15)",
+        "cvss_score": 8.0
+      },
+      {
+        "vuln_id": "CVE-2026-53615",
+        "pkg_name": "libsmartcols1",
+        "pkg_type": "debian",
+        "installed_version": "2.38.1-5+deb12u3",
+        "fixed_version": "",
+        "severity": "HIGH",
+        "title": "util-linux: util-linux: Partition metadata compromise via integer overflow in DOS partition parser",
+        "target": "/out/image.tar (debian 12.15)",
+        "cvss_score": 8.0
+      },
+      {
+        "vuln_id": "CVE-2026-53615",
+        "pkg_name": "libuuid1",
+        "pkg_type": "debian",
+        "installed_version": "2.38.1-5+deb12u3",
+        "fixed_version": "",
+        "severity": "HIGH",
+        "title": "util-linux: util-linux: Partition metadata compromise via integer overflow in DOS partition parser",
+        "target": "/out/image.tar (debian 12.15)",
+        "cvss_score": 8.0
+      },
+      {
+        "vuln_id": "CVE-2025-21927",
+        "pkg_name": "linux-libc-dev",
+        "pkg_type": "debian",
+        "installed_version": "6.1.190-1",
+        "fixed_version": "",
+        "severity": "HIGH",
+        "title": "kernel: nvme-tcp: fix potential memory corruption in nvme_tcp_recv_pdu()",
+        "target": "/out/image.tar (debian 12.15)",
+        "cvss_score": 8.0
+      },
+      {
+        "vuln_id": "CVE-2026-89633",
+        "pkg_name": "linux-libc-dev",
+        "pkg_type": "debian",
+        "installed_version": "6.1.190-1",
+        "fixed_version": "",
+        "severity": "HIGH",
+        "title": "kernel: smb: client: fix OOB read/write from unvalidated DataOffset in coalesce_t2()",
+        "target": "/out/image.tar (debian 12.15)",
+        "cvss_score": 8.0
+      },
+      {
+        "vuln_id": "CVE-2026-53615",
+        "pkg_name": "mount",
+        "pkg_type": "debian",
+        "installed_version": "2.38.1-5+deb12u3",
+        "fixed_version": "",
+        "severity": "HIGH",
+        "title": "util-linux: util-linux: Partition metadata compromise via integer overflow in DOS partition parser",
+        "target": "/out/image.tar (debian 12.15)",
+        "cvss_score": 8.0
+      },
+      {
+        "vuln_id": "CVE-2026-53615",
+        "pkg_name": "util-linux",
+        "pkg_type": "debian",
+        "installed_version": "2.38.1-5+deb12u3",
+        "fixed_version": "",
+        "severity": "HIGH",
+        "title": "util-linux: util-linux: Partition metadata compromise via integer overflow in DOS partition parser",
+        "target": "/out/image.tar (debian 12.15)",
+        "cvss_score": 8.0
+      },
+      {
+        "vuln_id": "CVE-2026-53615",
+        "pkg_name": "util-linux-extra",
+        "pkg_type": "debian",
+        "installed_version": "2.38.1-5+deb12u3",
+        "fixed_version": "",
+        "severity": "HIGH",
+        "title": "util-linux: util-linux: Partition metadata compromise via integer overflow in DOS partition parser",
+        "target": "/out/image.tar (debian 12.15)",
+        "cvss_score": 8.0
+      },
+      {
+        "vuln_id": "CVE-2026-78408",
+        "pkg_name": "bsdutils",
+        "pkg_type": "debian",
+        "installed_version": "1:2.38.1-5+deb12u3",
+        "fixed_version": "",
+        "severity": "HIGH",
+        "title": "util-linux: util-linux: nsenter --join-cgroup leaks root cgroup migration authority",
+        "target": "/out/image.tar (debian 12.15)",
+        "cvss_score": 7.9
+      },
+      {
+        "vuln_id": "CVE-2026-78408",
+        "pkg_name": "libblkid1",
+        "pkg_type": "debian",
+        "installed_version": "2.38.1-5+deb12u3",
+        "fixed_version": "",
+        "severity": "HIGH",
+        "title": "util-linux: util-linux: nsenter --join-cgroup leaks root cgroup migration authority",
+        "target": "/out/image.tar (debian 12.15)",
+        "cvss_score": 7.9
+      },
+      {
+        "vuln_id": "CVE-2026-78408",
+        "pkg_name": "libmount1",
+        "pkg_type": "debian",
+        "installed_version": "2.38.1-5+deb12u3",
+        "fixed_version": "",
+        "severity": "HIGH",
+        "title": "util-linux: util-linux: nsenter --join-cgroup leaks root cgroup migration authority",
+        "target": "/out/image.tar (debian 12.15)",
+        "cvss_score": 7.9
+      }
+    ],
+    "misconfigurations": [],
+    "secrets": []
+  },
+  "module_inventory": [
+    {
+      "file": "examples/php/wp_plugin_messy/admin/settings-page.php",
+      "loc": 31,
+      "public_types": [],
+      "public_callables": [
+        "map_register_admin_menu",
+        "map_render_settings_page"
+      ]
+    },
+    {
+      "file": "examples/php/wp_plugin_messy/includes/ajax-handlers.php",
+      "loc": 21,
+      "public_types": [],
+      "public_callables": [
+        "map_ajax_purge_logs",
+        "map_ajax_search_members"
+      ]
+    },
+    {
+      "file": "examples/php/wp_plugin_messy/includes/rest-endpoints.php",
+      "loc": 21,
+      "public_types": [],
+      "public_callables": [
+        "map_export_all_members",
+        "map_register_rest_routes"
+      ]
+    },
+    {
+      "file": "examples/php/wp_plugin_messy/member-analytics-portal.php",
+      "loc": 11,
+      "public_types": [],
+      "public_callables": [
+        "map_render_badge_shortcode"
+      ]
+    }
+  ],
+  "dangerous_sinks": [
+    {
+      "category": "xss",
+      "cwe_id": "CWE-79",
+      "severity": "high",
+      "file": "examples/php/wp_plugin_messy/admin/settings-page.php",
+      "line": 26,
+      "symbol": "map_render_settings_page",
+      "detail": "Unescaped request input rendered directly via 'echo $_GET['tab'] ?? 'general';'"
+    },
+    {
+      "category": "sql_injection",
+      "cwe_id": "CWE-89",
+      "severity": "high",
+      "file": "examples/php/wp_plugin_messy/includes/ajax-handlers.php",
+      "line": 10,
+      "symbol": "map_ajax_search_members",
+      "detail": "Unparameterized SQL in '$wpdb->get_results(\"SELECT ID, display_name, user_email FROM {$w)' — use prepared placeholders"
+    },
+    {
+      "category": "sql_injection",
+      "cwe_id": "CWE-89",
+      "severity": "high",
+      "file": "examples/php/wp_plugin_messy/includes/ajax-handlers.php",
+      "line": 21,
+      "symbol": "map_ajax_purge_logs",
+      "detail": "Unparameterized SQL in '$wpdb->query(\"DELETE FROM wp_map_events WHERE category = ')' — use prepared placeholders"
+    },
+    {
+      "category": "xss",
+      "cwe_id": "CWE-79",
+      "severity": "high",
+      "file": "examples/php/wp_plugin_messy/includes/ajax-handlers.php",
+      "line": 22,
+      "symbol": "map_ajax_purge_logs",
+      "detail": "Unescaped request input rendered directly via 'echo \"Purged category: \" . $_POST['category'];'"
+    },
+    {
+      "category": "sql_injection",
+      "cwe_id": "CWE-89",
+      "severity": "high",
+      "file": "examples/php/wp_plugin_messy/includes/rest-endpoints.php",
+      "line": 19,
+      "symbol": "map_export_all_members",
+      "detail": "Unparameterized SQL in '$wpdb->get_results($sql)' — use prepared placeholders"
+    }
+  ],
+  "api_endpoints": [
+    {
+      "http_method": "ANY",
+      "path": "/examples/php/wp_plugin_messy/admin/settings-page.php",
+      "handler": "settings-page.php",
+      "file": "examples/php/wp_plugin_messy/admin/settings-page.php",
+      "line": 1,
+      "has_auth_hint": false,
+      "auth_mechanisms": []
+    },
+    {
+      "http_method": "GET",
+      "path": "/examples/php/wp_plugin_messy/member-analytics-portal.php",
+      "handler": "member-analytics-portal.php",
+      "file": "examples/php/wp_plugin_messy/member-analytics-portal.php",
+      "line": 1,
+      "has_auth_hint": false,
+      "auth_mechanisms": []
+    },
+    {
+      "http_method": "POST",
+      "path": "/wp-admin/admin-ajax.php?action=map_purge_logs",
+      "handler": "map_ajax_purge_logs",
+      "file": "examples/php/wp_plugin_messy/includes/ajax-handlers.php",
+      "line": 4,
+      "has_auth_hint": true,
+      "auth_mechanisms": [
+        "wp_ajax_session"
+      ]
+    },
+    {
+      "http_method": "POST",
+      "path": "/wp-admin/admin-ajax.php?action=map_search_members",
+      "handler": "map_ajax_search_members",
+      "file": "examples/php/wp_plugin_messy/includes/ajax-handlers.php",
+      "line": 3,
+      "has_auth_hint": false,
+      "auth_mechanisms": []
+    },
+    {
+      "http_method": "GET",
+      "path": "/wp-json/member-analytics/v1/export",
+      "handler": "map_export_all_members",
+      "file": "examples/php/wp_plugin_messy/includes/rest-endpoints.php",
+      "line": 7,
+      "has_auth_hint": false,
+      "auth_mechanisms": []
+    }
+  ],
+  "architecture_overview": {
+    "pattern": "手続き型 WordPress フック直結スクリプト構成（Procedural Hook-Driven Plugin — 0 Classes / Global Functions）",
+    "entry_points": [
+      "member-analytics-portal.php",
+      "member-analytics-portal.php:map_render_badge_shortcode",
+      "includes/rest-endpoints.php:map_export_all_members",
+      "includes/ajax-handlers.php:map_ajax_search_members",
+      "includes/ajax-handlers.php:map_ajax_purge_logs",
+      "admin/settings-page.php:map_render_settings_page"
+    ],
+    "modules": [
+      {
+        "path": "member-analytics-portal.php",
+        "role": "プラグインエントリポイント・サブファイル読込・[member_analytics_badge] ショートコード登録",
+        "key_symbols": [
+          "map_render_badge_shortcode"
+        ],
+        "depends_on": [
+          "includes/rest-endpoints.php",
+          "includes/ajax-handlers.php",
+          "admin/settings-page.php"
+        ],
+        "health_note": "11 LOC。ABSPATH ガード欠落、Requires PHP: 7.4 (EOL)、手動 require_once 3件、$_GET['badge_label'] 未エスケープ XSS"
+      },
+      {
+        "path": "includes/rest-endpoints.php",
+        "role": "GET /wp-json/member-analytics/v1/export 会員エクスポート REST API",
+        "key_symbols": [
+          "map_register_rest_routes",
+          "map_export_all_members"
+        ],
+        "depends_on": [],
+        "health_note": "21 LOC。ABSPATH ガード欠落、$map_webhook_secret 直書き、permission_callback => '__return_true'、CWE-89 SQLi、print_r デバッグ出力"
+      },
+      {
+        "path": "includes/ajax-handlers.php",
+        "role": "会員検索 (nopriv) およびイベントログ削除用 Admin-AJAX ハンドラ",
+        "key_symbols": [
+          "map_ajax_search_members",
+          "map_ajax_purge_logs"
+        ],
+        "depends_on": [],
+        "health_note": "21 LOC。ABSPATH ガード欠落、wp_ajax_nopriv 未認証 SQLi、map_ajax_purge_logs の Nonce/権限欠落 + DELETE SQLi + 反射型 XSS"
+      },
+      {
+        "path": "admin/settings-page.php",
+        "role": "WordPress 管理画面設定ページ・テレメトリ送信",
+        "key_symbols": [
+          "map_register_admin_menu",
+          "map_render_settings_page"
+        ],
+        "depends_on": [],
+        "health_note": "31 LOC。ABSPATH ガード欠落、capability 'read'、CSRF Nonce 欠落、@file_get_contents タイムアウト未設定、$_GET['tab'] XSS、<script> 直書き"
+      }
+    ],
+    "dependency_notes": "composer.json 不在のため PSR-4 名前空間を持たず、member-analytics-portal.php から3つのサブファイルを無条件に require_once してグローバル名前空間の $wpdb・$_GET・$_POST に直接結合している。"
+  },
+  "architecture_record": {
+    "workflow_id": "php_wp_plugin_messy",
+    "workflow_run_id": "wf-31a8fefa",
+    "recorded_at": "2026-10-24T09:13:14.379419+00:00",
+    "target_root": "examples/php/wp_plugin_messy",
+    "system_profile": {
+      "system_purpose": "WordPress サイト向けに会員データの REST API エクスポート、admin-ajax による会員検索・イベントログ削除、フロントエンド用バッジショートコード、および管理画面でのテレメトリ送信先設定を提供するプラグイン（Member Analytics Portal v1.3.0）。",
+      "domain_context": "WordPress 会員管理・アクティビティ分析（wp_users テーブルの会員 PII 参照、カスタムテーブル wp_map_events の削除操作、wp_options へのテレメトリ URL 保存）。",
+      "runtime_type": "web_api",
+      "tech_stack": [
+        "PHP (>=7.4 declared in plugin header; Composer unmanaged raw_php)",
+        "WordPress Plugin API (Hooks, Shortcode API, WP REST API v1, Admin-AJAX, Options API)",
+        "WordPress $wpdb (MySQL / MariaDB global database access)"
+      ],
+      "external_integrations": [
+        "WordPress Database ($wpdb->users, wp_map_events, wp_options)",
+        "External Telemetry Endpoint (https://telemetry.example.com/ping via synchronous @file_get_contents)",
+        "Inbound Webhook Secret ($map_webhook_secret hardcoded in includes/rest-endpoints.php:3)"
+      ]
+    },
+    "structure_map": {
+      "architecture_pattern": "手続き型フック直結モノリス（Procedural WordPress Hook-Driven Script Architecture — クラス・名前空間・Service/Repository 層分離なし）",
+      "layers": [
+        {
+          "name": "Plugin Bootstrap & Shortcode Entry",
+          "responsibility": "WordPress プラグインメタデータの宣言、サブファイル3本の無条件 require_once 読込、rest_api_init フックおよび [member_analytics_badge] ショートコードの登録",
+          "paths": [
+            "member-analytics-portal.php"
+          ],
+          "allowed_dependencies": [
+            "REST & AJAX Hook Handlers",
+            "Admin Settings Page"
+          ]
+        },
+        {
+          "name": "REST & AJAX Hook Handlers",
+          "responsibility": "WP REST API (/wp-json/member-analytics/v1/export) および admin-ajax (map_search_members / map_purge_logs) のコールバック処理と $wpdb 直接クエリ実行",
+          "paths": [
+            "includes/rest-endpoints.php",
+            "includes/ajax-handlers.php"
+          ],
+          "allowed_dependencies": []
+        },
+        {
+          "name": "Admin Settings Page",
+          "responsibility": "admin_menu フックでの設定サブメニュー登録、POST による update_option 保存、外部テレメトリ通信、およびインライン HTML フォーム描画",
+          "paths": [
+            "admin/settings-page.php"
+          ],
+          "allowed_dependencies": []
+        }
+      ],
+      "modules": [
+        {
+          "path": "member-analytics-portal.php",
+          "role": "プラグインブートストラップ・ショートコード描画",
+          "key_symbols": [
+            "map_render_badge_shortcode"
+          ],
+          "depends_on": [
+            "includes/rest-endpoints.php",
+            "includes/ajax-handlers.php",
+            "admin/settings-page.php"
+          ],
+          "health_note": "11 LOC。ABSPATH ガード欠落、Requires PHP: 7.4、手動 require_once 3件、$_GET['badge_label'] 未エスケープ XSS"
+        },
+        {
+          "path": "includes/rest-endpoints.php",
+          "role": "会員一覧エクスポート REST API",
+          "key_symbols": [
+            "map_register_rest_routes",
+            "map_export_all_members"
+          ],
+          "depends_on": [],
+          "health_note": "21 LOC。ABSPATH ガード欠落、$map_webhook_secret 直書き、permission_callback => '__return_true'、$wpdb 生 SQL 結合 (CWE-89)、print_r デバッグ出力"
+        },
+        {
+          "path": "includes/ajax-handlers.php",
+          "role": "会員検索・ログパージ Admin-AJAX ハンドラ",
+          "key_symbols": [
+            "map_ajax_search_members",
+            "map_ajax_purge_logs"
+          ],
+          "depends_on": [],
+          "health_note": "21 LOC。ABSPATH ガード欠落、wp_ajax_nopriv 未認証 SQLi (CWE-89)、map_ajax_purge_logs の Nonce/権限欠落 + DELETE SQLi (CWE-89) + 反射型 XSS (CWE-79)"
+        },
+        {
+          "path": "admin/settings-page.php",
+          "role": "管理画面オプション設定・テレメトリ通知・HTML 描画",
+          "key_symbols": [
+            "map_register_admin_menu",
+            "map_render_settings_page"
+          ],
+          "depends_on": [],
+          "health_note": "31 LOC。ABSPATH ガード欠落、capability 'read'、CSRF Nonce 欠落、@file_get_contents タイムアウトなし外部通信、$_GET['tab'] XSS (CWE-79)、<script> 直書き"
+        }
+      ],
+      "boundary_assessment": "全4ファイル（84 LOC）にクラス定義が1つも存在せず（total_classes=0）、7つのグローバル関数が直接 $_GET/$_POST（10箇所）と global $wpdb（3箇所）を参照するフラットな手続き型構造となっている。コントローラ・ドメインサービス・データアクセス（Repository）・ビューテンプレートの境界が完全に欠落しており、さらに全ファイルで ABSPATH ガードが不在のため直接 HTTP アクセスに対するファイル境界防御も機能していない。"
+    },
+    "execution_flow_map": {
+      "entry_points": [
+        "member-analytics-portal.php",
+        "member-analytics-portal.php:map_render_badge_shortcode",
+        "includes/rest-endpoints.php:map_register_rest_routes",
+        "includes/rest-endpoints.php:map_export_all_members",
+        "includes/ajax-handlers.php:map_ajax_search_members",
+        "includes/ajax-handlers.php:map_ajax_purge_logs",
+        "admin/settings-page.php:map_register_admin_menu",
+        "admin/settings-page.php:map_render_settings_page"
+      ],
+      "execution_flows": [
+        {
+          "name": "REST API 会員一括エクスポートフロー（未認証 PII 漏洩 + SQLi）",
+          "trigger": "GET /wp-json/member-analytics/v1/export (rest_api_init -> map_register_rest_routes, permission_callback => '__return_true')",
+          "steps": [
+            "member-analytics-portal.php:11,15 が includes/rest-endpoints.php を require_once し rest_api_init フックに登録する",
+            "map_register_rest_routes (includes/rest-endpoints.php:5-12) が permission_callback => '__return_true' で /export ルートを公開する",
+            "map_export_all_members (includes/rest-endpoints.php:14-24) が $_GET['role_filter'] を未サニタイズで取得し、{$wpdb->users} に対する LIKE 句へ直接文字列結合して $wpdb->get_results($sql) を実行する",
+            "$_GET['debug'] 指定時は print_r($rows) を標準出力に垂れ流した上で ID・user_login・user_email を返却する"
+          ],
+          "involved_files": [
+            "member-analytics-portal.php",
+            "includes/rest-endpoints.php"
+          ]
+        },
+        {
+          "name": "Admin-AJAX 未認証会員検索フロー（wp_ajax_nopriv SQLi）",
+          "trigger": "POST /wp-admin/admin-ajax.php?action=map_search_members (wp_ajax_nopriv_map_search_members)",
+          "steps": [
+            "includes/ajax-handlers.php:3 が未認証利用者向けに wp_ajax_nopriv_map_search_members を登録する",
+            "map_ajax_search_members (includes/ajax-handlers.php:6-15) が Nonce・権限検査なしに $_POST['term'] を読み取る",
+            "{$wpdb->users} テーブルへの SELECT 文に $_POST['term'] を直接結合して $wpdb->get_results() を実行し、echo json_encode($results) と wp_die() で終了する"
+          ],
+          "involved_files": [
+            "member-analytics-portal.php",
+            "includes/ajax-handlers.php"
+          ]
+        },
+        {
+          "name": "Admin-AJAX イベントログ削除フロー（Nonce/権限欠落 + DELETE SQLi + XSS）",
+          "trigger": "POST /wp-admin/admin-ajax.php?action=map_purge_logs (wp_ajax_map_purge_logs)",
+          "steps": [
+            "includes/ajax-handlers.php:4 がログインセッション向けに wp_ajax_map_purge_logs を登録する",
+            "map_ajax_purge_logs (includes/ajax-handlers.php:17-24) が check_ajax_referer() と current_user_can() を省略したまま $_POST['category'] を取得する",
+            "ハードコードされた wp_map_events テーブルへ DELETE 文を文字列結合で発行し、$_POST['category'] を未エスケープで echo 出力する"
+          ],
+          "involved_files": [
+            "member-analytics-portal.php",
+            "includes/ajax-handlers.php"
+          ]
+        },
+        {
+          "name": "管理画面オプション更新・外部テレメトリ送信フロー（権限昇格 + CSRF + ブロッキング I/O + XSS）",
+          "trigger": "GET/POST /wp-admin/options-general.php?page=member-analytics-settings (admin_menu -> capability 'read')",
+          "steps": [
+            "map_register_admin_menu (admin/settings-page.php:5-14) が購読者権限 ('read') で設定サブページを登録する",
+            "map_render_settings_page (admin/settings-page.php:16-34) が Nonce・権限検証なしで $_POST['map_telemetry_url'] を update_option('map_telemetry_url', ...) に保存する",
+            "保存直後にタイムアウト未設定・エラー抑制付きの @file_get_contents('https://telemetry.example.com/ping?site=...') を同期実行する",
+            "$_GET['tab'] を未エスケープで <h1> と <input value> に出力し、ハードコード <script src=...> タグを描画する"
+          ],
+          "involved_files": [
+            "member-analytics-portal.php",
+            "admin/settings-page.php"
+          ]
+        },
+        {
+          "name": "フロントエンド会員バッジショートコード描画フロー（反射型 XSS）",
+          "trigger": "[member_analytics_badge] ショートコード展開",
+          "steps": [
+            "member-analytics-portal.php:16 が add_shortcode('member_analytics_badge', 'map_render_badge_shortcode') を登録する",
+            "map_render_badge_shortcode (member-analytics-portal.php:18-22) が $atts を無視して $_GET['badge_label'] を未エスケープのまま <span> タグに連結して返却する"
+          ],
+          "involved_files": [
+            "member-analytics-portal.php"
+          ]
+        }
+      ],
+      "state_and_storage": [
+        "WordPress コア会員テーブル ({$wpdb->users}: ID, user_login, display_name, user_email の参照 — includes/rest-endpoints.php:18, includes/ajax-handlers.php:11)",
+        "プラグイン独自イベントテーブル (wp_map_events: 接頭辞ハードコードでの DELETE 実行、スキーマ作成/dbDelta 不在 — includes/ajax-handlers.php:21)",
+        "WordPress Options テーブル (wp_options の 'map_telemetry_url' キー更新 — admin/settings-page.php:20)",
+        "グローバル変数状態 ($map_webhook_secret in includes/rest-endpoints.php:3 および global $wpdb / $_GET / $_POST 直参照)"
+      ],
+      "error_and_concurrency_model": "PHP-FPM / Apache リクエスト単位の同期モデルで動作するが、admin/settings-page.php:21 の @file_get_contents() がデフォルト socket timeout（通常60秒）まで PHP ワーカープロセスを専有・ブロックし、かつ @ 演算子により通信失敗を完全に握り潰す。また $wpdb クエリ戻り値や $wpdb->last_error の検査・トランザクション制御が一切存在しない。"
+    }
+  },
+  "audit_dimensions": [
+    {
+      "action_id": "act-10",
+      "audit_id": "php_test_audit",
+      "title": "Evaluate PHP Test Suite Completeness & Structure",
+      "score": 5,
+      "grade": "D",
+      "rules_evaluated": [
+        "php/testing"
+      ],
+      "pass_count": 0,
+      "warn_count": 0,
+      "fail_count": 1,
+      "summary": "テストスイート監査の結果、4つのソースファイル（7関数、5つの REST/AJAX/管理画面エントリポイント）に対してテストファイル・テスト関数がともに 0件（test_files_count=0, test_functions_count=0, module_test_coverage_pct=null）であり、PHPUnit / Pest や WordPress 公式テストハーネス（WP_UnitTestCase / WP_Ajax_UnitTestCase / Brain Monkey）の設定も一切存在しない。"
+    },
+    {
+      "action_id": "act-14",
+      "audit_id": "security_vulnerability_audit",
+      "title": "Evaluate Supply-Chain CVEs, Container Misconfigs, Secrets, Dangerous Sinks & API Boundaries",
+      "score": 8,
+      "grade": "D",
+      "rules_evaluated": [
+        "common/security_vulnerability",
+        "common/supply_chain"
+      ],
+      "pass_count": 0,
+      "warn_count": 0,
+      "fail_count": 2,
+      "summary": "統合セキュリティ・脆弱性監査（SEC-01〜SEC-05）において、composer.lock 不在のためアプリ層 SCA CVE は 0 件である一方、検証用 PHP 8.2 (Debian 12.15) コンテナ OS 層では CRITICAL 7件・HIGH 278件（計2,910件: CVE-2026-6653, CVE-2023-45853, CVE-2025-7458 等）が検出された。さらにプラグイン本体コードでは SEC-03（includes/rest-endpoints.php:3 の Webhook 秘密鍵直書き）、SEC-04（CWE-89 SQLi 3箇所・CWE-79 XSS 4箇所）、および SEC-05（REST /export の '__return_true' 無認証 PII 公開、wp_ajax_nopriv_map_search_members 未認証 SQLi、wp_ajax_map_purge_logs と設定画面の Nonce/Capability 欠落、全4ファイルの ABSPATH ガード不在）という致命的な脆弱性が重なっている。"
+    },
+    {
+      "action_id": "act-05",
+      "audit_id": "php_ast_audit",
+      "title": "Interpret PHP AST Facts & Evaluate Quality, Strict Types, Sinks & Frameworks",
+      "score": 14,
+      "grade": "D",
+      "rules_evaluated": [
+        "common/architecture",
+        "common/maintainability",
+        "common/security",
+        "common/security_vulnerability",
+        "php/code_quality",
+        "php/typing",
+        "php/modern_stack",
+        "php/frameworks/laravel",
+        "php/frameworks/wordpress"
+      ],
+      "pass_count": 0,
+      "warn_count": 1,
+      "fail_count": 7,
+      "summary": "PHP AST・WordPress フレームワーク監査の結果、全4ファイル（84 LOC、0クラス、7関数）において declare(strict_types=1) と型宣言・PHPDoc カバレッジがともに 0.0% であり、16件の WordPress 規約違反、13件のグローバル状態/スーパーグローバル直参照、および 5件の HIGH 危険コードシンク（CWE-89 SQLi 3件、CWE-79 XSS 2件＋ショートコード/属性出力の未エスケープ XSS）が検出された。特に REST API の permission_callback => '__return_true'、wp_ajax_nopriv_map_search_members の未認証 SQLi、管理画面の capability 'read' と CSRF Nonce 欠落が致命的である。"
+    },
+    {
+      "action_id": "act-02",
+      "audit_id": "repo_structure_audit",
+      "title": "Evaluate PHP Packaging, Composer Lockfile, Runtime Version & Governance",
+      "score": 18,
+      "grade": "D",
+      "rules_evaluated": [
+        "common/supply_chain",
+        "common/documentation",
+        "common/git_workflow",
+        "common/security",
+        "php/dependencies",
+        "php/modern_stack"
+      ],
+      "pass_count": 0,
+      "warn_count": 1,
+      "fail_count": 5,
+      "summary": "WordPress プラグイン Member Analytics Portal (v1.3.0) は composer.json / composer.lock を持たない raw_php 構成であり、プラグインヘッダで EOL 済みの PHP 7.4 (Requires PHP: 7.4) を指定している。手動 require_once による手続き型グローバル構成、テストスイート不在 (0件)、LICENSE / SECURITY.md / CI / Dependabot / .gitignore の全面欠落に加え、Webhook 秘密鍵のハードコードとタイムアウト未設定の外部 HTTP 呼び出しが確認された。"
+    },
+    {
+      "action_id": "act-09",
+      "audit_id": "service_readiness_audit",
+      "title": "Evaluate 12-Factor Config/Statelessness & SRE PRR Timeouts/Observability",
+      "score": 20,
+      "grade": "D",
+      "rules_evaluated": [
+        "common/twelve_factor",
+        "common/production_readiness",
+        "common/security"
+      ],
+      "pass_count": 0,
+      "warn_count": 0,
+      "fail_count": 3,
+      "summary": "本番運用レディネス（SRE PRR）・Twelve-Factor 監査において、admin/settings-page.php:21 の外部テレメトリ通信がタイムアウト未設定の @file_get_contents() で同期実行され、かつ @ 演算子で障害を握り潰しているため、外部エンドポイント遅延時に PHP-FPM ワーカー枯渇を引き起こすことが確認された。またテレメトリ送信先ドメイン・Webhook 秘密鍵・DB テーブル接頭辞（wp_map_events）のハードコードや、includes/rest-endpoints.php:21 の print_r() 非構造化出力により Twelve-Factor 基準にも違反している。"
+    },
+    {
+      "action_id": "act-03",
+      "audit_id": "supply_chain_audit",
+      "title": "Evaluate Supply-Chain, CI Permissions, Container & Secret Hygiene",
+      "score": 20,
+      "grade": "D",
+      "rules_evaluated": [
+        "common/supply_chain",
+        "common/security",
+        "common/git_workflow"
+      ],
+      "pass_count": 0,
+      "warn_count": 1,
+      "fail_count": 2,
+      "summary": "サプライチェーン・秘密管理監査において、includes/rest-endpoints.php:3 に Webhook 署名用シークレット ($map_webhook_secret = 'whsec_WpMemberAnalyticsHardcodedKey2026') が平文でハードコードされている重大な違反を検出した。また composer.json / composer.lock、LICENSE、SECURITY.md、Dependabot/Renovate、CI ワークフロー、.gitignore がすべて欠落しており、依存性固定と脆弱性連絡体制が未構築である。"
+    },
+    {
+      "action_id": "act-12",
+      "audit_id": "container_runtime_audit",
+      "title": "Evaluate Buildability, Offline Test Results, Measured Coverage & Startup Health",
+      "score": 45,
+      "grade": "D",
+      "rules_evaluated": [
+        "common/runtime_verification",
+        "common/production_readiness"
+      ],
+      "pass_count": 0,
+      "warn_count": 0,
+      "fail_count": 2,
+      "summary": "隔離 Docker コンテナ（PHP 8.2 ハーネス: php/raw.dockerfile）を用いた動的検証では、RV-01 コンテナビルド（60.24s）、全4ファイルの php -l 構文検証（0.80s）、および RV-04 WordPress フック登録スモークテスト（0.59s、ABSPATH スタブ下で5フック正常登録: rest_api_init, member_analytics_badge, wp_ajax_nopriv_map_search_members, wp_ajax_map_purge_logs, admin_menu）がすべて成功した。一方、PHPUnit テストが 0件（total_tests=0）のためオフライン単体テスト検証と PCOV 実測カバレッジ計測（measured=false）が一切行われておらず（RV-02/RV-03 未達）、さらにコールバック実行時にはタイムアウト未設定の @file_get_contents によるブロッキングリスクが残存する。"
+    }
+  ],
+  "rule_compliance": [
+    {
+      "rule_id": "common/architecture",
+      "status": "fail",
+      "source_action": "php_ast_audit",
+      "evidence": "total_classes=0, total_functions=7, global_state_usages=13 (global $wpdb x3, $_POST/$_GET x10); admin/settings-page.php:16-34 mixes POST state mutation, external HTTP I/O, and HTML rendering",
+      "summary": "クラス/名前空間による層分離が皆無（0クラス）で、ルーティング・DB クエリ・外部通信・HTML 出力がグローバル手続き関数に混在している"
+    },
+    {
+      "rule_id": "common/documentation",
+      "status": "fail",
+      "source_action": "repo_structure_audit",
+      "evidence": "README.md: 2 non-empty lines, headings=['# Member Analytics Portal (WordPress Plugin)']; missing prerequisites, REST/AJAX/shortcode specification, capability model, and test commands",
+      "summary": "README.md が見出し1件と1文の配置手順のみで、前提要件・REST/AJAX 仕様・権限モデル・開発/テスト手順が一切記載されていない"
+    },
+    {
+      "rule_id": "common/production_readiness",
+      "status": "fail",
+      "source_action": "service_readiness_audit",
+      "evidence": "missing_io_timeouts=1 (admin/settings-page.php:21 @file_get_contents without stream_context timeout); bug_risk_idioms=1 (@ error suppression); zero $wpdb error checks or WP_Error handling; admin/settings-page.php:21 @file_get_contents without stream_context timeout + @ error suppression; includes/rest-endpoints.php:21 print_r($rows)",
+      "summary": "タイムアウトなしの外部同期 HTTP 呼び出し（file_get_contents）と @ エラー抑制により、ワーカー枯渇防止および障害可観測性（SRE PRR）を満たさない"
+    },
+    {
+      "rule_id": "common/runtime_verification",
+      "status": "fail",
+      "source_action": "container_runtime_audit",
+      "evidence": "harness_build=passed (60.24s, PHP 8.2); php -l syntax gate=passed (0.80s); smoke_check=passed (0.59s, 'WordPress plugin member-analytics-portal.php loaded cleanly (5 hooks registered)'); test_execution.total_tests=0; coverage.measured=false (line_coverage_pct=null)",
+      "summary": "PHP 8.2 ハーネスでの構文検証（php -l）と WP 5フック登録スモーク（RV-01/RV-04）は合格したが、PHPUnit 単体テストが0件で実測カバレッジ未計測（RV-02/RV-03 欠落）のため不合格"
+    },
+    {
+      "rule_id": "common/security",
+      "status": "fail",
+      "source_action": "repo_structure_audit",
+      "evidence": "includes/rest-endpoints.php:3 hardcoded $map_webhook_secret; includes/rest-endpoints.php:10 permission_callback => '__return_true'; admin/settings-page.php:10 capability 'read'; raw SQL string concatenation in includes/rest-endpoints.php:18 & includes/ajax-handlers.php:11,21; includes/rest-endpoints.php:3 $map_webhook_secret = 'whsec_WpMemberAnalyticsHardcodedKey2026'; committed_secret_files=[]; includes/rest-endpoints.php:3 hardcoded $map_webhook_secret; includes/rest-endpoints.php:10 '__return_true'; admin/settings-page.php:10 capability 'read'; unvalidated $_GET/$_POST across all 4 files; includes/rest-endpoints.php:3 hardcoded secret; admin/settings-page.php:18-21 unvalidated $_POST['map_telemetry_url'] saved & transmitted without Nonce/capability check; includes/rest-endpoints.php:21 debug=1 leaks raw user rows via print_r",
+      "summary": "Webhook シークレットの直書き、REST API の無認可公開、購読者権限での管理画面登録、生 SQL 文字列結合により OWASP ASVS 原則に重大違反している"
+    },
+    {
+      "rule_id": "common/security_vulnerability",
+      "status": "fail",
+      "source_action": "php_ast_audit",
+      "evidence": "dangerous_sinks=5: CWE-89 SQLi at includes/rest-endpoints.php:19, includes/ajax-handlers.php:10, includes/ajax-handlers.php:21; CWE-79 XSS at admin/settings-page.php:26,29, includes/ajax-handlers.php:22, member-analytics-portal.php:21; api_endpoints=5 (4 without auth hint); SEC-01: app_vuln_counts=0 (no composer.lock), os_vuln_counts={critical:7, high:278, medium:1423, low:1080, total:2910} on debian 12.15 (CVE-2026-6653, CVE-2023-45853, CVE-2025-7458); SEC-03: includes/rest-endpoints.php:3 $map_webhook_secret=[REDACTED]; SEC-04: 5 AST HIGH sinks (3x CWE-89 SQLi, 2x CWE-79 XSS + shortcode/attr XSS); SEC-05: 5 API endpoints (4 without auth hint, '__return_true' REST export, wp_ajax_nopriv SQLi, missing Nonces & ABSPATH guards)",
+      "summary": "未認証 REST/AJAX エンドポイントにおける CWE-89 SQL インジェクション（3箇所）と CWE-79 XSS（4箇所）、認可・CSRF 境界欠落が連鎖している"
+    },
+    {
+      "rule_id": "common/supply_chain",
+      "status": "fail",
+      "source_action": "repo_structure_audit",
+      "evidence": "manifest_files=[], lockfiles_found=[], has_license=False, has_security_policy=False, has_dependency_automation=False, ci_workflows_found=[]; manifest_files=[], lockfiles_found=[], has_license=False, has_security_policy=False, has_dependency_automation=False, ci_workflows_found=[], has_dockerfile=False; manifest_files=[], lockfiles_found=[] (Trivy SCA blind to unmanaged PHP dependencies; Requires PHP: 7.4 EOL); has_license=False, has_security_policy=False, has_dependency_automation=False, ci_workflows_found=[]",
+      "summary": "composer.json / composer.lock が存在せず、LICENSE・SECURITY.md・Dependabot・CI ワークフロー等のサプライチェーン統制がすべて欠落している"
+    },
+    {
+      "rule_id": "common/twelve_factor",
+      "status": "fail",
+      "source_action": "service_readiness_audit",
+      "evidence": "includes/rest-endpoints.php:3 hardcoded $map_webhook_secret; admin/settings-page.php:21 hardcoded 'https://telemetry.example.com/ping'; includes/ajax-handlers.php:21 hardcoded table 'wp_map_events'; includes/rest-endpoints.php:21 print_r($rows)",
+      "summary": "シークレット・外部 URL・DB テーブル接頭辞の直書きと print_r() 標準出力デバッグにより Twelve-Factor (III 設定, IV バックエンドサービス, XI ログ) に違反"
+    },
+    {
+      "rule_id": "php/code_quality",
+      "status": "fail",
+      "source_action": "php_ast_audit",
+      "evidence": "late_imports=3 (manual require_once in member-analytics-portal.php:11-13); global_state_usages=13; docstring_coverage_pct=0.0% (7 missing PHPDocs); @file_get_contents at admin/settings-page.php:21",
+      "summary": "PSR-4 名前空間不在、インライン HTML と更新処理のスパゲッティ混在、スーパーグローバル直参照10箇所、PHPDoc 0%、@ エラー抑制により不合格"
+    },
+    {
+      "rule_id": "php/dependencies",
+      "status": "fail",
+      "source_action": "repo_structure_audit",
+      "evidence": "build_system='raw_php', manifest_files=[], lockfiles_found=[]; member-analytics-portal.php:7 'Requires PHP: 7.4'; member-analytics-portal.php:11-13 manual require_once includes",
+      "summary": "composer.json / composer.lock と PSR-4 オートローディングが未導入で手動 require_once に依存し、かつ EOL 済みの PHP 7.4 を下限指定している"
+    },
+    {
+      "rule_id": "php/frameworks/wordpress",
+      "status": "fail",
+      "source_action": "php_ast_audit",
+      "evidence": "framework_issues=16: missing ABSPATH guard in all 4 files; rest-endpoints.php:10 '__return_true'; ajax-handlers.php:3 wp_ajax_nopriv PII/SQLi; missing Nonce & current_user_can in ajax-handlers.php:17 & settings-page.php:16; settings-page.php:10 'read' capability; settings-page.php:27 hardcoded <script>; 3 unprepared $wpdb queries",
+      "summary": "ABSPATH ガード全欠落、REST '__return_true'、wp_ajax_nopriv 情報漏洩、Nonce/権限検証欠落、$wpdb->prepare 不使用、<script> 直書きにより全面不合格"
+    },
+    {
+      "rule_id": "php/modern_stack",
+      "status": "fail",
+      "source_action": "repo_structure_audit",
+      "evidence": "member-analytics-portal.php:7 'Requires PHP: 7.4'; admin/settings-page.php:21 @file_get_contents('https://telemetry.example.com/ping?...') without timeout; includes/rest-endpoints.php:21 print_r($rows); member-analytics-portal.php:7 'Requires PHP: 7.4'; admin/settings-page.php:21 @file_get_contents without timeout; includes/rest-endpoints.php:21 print_r($rows); includes/ajax-handlers.php:13 echo json_encode($results)",
+      "summary": "EOL の PHP 7.4 指定に加え、エラー抑制演算子 @ 付きのタイムアウトなし file_get_contents 外部通信や print_r デバッグ出力が残存している"
+    },
+    {
+      "rule_id": "php/testing",
+      "status": "fail",
+      "source_action": "php_test_audit",
+      "evidence": "source_files_count=4, test_files_count=0, test_functions_count=0, module_test_coverage_pct=null; no phpunit.xml, composer.json require-dev, or WP_UnitTestCase setup",
+      "summary": "自動テストスイートおよびテストランナー設定（PHPUnit / WP_UnitTestCase / Pest）が完全に不在で、認可・SQLi・XSS 回帰を検知する仕組みが皆無である"
+    },
+    {
+      "rule_id": "php/typing",
+      "status": "fail",
+      "source_action": "php_ast_audit",
+      "evidence": "type_safety_coverage_pct=0.0%; type_safety_issues=11 (4 files missing declare(strict_types=1); 7 functions missing return types; untyped $request and $atts)",
+      "summary": "全4ファイルで declare(strict_types=1); が欠落し、全7関数で引数・戻り値型宣言が存在しないため型安全カバレッジが 0.0% である"
+    },
+    {
+      "rule_id": "common/git_workflow",
+      "status": "warn",
+      "source_action": "repo_structure_audit",
+      "evidence": "has_gitignore=False, committed_secret_files=[]",
+      "summary": "秘密鍵ファイル自体のコミットはないが、.gitignore が存在せず vendor/ やローカルキャッシュ・環境設定ファイルの誤コミット防止策が未整備である"
+    },
+    {
+      "rule_id": "common/maintainability",
+      "status": "warn",
+      "source_action": "php_ast_audit",
+      "evidence": "complex_functions=[], excessive_parameters=[], bug_risk_idioms=1 (admin/settings-page.php:21 @file_get_contents error suppression); includes/ajax-handlers.php:21 hardcoded table 'wp_map_events'",
+      "summary": "個別関数の行数・分岐複雑度は低いものの、@ 演算子による通信障害の握り潰し、テーブル接頭辞 wp_ のハードコード、13箇所のグローバル結合が保守性を損なっている"
+    },
+    {
+      "rule_id": "php/frameworks/laravel",
+      "status": "not_applicable",
+      "source_action": "php_ast_audit",
+      "evidence": "detected_frameworks=['wordpress'] (no Laravel/Illuminate packages)",
+      "summary": "WordPress プラグインであり Laravel フレームワークは使用していないため対象外"
+    }
+  ],
+  "module_hotspots": [
+    {
+      "file_path": "admin/settings-page.php",
+      "loc": 0,
+      "risk_score": 1.0,
+      "finding_counts": {
+        "critical": 1,
+        "high": 2,
+        "medium": 1
+      },
+      "top_rules": [
+        "php/frameworks/wordpress",
+        "common/production_readiness",
+        "common/security_vulnerability",
+        "php/code_quality"
+      ]
+    },
+    {
+      "file_path": "includes/ajax-handlers.php",
+      "loc": 0,
+      "risk_score": 1.0,
+      "finding_counts": {
+        "critical": 3
+      },
+      "top_rules": [
+        "common/security_vulnerability",
+        "php/frameworks/wordpress"
+      ]
+    },
+    {
+      "file_path": "includes/rest-endpoints.php",
+      "loc": 0,
+      "risk_score": 1.0,
+      "finding_counts": {
+        "critical": 3,
+        "medium": 2
+      },
+      "top_rules": [
+        "common/security",
+        "common/security_vulnerability",
+        "php/frameworks/wordpress",
+        "common/twelve_factor"
+      ]
+    },
+    {
+      "file_path": "member-analytics-portal.php",
+      "loc": 0,
+      "risk_score": 1.0,
+      "finding_counts": {
+        "high": 5,
+        "medium": 1,
+        "low": 1
+      },
+      "top_rules": [
+        "php/dependencies",
+        "php/frameworks/wordpress",
+        "common/runtime_verification",
+        "php/testing"
+      ]
+    },
+    {
+      "file_path": "examples/php/wp_plugin_messy/includes/rest-endpoints.php",
+      "loc": 21,
+      "risk_score": 0.51,
+      "finding_counts": {},
+      "top_rules": []
+    },
+    {
+      "file_path": "examples/php/wp_plugin_messy/includes/ajax-handlers.php",
+      "loc": 21,
+      "risk_score": 0.44,
+      "finding_counts": {},
+      "top_rules": []
+    },
+    {
+      "file_path": "README.md",
+      "loc": 0,
+      "risk_score": 0.3,
+      "finding_counts": {
+        "medium": 2
+      },
+      "top_rules": [
+        "common/supply_chain",
+        "common/documentation"
+      ]
+    },
+    {
+      "file_path": "examples/php/wp_plugin_messy/admin/settings-page.php",
+      "loc": 31,
+      "risk_score": 0.26,
+      "finding_counts": {},
+      "top_rules": []
+    },
+    {
+      "file_path": "examples/php/wp_plugin_messy/member-analytics-portal.php",
+      "loc": 11,
+      "risk_score": 0.14,
+      "finding_counts": {},
+      "top_rules": []
+    }
+  ],
+  "strengths": [
+    "member-analytics-portal.php に WordPress 標準プラグインヘッダ（Plugin Name, Version, Requires at least, Requires PHP）が定義されており WordPress プラグインとして認識可能である",
+    ".env や *.pem / *.key などの秘密鍵ファイル自体はリポジトリにコミットされていない（committed_secret_files=[]）",
+    ".env、*.pem、*.key などの認証情報ファイル自体の Git コミットは存在しない（committed_secret_files=[]）",
+    "危険な特権 CI トリガー（pull_request_target）や root 固定の壊れたプロジェクト Dockerfile は含まれていない",
+    "全7関数が短く保たれており（総計 84 LOC）、高分岐の巨大関数（complex_functions=0）や過剰引数関数（excessive_parameters=0）は存在しない",
+    "モジュール間の循環インポート（circular_dependencies=0）や廃止済み mysql_* / eval / unserialize 呼び出しは存在しない",
+    "プロセス内メモリに永続キャッシュを持たず、状態は WordPress DB ($wpdb / Options API) 側に委譲されているため PHP ワーカー自体はステートレスに再起動可能である",
+    "PHP 8.2 コンテナ環境（php/raw.dockerfile）において全4ファイルの php -l 構文検査がエラー 0 件で通過し、PHP 8.2 パーサレベルでの構文互換性が確認された",
+    "WordPress コアスタブ（ABSPATH, add_action, add_shortcode, register_rest_route）を用いた動的スモーク検証で member-analytics-portal.php が正常ロードされ、計5つのフック登録が確認された（0.59s）",
+    "OS コマンド実行（CWE-78: exec/shell_exec/system）や危険なデシリアライズ（CWE-502: unserialize）、動的コード評価（CWE-94: eval）のシンクは 0 件である",
+    "Trivy ファイルシステム検査において .env や秘密鍵ファイル（*.pem / *.key）のコミットは 0 件である",
+    "PHP 8.2 コンテナ環境における全4ファイルの php -l 構文検証（0.80s）および WordPress スタブハーネスによる5フック登録スモークテスト（0.59s）が正常通過している",
+    "総コード量が 4ファイル・84 LOC と小規模で高複雑度関数（complex_functions=0）や循環依存（circular_dependencies=0）がなく、短期間での抜本的リファクタリングが容易である",
+    "OS コマンド実行（CWE-78）や危険なデシリアライズ（CWE-502）シンク、および .env / 秘密鍵ファイルの Git コミットは 0 件である"
+  ],
+  "findings": [
+    {
+      "severity": "critical",
+      "category": "security",
+      "rule_id": "common/security",
+      "file_path": "includes/rest-endpoints.php",
+      "line": 3,
+      "symbol": "map_webhook_secret",
+      "evidence": "$map_webhook_secret = 'whsec_WpMemberAnalyticsHardcodedKey2026';",
+      "description": "Webhook 検証用シークレットキーがソースコード先頭のグローバル変数に平文でハードコードされており、リポジトリ閲覧者やファイル漏洩時に即座に悪用可能である。",
+      "recommendation": "直書きされたシークレットを即時無効化・ローテーションし、wp-config.php 定数または環境変数（getenv）から取得して hash_equals() で検証する構成へ移行する。"
+    },
+    {
+      "severity": "critical",
+      "category": "security",
+      "rule_id": "common/security_vulnerability",
+      "file_path": "includes/ajax-handlers.php",
+      "line": 3,
+      "symbol": "map_ajax_search_members",
+      "evidence": "add_action('wp_ajax_nopriv_map_search_members', 'map_ajax_search_members'); $wpdb->get_results(\"SELECT ID, display_name, user_email FROM {$wpdb->users} WHERE display_name LIKE '%\" . $_POST['term'] . \"%'\");",
+      "description": "未認証ユーザ向けフック wp_ajax_nopriv_map_search_members が公開されており、サニタイズ・プリペアドステートメントなしの $_POST['term'] 結合により未認証 SQL インジェクション（CWE-89）および会員メールアドレス漏洩が発生する。",
+      "recommendation": "未認証公開（wp_ajax_nopriv_*）を廃止してログイン・権限チェック（current_user_can）と check_ajax_referer() を追加し、$wpdb->prepare() + $wpdb->esc_like() と wp_send_json_success() を使用する。"
+    },
+    {
+      "severity": "critical",
+      "category": "security",
+      "rule_id": "common/security_vulnerability",
+      "file_path": "includes/ajax-handlers.php",
+      "line": 10,
+      "symbol": "map_ajax_search_members",
+      "evidence": "SEC-05 & SEC-04: POST /wp-admin/admin-ajax.php?action=map_search_members (wp_ajax_nopriv) + CWE-89 unparameterized LIKE '%\" . $_POST['term'] . \"%'",
+      "description": "未認証の攻撃者が admin-ajax 経由で任意の SQL ペイロードを $_POST['term'] に注入でき、データベース全体の抽出および会員メールアドレス列挙が可能である。",
+      "recommendation": "wp_ajax_nopriv_map_search_members フックを削除し、check_ajax_referer()・current_user_can('list_users')・$wpdb->prepare() を実装する。"
+    },
+    {
+      "severity": "critical",
+      "category": "security",
+      "rule_id": "common/security_vulnerability",
+      "file_path": "includes/rest-endpoints.php",
+      "line": 7,
+      "symbol": "map_register_rest_routes",
+      "evidence": "SEC-05 & SEC-04: GET /wp-json/member-analytics/v1/export with 'permission_callback' => '__return_true' + CWE-89 SQLi on $_GET['role_filter'] + ?debug=1 print_r($rows)",
+      "description": "SEC-05 境界違反と SEC-04 (CWE-89) が複合しており、認証不要で誰でも REST API から wp_users の全会員情報（ID, user_login, user_email）を取得・SQL インジェクション攻撃できる。",
+      "recommendation": "permission_callback で current_user_can('list_users') を強制し、args スキーマ検証と $wpdb->prepare() + $wpdb->esc_like() を適用、print_r デバッグ分岐を削除する。"
+    },
+    {
+      "severity": "critical",
+      "category": "security",
+      "rule_id": "php/frameworks/wordpress",
+      "file_path": "admin/settings-page.php",
+      "line": 10,
+      "symbol": "map_register_admin_menu",
+      "evidence": "add_options_page('Member Analytics', 'Member Analytics', 'read', ...); update_option('map_telemetry_url', $_POST['map_telemetry_url']); @file_get_contents('https://telemetry.example.com/ping?site=' . urlencode($telemetry_url));",
+      "description": "設定画面の要求権限に最低権限 'read'（購読者でもアクセス可能）が指定されており、かつ POST 保存処理に check_admin_referer() と current_user_can('manage_options') がないため、権限昇格・CSRF によるオプション改ざんと外部送信トリガーが可能である。",
+      "recommendation": "add_options_page の capability を 'manage_options' に変更し、フォームに wp_nonce_field()、保存時に check_admin_referer() と current_user_can('manage_options') および esc_url_raw() バリデーションを実装する。"
+    },
+    {
+      "severity": "critical",
+      "category": "security",
+      "rule_id": "php/frameworks/wordpress",
+      "file_path": "includes/ajax-handlers.php",
+      "line": 17,
+      "symbol": "map_ajax_purge_logs",
+      "evidence": "$category = $_POST['category']; $wpdb->query(\"DELETE FROM wp_map_events WHERE category = '\" . $category . \"'\"); echo \"Purged category: \" . $_POST['category'];",
+      "description": "イベントログ削除 AJAX ハンドラ (wp_ajax_map_purge_logs) に check_ajax_referer() と current_user_can() がなく、購読者を含む任意のログインユーザや CSRF 誘導により DELETE 文への SQL インジェクション（CWE-89）と反射型 XSS（CWE-79）が可能である。またテーブル名 wp_map_events がハードコードされている。",
+      "recommendation": "check_ajax_referer('map_purge_logs') と current_user_can('manage_options') を強制し、{$wpdb->prefix}map_events に対して $wpdb->prepare() または $wpdb->delete() を用い、出力は wp_send_json_success() で返す。"
+    },
+    {
+      "severity": "critical",
+      "category": "security",
+      "rule_id": "php/frameworks/wordpress",
+      "file_path": "includes/rest-endpoints.php",
+      "line": 10,
+      "symbol": "map_register_rest_routes",
+      "evidence": "register_rest_route('member-analytics/v1', '/export', [..., 'permission_callback' => '__return_true']); $sql = \"SELECT ID, user_login, user_email FROM {$wpdb->users} WHERE user_nicename LIKE '%\" . $role_filter . \"%'\";",
+      "description": "会員エクスポート REST API (GET /wp-json/member-analytics/v1/export) に permission_callback => '__return_true' が設定されており、未認証の第三者が全会員のログイン名・メールアドレス（PII）を取得できる上、$_GET['role_filter'] の文字列結合により SQL インジェクション（CWE-89）が成立する。",
+      "recommendation": "permission_callback で current_user_can('list_users') または 'manage_options' を必須化し、WP_REST_Request の args バリデーションと $wpdb->prepare() + $wpdb->esc_like() を適用、debug 用 print_r($rows) を削除する。"
+    },
+    {
+      "severity": "high",
+      "category": "code_quality",
+      "rule_id": "common/production_readiness",
+      "file_path": "admin/settings-page.php",
+      "line": 21,
+      "symbol": "map_render_settings_page",
+      "evidence": "@file_get_contents('https://telemetry.example.com/ping?site=' . urlencode($telemetry_url));",
+      "description": "WordPress HTTP API を使わずタイムアウト未設定の file_get_contents() で外部 HTTPS 通信を同期実行しており、相手先応答遅延時に default_socket_timeout（60秒）まで PHP ワーカーをブロックする上、@ 演算子で TLS/接続エラーを完全に隠蔽している。",
+      "recommendation": "wp_safe_remote_get($url, ['timeout' => 3, 'redirection' => 0]) + is_wp_error() 判定へ置き換え、さらに管理画面リクエストをブロックしないよう Action Scheduler または wp_schedule_single_event() で非同期化する。"
+    },
+    {
+      "severity": "high",
+      "category": "dependencies",
+      "rule_id": "php/dependencies",
+      "file_path": "member-analytics-portal.php",
+      "line": 7,
+      "symbol": null,
+      "evidence": "Requires PHP: 7.4; manifest_files=[]; lockfiles_found=[]; member-analytics-portal.php:11-13 require_once",
+      "description": "セキュリティサポート終了済み（EOL）の PHP 7.4 をターゲットとしており、composer.json / composer.lock および PSR-4 名前空間オートローディングが未導入のまま手動 require_once でファイルを読み込んでいる。",
+      "recommendation": "Requires PHP を 8.2 以上に引き上げ、composer.json（require.php: ^8.2、PSR-4 autoload: MemberAnalyticsPortal\\ -> src/）と composer.lock を整備する。"
+    },
+    {
+      "severity": "high",
+      "category": "security",
+      "rule_id": "common/security_vulnerability",
+      "file_path": "admin/settings-page.php",
+      "line": 26,
+      "symbol": "map_render_settings_page",
+      "evidence": "<h1>Member Analytics Settings — Tab: <?php echo $_GET['tab'] ?? 'general'; ?></h1> ... value=\"<?php echo $active_tab; ?>\"",
+      "description": "管理画面テンプレート内で $_GET['tab'] がサニタイズ・エスケープなしに HTML 本文（26行目）および input value 属性（29行目）へ直接出力されており、反射型 XSS（CWE-79）が存在する。",
+      "recommendation": "入力取得時に sanitize_key(wp_unslash($_GET['tab'] ?? 'general')) を適用し、出力時は esc_html() および esc_attr() で遅延エスケープする。"
+    },
+    {
+      "severity": "high",
+      "category": "security",
+      "rule_id": "php/frameworks/wordpress",
+      "file_path": "member-analytics-portal.php",
+      "line": 1,
+      "symbol": "member-analytics-portal.php",
+      "evidence": "Missing if (!defined('ABSPATH')) { exit; } in member-analytics-portal.php:1, includes/rest-endpoints.php:1, includes/ajax-handlers.php:1, admin/settings-page.php:1",
+      "description": "全4つの PHP ファイル先頭に ABSPATH 定数チェックが存在せず、Web サーバ経由でプラグイン PHP ファイルへ直接リクエストされた際に未定義関数エラーによるフルパス漏洩や意図しない初期化が起きる。",
+      "recommendation": "全 PHP ファイルの declare(strict_types=1); 直後に if (!defined('ABSPATH')) { exit; } を配置する。"
+    },
+    {
+      "severity": "high",
+      "category": "security",
+      "rule_id": "php/frameworks/wordpress",
+      "file_path": "member-analytics-portal.php",
+      "line": 20,
+      "symbol": "map_render_badge_shortcode",
+      "evidence": "$label = isset($_GET['badge_label']) ? $_GET['badge_label'] : 'Active Member'; return '<span class=\"map-badge\">' . $label . '</span>';",
+      "description": "公開ページに埋め込まれるショートコード [member_analytics_badge] がクエリパラメータ $_GET['badge_label'] を未エスケープで HTML 結合して返しており、フロントエンド閲覧者に対する反射型 XSS（CWE-79）を引き起こす。",
+      "recommendation": "shortcode_atts() で属性を受け取る設計に改め、クエリ値を扱う場合も sanitize_text_field(wp_unslash(...)) と出力時の esc_html() を徹底する。"
+    },
+    {
+      "severity": "high",
+      "category": "testing",
+      "rule_id": "common/runtime_verification",
+      "file_path": "member-analytics-portal.php",
+      "line": 15,
+      "symbol": null,
+      "evidence": "test_execution.total_tests=0, coverage.measured=false, line_coverage_pct=null; smoke_check registered 5 hooks but 0 callbacks executed under assertions",
+      "description": "プラグイン初期化と5つのフック登録自体はスモークテストで通過するものの、PHPUnit テストが 0 件のためオフライン単体テスト（RV-02）および PCOV 行・分岐カバレッジ計測（RV-03）が未実施であり、コールバック内部の SQLi・XSS・認可欠落を動的に検出できない。",
+      "recommendation": "PHPUnit + PCOV を構成し、登録された5フックすべてのコールバック関数に対する単体・統合テストを実装してオフライン実行（--network=none）で行網羅率 80% 以上を計測可能にする。"
+    },
+    {
+      "severity": "high",
+      "category": "testing",
+      "rule_id": "php/testing",
+      "file_path": "member-analytics-portal.php",
+      "line": 1,
+      "symbol": null,
+      "evidence": "source_files_count=4, test_files_count=0, test_functions_count=0; tooling_modernization_issues includes 'No automated PHP test runner (PHPUnit / Pest) configured'",
+      "description": "プラグイン全体に単体テスト・統合テストが1件も存在せず、REST API の権限境界（401/403 拒否）、AJAX Nonce 検証、SQL プレースホルダ安全性を検証する自動化テストが欠落している。",
+      "recommendation": "PHPUnit 11 + yoast/phpunit-polyfills + wp-phpunit（WP_UnitTestCase / WP_Ajax_UnitTestCase / WP_Test_REST_TestCase）または Brain Monkey を導入し、認可拒否系・サニタイズ系を含む自動テストと PCOV カバレッジ計測（80%以上）を整備する。"
+    },
+    {
+      "severity": "medium",
+      "category": "architecture",
+      "rule_id": "php/code_quality",
+      "file_path": "admin/settings-page.php",
+      "line": 27,
+      "symbol": "map_render_settings_page",
+      "evidence": "<script src=\"/wp-content/plugins/member-analytics-portal/assets/admin-chart.js\"></script>; global_state_usages=13",
+      "description": "管理画面 HTML 内にハードコードパスで <script> タグが直書きされており（サブディレクトリ型 WP でパス破綻・CSP 非対応）、また全モジュールが $_GET/$_POST と global $wpdb に直接結合している。",
+      "recommendation": "admin_enqueue_scripts フック内で plugins_url() + wp_enqueue_script() を使用してアセット登録し、リクエスト処理・Repository・View テンプレートを PSR-4 クラスへ分離する。"
+    },
+    {
+      "severity": "medium",
+      "category": "code_quality",
+      "rule_id": "common/twelve_factor",
+      "file_path": "includes/rest-endpoints.php",
+      "line": 21,
+      "symbol": "map_export_all_members",
+      "evidence": "if (!empty($_GET['debug'])) { print_r($rows); }",
+      "description": "クエリパラメータ ?debug=1 を指定するだけで REST API レスポンスストリームへ print_r($rows) が直接出力され、JSON 形式を破壊すると同時に非構造化デバッグ情報を露出させる。",
+      "recommendation": "print_r($rows) ブロックを削除し、監査・診断ログが必要な場合は PSR-3 LoggerInterface を通じて構造化 JSON ログとして出力する。"
+    },
+    {
+      "severity": "medium",
+      "category": "dependencies",
+      "rule_id": "common/supply_chain",
+      "file_path": "README.md",
+      "line": 1,
+      "symbol": null,
+      "evidence": "has_license=False, has_security_policy=False, has_dependency_automation=False, has_gitignore=False",
+      "description": "WordPress プラグイン配布に必須となる LICENSE（GPLv2+ 互換）や脆弱性報告窓口を示す SECURITY.md、自動依存更新設定が存在しない。",
+      "recommendation": "LICENSE、SECURITY.md、.gitignore、.github/dependabot.yml をリポジトリ直下に追加し、最小権限（permissions: contents: read）の GitHub Actions CI を整備する。"
+    },
+    {
+      "severity": "medium",
+      "category": "dependencies",
+      "rule_id": "common/supply_chain",
+      "file_path": "member-analytics-portal.php",
+      "line": 1,
+      "symbol": null,
+      "evidence": "has_license=False, has_security_policy=False, has_dependency_automation=False, ci_workflows_found=[], has_gitignore=False",
+      "description": "LICENSE（GPLv2+ 等）、SECURITY.md、.gitignore、Dependabot/Renovate、および GitHub Actions CI ワークフローがすべて欠落しており、配布・保守ガバナンスが確立されていない。",
+      "recommendation": "LICENSE、SECURITY.md、.gitignore、.github/dependabot.yml、および最小権限 permissions 付き CI ワークフローを追加する。"
+    },
+    {
+      "severity": "medium",
+      "category": "documentation",
+      "rule_id": "common/documentation",
+      "file_path": "README.md",
+      "line": 1,
+      "symbol": null,
+      "evidence": "README.md has 2 non-empty lines and 1 heading ('# Member Analytics Portal (WordPress Plugin)')",
+      "description": "README.md がディレクトリ配置の1文のみで、サポート PHP/WordPress バージョン、REST/AJAX/ショートコード仕様、要求権限（Capability）、開発・テスト手順が欠落している。",
+      "recommendation": "Standard Readme 構成に従い、概要、動作要件（PHP 8.2+, WP 6.4+）、フック/エンドポイント仕様、Composer/PHPUnit テスト手順を文書化する。"
+    },
+    {
+      "severity": "medium",
+      "category": "typing",
+      "rule_id": "php/typing",
+      "file_path": "includes/rest-endpoints.php",
+      "line": 14,
+      "symbol": "map_export_all_members",
+      "evidence": "type_safety_coverage_pct=0.0%; 4 files missing declare(strict_types=1); 7 functions missing parameter/return types",
+      "description": "全ファイルで declare(strict_types=1); が未宣言であり、WP_REST_Request 引数や配列/文字列戻り値を含む全7関数にネイティブ型宣言がなく、PHPStan 等の静的型検証が機能しない。",
+      "recommendation": "全ファイル先頭に declare(strict_types=1); を追加し、WP_REST_Request / WP_REST_Response / array / string / void 等の厳密な型宣言と PHPDoc ジェネリクスを付与する。"
+    },
+    {
+      "severity": "low",
+      "category": "dependencies",
+      "rule_id": "common/security_vulnerability",
+      "file_path": "member-analytics-portal.php",
+      "line": 7,
+      "symbol": null,
+      "evidence": "SEC-01: app_vuln_counts=0 (no composer.lock); os_vuln_counts={critical:7, high:278} in debian 12.15 harness image (CVE-2026-6653 libxml2, CVE-2023-45853 zlib1g, CVE-2025-7458 libsqlite3-0, CVE-2026-111497 libbrotli1 -> 1.0.9-2+deb12u1)",
+      "description": "アプリ層は composer.lock 未整備のため SCA 監視外となっており、またコンテナデプロイ時には Debian 12 ベースイメージ OS 層に多数の未修正/更新可能パッケージ CVE（libbrotli1 等）が存在する。",
+      "recommendation": "composer.json / composer.lock を導入してアプリ依存 SCA を有効化し、本番 WordPress コンテナ運用時は Alpine または定期 apt upgrade 済みの最小 PHP 8.3+ イメージを採用する。"
+    }
+  ],
+  "action_plan": [
+    {
+      "priority": "P0",
+      "title": "$wpdb->prepare() による全 SQL パラメータ化と遅延エスケープ（esc_html / esc_attr）の徹底",
+      "category": "security",
+      "target_files": [
+        "member-analytics-portal.php",
+        "includes/rest-endpoints.php",
+        "includes/ajax-handlers.php",
+        "admin/settings-page.php"
+      ],
+      "related_rules": [
+        "common/security_vulnerability",
+        "php/frameworks/wordpress",
+        "CWE-89",
+        "CWE-79"
+      ],
+      "action": "3箇所の $wpdb 生 SQL 結合をすべて $wpdb->prepare() + $wpdb->esc_like() および {$wpdb->prefix}map_events に書き換え、ショートコード・設定画面・AJAX 出力に入力サニタイズと esc_html() / esc_attr() / wp_send_json_success() を適用する。",
+      "expected_impact": "検出された CWE-89 SQL インジェクション（3件）と CWE-79 XSS（全経路）を完全に解消する。"
+    },
+    {
+      "priority": "P0",
+      "title": "REST / Admin-AJAX / 設定画面の認可境界（Capability）・CSRF Nonce・ABSPATH ガードの全面実装",
+      "category": "security",
+      "target_files": [
+        "member-analytics-portal.php",
+        "includes/rest-endpoints.php",
+        "includes/ajax-handlers.php",
+        "admin/settings-page.php"
+      ],
+      "related_rules": [
+        "php/frameworks/wordpress",
+        "common/security_vulnerability",
+        "common/security"
+      ],
+      "action": "全4ファイルに ABSPATH ガードを追加し、REST /export の '__return_true' を current_user_can('list_users') へ置換、wp_ajax_nopriv_map_search_members を廃止、AJAX・設定フォームに check_ajax_referer / check_admin_referer と 'manage_options' 権限検査を導入する。",
+      "expected_impact": "未認証 PII 漏洩、購読者からの権限昇格、CSRF 経由のデータ破壊リスクを即座に遮断する。"
+    },
+    {
+      "priority": "P0",
+      "title": "SEC-03/SEC-04/SEC-05 全脆弱性の即時封じ込め（認可・Nonce・$wpdb->prepare・エスケープ・秘密鍵除去）",
+      "category": "security",
+      "target_files": [
+        "member-analytics-portal.php",
+        "includes/rest-endpoints.php",
+        "includes/ajax-handlers.php",
+        "admin/settings-page.php"
+      ],
+      "related_rules": [
+        "common/security_vulnerability",
+        "php/frameworks/wordpress",
+        "CWE-89",
+        "CWE-79"
+      ],
+      "action": "ハードコード秘密鍵の失効・外部化、全4ファイルへの ABSPATH ガード追加、REST/AJAX/管理画面への current_user_can + Nonce 強制、全3クエリの $wpdb->prepare 化、および全出力箇所の esc_html / esc_attr 適用を一括実施する。",
+      "expected_impact": "未認証 PII 漏洩・SQL インジェクション・XSS・CSRF・権限昇格の全攻撃経路を根絶する。"
+    },
+    {
+      "priority": "P0",
+      "title": "ハードコードされた Webhook シークレットの除去と鍵ローテーション",
+      "category": "security",
+      "target_files": [
+        "includes/rest-endpoints.php"
+      ],
+      "related_rules": [
+        "common/security"
+      ],
+      "action": "includes/rest-endpoints.php:3 の $map_webhook_secret 直書きを削除して既存キーを失効させ、環境変数または wp-config.php 定数からの注入に変更する。",
+      "expected_impact": "ソースコード流出による Webhook 偽装・認証バイパスリスクを根絶する。"
+    },
+    {
+      "priority": "P1",
+      "title": "外部テレメトリ通信の wp_safe_remote_get（明示タイムアウト）移行と PSR-3 構造化ログ整備",
+      "category": "code_quality",
+      "target_files": [
+        "admin/settings-page.php",
+        "includes/rest-endpoints.php"
+      ],
+      "related_rules": [
+        "common/production_readiness",
+        "common/twelve_factor",
+        "php/modern_stack"
+      ],
+      "action": "@file_get_contents を timeout=3 秒・is_wp_error() ハンドリング付きの wp_safe_remote_get()（または非同期 WP-Cron）に置換し、includes/rest-endpoints.php の print_r デバッグ出力を除去して PSR-3 ロガーを導入する。",
+      "expected_impact": "外部通信ハング時の PHP-FPM ワーカー枯渇を防止し、エラー追跡性と JSON API 応答の整合性を確保する。"
+    },
+    {
+      "priority": "P1",
+      "title": "Composer + PSR-4 オートローディング導入と PHP 8.2+ ランタイム制約への刷新",
+      "category": "dependencies",
+      "target_files": [
+        "member-analytics-portal.php"
+      ],
+      "related_rules": [
+        "php/dependencies",
+        "php/modern_stack",
+        "common/supply_chain"
+      ],
+      "action": "composer.json（php: ^8.2, autoload.psr-4）と composer.lock を作成し、プラグインヘッダの Requires PHP を 8.2 に更新した上で手動 require_once を PSR-4 クラスローディングへ移行する。",
+      "expected_impact": "依存関係の決定論的ロックと名前空間衝突の防止を実現し、PHP 8.2+ の型・セキュリティ機能を活用可能にする。"
+    },
+    {
+      "priority": "P1",
+      "title": "PHPUnit + WP_UnitTestCase / WP_Ajax_UnitTestCase 自動テストスイートとカバレッジ計測の導入",
+      "category": "testing",
+      "target_files": [
+        "member-analytics-portal.php",
+        "includes/rest-endpoints.php",
+        "includes/ajax-handlers.php",
+        "admin/settings-page.php"
+      ],
+      "related_rules": [
+        "php/testing"
+      ],
+      "action": "composer.json の require-dev に phpunit/phpunit と yoast/phpunit-polyfills を追加し、REST /export の未認証 401/403 拒否、AJAX Nonce 検証、SQL プリペアドバインディング、XSS エスケープを検証するテストケースを作成する。",
+      "expected_impact": "認可バイパスやインジェクション脆弱性の再発を CI 上で自動的に防止し、安全なリファクタリング基盤を確立する。"
+    },
+    {
+      "priority": "P1",
+      "title": "コンテナ内オフライン実行可能な PHPUnit + PCOV カバレッジ検証パイプラインの構築",
+      "category": "testing",
+      "target_files": [
+        "member-analytics-portal.php"
+      ],
+      "related_rules": [
+        "common/runtime_verification",
+        "php/testing"
+      ],
+      "action": "phpunit.xml.dist と tests/ ディレクトリを整備し、--network=none コンテナ内で外部テレメトリ通信をモック化した単体テストと PCOV Clover カバレッジ出力を有効化する。",
+      "expected_impact": "RV-02（オフラインテスト合格）と RV-03（実測行カバレッジ 80%+）を達成し、動的回帰保証を確立する。"
+    },
+    {
+      "priority": "P1",
+      "title": "PSR-4 サービス/リポジトリ分離と declare(strict_types=1)・ネイティブ型宣言・wp_enqueue_script 化",
+      "category": "typing",
+      "target_files": [
+        "member-analytics-portal.php",
+        "includes/rest-endpoints.php",
+        "includes/ajax-handlers.php",
+        "admin/settings-page.php"
+      ],
+      "related_rules": [
+        "php/typing",
+        "php/code_quality",
+        "common/architecture",
+        "php/frameworks/wordpress"
+      ],
+      "action": "全ファイルに declare(strict_types=1); と引数・戻り値型・PHPDoc を付与し、$wpdb アクセスを Repository クラスへ隔離、直書き <script> タグを admin_enqueue_scripts + wp_enqueue_script() に移行する。",
+      "expected_impact": "型安全カバレッジと PHPDoc カバレッジを 0% から 100% へ引き上げ、テスタブルな層構造を確立する。"
+    },
+    {
+      "priority": "P2",
+      "title": "README 拡充とリポジトリガバナンスファイル（LICENSE / SECURITY.md / .gitignore / CI）の整備",
+      "category": "documentation",
+      "target_files": [
+        "README.md"
+      ],
+      "related_rules": [
+        "common/documentation",
+        "common/git_workflow",
+        "common/supply_chain"
+      ],
+      "action": "README.md に REST/AJAX/ショートコード仕様・権限要件・PHPUnit 実行手順を記載し、.gitignore、LICENSE、SECURITY.md、Dependabot、GitHub Actions CI を追加する。",
+      "expected_impact": "プラグイン利用者・開発者のオンボーディング品質を高め、サプライチェーン監査基準を満たす。"
+    }
+  ],
+  "report_hints": [
+    "7軸レーダーチャートで全軸が推奨基準80点を大きく下回り特にセキュリティ(10)・型安全性(12)・テスト(18)が危機的水準にあるプロファイルを可視化する",
+    "WordPress フック構成と全4ファイルの ABSPATH ガード欠落、REST ('__return_true') & wp_ajax_nopriv から $wpdb 生 SQL 結合へ至る攻撃データフロー、および WP プラグイン検証境界トポロジを3観点の Drawlib 図で描く",
+    "PHP 8.2 コンテナでの php -l 構文検証・5フック登録スモーク合格と、PHPUnit 0件・実測カバレッジ未計測のギャップを対比表示する",
+    "WordPress 固有の認可破綻（'__return_true' / wp_ajax_nopriv / capability 'read' / Nonce 不在）× CWE-89 SQLi (3箇所) × CWE-79 XSS (4箇所) × ハードコード秘密鍵 × OS ベースイメージ CVE を統合マトリクスで示す"
+  ],
+  "summary": "WordPress プラグイン Member Analytics Portal (examples/php/wp_plugin_messy, v1.3.0) の総合健全性スコアは 20/100 (Grade D) と診断された。PHP 8.2 隔離コンテナでの php -l 構文検証と5フック登録スモークテスト自体は通過するものの、REST API (/wp-json/member-analytics/v1/export) の permission_callback => '__return_true' による会員 PII 無認証露出、wp_ajax_nopriv_map_search_members の未認証 SQL インジェクション、wp_ajax_map_purge_logs および設定画面（capability 'read'）の Nonce/権限検証欠落、3箇所の $wpdb 生 SQL 文字列結合（CWE-89）、4箇所の未エスケープ XSS（CWE-79）、Webhook シークレット直書き、全4ファイルの ABSPATH ガード不在など、即時悪用可能な致命的脆弱性が集中している。また Requires PHP: 7.4 (EOL) 指定、Composer/PSR-4 不在、strict_types=1・型宣言・PHPDoc・PHPUnit テストがすべて 0% であり、本番 WordPress 環境への導入前に Phase 1 (P0) の緊急セキュリティ封じ込めが不可欠である。"
+}
