@@ -15,5 +15,5 @@ import pni
 def test_package_metadata() -> None:
     """Test that pni package exports version and library name."""
     assert pni.LIB_NAME == "pni501"
-    assert pni.LIB_VERSION == "0.1.0"
-    assert pni.__version__ == "0.1.0"
+    assert pni.LIB_VERSION == "0.1.1"
+    assert pni.__version__ == "0.1.1"
