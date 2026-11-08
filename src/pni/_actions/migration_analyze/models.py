@@ -212,7 +212,10 @@ class MigrationAxis(BaseModel):
     to_be: str
     migration_approach: str
     risk_level: MigrationRiskLevel = "medium"
-    affected_files: list[str] = Field(default_factory=list)
+    affected_files: list[str] = Field(
+        default_factory=list,
+        description="Exact existing repository-relative file or directory paths ONLY (no parenthetical descriptions).",
+    )
 
 
 class TargetLayerSpec(BaseModel):
@@ -228,7 +231,9 @@ class TargetLayerSpec(BaseModel):
 class ComponentMigrationMapping(BaseModel):
     """Concrete mapping from an existing legacy source file/symbol to its To-Be layer and Port/Adapter."""
 
-    source_file: str
+    source_file: str = Field(
+        description="Exact existing repository-relative source file path ONLY (no parenthetical descriptions)."
+    )
     source_symbol: str = ""
     target_layer: str
     target_component: str
@@ -250,7 +255,9 @@ class DecisionLogItem(BaseModel):
     """Stakeholder sign-off item ('Spec vs. Bug') isolated prior to business-logic changes in Phase 3."""
 
     decision_id: str
-    file_path: str
+    file_path: str = Field(
+        description="Exact existing repository-relative file path ONLY (no parenthetical descriptions)."
+    )
     line: Optional[int] = None
     current_behavior: str
     impact_if_changed: str
@@ -277,7 +284,10 @@ class MigrationPrTicket(BaseModel):
     wave: int = Field(default=1, ge=1, le=4)
     axis_category: MigrationAxisCategory = "architecture_pattern"
     title: str
-    target_files: list[str] = Field(default_factory=list)
+    target_files: list[str] = Field(
+        default_factory=list,
+        description="Exact repository-relative As-Is or To-Be file paths ONLY (no parenthetical descriptions).",
+    )
     changes_summary: str
     automated_or_manual: Literal["codemod", "manual", "hybrid"] = "manual"
     verification_cmd: str

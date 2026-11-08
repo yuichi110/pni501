@@ -528,7 +528,10 @@ def _format_trivy_security_lines(score: ScoreResult) -> list[str]:
             "(evaluate supply-chain lockfile/pinning hygiene from `metrics_snapshot` + AST security facts below)."
         ]
     ac = sf.app_vuln_counts
+    cc = sf.core_app_vuln_counts
+    dc = sf.dev_app_vuln_counts
     oc = sf.os_vuln_counts
+    hc = sf.harness_os_vuln_counts
     lines = [
         (
             f"- **Trivy Security Scan (`status={sf.status}`)**: engine=`{sf.container_engine}`, "
@@ -536,15 +539,27 @@ def _format_trivy_security_lines(score: ScoreResult) -> list[str]:
             f"(`{sf.resolved_image_source or 'none'}`)"
         ),
         (
-            f"- **Application Dependency CVEs**: total=`{ac.total}` "
-            f"(CRITICAL=`{ac.critical}`, HIGH=`{ac.high}`, MEDIUM=`{ac.medium}`, LOW=`{ac.low}`)"
+            f"- **Application Dependency CVEs (Total=`{ac.total}`)**: "
+            f"Core Runtime=`{cc.total}` (CRITICAL=`{cc.critical}`, HIGH=`{cc.high}`, "
+            f"MEDIUM=`{cc.medium}`, LOW=`{cc.low}`) | "
+            f"Dev/Optional Lockfile=`{dc.total}` (CRITICAL=`{dc.critical}`, HIGH=`{dc.high}`, "
+            f"MEDIUM=`{dc.medium}`, LOW=`{dc.low}`)"
         ),
         (
-            f"- **Container OS Base-Image CVEs**: total=`{oc.total}` "
+            f"- **Container OS Base-Image CVEs**: Project Dockerfile OS=`{oc.total}` "
             f"(CRITICAL=`{oc.critical}`, HIGH=`{oc.high}`, MEDIUM=`{oc.medium}`, LOW=`{oc.low}`)"
+            + (
+                f" | Test Harness Base-OS (`{sf.resolved_image_source}`, non-shipped)=`{hc.total}` "
+                f"(CRITICAL=`{hc.critical}`, HIGH=`{hc.high}`)"
+                if hc.total > 0
+                else ""
+            )
         ),
     ]
-    for v in sf.vulnerabilities[:15]:
+    app_items = sf.app_vulnerabilities or [
+        v for v in sf.vulnerabilities if v.scope in {"runtime_core", "dev_or_optional"}
+    ]
+    for v in app_items[:15]:
         fix_lbl = f" -> fix=`{v.fixed_version}`" if v.fixed_version else " (no upstream fix)"
         unpinned_lbl = (
             f" | [UNPINNED SPECIFIER RANGE MATCH — {v.version_resolution_note}]"
@@ -552,8 +567,14 @@ def _format_trivy_security_lines(score: ScoreResult) -> list[str]:
             else ""
         )
         lines.append(
-            f"  - **CVE** `[{v.severity}]` `{v.vuln_id}` | `{v.pkg_name}@{v.installed_version}` "
-            f"(`{v.pkg_type}`){fix_lbl}{unpinned_lbl} | {v.title[:90]}"
+            f"  - **App CVE** `[{v.severity}]` `[{v.scope}]` `{v.vuln_id}` | "
+            f"`{v.pkg_name}@{v.installed_version}` (`{v.pkg_type}`){fix_lbl}{unpinned_lbl} | {v.title[:90]}"
+        )
+    for v in sf.os_vulnerabilities[:10]:
+        fix_lbl = f" -> fix=`{v.fixed_version}`" if v.fixed_version else " (no upstream fix)"
+        lines.append(
+            f"  - **OS CVE** `[{v.severity}]` `{v.vuln_id}` | `{v.pkg_name}@{v.installed_version}` "
+            f"(`{v.pkg_type}`){fix_lbl} | {v.title[:90]}"
         )
     for mc in sf.misconfigurations[:10]:
         ln = f":{mc.start_line}" if mc.start_line else ""

@@ -476,3 +476,137 @@ class WorkflowStateDB:
             if updated is not None:
                 cancelled.append(updated)
         return cancelled
+
+    def _replace_tail_actions_from_primitives(
+        self,
+        conn: sqlite3.Connection,
+        run_id: str,
+        from_seq: int,
+        primitives: list[PrimitiveStep],
+        now: str,
+    ) -> list[str]:
+        """Delete actions at `seq >= from_seq` and insert fresh pending rows from `primitives`."""
+        conn.execute("DELETE FROM action_runs WHERE run_id = ? AND seq >= ?", (run_id, from_seq))
+        reset_ids: list[str] = []
+        for idx in range(from_seq, len(primitives) + 1):
+            step = primitives[idx - 1]
+            action_id = f"act-{idx:02d}"
+            reset_ids.append(action_id)
+            conn.execute(
+                """
+                INSERT INTO action_runs (
+                    run_id, action_id, seq, primitive_type, name, source_action,
+                    rules_json, params_json, prompt, status,
+                    deterministic_output_json, agent_input_json, updated_at
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                """,
+                (
+                    run_id,
+                    action_id,
+                    idx,
+                    step.type.value,
+                    step.name,
+                    step.source_action,
+                    json.dumps(step.rules),
+                    json.dumps(step.params),
+                    step.prompt,
+                    RunStatus.PENDING.value,
+                    None,
+                    None,
+                    now,
+                ),
+            )
+        return reset_ids
+
+    def rewind_run_from_seq(
+        self,
+        run_id: str,
+        from_seq: int,
+        *,
+        workflow_def: Optional[WorkflowDefinition] = None,
+        primitives: Optional[list[PrimitiveStep]] = None,
+        resolved_outputs: Optional[WorkflowOutputs] = None,
+    ) -> tuple[WorkflowRunRecord, list[str], bool]:
+        """Reset actions at `seq >= from_seq` to pending and optionally re-sync parameters from YAML.
+
+        Args:
+            run_id: Target workflow run identifier.
+            from_seq: 1-based action sequence index to rewind back to (inclusive).
+            workflow_def: Optional reloaded workflow definition from `.pni/workflows/`.
+            primitives: Optional normalized primitives from the reloaded workflow YAML.
+            resolved_outputs: Optional resolved outputs from the reloaded workflow YAML.
+
+        Returns:
+            tuple[WorkflowRunRecord, list[str], bool]: `(updated_run, reset_action_ids, yaml_resynced)`.
+
+        Raises:
+            ValueError: If `run_id` is missing, cancelled, or `from_seq` is out of bounds.
+        """
+        existing = self.get_run(run_id)
+        if existing is None:
+            msg = f"Workflow run '{run_id}' not found."
+            raise ValueError(msg)
+        if existing.status == RunStatus.CANCELLED:
+            msg = f"Workflow run '{run_id}' is cancelled and cannot be rewound."
+            raise ValueError(msg)
+
+        all_actions = self.get_actions(run_id)
+        if not all_actions or from_seq < 1 or from_seq > len(all_actions):
+            msg = f"Invalid rewind sequence {from_seq} for run '{run_id}' (1..{len(all_actions)})."
+            raise ValueError(msg)
+
+        prior_types = [a.primitive_type for a in all_actions if a.seq < from_seq]
+        can_replace_tail = (
+            workflow_def is not None
+            and primitives is not None
+            and len(primitives) >= from_seq
+            and [p.type for p in primitives[: from_seq - 1]] == prior_types
+        )
+
+        now = _utc_now_iso()
+        resynced = False
+        with self._connect() as conn:
+            if workflow_def is not None:
+                eff_out = resolved_outputs or workflow_def.outputs
+                conn.execute(
+                    """
+                    UPDATE workflow_runs
+                    SET workflow_name = ?, description = ?, status = ?,
+                        targets_json = ?, outputs_json = ?, updated_at = ?
+                    WHERE run_id = ?
+                    """,
+                    (
+                        workflow_def.name,
+                        workflow_def.description,
+                        RunStatus.IN_PROGRESS.value,
+                        workflow_def.targets.model_dump_json(),
+                        eff_out.model_dump_json(),
+                        now,
+                        run_id,
+                    ),
+                )
+                resynced = True
+            else:
+                conn.execute(
+                    "UPDATE workflow_runs SET status = ?, updated_at = ? WHERE run_id = ?",
+                    (RunStatus.IN_PROGRESS.value, now, run_id),
+                )
+
+            if can_replace_tail and primitives is not None:
+                reset_ids = self._replace_tail_actions_from_primitives(conn, run_id, from_seq, primitives, now)
+            else:
+                conn.execute(
+                    """
+                    UPDATE action_runs
+                    SET status = ?, deterministic_output_json = NULL, agent_input_json = NULL, updated_at = ?
+                    WHERE run_id = ? AND seq >= ?
+                    """,
+                    (RunStatus.PENDING.value, now, run_id, from_seq),
+                )
+                reset_ids = [a.action_id for a in all_actions if a.seq >= from_seq]
+
+        updated = self.get_run(run_id)
+        if updated is None:
+            msg = f"Failed to reload rewound run '{run_id}'."
+            raise RuntimeError(msg)
+        return updated, reset_ids, resynced

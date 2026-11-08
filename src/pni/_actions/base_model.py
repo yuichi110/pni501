@@ -129,7 +129,9 @@ class CategoryRationales(BaseModel):
 class ModuleSummary(BaseModel):
     """Module/component map entry to guide downstream AI architecture diagrams and reviews."""
 
-    path: str
+    path: str = Field(
+        description="Exact existing repository-relative file or directory path ONLY (no parenthetical descriptions)."
+    )
     role: str
     key_symbols: list[str] = Field(default_factory=list)
     depends_on: list[str] = Field(default_factory=list)
@@ -170,7 +172,10 @@ class ArchitectureLayer(BaseModel):
 
     name: str
     responsibility: str
-    paths: list[str] = Field(default_factory=list)
+    paths: list[str] = Field(
+        default_factory=list,
+        description="Exact existing repository-relative file or directory paths ONLY (no parenthetical descriptions).",
+    )
     allowed_dependencies: list[str] = Field(default_factory=list)
 
 
@@ -189,13 +194,19 @@ class ExecutionFlow(BaseModel):
     name: str
     trigger: str
     steps: list[str] = Field(default_factory=list)
-    involved_files: list[str] = Field(default_factory=list)
+    involved_files: list[str] = Field(
+        default_factory=list,
+        description="Exact 'path/to/file' or 'path/to/file:Symbol' strings ONLY (no parenthetical descriptions).",
+    )
 
 
 class ExecutionFlowMap(BaseModel):
     """Aspect 3 (flows_and_state): Grounded entry points, execution flows, and state management."""
 
-    entry_points: list[str] = Field(default_factory=list)
+    entry_points: list[str] = Field(
+        default_factory=list,
+        description="Exact 'path/to/file' or 'path/to/file:Symbol' strings ONLY (no parenthetical descriptions).",
+    )
     execution_flows: list[ExecutionFlow] = Field(default_factory=list)
     state_and_storage: list[str] = Field(default_factory=list)
     error_and_concurrency_model: str = ""
@@ -217,7 +228,10 @@ class ArchitectureOverview(BaseModel):
     """High-level structural summary of the target project for downstream AI consumption."""
 
     pattern: str = ""
-    entry_points: list[str] = Field(default_factory=list)
+    entry_points: list[str] = Field(
+        default_factory=list,
+        description="Exact 'path/to/file' or 'path/to/file:Symbol' strings ONLY (no parenthetical descriptions).",
+    )
     modules: list[ModuleSummary] = Field(default_factory=list)
     dependency_notes: str = ""
 
@@ -263,7 +277,10 @@ class Finding(BaseModel):
     severity: SeverityLevel
     category: str = ""
     rule_id: str
-    file_path: Optional[str] = None
+    file_path: Optional[str] = Field(
+        default=None,
+        description="Exact existing repository-relative file path ONLY (no line numbers or parenthetical notes).",
+    )
     line: Optional[int] = None
     symbol: Optional[str] = None
     evidence: str = ""
@@ -379,7 +396,10 @@ class ActionItem(BaseModel):
     priority: PriorityLevel
     title: str
     category: str
-    target_files: list[str] = Field(default_factory=list)
+    target_files: list[str] = Field(
+        default_factory=list,
+        description="Exact existing repository-relative file or directory paths ONLY (no parenthetical descriptions).",
+    )
     related_rules: list[str] = Field(default_factory=list)
     action: str
     expected_impact: str

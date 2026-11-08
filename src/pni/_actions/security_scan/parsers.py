@@ -17,16 +17,19 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Final, Optional
 
+from pni._actions.security_scan.dep_scopes import normalize_vuln_pkg_key
 from pni._actions.security_scan.models import (
     MisconfigItem,
     SecretFindingItem,
     VulnerabilityItem,
     VulnerabilitySummaryCounts,
+    VulnScope,
     VulnSeverity,
 )
 from pni._config import OptOutEntry, match_opt_out, matches_opt_out_scope
 
 MAX_STORED_VULNERABILITIES: Final[int] = 40
+MAX_STORED_OS_VULNERABILITIES: Final[int] = 25
 MAX_STORED_MISCONFIGS: Final[int] = 25
 MAX_STORED_SECRETS: Final[int] = 25
 
@@ -36,6 +39,12 @@ _SEVERITY_ORDER: Final[dict[str, int]] = {
     "MEDIUM": 2,
     "LOW": 3,
     "UNKNOWN": 4,
+}
+_SCOPE_ORDER: Final[dict[str, int]] = {
+    "runtime_core": 0,
+    "dev_or_optional": 1,
+    "os_package": 2,
+    "harness_os": 3,
 }
 
 _OS_PKG_TYPES: Final[frozenset[str]] = frozenset(
@@ -74,6 +83,11 @@ class ParsedTrivyBundle:
     vulnerabilities: list[VulnerabilityItem]
     misconfigurations: list[MisconfigItem]
     secrets: list[SecretFindingItem]
+    core_app_vuln_counts: VulnerabilitySummaryCounts = field(default_factory=VulnerabilitySummaryCounts)
+    dev_app_vuln_counts: VulnerabilitySummaryCounts = field(default_factory=VulnerabilitySummaryCounts)
+    harness_os_vuln_counts: VulnerabilitySummaryCounts = field(default_factory=VulnerabilitySummaryCounts)
+    app_vulnerabilities: list[VulnerabilityItem] = field(default_factory=list)
+    os_vulnerabilities: list[VulnerabilityItem] = field(default_factory=list)
     opt_out_counts: dict[str, int] = field(default_factory=dict)
 
 
@@ -96,6 +110,24 @@ def is_os_package_type(pkg_type: str, result_class: str = "") -> bool:
     if result_class.strip().lower() == "os-pkgs":
         return True
     return pkg_type.strip().lower() in _OS_PKG_TYPES
+
+
+def _classify_vuln_scope(
+    pkg_name: str,
+    pkg_type: str,
+    res_class: str,
+    *,
+    from_image: bool,
+    is_harness_image: bool,
+    non_core_packages: set[str] | frozenset[str],
+) -> VulnScope:
+    """Classify a vulnerability into runtime_core, dev_or_optional, os_package, or harness_os."""
+    is_os = is_os_package_type(pkg_type, res_class)
+    if is_os or (from_image and is_harness_image and pkg_type.strip().lower() == "gobinary"):
+        return "harness_os" if (from_image and is_harness_image) else "os_package"
+    if normalize_vuln_pkg_key(pkg_name) in non_core_packages:
+        return "dev_or_optional"
+    return "runtime_core"
 
 
 def _extract_cvss_score(raw_cvss: object) -> Optional[float]:
@@ -175,13 +207,16 @@ def _as_list(val: object) -> list[object]:
 
 def _parse_result_vulns(
     res: dict[str, object],
-    vuln_map: dict[tuple[str, str, str], tuple[VulnerabilityItem, bool]],
+    vuln_map: dict[tuple[str, str, str], VulnerabilityItem],
+    *,
+    from_image: bool,
+    is_harness_image: bool,
+    non_core_packages: set[str] | frozenset[str],
 ) -> None:
     """Extract and deduplicate VulnerabilityItem records from one Trivy Result entry."""
     target = str(res.get("Target") or "")
     pkg_type = str(res.get("Type") or res.get("Class") or "unknown")
     res_class = str(res.get("Class") or "")
-    is_os = is_os_package_type(pkg_type, res_class)
 
     for raw_v in _as_list(res.get("Vulnerabilities")):
         if not isinstance(raw_v, dict):
@@ -192,6 +227,14 @@ def _parse_result_vulns(
         if not vuln_id or not pkg_name:
             continue
         unpinned = is_symbolic_or_unpinned_version(installed)
+        scope = _classify_vuln_scope(
+            pkg_name,
+            pkg_type,
+            res_class,
+            from_image=from_image,
+            is_harness_image=is_harness_image,
+            non_core_packages=non_core_packages,
+        )
         item = VulnerabilityItem(
             vuln_id=vuln_id,
             pkg_name=pkg_name,
@@ -199,6 +242,7 @@ def _parse_result_vulns(
             installed_version=installed,
             fixed_version=str(raw_v.get("FixedVersion") or "").strip(),
             severity=normalize_severity(raw_v.get("Severity")),
+            scope=scope,
             title=str(raw_v.get("Title") or raw_v.get("Description") or "").strip()[:180],
             target=target,
             cvss_score=_extract_cvss_score(raw_v.get("CVSS")),
@@ -207,8 +251,10 @@ def _parse_result_vulns(
         )
         key = (vuln_id, pkg_name, installed)
         existing = vuln_map.get(key)
-        if existing is None or (not existing[0].fixed_version and item.fixed_version):
-            vuln_map[key] = (item, is_os)
+        if existing is None:
+            vuln_map[key] = item
+        elif not existing.fixed_version and item.fixed_version:
+            vuln_map[key] = existing.model_copy(update={"fixed_version": item.fixed_version})
 
 
 def _parse_result_misconfigs(
@@ -297,7 +343,7 @@ def _is_skipped_target_path(
 
 
 def _filter_trivy_maps(
-    vuln_map: dict[tuple[str, str, str], tuple[VulnerabilityItem, bool]],
+    vuln_map: dict[tuple[str, str, str], VulnerabilityItem],
     misconfig_map: dict[tuple[str, str, Optional[int]], MisconfigItem],
     secret_map: dict[tuple[str, str, Optional[int]], SecretFindingItem],
     *,
@@ -305,15 +351,15 @@ def _filter_trivy_maps(
     skip_files: Sequence[str],
     skip_dirs: Sequence[str],
 ) -> tuple[
-    list[tuple[VulnerabilityItem, bool]],
+    list[VulnerabilityItem],
     list[MisconfigItem],
     list[SecretFindingItem],
     dict[str, int],
 ]:
     """Filter parsed Trivy items against skip_files/skip_dirs and [[opt_out]] waivers."""
     opt_out_counts: dict[str, int] = {}
-    all_pairs: list[tuple[VulnerabilityItem, bool]] = []
-    for item, is_os in vuln_map.values():
+    kept_vulns: list[VulnerabilityItem] = []
+    for item in vuln_map.values():
         if _is_skipped_target_path(item.target, skip_files, skip_dirs):
             continue
         matched = match_opt_out(
@@ -324,7 +370,7 @@ def _filter_trivy_maps(
         if matched is not None:
             opt_out_counts[matched.id] = opt_out_counts.get(matched.id, 0) + 1
         else:
-            all_pairs.append((item, is_os))
+            kept_vulns.append(item)
 
     filtered_misconfigs: list[MisconfigItem] = []
     for m_item in misconfig_map.values():
@@ -354,7 +400,18 @@ def _filter_trivy_maps(
         else:
             filtered_secrets.append(s_item)
 
-    return all_pairs, filtered_misconfigs, filtered_secrets, opt_out_counts
+    return kept_vulns, filtered_misconfigs, filtered_secrets, opt_out_counts
+
+
+def _vuln_sort_key(item: VulnerabilityItem) -> tuple[int, int, float, str, str]:
+    """Return deterministic sort key ordering runtime_core -> dev_or_optional -> OS, then severity & CVSS."""
+    return (
+        _SCOPE_ORDER.get(item.scope, 9),
+        _SEVERITY_ORDER.get(item.severity, 9),
+        -(item.cvss_score or 0.0),
+        item.pkg_name,
+        item.vuln_id,
+    )
 
 
 def parse_trivy_reports(
@@ -364,19 +421,27 @@ def parse_trivy_reports(
     opt_outs: Sequence[OptOutEntry] = (),
     skip_files: Sequence[str] = (),
     skip_dirs: Sequence[str] = (),
+    non_core_packages: set[str] | frozenset[str] = frozenset(),
+    is_harness_image: bool = False,
 ) -> ParsedTrivyBundle:
-    """Parse, deduplicate, classify, and cap Trivy filesystem and resolved-image JSON reports."""
-    vuln_map: dict[tuple[str, str, str], tuple[VulnerabilityItem, bool]] = {}
+    """Parse, deduplicate, scope-classify, and cap Trivy filesystem and resolved-image JSON reports."""
+    vuln_map: dict[tuple[str, str, str], VulnerabilityItem] = {}
     misconfig_map: dict[tuple[str, str, Optional[int]], MisconfigItem] = {}
     secret_map: dict[tuple[str, str, Optional[int]], SecretFindingItem] = {}
 
-    for report_path in (fs_json_path, image_json_path):
+    for report_path, from_image in ((fs_json_path, False), (image_json_path, True)):
         for res in _load_trivy_results(report_path):
-            _parse_result_vulns(res, vuln_map)
+            _parse_result_vulns(
+                res,
+                vuln_map,
+                from_image=from_image,
+                is_harness_image=is_harness_image,
+                non_core_packages=non_core_packages,
+            )
             _parse_result_misconfigs(res, misconfig_map)
             _parse_result_secrets(res, secret_map)
 
-    all_pairs, filtered_misconfigs, filtered_secrets, opt_out_counts = _filter_trivy_maps(
+    kept_vulns, filtered_misconfigs, filtered_secrets, opt_out_counts = _filter_trivy_maps(
         vuln_map,
         misconfig_map,
         secret_map,
@@ -385,21 +450,15 @@ def parse_trivy_reports(
         skip_dirs=skip_dirs,
     )
 
-    all_vulns = [pair[0] for pair in all_pairs]
-    app_vulns = [pair[0] for pair in all_pairs if not pair[1]]
-    os_vulns = [pair[0] for pair in all_pairs if pair[1]]
+    core_app = [v for v in kept_vulns if v.scope == "runtime_core"]
+    dev_app = [v for v in kept_vulns if v.scope == "dev_or_optional"]
+    app_vulns = [*core_app, *dev_app]
+    proj_os_vulns = [v for v in kept_vulns if v.scope == "os_package"]
+    harness_os_vulns = [v for v in kept_vulns if v.scope == "harness_os"]
 
-    sorted_pairs = sorted(
-        all_pairs,
-        key=lambda p: (
-            _SEVERITY_ORDER.get(p[0].severity, 9),
-            1 if p[1] else 0,
-            -(p[0].cvss_score or 0.0),
-            p[0].pkg_name,
-            p[0].vuln_id,
-        ),
-    )
-    capped_vulns = [p[0] for p in sorted_pairs[:MAX_STORED_VULNERABILITIES]]
+    sorted_app = sorted(app_vulns, key=_vuln_sort_key)[:MAX_STORED_VULNERABILITIES]
+    sorted_os = sorted(proj_os_vulns, key=_vuln_sort_key)[:MAX_STORED_OS_VULNERABILITIES]
+    combined_capped = [*sorted_app, *sorted_os][:MAX_STORED_VULNERABILITIES]
 
     sorted_misconfigs = sorted(
         filtered_misconfigs,
@@ -412,10 +471,15 @@ def parse_trivy_reports(
     )[:MAX_STORED_SECRETS]
 
     return ParsedTrivyBundle(
-        vuln_counts=_summarize_counts(all_vulns),
+        vuln_counts=_summarize_counts([*app_vulns, *proj_os_vulns]),
         app_vuln_counts=_summarize_counts(app_vulns),
-        os_vuln_counts=_summarize_counts(os_vulns),
-        vulnerabilities=capped_vulns,
+        core_app_vuln_counts=_summarize_counts(core_app),
+        dev_app_vuln_counts=_summarize_counts(dev_app),
+        os_vuln_counts=_summarize_counts(proj_os_vulns),
+        harness_os_vuln_counts=_summarize_counts(harness_os_vulns),
+        vulnerabilities=combined_capped,
+        app_vulnerabilities=sorted_app,
+        os_vulnerabilities=sorted_os,
         misconfigurations=sorted_misconfigs,
         secrets=sorted_secrets,
         opt_out_counts=opt_out_counts,

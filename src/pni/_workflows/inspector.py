@@ -356,7 +356,9 @@ def resolve_run_actions_by_selector(
         for a in actions
         if needle in {a.source_action, _short_source_action(a.source_action)}
     ]
-    matched = by_source or [a for a in actions if needle in {a.primitive_type.value, a.name}]
+    matched = by_source or [
+        a for a in actions if needle in {a.primitive_type.value, a.name, a.name.split(" (", maxsplit=1)[0]}
+    ]
     if not matched:
         msg = f"Action selector '{needle}' did not match any step in run. {_available_run_selectors_hint(actions)}"
         raise ValueError(msg)

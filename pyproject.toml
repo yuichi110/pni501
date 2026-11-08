@@ -28,6 +28,7 @@ Repository = "https://github.com/yuichi110/pni501"
 
 [project.scripts]
 pni = "pni.cli:main"
+pni501 = "pni.cli:main"
 
 [tool.uv.build-backend]
 module-name = "pni"

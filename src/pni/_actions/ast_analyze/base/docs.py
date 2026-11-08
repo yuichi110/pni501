@@ -41,6 +41,7 @@ class BaseDocChecker(ABC):
 
         candidates = 0
         documented = 0
+        annotated_doc_fns = 0
         missing: list[CodeLocation] = []
         empty: list[CodeLocation] = []
         mismatches: list[CodeLocation] = []
@@ -49,6 +50,7 @@ class BaseDocChecker(ABC):
             stats = self.inspect_unit_docs(unit)
             candidates += stats.candidates
             documented += stats.documented
+            annotated_doc_fns += stats.annotated_doc_functions
             missing.extend(stats.missing_docstrings)
             empty.extend(stats.empty_docstrings)
             mismatches.extend(stats.doc_signature_mismatches)
@@ -56,6 +58,7 @@ class BaseDocChecker(ABC):
         coverage_pct = round((documented / candidates) * 100.0, 1) if candidates > 0 else 100.0
         return DocResult(
             docstring_coverage_pct=coverage_pct,
+            annotated_doc_functions_count=annotated_doc_fns,
             missing_docstrings=missing,
             empty_docstrings=empty,
             doc_signature_mismatches=mismatches,

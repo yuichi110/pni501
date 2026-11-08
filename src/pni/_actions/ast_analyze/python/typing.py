@@ -84,35 +84,66 @@ def _collect_type_weaknesses(
     return weak
 
 
+def _is_init_method(fn_node: SgNode, fn_name: str) -> bool:
+    """Return True if fn_node is a class `__init__` method."""
+    return fn_name == "__init__" and fn_node.inside(kind="class_definition")
+
+
+def _inspect_callable_parameters(
+    fn_node: SgNode,
+    fn_name: str,
+    rel_file: str,
+    lineno: int,
+) -> tuple[list[str], int, list[CodeLocation]]:
+    """Inspect callable parameters and return `(missing_names, typed_count, weak_locations)`."""
+    missing_params: list[str] = []
+    typed_count = 0
+    weak_locs: list[CodeLocation] = []
+    params_node = fn_node.field("parameters")
+    if params_node is None:
+        return missing_params, typed_count, weak_locs
+
+    for param in params_node.named_children():
+        pkind = param.kind()
+        if pkind not in VALID_PARAM_KINDS:
+            continue
+        pname = extract_param_name(param)
+        if pname in {"self", "cls", ""}:
+            continue
+        if pkind in _UNTYPED_PARAM_KINDS:
+            missing_params.append(pname)
+        elif pkind in _TYPED_PARAM_KINDS:
+            typed_count += 1
+            weak_locs.extend(
+                _collect_type_weaknesses(param.field("type"), rel_file, lineno, fn_name, f"Parameter '{pname}'")
+            )
+    return missing_params, typed_count, weak_locs
+
+
 def _inspect_function_typing(
     fn_node: SgNode,
     rel_file: str,
-) -> tuple[bool, list[CodeLocation], list[CodeLocation]]:
-    """Inspect a Python function_definition node for missing annotations and weak types."""
+) -> tuple[bool, list[CodeLocation], list[CodeLocation], list[CodeLocation]]:
+    """Inspect a Python function_definition node for missing annotations, __init__ -> None omissions, and weak types."""
     missing: list[CodeLocation] = []
-    weak_locs: list[CodeLocation] = []
-    missing_params: list[str] = []
+    omitted_init: list[CodeLocation] = []
     lineno = fn_node.range().start.line + 1
     fn_name = function_symbol_name(fn_node)
-
-    params_node = fn_node.field("parameters")
-    if params_node is not None:
-        for param in params_node.named_children():
-            pkind = param.kind()
-            if pkind not in VALID_PARAM_KINDS:
-                continue
-            pname = extract_param_name(param)
-            if pname in {"self", "cls", ""}:
-                continue
-            if pkind in _UNTYPED_PARAM_KINDS:
-                missing_params.append(pname)
-            elif pkind in _TYPED_PARAM_KINDS:
-                weak_locs.extend(
-                    _collect_type_weaknesses(param.field("type"), rel_file, lineno, fn_name, f"Parameter '{pname}'")
-                )
+    missing_params, typed_count, weak_locs = _inspect_callable_parameters(fn_node, fn_name, rel_file, lineno)
 
     ret_node = fn_node.field("return_type")
     if ret_node is None:
+        if not missing_params and _is_init_method(fn_node, fn_name):
+            note = "all parameters typed; allowed by PEP 484/mypy" if typed_count > 0 else "parameterless __init__"
+            omitted_init.append(
+                CodeLocation(
+                    file=rel_file,
+                    line=lineno,
+                    symbol=fn_name,
+                    detail=f"__init__ omits '-> None' return annotation ({note})",
+                )
+            )
+            return True, [], omitted_init, weak_locs
         missing_params.append("return")
     else:
         weak_locs.extend(_collect_type_weaknesses(ret_node, rel_file, lineno, fn_name, "Return annotation"))
@@ -127,7 +158,7 @@ def _inspect_function_typing(
                 detail=f"Missing annotations: {', '.join(missing_params)}",
             )
         )
-    return is_typed, missing, weak_locs
+    return is_typed, missing, omitted_init, weak_locs
 
 
 def _is_enum_class(cls_node: SgNode) -> bool:
@@ -199,13 +230,15 @@ class PythonTypingChecker(BaseTypingChecker):
         functions = unit.root.find_all(kind="function_definition")
         safe_count = 0
         issues: list[CodeLocation] = []
+        omitted_init: list[CodeLocation] = []
         weak_usages: list[CodeLocation] = []
 
         for fn_node in functions:
-            is_typed, fn_issues, fn_weak = _inspect_function_typing(fn_node, unit.rel_path)
+            is_typed, fn_issues, fn_omitted_init, fn_weak = _inspect_function_typing(fn_node, unit.rel_path)
             if is_typed:
                 safe_count += 1
             issues.extend(fn_issues)
+            omitted_init.extend(fn_omitted_init)
             weak_usages.extend(fn_weak)
 
         issues.extend(_inspect_class_attributes(unit))
@@ -215,6 +248,7 @@ class PythonTypingChecker(BaseTypingChecker):
             total_callables=len(functions),
             type_safe_callables=safe_count,
             type_safety_issues=issues,
+            omitted_init_return_annotations=omitted_init,
             weak_type_usages=weak_usages,
             unscoped_type_ignores=ignores,
         )

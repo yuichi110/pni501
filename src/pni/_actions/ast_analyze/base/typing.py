@@ -42,6 +42,7 @@ class BaseTypingChecker(ABC):
         total_callables = 0
         safe_callables = 0
         issues: list[CodeLocation] = []
+        omitted_init: list[CodeLocation] = []
         weak_usages: list[CodeLocation] = []
         ignores: list[CodeLocation] = []
 
@@ -50,6 +51,7 @@ class BaseTypingChecker(ABC):
             total_callables += stats.total_callables
             safe_callables += stats.type_safe_callables
             issues.extend(stats.type_safety_issues)
+            omitted_init.extend(stats.omitted_init_return_annotations)
             weak_usages.extend(stats.weak_type_usages)
             ignores.extend(stats.unscoped_type_ignores)
 
@@ -57,6 +59,7 @@ class BaseTypingChecker(ABC):
         return TypingResult(
             type_safety_coverage_pct=coverage_pct,
             type_safety_issues=issues,
+            omitted_init_return_annotations=omitted_init,
             weak_type_usages=weak_usages,
             unscoped_type_ignores=ignores,
         )

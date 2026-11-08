@@ -122,11 +122,13 @@ class AstFacts(BaseModel):
     # 2. Type Safety (BaseTypingChecker)
     type_safety_coverage_pct: Optional[float] = 100.0
     type_safety_issues: list[CodeLocation] = Field(default_factory=list)
+    omitted_init_return_annotations: list[CodeLocation] = Field(default_factory=list)
     weak_type_usages: list[CodeLocation] = Field(default_factory=list)
     unscoped_type_ignores: list[CodeLocation] = Field(default_factory=list)
 
     # 3. API Documentation (BaseDocChecker)
     docstring_coverage_pct: Optional[float] = 100.0
+    annotated_doc_functions_count: int = 0
     missing_docstrings: list[CodeLocation] = Field(default_factory=list)
     empty_docstrings: list[CodeLocation] = Field(default_factory=list)
     doc_signature_mismatches: list[CodeLocation] = Field(default_factory=list)
@@ -219,6 +221,7 @@ class UnitTypingStats:
     total_callables: int = 0
     type_safe_callables: int = 0
     type_safety_issues: list[CodeLocation] = field(default_factory=list)
+    omitted_init_return_annotations: list[CodeLocation] = field(default_factory=list)
     weak_type_usages: list[CodeLocation] = field(default_factory=list)
     unscoped_type_ignores: list[CodeLocation] = field(default_factory=list)
 
@@ -229,6 +232,7 @@ class TypingResult:
 
     type_safety_coverage_pct: Optional[float] = 100.0
     type_safety_issues: list[CodeLocation] = field(default_factory=list)
+    omitted_init_return_annotations: list[CodeLocation] = field(default_factory=list)
     weak_type_usages: list[CodeLocation] = field(default_factory=list)
     unscoped_type_ignores: list[CodeLocation] = field(default_factory=list)
 
@@ -239,6 +243,7 @@ class UnitDocStats:
 
     candidates: int = 0
     documented: int = 0
+    annotated_doc_functions: int = 0
     missing_docstrings: list[CodeLocation] = field(default_factory=list)
     empty_docstrings: list[CodeLocation] = field(default_factory=list)
     doc_signature_mismatches: list[CodeLocation] = field(default_factory=list)
@@ -249,6 +254,7 @@ class DocResult:
     """Aggregated docstring / Javadoc coverage, missing/empty docs, and signature mismatches."""
 
     docstring_coverage_pct: Optional[float] = 100.0
+    annotated_doc_functions_count: int = 0
     missing_docstrings: list[CodeLocation] = field(default_factory=list)
     empty_docstrings: list[CodeLocation] = field(default_factory=list)
     doc_signature_mismatches: list[CodeLocation] = field(default_factory=list)

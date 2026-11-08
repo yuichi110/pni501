@@ -108,6 +108,7 @@ Always execute workflows through the stateful pull-push cycle:
 - `pni workflows push-action <run_id> <action_id> [INPUT] [--file <path>]`: Validate input and advance state.
 - `pni workflows status [run_or_workflow] [--latest] [-w <workflow_id>] [-s <status>] [-n <limit>] [--json]`: Inspect step progress (`done/total`, current step) and history (always prefer this CLI over raw `sqlite3` queries).
 - `pni workflows inspect-action <run_or_workflow> <action> [--agent-input|--deterministic|--json] [-o <path>]`: Inspect or export recorded deterministic outputs and agent inputs from current or prior runs without touching SQLite directly.
+- `pni workflows rewind <run_or_workflow> <action> [--pull]` (alias: `retry-action`): Rewind a workflow run back to `<action>`, re-sync `.pni/workflows/<id>.yaml` parameters, and clear downstream step outputs for clean re-execution.
 - `pni workflows cancel [<run_id> | --superseded [-w <workflow_id>]]`: Cancel an abandoned `in_progress` run or clean up superseded runs.
 - `pni progress init [target] [-w <workflow_id>] [--force]`: Scaffold `.pni/progress/<target>.yaml` with milestones, tasks, and `git_policy`.
 - `pni progress validate [target_or_path]`: Validate `.pni/progress/<target>.yaml` schema, dates, `git_policy`, and acyclic `depends_on` DAG.

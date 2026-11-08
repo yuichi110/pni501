@@ -13,10 +13,36 @@ from __future__ import annotations
 
 from typing import Literal, Optional
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, model_validator
 
 SecurityScanStatus = Literal["passed", "failed", "skipped", "error", "timeout"]
 VulnSeverity = Literal["CRITICAL", "HIGH", "MEDIUM", "LOW", "UNKNOWN"]
+VulnScope = Literal["runtime_core", "dev_or_optional", "os_package", "harness_os"]
+
+_MODEL_OS_TYPES: frozenset[str] = frozenset(
+    {
+        "alpine",
+        "alma",
+        "amazon",
+        "azurelinux",
+        "cbl-mariner",
+        "centos",
+        "chainguard",
+        "debian",
+        "fedora",
+        "opensuse",
+        "opensuse-leap",
+        "opensuse-tumbleweed",
+        "oracle",
+        "photon",
+        "redhat",
+        "rocky",
+        "sles",
+        "suse",
+        "ubuntu",
+        "wolfi",
+    }
+)
 
 
 def _default_fail_severities() -> list[VulnSeverity]:
@@ -33,6 +59,7 @@ class SecurityScanOptions(BaseModel):
     scan_filesystem: bool = True
     scan_resolved_image: bool = True
     fail_on_severities: list[VulnSeverity] = Field(default_factory=_default_fail_severities)
+    fail_on_dev_dependencies: bool = False
     scan_timeout_sec: int = Field(default=240, ge=15, le=1200)
     build_timeout_sec: int = Field(default=300, ge=15, le=1800)
 
@@ -56,6 +83,7 @@ class VulnerabilityItem(BaseModel):
     installed_version: str
     fixed_version: str = ""
     severity: VulnSeverity
+    scope: VulnScope = "runtime_core"
     title: str = ""
     target: str = ""
     cvss_score: Optional[float] = None
@@ -102,8 +130,31 @@ class SecurityFacts(BaseModel):
     artifacts_dir: str = ""
     vuln_counts: VulnerabilitySummaryCounts = Field(default_factory=VulnerabilitySummaryCounts)
     app_vuln_counts: VulnerabilitySummaryCounts = Field(default_factory=VulnerabilitySummaryCounts)
+    core_app_vuln_counts: VulnerabilitySummaryCounts = Field(default_factory=VulnerabilitySummaryCounts)
+    dev_app_vuln_counts: VulnerabilitySummaryCounts = Field(default_factory=VulnerabilitySummaryCounts)
     os_vuln_counts: VulnerabilitySummaryCounts = Field(default_factory=VulnerabilitySummaryCounts)
+    harness_os_vuln_counts: VulnerabilitySummaryCounts = Field(default_factory=VulnerabilitySummaryCounts)
     vulnerabilities: list[VulnerabilityItem] = Field(default_factory=list)
+    app_vulnerabilities: list[VulnerabilityItem] = Field(default_factory=list)
+    os_vulnerabilities: list[VulnerabilityItem] = Field(default_factory=list)
     misconfigurations: list[MisconfigItem] = Field(default_factory=list)
     secrets: list[SecretFindingItem] = Field(default_factory=list)
     opt_out_counts: dict[str, int] = Field(default_factory=dict)
+
+    @model_validator(mode="after")
+    def _backfill_separated_lists_and_counts(self) -> SecurityFacts:
+        """Backfill separated app/os vulnerability arrays and core counts when loaded from legacy JSON."""
+        if self.vulnerabilities and not self.app_vulnerabilities and not self.os_vulnerabilities:
+            for item in self.vulnerabilities:
+                is_os = item.scope in {"os_package", "harness_os"} or item.pkg_type.strip().lower() in _MODEL_OS_TYPES
+                if is_os:
+                    self.os_vulnerabilities.append(item)
+                else:
+                    self.app_vulnerabilities.append(item)
+        if (
+            self.app_vuln_counts.total > 0
+            and self.core_app_vuln_counts.total == 0
+            and self.dev_app_vuln_counts.total == 0
+        ):
+            self.core_app_vuln_counts = self.app_vuln_counts.model_copy()
+        return self

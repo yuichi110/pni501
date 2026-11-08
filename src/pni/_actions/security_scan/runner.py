@@ -25,6 +25,7 @@ from pni._actions.runtime_check.selector import (
     compute_harness_build_args,
     select_harness_tool,
 )
+from pni._actions.security_scan.dep_scopes import discover_non_core_packages
 from pni._actions.security_scan.models import (
     SecurityFacts,
     SecurityScanOptions,
@@ -140,10 +141,16 @@ def _counts_trigger_failure(counts: VulnerabilitySummaryCounts, fail_set: set[Vu
     )
 
 
-def _derive_security_status(bundle: ParsedTrivyBundle, fail_severities: list[VulnSeverity]) -> SecurityScanStatus:
-    """Derive `passed` or `failed` from deduplicated vulnerabilities, misconfigs, and secrets."""
+def _derive_security_status(
+    bundle: ParsedTrivyBundle,
+    fail_severities: list[VulnSeverity],
+    *,
+    fail_on_dev: bool = False,
+) -> SecurityScanStatus:
+    """Derive `passed` or `failed` from core runtime (or all app) CVEs, misconfigs, and secrets."""
     fail_set = set(fail_severities)
-    if _counts_trigger_failure(bundle.app_vuln_counts, fail_set):
+    gated_counts = bundle.app_vuln_counts if fail_on_dev else bundle.core_app_vuln_counts
+    if _counts_trigger_failure(gated_counts, fail_set):
         return "failed"
     if any(m.severity in fail_set for m in bundle.misconfigurations):
         return "failed"
@@ -330,14 +337,22 @@ def run_security_scan(
                 created_tags,
             )
 
+        is_harness_img = resolved_img_src.startswith(".pni/dockerfiles/")
+        non_core_pkgs = discover_non_core_packages(target_dir)
         bundle = parse_trivy_reports(
             fs_json_path=sec_dir / "trivy_fs.json" if scanned_fs else None,
             image_json_path=sec_dir / "trivy_image.json" if scanned_img else None,
             opt_outs=pni_cfg.opt_out,
             skip_files=eff_skip_files,
             skip_dirs=eff_skip_dirs,
+            non_core_packages=non_core_pkgs,
+            is_harness_image=is_harness_img,
         )
-        status = _derive_security_status(bundle, opts.fail_on_severities)
+        status = _derive_security_status(
+            bundle,
+            opts.fail_on_severities,
+            fail_on_dev=opts.fail_on_dev_dependencies,
+        )
         completed = SecurityFacts(
             status=status,
             container_engine=engine_name,
@@ -349,8 +364,13 @@ def run_security_scan(
             artifacts_dir=sec_rel,
             vuln_counts=bundle.vuln_counts,
             app_vuln_counts=bundle.app_vuln_counts,
+            core_app_vuln_counts=bundle.core_app_vuln_counts,
+            dev_app_vuln_counts=bundle.dev_app_vuln_counts,
             os_vuln_counts=bundle.os_vuln_counts,
+            harness_os_vuln_counts=bundle.harness_os_vuln_counts,
             vulnerabilities=bundle.vulnerabilities,
+            app_vulnerabilities=bundle.app_vulnerabilities,
+            os_vulnerabilities=bundle.os_vulnerabilities,
             misconfigurations=bundle.misconfigurations,
             secrets=bundle.secrets,
             opt_out_counts=bundle.opt_out_counts,

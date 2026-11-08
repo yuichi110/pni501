@@ -80,6 +80,7 @@ from pni._workflows import (
     push_workflow_action,
     query_workflow_run_summaries,
     resolve_run_by_id_or_workflow,
+    rewind_workflow_run,
     run_workflow_action_adhoc,
     start_workflow_run,
 )
@@ -1013,6 +1014,53 @@ def inspect_workflow_action_cmd(
         raise typer.Exit(code=1) from exc
 
     _write_or_print_payload(out_text, output_file)
+
+
+@workflows_app.command("rewind")
+@workflows_app.command("retry-action")
+def rewind_workflow_cmd(
+    run_or_workflow: str = typer.Argument(
+        ...,
+        help="Workflow run ID ('wf-...') or workflow ID (e.g., 'pni501').",
+    ),
+    action: str = typer.Argument(
+        ...,
+        help="Target action ID ('act-10' or '10'), composite step ('runtime_verification'), or primitive.",
+    ),
+    pull: bool = typer.Option(
+        False,
+        "--pull",
+        "-p",
+        help="Immediately execute 'get-action' on the rewound step and print its output.",
+    ),
+) -> None:
+    """Rewind a workflow run back to a step, re-sync .pni/workflows/*.yaml parameters, and reset downstream steps."""
+    project_root = Path.cwd()
+    try:
+        outcome = rewind_workflow_run(run_or_workflow, action, project_root)
+    except ValueError as exc:
+        err_console.print(f"[bold red]Error: {exc}[/bold red]")
+        raise typer.Exit(code=1) from exc
+
+    sync_note = "re-synced latest .pni/workflows YAML" if outcome.yaml_resynced else "kept recorded step definitions"
+    console.print(
+        f"[bold green]✓ Rewound workflow run[/bold green] [bold yellow]{outcome.run.run_id}[/bold yellow] "
+        f"([cyan]{outcome.run.workflow_id}[/cyan]) to [bold cyan]{outcome.target_action_id}[/bold cyan] "
+        f"[dim]({len(outcome.reset_action_ids)} step(s) reset to pending; {sync_note})[/dim]"
+    )
+    if pull:
+        try:
+            run_rec, _, guide = get_workflow_action(outcome.run.run_id, project_root)
+        except WorkflowPrerequisiteError as exc:
+            err_console.print(f"[bold red]Error: {exc}[/bold red]")
+            raise typer.Exit(code=1) from exc
+        if run_rec is None:
+            err_console.print(f"[bold red]{guide}[/bold red]")
+            raise typer.Exit(code=1)
+        print(guide)
+        return
+
+    console.print(f"Next step: [bold]pni workflows get-action {outcome.run.run_id}[/bold]")
 
 
 @workflows_app.command("cancel")

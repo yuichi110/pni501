@@ -36,6 +36,7 @@ This guide mirrors `pni instructions` so AI coding agents can access the complet
 - **Progress Monitoring, Past-Run Inspection & Cleanup (Never Query SQLite Manually)**:
   - Check progress across workflows: `pni workflows status --latest [--json]` or `pni workflows status -s in_progress [--json]` (or `pni workflows status <run_id>` for step-level notes).
   - Inspect or export prior step payloads during re-audits: `pni workflows inspect-action <run_or_workflow> <action> [--agent-input | --deterministic] [-o <file.json>]`.
+  - Re-run or rewind from an intermediate step after adjusting `.pni/pni.toml`, harness Dockerfiles, or `.pni/workflows/*.yaml`: `pni workflows rewind <run_or_workflow> <action> [--pull]` (alias: `retry-action`).
   - Clean up abandoned runs: `pni workflows cancel <run_id>` or `pni workflows cancel --superseded`.
 
 ## 3. Core Anti-Hallucination & Visual Report Rules

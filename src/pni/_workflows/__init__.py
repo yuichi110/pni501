@@ -36,10 +36,12 @@ from pni._workflows.base_model import (
     WorkflowTargets,
 )
 from pni._workflows.engine import (
+    RewindOutcome,
     get_workflow_action,
     inspect_base_audit_status,
     inspect_pentests_prerequisite,
     push_workflow_action,
+    rewind_workflow_run,
     start_workflow_run,
 )
 from pni._workflows.inspector import (
@@ -70,6 +72,7 @@ __all__ = [
     "CompiledAuditDigest",
     "DEFAULT_STATE_DB_REL_PATH",
     "InspectedActionItem",
+    "RewindOutcome",
     "RunStatus",
     "WorkflowCategory",
     "WorkflowDefinition",
@@ -101,6 +104,7 @@ __all__ = [
     "resolve_run_actions_by_selector",
     "resolve_run_by_id_or_workflow",
     "resolve_workflow_outputs",
+    "rewind_workflow_run",
     "run_workflow_action_adhoc",
     "select_workflow_primitives",
     "start_workflow_run",

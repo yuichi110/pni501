@@ -15,6 +15,8 @@ import json
 from datetime import datetime, timezone
 from pathlib import Path
 
+from pydantic import BaseModel, Field
+
 from pni._actions import (
     ActionItem,
     ArchitectureRecord,
@@ -87,6 +89,10 @@ from pni._workflows.base_model import (
     WorkflowFactsBundle,
     WorkflowPrerequisiteError,
     WorkflowRunRecord,
+)
+from pni._workflows.inspector import (
+    resolve_run_actions_by_selector,
+    resolve_run_by_id_or_workflow,
 )
 from pni._workflows.manager import (
     load_workflow,
@@ -614,6 +620,11 @@ def _render_ast_facts(af: AstFacts) -> list[str]:
     imp_pct = f"{af.import_hygiene_coverage_pct}%" if af.import_hygiene_coverage_pct is not None else "N/A"
     typ_pct = f"{af.type_safety_coverage_pct}%" if af.type_safety_coverage_pct is not None else "N/A"
     doc_pct = f"{af.docstring_coverage_pct}%" if af.docstring_coverage_pct is not None else "N/A"
+    ann_doc_note = (
+        f" (includes `{af.annotated_doc_functions_count}` PEP 727 `Annotated[..., Doc()]` callables)"
+        if af.annotated_doc_functions_count > 0
+        else ""
+    )
     tst_pct = f"{af.module_test_coverage_pct}%" if af.module_test_coverage_pct is not None else "N/A"
     lines = [
         f"\n### Deterministic AST Facts (`ast_analyze`, language=`{af.language}`)",
@@ -623,7 +634,7 @@ def _render_ast_facts(af: AstFacts) -> list[str]:
         ),
         f"- **Import Hygiene Coverage**: `{imp_pct}`",
         f"- **Type Safety Coverage**: `{typ_pct}`",
-        f"- **Docstring / Javadoc Coverage**: `{doc_pct}`",
+        f"- **Docstring / Javadoc Coverage**: `{doc_pct}`{ann_doc_note}",
         f"- **Test Suite AST**: `{af.test_functions_count}` tests, module coverage `{tst_pct}`",
         (
             f"- **Circular Dependencies**: `{len(af.circular_dependencies)}` "
@@ -644,6 +655,7 @@ def _render_ast_facts(af: AstFacts) -> list[str]:
         ("Wildcard Imports", af.wildcard_imports),
         ("Late (In-Function) Imports", af.late_imports),
         ("Type Safety Issues", af.type_safety_issues),
+        ("Omitted __init__ -> None Annotations (PEP 484 Allowed)", af.omitted_init_return_annotations),
         ("Weak / Suppressed Type Usages", af.weak_type_usages),
         ("Unscoped Type Ignores", af.unscoped_type_ignores),
         ("Missing Docstrings / Javadocs", af.missing_docstrings),
@@ -778,9 +790,12 @@ def _render_runtime_facts(rf: RuntimeFacts) -> list[str]:
 
 
 def _render_security_facts(sf: SecurityFacts) -> list[str]:
-    """Render deterministic SecurityFacts (Trivy CVEs, IaC misconfigs, redacted secrets) into Markdown."""
+    """Render deterministic SecurityFacts (3-tier App/Dev/OS CVEs, IaC misconfigs, redacted secrets)."""
     ac = sf.app_vuln_counts
+    cc = sf.core_app_vuln_counts
+    dc = sf.dev_app_vuln_counts
     oc = sf.os_vuln_counts
+    hc = sf.harness_os_vuln_counts
     lines = [
         f"\n### Containerized Security & Supply-Chain Scan (`security_scan`, status=`{sf.status}`)",
         (
@@ -789,24 +804,43 @@ def _render_security_facts(sf: SecurityFacts) -> list[str]:
             f"(source=`{sf.resolved_image_source or 'none'}`, skip_reason=`{sf.skip_reason or 'none'}`)"
         ),
         (
-            f"- **Application Dependency CVEs**: total=`{ac.total}` "
-            f"(CRITICAL=`{ac.critical}`, HIGH=`{ac.high}`, MEDIUM=`{ac.medium}`, LOW=`{ac.low}`)"
+            f"- **Application Dependency CVEs (total=`{ac.total}`)**: "
+            f"Core Runtime=`{cc.total}` (CRITICAL=`{cc.critical}`, HIGH=`{cc.high}`, "
+            f"MEDIUM=`{cc.medium}`, LOW=`{cc.low}`) | "
+            f"Dev/Optional Lockfile=`{dc.total}` (CRITICAL=`{dc.critical}`, HIGH=`{dc.high}`, "
+            f"MEDIUM=`{dc.medium}`, LOW=`{dc.low}`)"
         ),
         (
-            f"- **Container OS Layer CVEs**: total=`{oc.total}` "
+            f"- **Container OS Layer CVEs**: Project Dockerfile OS=`{oc.total}` "
             f"(CRITICAL=`{oc.critical}`, HIGH=`{oc.high}`, MEDIUM=`{oc.medium}`, LOW=`{oc.low}`)"
+            + (
+                f" | Test Harness Base-OS (`{sf.resolved_image_source}`, non-shipped)=`{hc.total}`"
+                if hc.total > 0
+                else ""
+            )
         ),
     ]
-    if sf.vulnerabilities:
-        lines.append(f"- **Top Deduplicated Vulnerabilities ({len(sf.vulnerabilities)} shown)**:")
-        for v in sf.vulnerabilities[:12]:
+    app_items = sf.app_vulnerabilities or [
+        v for v in sf.vulnerabilities if v.scope in {"runtime_core", "dev_or_optional"}
+    ]
+    if app_items:
+        lines.append(f"- **Application Vulnerabilities ({len(app_items)} total, up to 12 shown)**:")
+        for v in app_items[:12]:
             fix_lbl = f" -> fix=`{v.fixed_version}`" if v.fixed_version else " (no upstream fix)"
             unpinned_lbl = (
                 f" [UNPINNED RANGE MATCH: {v.version_resolution_note}]" if v.is_unpinned_specifier else ""
             )
             lines.append(
-                f"  - `[{v.severity}]` `{v.vuln_id}` in `{v.pkg_name}@{v.installed_version}` "
+                f"  - `[{v.severity}]` `[{v.scope}]` `{v.vuln_id}` in `{v.pkg_name}@{v.installed_version}` "
                 f"(`{v.pkg_type}`){fix_lbl}{unpinned_lbl}: {v.title[:100]}"
+            )
+    if sf.os_vulnerabilities:
+        lines.append(f"- **Project Container OS Vulnerabilities ({len(sf.os_vulnerabilities)} shown)**:")
+        for v in sf.os_vulnerabilities[:8]:
+            fix_lbl = f" -> fix=`{v.fixed_version}`" if v.fixed_version else " (no upstream fix)"
+            lines.append(
+                f"  - `[{v.severity}]` `{v.vuln_id}` in `{v.pkg_name}@{v.installed_version}` "
+                f"(`{v.pkg_type}`){fix_lbl}: {v.title[:100]}"
             )
     if sf.misconfigurations:
         lines.append(f"- **Container / IaC Misconfigurations ({len(sf.misconfigurations)})**:")
@@ -1144,7 +1178,9 @@ def _build_deterministic_metrics(bundle: WorkflowFactsBundle) -> dict[str, Metri
         metrics["unsorted_imports_count"] = len(af.unsorted_imports)
         metrics["wildcard_imports_count"] = len(af.wildcard_imports)
         metrics["type_safety_issues_count"] = len(af.type_safety_issues)
+        metrics["omitted_init_return_count"] = len(af.omitted_init_return_annotations)
         metrics["weak_type_usages_count"] = len(af.weak_type_usages)
+        metrics["annotated_doc_functions_count"] = af.annotated_doc_functions_count
         metrics["empty_docstrings_count"] = len(af.empty_docstrings)
         metrics["doc_signature_mismatches_count"] = len(af.doc_signature_mismatches)
         metrics["complex_functions_count"] = len(af.complex_functions)
@@ -1195,8 +1231,14 @@ def _populate_security_metrics(metrics: dict[str, MetricScalar], sf: SecurityFac
     metrics["app_vuln_critical"] = sf.app_vuln_counts.critical
     metrics["app_vuln_high"] = sf.app_vuln_counts.high
     metrics["app_vuln_total"] = sf.app_vuln_counts.total
-    metrics["app_vuln_unpinned_range_matches"] = sum(1 for v in sf.vulnerabilities if v.is_unpinned_specifier)
+    metrics["core_app_vuln_total"] = sf.core_app_vuln_counts.total
+    metrics["core_app_vuln_high_or_crit"] = sf.core_app_vuln_counts.critical + sf.core_app_vuln_counts.high
+    metrics["dev_app_vuln_total"] = sf.dev_app_vuln_counts.total
+    metrics["app_vuln_unpinned_range_matches"] = sum(
+        1 for v in (sf.app_vulnerabilities or sf.vulnerabilities) if v.is_unpinned_specifier
+    )
     metrics["os_vuln_high_or_crit"] = sf.os_vuln_counts.critical + sf.os_vuln_counts.high
+    metrics["harness_os_vuln_total"] = sf.harness_os_vuln_counts.total
     metrics["misconfig_count"] = len(sf.misconfigurations)
     metrics["secret_leak_count"] = len(sf.secrets)
 
@@ -1297,6 +1339,18 @@ def _enrich_score_result(
     return score_obj
 
 
+def _has_prose_annotation(raw_ref: str) -> bool:
+    """Return True if raw_ref appends parenthetical notes or prose after path/symbol."""
+    stripped = raw_ref.strip()
+    if " (" in stripped and stripped.endswith(")"):
+        return True
+    if ":" in stripped:
+        symbol_part = stripped.split(":", maxsplit=1)[1].split("#", maxsplit=1)[0].strip()
+        if any(ch.isspace() for ch in symbol_part) or "(" in symbol_part or ")" in symbol_part:
+            return True
+    return False
+
+
 def _is_grounded_repo_path(
     raw_ref: str,
     project_root: Path,
@@ -1304,6 +1358,8 @@ def _is_grounded_repo_path(
     inventory_paths: set[str],
 ) -> bool:
     """Return True if raw_ref ('path' or 'path:symbol') resolves to an existing repo path or AST inventory entry."""
+    if _has_prose_annotation(raw_ref):
+        return False
     clean = raw_ref.split(":", maxsplit=1)[0].split("#", maxsplit=1)[0].strip().rstrip("/")
     if not clean:
         return False
@@ -1333,7 +1389,8 @@ def _verify_grounded_paths(
     if missing:
         msg = (
             f"Unverified/hallucinated path(s) in '{field_name}': {missing}. "
-            "Every path must exist in the repository or AstFacts.module_inventory."
+            "Every path must exist in the repository or AstFacts.module_inventory "
+            "(use exact 'path/to/file' or 'path/to/file:Symbol' strings ONLY without parenthetical descriptions)."
         )
         raise ValueError(msg)
 
@@ -1594,4 +1651,94 @@ def push_workflow_action(
             f"Run: pni workflows get-action {run_id}"
         )
     return True, done_msg
+
+
+class RewindOutcome(BaseModel):
+    """Structured result returned after rewinding a stateful workflow run to an action step."""
+
+    run: WorkflowRunRecord
+    target_action_id: str
+    target_seq: int
+    reset_action_ids: list[str] = Field(default_factory=list)
+    yaml_resynced: bool = False
+
+
+def _refresh_cached_bundle_after_rewind(
+    db: WorkflowStateDB,
+    updated_run: WorkflowRunRecord,
+    project_root: Path,
+) -> None:
+    """Recompute and persist facts.json and architecture.json from remaining completed steps."""
+    remaining_actions = db.get_actions(updated_run.run_id)
+    bundle = _assemble_facts_bundle(updated_run, remaining_actions, db=db)
+
+    facts_file = project_root / _resolve_facts_rel_path(updated_run)
+    ensure_cache_parent(project_root, facts_file)
+    facts_file.write_text(bundle.model_dump_json(indent=2), encoding="utf-8")
+
+    arch_file = project_root / _resolve_arch_rel_path(updated_run)
+    if bundle.architecture_record is not None:
+        ensure_cache_parent(project_root, arch_file)
+        arch_file.write_text(bundle.architecture_record.model_dump_json(indent=2) + "\n", encoding="utf-8")
+    else:
+        arch_file.unlink(missing_ok=True)
+
+
+def rewind_workflow_run(
+    run_or_workflow: str,
+    action_selector: str,
+    project_root: Path,
+) -> RewindOutcome:
+    """Rewind a stateful workflow run back to `action_selector` and re-sync workflow YAML parameters.
+
+    Args:
+        run_or_workflow: Explicit `wf-xxxxxxxx` run ID or workflow ID in `.pni/workflows/`.
+        action_selector: Action ID (`act-10`, `10`), composite `uses` ID, step name, or primitive type.
+        project_root: Workspace root directory.
+
+    Returns:
+        RewindOutcome: Updated run record, target action ID, reset step list, and YAML sync flag.
+
+    Raises:
+        ValueError: If the state DB, run, or action selector does not exist or run is cancelled.
+    """
+    db_file = project_root / DEFAULT_STATE_DB_REL_PATH
+    if not db_file.exists():
+        msg = f"Workflow state database '{DEFAULT_STATE_DB_REL_PATH}' does not exist."
+        raise ValueError(msg)
+
+    db = WorkflowStateDB(project_root)
+    run = resolve_run_by_id_or_workflow(db, run_or_workflow)
+    if run is None:
+        msg = f"Workflow run or workflow '{run_or_workflow}' not found in '{DEFAULT_STATE_DB_REL_PATH}'."
+        raise ValueError(msg)
+
+    all_actions = db.get_actions(run.run_id)
+    matched = resolve_run_actions_by_selector(all_actions, action_selector)
+    from_seq = min(a.seq for a in matched)
+
+    wf_def: WorkflowDefinition | None = None
+    primitives: list[PrimitiveStep] | None = None
+    resolved_outputs = None
+    loaded = load_workflow(run.workflow_id, project_root)
+    if loaded is not None:
+        _, wf_def = loaded
+        primitives = normalize_workflow_steps(wf_def, project_root)
+        resolved_outputs = resolve_workflow_outputs(wf_def, primitives)
+
+    updated_run, reset_ids, resynced = db.rewind_run_from_seq(
+        run.run_id,
+        from_seq,
+        workflow_def=wf_def,
+        primitives=primitives,
+        resolved_outputs=resolved_outputs,
+    )
+    _refresh_cached_bundle_after_rewind(db, updated_run, project_root)
+    return RewindOutcome(
+        run=updated_run,
+        target_action_id=f"act-{from_seq:02d}",
+        target_seq=from_seq,
+        reset_action_ids=reset_ids,
+        yaml_resynced=resynced,
+    )
 

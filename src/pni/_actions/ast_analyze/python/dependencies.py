@@ -32,6 +32,7 @@ _STDLIB_MODULES: Final[frozenset[str]] = frozenset({*sys.stdlib_module_names, "_
 _DIST_TO_IMPORT_ALIASES: Final[dict[str, tuple[str, ...]]] = {
     "pyyaml": ("yaml",),
     "pillow": ("pil",),
+    "python_multipart": ("python_multipart", "multipart"),
     "beautifulsoup4": ("bs4",),
     "scikit_learn": ("sklearn",),
     "scikit_image": ("skimage",),
@@ -48,9 +49,30 @@ _DIST_TO_IMPORT_ALIASES: Final[dict[str, tuple[str, ...]]] = {
     "markdown_it_py": ("markdown_it",),
     "ruamel_yaml": ("ruamel",),
     "grpcio": ("grpc",),
+    "pyopenssl": ("openssl",),
+    "gitpython": ("git",),
+    "pynacl": ("nacl",),
+    "pycryptodome": ("crypto",),
+    "pycryptodomex": ("cryptodome",),
+    "python_jose": ("jose",),
+    "python_magic": ("magic",),
+    "python_slugify": ("slugify",),
+    "pyserial": ("serial",),
+    "pyzmq": ("zmq",),
+    "graphql_core": ("graphql",),
+    "psycopg_binary": ("psycopg",),
     "pygments": ("pygments",),
     "xlsxwriter": ("xlsxwriter",),
     "lxml": ("lxml",),
+}
+_NAMESPACE_DIST_PREFIXES: Final[dict[str, tuple[str, ...]]] = {
+    "opentelemetry": ("opentelemetry_",),
+    "google": ("google_", "googleapis_"),
+    "azure": ("azure_",),
+    "sphinxcontrib": ("sphinxcontrib_",),
+    "zope": ("zope_",),
+    "jaraco": ("jaraco_",),
+    "mpl_toolkits": ("matplotlib", "mpl_toolkits_"),
 }
 _RUNTIME_DRIVER_ALLOWLIST: Final[frozenset[str]] = frozenset(
     {
@@ -272,6 +294,9 @@ def _matches_declared(
     if imp_norm in declared_set:
         matched.add(imp_norm)
     matched.update(imp_to_dists.get(imp_norm, set()) & declared_set)
+    ns_prefixes = _NAMESPACE_DIST_PREFIXES.get(imp_norm, ())
+    if ns_prefixes:
+        matched.update(d for d in declared_set if d.startswith(ns_prefixes))
     return matched
 
 
