@@ -50,4 +50,4 @@ def test_check_new_version_initial() -> None:
 def test_get_new_version() -> None:
     """Test extracting new version from pyproject.toml."""
     ver = get_new_version()
-    assert ver == "0.1.1"
+    assert ver == "0.1.2"
