@@ -12,6 +12,7 @@
 from __future__ import annotations
 
 import json
+import shutil
 from pathlib import Path
 from typing import Optional
 
@@ -41,7 +42,11 @@ from pni._actions import (
     run_web_pentest,
     scaffold_progress_plan,
 )
-from pni._cache import ensure_cache_dir
+from pni._actions.runtime_check.engine_detect import (
+    detect_container_engine,
+    prune_pni_container_artifacts,
+)
+from pni._cache import CACHE_REL_DIR, ensure_cache_dir
 from pni._config import load_pni_config, scaffold_pni_config
 from pni._instructions import copy_instruction_templates, get_instructions_content
 from pni._pentests import ensure_target_pentests
@@ -103,7 +108,7 @@ HELP_EPILOG: str = (
     "via 'pni progress init/validate' before 'pni workflows start').\n"
     '  • Run [bold yellow]"pni rules show <lang>/workflow_guide"[/bold yellow] '
     '(e.g., [bold yellow]"python/workflow_guide"[/bold yellow], [bold yellow]"java/workflow_guide"[/bold yellow], '
-    '[bold yellow]"php/workflow_guide"[/bold yellow]) '
+    '[bold yellow]"php/workflow_guide"[/bold yellow], [bold yellow]"go/workflow_guide"[/bold yellow]) '
     "for language-specific workflow & action best practices.\n"
     '  • Run [bold yellow]"pni rules list --all"[/bold yellow] '
     "to explore all available engineering rules and workflow guides.\n"
@@ -155,11 +160,19 @@ progress_app = typer.Typer(
     no_args_is_help=True,
     context_settings=CONTEXT_SETTINGS,
 )
+cache_app = typer.Typer(
+    name="cache",
+    help="Clean up .pni/cache/ artifacts and temporary PNI container harness images.",
+    epilog=HELP_EPILOG,
+    no_args_is_help=True,
+    context_settings=CONTEXT_SETTINGS,
+)
 app.add_typer(rules_app, name="rules")
 app.add_typer(workflows_app, name="workflows")
 app.add_typer(report_app, name="report")
 app.add_typer(pentests_app, name="pentests")
 app.add_typer(progress_app, name="progress")
+app.add_typer(cache_app, name="cache")
 
 console = Console()
 err_console = Console(stderr=True)
@@ -205,7 +218,10 @@ def init(
         None,
         "--lang",
         "-l",
-        help="Target programming language ('python', 'java', 'php'). Auto-detected if omitted.",
+        help=(
+            "Target programming language ('python', 'java', 'php', 'go', 'typescript', 'javascript'). "
+            "Auto-detected if omitted."
+        ),
     ),
     force: bool = typer.Option(
         False,
@@ -1636,6 +1652,49 @@ def pentests_run_cmd(
         raise typer.Exit(code=1)
 
 
+@cache_app.command("clean")
+def cache_clean_cmd(
+    docker: bool = typer.Option(
+        False,
+        "--docker",
+        help="Also remove temporary PNI container images ('pni-*'), dangling images, and builder cache.",
+    ),
+    container_engine: str = typer.Option(
+        "auto",
+        "--container-engine",
+        help="Container runtime preference ('auto', 'docker', 'podman') when --docker is enabled.",
+    ),
+) -> None:
+    """Clean `.pni/cache/` artifacts and optionally prune PNI Docker/Podman harness images."""
+    ws_root = Path.cwd().resolve()
+    cache_dir = ws_root / CACHE_REL_DIR
+    removed_entries = 0
+    if cache_dir.is_dir():
+        for child in cache_dir.iterdir():
+            if child.name == ".gitignore":
+                continue
+            if child.is_dir():
+                shutil.rmtree(child, ignore_errors=True)
+            else:
+                child.unlink(missing_ok=True)
+            removed_entries += 1
+        ensure_cache_dir(ws_root)
+    console.print(
+        f"[bold green]✓ Cleaned .pni/cache/[/bold green] (removed {removed_entries} cached entry/entries)"
+    )
+
+    if docker:
+        engine_name, engine_bin, reason = detect_container_engine(container_engine)
+        if engine_name is None or engine_bin is None:
+            console.print(f"[yellow]Notice: Skipping container cleanup ({reason}).[/yellow]")
+            return
+        removed_tags = prune_pni_container_artifacts(engine_bin)
+        console.print(
+            f"[bold green]✓ Pruned container artifacts via {engine_name}[/bold green] "
+            f"(removed {len(removed_tags)} PNI image tag(s))"
+        )
+
+
 @app.command("instructions")
 def instructions() -> None:
     """Print the AI agent instruction guide in Markdown format to stdout."""
@@ -1650,9 +1709,27 @@ def instruction_alias() -> None:
     instructions()
 
 
+def _version_callback(value: bool) -> None:
+    """Print PNI package name and version when --version / -V is passed."""
+    if value:
+        console.print(f"{LIB_NAME} {LIB_VERSION}")
+        raise typer.Exit(code=0)
+
+
 @app.callback(invoke_without_command=True)
-def callback(ctx: typer.Context) -> None:
+def callback(
+    ctx: typer.Context,
+    show_version: bool = typer.Option(
+        False,
+        "--version",
+        "-V",
+        callback=_version_callback,
+        is_eager=True,
+        help="Show pni501 version and exit.",
+    ),
+) -> None:
     """PNI entrypoint callback."""
+    _ = show_version
     if ctx.invoked_subcommand is None:
         console.print("[bold cyan]Project Nemesis Index (PNI)[/bold cyan]")
         console.print(f"{LIB_NAME} version [bold green]{LIB_VERSION}[/bold green]\n")

@@ -30,7 +30,7 @@ SUPPORTED_LANGUAGES: Final[tuple[str, ...]] = (
 )
 
 _MANIFEST_LANGUAGE_RULES: Final[tuple[tuple[str, tuple[str, ...]], ...]] = (
-    ("python", ("pyproject.toml", "setup.py", "requirements.txt")),
+    ("python", ("pyproject.toml", "setup.py")),
     ("java", ("pom.xml", "build.gradle", "build.gradle.kts", "settings.gradle", "settings.gradle.kts")),
     ("php", ("composer.json", "wp-config.php", "wp-config-sample.php", "artisan", "phpunit.xml", "phpunit.xml.dist")),
     ("go", ("go.mod", "go.work")),

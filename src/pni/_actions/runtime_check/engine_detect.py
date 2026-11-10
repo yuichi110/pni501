@@ -199,3 +199,23 @@ def remove_container_images(engine_bin: str, image_tags: list[str]) -> None:
     if not unique_tags:
         return
     run_safe_command([engine_bin, "rmi", "-f", *unique_tags], timeout_sec=20.0)
+
+
+def prune_pni_container_artifacts(engine_bin: str) -> list[str]:
+    """Remove temporary `pni-*` harness/scan/pentest images, dangling layers, and build cache."""
+    removed: list[str] = []
+    list_res = run_safe_command(
+        [engine_bin, "images", "--format", "{{.Repository}}:{{.Tag}}"],
+        timeout_sec=10.0,
+    )
+    if not list_res.timed_out and list_res.exit_code == 0:
+        pni_prefixes = ("pni-harness-", "pni-proj-", "pni-sec-", "pni-pentest-")
+        for line in list_res.stdout.splitlines():
+            tag = line.strip()
+            if tag.startswith(pni_prefixes) and tag not in removed:
+                removed.append(tag)
+    if removed:
+        remove_container_images(engine_bin, removed)
+    run_safe_command([engine_bin, "image", "prune", "-f"], timeout_sec=30.0)
+    run_safe_command([engine_bin, "builder", "prune", "-f"], timeout_sec=30.0)
+    return removed

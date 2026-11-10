@@ -18,7 +18,10 @@ from typing import Final
 from ast_grep_py import SgNode
 
 from pni._actions.ast_analyze.base import BaseTestChecker
-from pni._actions.ast_analyze.go._helpers import iter_go_callables
+from pni._actions.ast_analyze.go._helpers import (
+    get_go_callable_params,
+    iter_go_callables,
+)
 from pni._actions.ast_analyze.models import (
     CodeLocation,
     ParsedUnit,
@@ -31,6 +34,8 @@ _GO_ASSERT_RE: Final[re.Pattern[str]] = re.compile(
     r"|\bcmp\.(?:Diff|Equal)\s*\("
     r"|\breflect\.DeepEqual\s*\("
 )
+_TESTING_PARAM_TYPES: Final[tuple[str, ...]] = ("testing.T", "testing.B", "testing.F", "testing.TB")
+_PUNCTUATION_KINDS: Final[frozenset[str]] = frozenset({"(", ")", ","})
 
 
 def _is_go_test_function(name: str) -> bool:
@@ -54,6 +59,34 @@ def _collect_helper_functions(test_units: list[ParsedUnit]) -> set[str]:
     return helpers
 
 
+def _extract_testing_param_names(node: SgNode) -> set[str]:
+    """Return `*testing.T` / `*testing.B` / `*testing.F` parameter names declared on a test callable."""
+    names: set[str] = {"t", "b", "f"}
+    for pname, ptype in get_go_callable_params(node):
+        if pname != "_" and any(tok in ptype for tok in _TESTING_PARAM_TYPES):
+            names.add(pname)
+    return names
+
+
+def _call_delegates_assertion(call: SgNode, helper_names: set[str], testing_params: set[str]) -> bool:
+    """Return True if `call` invokes a known helper, passes `t` to a helper, or delegates `t.Run(name, fn)`."""
+    fn = call.field("function")
+    callee_short = ""
+    if fn is not None:
+        fn_text = fn.text().strip()
+        callee_short = fn_text.rsplit(".", 1)[-1]
+        if callee_short in helper_names:
+            return True
+
+    args_node = call.field("arguments")
+    if args_node is None:
+        return False
+    arg_nodes = [c for c in args_node.children() if c.kind() not in _PUNCTUATION_KINDS]
+    if callee_short == "Run" and len(arg_nodes) >= 2 and arg_nodes[1].kind() != "func_literal":
+        return True
+    return any(arg.kind() == "identifier" and arg.text().strip() in testing_params for arg in arg_nodes)
+
+
 def _test_has_assertion(node: SgNode, short_name: str, helper_names: set[str]) -> bool:
     """Return True if a Go test function verifies outcomes via `testing.T`, `testify`, `Example` output, or helpers."""
     if short_name.startswith(("Benchmark", "Example")):
@@ -61,15 +94,11 @@ def _test_has_assertion(node: SgNode, short_name: str, helper_names: set[str]) -
     text = node.text()
     if _GO_ASSERT_RE.search(text):
         return True
-    for call in node.find_all(kind="call_expression"):
-        fn = call.field("function")
-        if fn is None:
-            continue
-        fn_text = fn.text().strip()
-        callee_short = fn_text.rsplit(".", 1)[-1]
-        if callee_short in helper_names:
-            return True
-    return False
+    testing_params = _extract_testing_param_names(node)
+    return any(
+        _call_delegates_assertion(call, helper_names, testing_params)
+        for call in node.find_all(kind="call_expression")
+    )
 
 
 class GoTestChecker(BaseTestChecker):

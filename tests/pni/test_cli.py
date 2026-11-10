@@ -24,12 +24,30 @@ from pni.cli import app
 runner = CliRunner()
 
 
-def test_cli_version() -> None:
-    """Test 'pni version' command."""
+def test_cli_version(tmp_path: Path) -> None:
+    """Test 'pni version', 'pni --version', 'pni -V', and 'pni cache clean' commands."""
     result = runner.invoke(app, ["version"])
     assert result.exit_code == 0
     assert "pni501" in result.stdout
-    assert "0.1.3" in result.stdout
+    assert "0.1.4" in result.stdout
+
+    for flag in ("--version", "-V"):
+        flag_res = runner.invoke(app, [flag])
+        assert flag_res.exit_code == 0
+        assert "pni501 0.1.4" in flag_res.stdout
+
+    original_cwd = Path.cwd()
+    try:
+        os.chdir(tmp_path)
+        cache_sub = tmp_path / ".pni" / "cache" / "full_audit"
+        cache_sub.mkdir(parents=True)
+        (cache_sub / "facts.json").write_text("{}", encoding="utf-8")
+        clean_res = runner.invoke(app, ["cache", "clean"])
+        assert clean_res.exit_code == 0
+        assert not cache_sub.exists()
+        assert (tmp_path / ".pni" / "cache" / ".gitignore").is_file()
+    finally:
+        os.chdir(original_cwd)
 
 
 def test_cli_default() -> None:

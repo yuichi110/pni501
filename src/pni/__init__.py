@@ -14,7 +14,7 @@ from __future__ import annotations
 from typing import Final
 
 LIB_NAME: Final[str] = "pni501"
-LIB_VERSION: Final[str] = "0.1.3"
+LIB_VERSION: Final[str] = "0.1.4"
 
 __version__: Final[str] = LIB_VERSION
 

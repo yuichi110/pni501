@@ -97,12 +97,10 @@ def select_php_image_version(constraint: Optional[str]) -> str:
 
 
 def select_go_image_version(constraint: Optional[str]) -> str:
-    """Select an official Golang Bookworm container tag ('1.21', '1.22', '1.23', '1.24') from go.mod version."""
+    """Select an official Golang Bookworm container tag ('1.22', '1.23', '1.24') with a '1.22' floor."""
     if not constraint or not constraint.strip():
         return "1.22"
     text = constraint.strip()
-    if "<1.22" in text or "==1.21" in text:
-        return "1.21"
     matches = [int(m) for m in _GO_VER_RE.findall(text)]
     if not matches:
         return "1.22"

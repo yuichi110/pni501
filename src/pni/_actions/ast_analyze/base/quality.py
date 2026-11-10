@@ -160,10 +160,14 @@ class BaseQualityChecker(ABC):
                 score += 1 + depth
         return score
 
+    def effective_callable_lines(self, node: SgNode) -> int:
+        """Return effective line span of `node` for unit-size evaluation."""
+        return _effective_callable_lines(node)
+
     def evaluate_complexity(self, node: SgNode, symbol: str, rel_path: str) -> CodeLocation | None:
         """Check whether a callable exceeds line length, McCabe branch, or cognitive thresholds."""
         callable_start = node.range().start.index
-        func_len = _effective_callable_lines(node)
+        func_len = self.effective_callable_lines(node)
         branches = sum(
             1
             for bkind in self.branch_node_kinds

@@ -63,7 +63,7 @@ class PniScanConfig(BaseModel):
     """Filesystem and secret scan scope controls in .pni/pni.toml."""
 
     respect_gitignore: bool = True
-    include_gitignored: list[str] = Field(default_factory=lambda: ["uv.lock", "composer.lock"])
+    include_gitignored: list[str] = Field(default_factory=lambda: ["uv.lock", "composer.lock", "go.sum"])
     skip_files: list[str] = Field(default_factory=list)
     skip_dirs: list[str] = Field(default_factory=list)
 
@@ -80,7 +80,7 @@ class PniReportConfig(BaseModel):
 
 
 class OptOutEntry(BaseModel):
-    """Declarative design waiver ([[opt_out]]) requiring an explicit engineering rationale."""
+    """Declarative design waivers ([[opt_out]]) requiring an explicit engineering rationale."""
 
     id: str
     scope: list[str] = Field(default_factory=list)
@@ -231,13 +231,13 @@ def render_default_pni_toml(project_root: Path, *, lang: str = "python") -> str:
         f"source = [{src_literal}]\n"
         f"tests = [{tst_literal}]\n"
         'docs = ["README.md"]\n'
-        'exclude = ["reports/**", "reports_src/**"]\n\n'
+        'exclude = ["docs/**", "docs_src/**", "reports/**", "reports_src/**"]\n\n'
         "[scan]\n"
         "# Exclude untracked files matched by .gitignore (e.g. local developer .env) from filesystem/secret scans\n"
         "respect_gitignore = true\n"
         f"include_gitignored = [{ignored_lock_literal}]\n"
         'skip_files = [".env", ".env.*", "**/.env"]\n'
-        'skip_dirs = ["reports", "reports_src"]\n\n'
+        'skip_dirs = ["docs", "docs_src", "reports", "reports_src"]\n\n'
         "[report]\n"
         'src_dir = "reports_src"\n'
         'output_dir = "reports"\n'

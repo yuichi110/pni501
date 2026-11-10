@@ -26,13 +26,59 @@ from pni._actions.ast_analyze.models import (
 
 _UNSCOPED_NOLINT_RE: Final[re.Pattern[str]] = re.compile(r"//\s*nolint(?:\s*$|\s+//)")
 _ANY_WORD_RE: Final[re.Pattern[str]] = re.compile(r"\bany\b|interface\s*\{\s*\}")
+_BARE_ANY_TYPE_RE: Final[re.Pattern[str]] = re.compile(r"^(?:any|interface\s*\{\s*\})$")
+_FMT_VARIADIC_NAME_PREFIXES: Final[tuple[str, ...]] = (
+    "print",
+    "fprint",
+    "sprint",
+    "log",
+    "error",
+    "fatal",
+    "panic",
+    "debug",
+    "info",
+    "warn",
+)
 
 
-def _signature_uses_weak_any(callable_node: SgNode) -> list[str]:
+def _is_exempt_fmt_variadic(param_decls: list[SgNode], short_name: str) -> bool:
+    """Return True if the final variadic parameter is a `fmt.Printf` / logging style `...any` / `...interface{}`."""
+    if not param_decls or param_decls[-1].kind() != "variadic_parameter_declaration":
+        return False
+    last_type_node = param_decls[-1].field("type")
+    last_type = last_type_node.text().strip() if last_type_node is not None else ""
+    if not _BARE_ANY_TYPE_RE.match(last_type):
+        return False
+    if short_name.lower().startswith(_FMT_VARIADIC_NAME_PREFIXES):
+        return True
+    if len(param_decls) >= 2:
+        prev_type_node = param_decls[-2].field("type")
+        prev_type = prev_type_node.text().strip() if prev_type_node is not None else ""
+        if prev_type == "string":
+            return True
+    return False
+
+
+def _params_use_weak_any(params_node: SgNode, short_name: str) -> bool:
+    """Return True if parameter declarations contain non-exempt `any` or `interface{}`."""
+    param_decls = [
+        c for c in params_node.children() if c.kind() in {"parameter_declaration", "variadic_parameter_declaration"}
+    ]
+    if not param_decls:
+        return bool(_ANY_WORD_RE.search(params_node.text()))
+    if any(_ANY_WORD_RE.search(p.text()) for p in param_decls if p.kind() == "parameter_declaration"):
+        return True
+    variadic_decls = [p for p in param_decls if p.kind() == "variadic_parameter_declaration"]
+    if not variadic_decls or not any(_ANY_WORD_RE.search(p.text()) for p in variadic_decls):
+        return False
+    return not _is_exempt_fmt_variadic(param_decls, short_name)
+
+
+def _signature_uses_weak_any(callable_node: SgNode, short_name: str = "") -> list[str]:
     """Return list of parameter or result segments using untyped `any` or `interface{}`."""
     matches: list[str] = []
     params = callable_node.field("parameters")
-    if params is not None and _ANY_WORD_RE.search(params.text()):
+    if params is not None and _params_use_weak_any(params, short_name):
         matches.append("parameters")
     result = callable_node.field("result")
     if result is not None and _ANY_WORD_RE.search(result.text()):
@@ -52,8 +98,8 @@ class GoTypingChecker(BaseTypingChecker):
         weak_usages: list[CodeLocation] = []
         ignores: list[CodeLocation] = []
 
-        for qual, _short, node in callables:
-            weak_parts = _signature_uses_weak_any(node)
+        for qual, short, node in callables:
+            weak_parts = _signature_uses_weak_any(node, short)
             if weak_parts:
                 weak_usages.append(
                     CodeLocation(

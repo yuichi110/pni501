@@ -276,7 +276,8 @@ func TestNoAssertionsAndSleep(t *testing.T) {
 def test_go_runtime_selector_parsers_smoke_and_scaffolding(tmp_path: Path) -> None:
     """Verify Go runtime selectors, test/coverprofile parsers, smoke plan, pentest plan, and CLI init."""
     assert select_go_image_version(None) == "1.22"
-    assert select_go_image_version(">=1.21, <1.22") == "1.21"
+    assert select_go_image_version("1.15") == "1.22"
+    assert select_go_image_version(">=1.21, <1.22") == "1.22"
     assert select_go_image_version(">=1.23") == "1.23"
     assert select_go_image_version(">=1.24") == "1.24"
 
@@ -386,3 +387,120 @@ github.com/acme/svc/main.go:15.2,18.10 2 0
     df_path, template_id = ensure_target_dockerfile(tmp_path, ".", "go", "go")
     assert df_path.is_file()
     assert template_id == "go/go.dockerfile"
+    df_text = df_path.read_text(encoding="utf-8")
+    assert "USER pni" in df_text
+    assert "chmod -R a+rwX /workspace /go /out" in df_text
+
+
+def test_go_cobra_idioms_and_init_scaffolding(tmp_path: Path) -> None:
+    """Verify Go AST false-positive fixes (t.Run delegation, chained blank discard, raw string LOC, Printf variadic)."""
+    (tmp_path / "go.mod").write_text("module github.com/spf13/cobra\n\ngo 1.15\n", encoding="utf-8")
+    # Even if a docs requirements.txt exists, go.mod must take precedence as a Go repository
+    (tmp_path / "requirements.txt").write_text("mkdocs>=1.5.0\n", encoding="utf-8")
+
+    raw_lines = "\n".join(f"# bash completion line {i}" for i in range(70))
+    (tmp_path / "command.go").write_text(
+        f"""package cobra
+
+import "fmt"
+
+// FlagSet holds command flags.
+type FlagSet struct{{}}
+
+// MarkHidden marks a flag hidden.
+func (f *FlagSet) MarkHidden(name string) error {{
+\treturn nil
+}}
+
+// GetString returns a flag value and error.
+func (f *FlagSet) GetString(name string) (string, error) {{
+\treturn name, nil
+}}
+
+// Command represents a CLI command.
+type Command struct{{}}
+
+// Flags returns the command FlagSet.
+func (c *Command) Flags() *FlagSet {{
+\treturn &FlagSet{{}}
+}}
+
+// Printf formats and prints output using fmt-compatible variadic arguments.
+func (c *Command) Printf(format string, i ...interface{{}}) {{
+\tfmt.Printf(format, i...)
+}}
+
+// Println prints output using fmt-compatible variadic arguments.
+func (c *Command) Println(i ...any) {{
+\tfmt.Println(i...)
+}}
+
+// Configure sets up flags and reads a value with partial blank error discard.
+func (c *Command) Configure() string {{
+\t_ = c.Flags().MarkHidden("secret")
+\tval, _ := c.Flags().GetString("name")
+\treturn val
+}}
+
+// GenBashComp returns a long multiline raw string template with minimal branching.
+func GenBashComp(includeDesc bool) string {{
+\tif includeDesc {{
+\t\treturn `{raw_lines}`
+\t}}
+\treturn ""
+}}
+""",
+        encoding="utf-8",
+    )
+    (tmp_path / "command_test.go").write_text(
+        """package cobra
+
+import "testing"
+
+type calledAsTestcase struct {
+\twant string
+}
+
+func (tc calledAsTestcase) test(t *testing.T) {
+\tif tc.want == "" {
+\t\tt.Errorf("unexpected empty want")
+\t}
+}
+
+func assertEqual(t *testing.T, got, want string) {
+\tif got != want {
+\t\tt.Fatalf("got %q, want %q", got, want)
+\t}
+}
+
+func TestCalledAsMethodValue(t *testing.T) {
+\ttests := map[string]calledAsTestcase{"ok": {want: "run"}}
+\tfor name, tc := range tests {
+\t\tt.Run(name, tc.test)
+\t}
+}
+
+func TestDelegatedHelperArg(t *testing.T) {
+\tc := &Command{}
+\tassertEqual(t, c.Configure(), "name")
+}
+""",
+        encoding="utf-8",
+    )
+
+    assert detect_active_language(tmp_path) == "go"
+    init_project(tmp_path)
+    toml_text = (tmp_path / ".pni" / "pni.toml").read_text(encoding="utf-8")
+    assert 'source = ["."]' in toml_text
+    assert 'tests = ["."]' in toml_text
+    assert 'include_gitignored = ["go.sum"]' in toml_text
+    assert '"docs/**"' in toml_text
+
+    facts = run_ast_analyze(tmp_path, targets=["."], test_targets=["."], lang="go")
+    assert facts.assertion_free_tests == []
+    assert facts.complex_functions == []
+    assert facts.weak_type_usages == []
+    assert facts.type_safety_coverage_pct == 100.0
+    assert len(facts.bug_risk_idioms) == 1
+    assert "c.Flags().GetString" in facts.bug_risk_idioms[0].detail
+    assert "c.Flags(...)" not in facts.bug_risk_idioms[0].detail
