@@ -31,9 +31,16 @@ from pni._actions.ast_analyze.models import (
 _NESTED_CALLABLE_BOUNDARY_KINDS: Final[frozenset[str]] = frozenset(
     {
         "function_definition",
+        "function_declaration",
         "method_declaration",
+        "method_definition",
         "constructor_declaration",
         "anonymous_class",
+        "func_literal",
+        "arrow_function",
+        "function_expression",
+        "generator_function",
+        "generator_function_declaration",
     }
 )
 

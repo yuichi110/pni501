@@ -81,14 +81,41 @@ _WEB_FRAMEWORKS: Final[frozenset[str]] = frozenset(
         "codeigniter",
         "wordpress",
         "gin",
+        "echo",
+        "fiber",
+        "chi",
+        "gorilla-mux",
+        "grpc",
         "express",
+        "fastify",
+        "nestjs",
+        "hono",
+        "koa",
+        "nextjs",
+        "nuxt",
+        "react",
+        "vue",
+        "angular",
+        "svelte",
     }
 )
 _WORKER_PACKAGES: Final[frozenset[str]] = frozenset(
-    {"celery", "dramatiq", "rq", "arq", "huey", "temporalio", "faust"}
+    {"celery", "dramatiq", "rq", "arq", "huey", "temporalio", "faust", "bullmq"}
 )
 _CLI_PACKAGES: Final[frozenset[str]] = frozenset(
-    {"typer", "click", "picocli", "jcommander", "commons_cli", "cobra", "symfony_console", "laravel_zero"}
+    {
+        "typer",
+        "click",
+        "picocli",
+        "jcommander",
+        "commons_cli",
+        "cobra",
+        "urfave-cli",
+        "symfony_console",
+        "laravel_zero",
+        "commander",
+        "yargs",
+    }
 )
 _LICENSE_CANDIDATES: Final[tuple[str, ...]] = (
     "LICENSE",
@@ -251,6 +278,27 @@ def _detect_php_archetype_signals(project_root: Path) -> tuple[bool, bool, bool]
     return has_web, has_cli, force_lib
 
 
+def _detect_go_or_node_archetype_signals(project_root: Path) -> tuple[bool, bool, bool]:
+    """Return (has_go_main, has_node_bin, has_sdk) from Go cmd/pkg directories or Node package.json."""
+    has_go_main = (
+        (project_root / "main.go").is_file()
+        or ((project_root / "cmd").is_dir() and any((project_root / "cmd").rglob("main.go")))
+    )
+    has_node_bin = False
+    has_sdk = (project_root / "pkg").is_dir() and any((project_root / "pkg").rglob("*.go"))
+
+    pkg_json = project_root / "package.json"
+    if pkg_json.is_file():
+        with contextlib.suppress(Exception):
+            pdata = json.loads(pkg_json.read_text(encoding="utf-8"))
+            if isinstance(pdata, dict):
+                if pdata.get("bin"):
+                    has_node_bin = True
+                if (pdata.get("main") or pdata.get("exports")) and not pdata.get("private", False):
+                    has_sdk = True
+    return has_go_main, has_node_bin, has_sdk
+
+
 def infer_runtime_types(
     project_root: Path,
     *,
@@ -271,17 +319,24 @@ def infer_runtime_types(
     """
     fw_set = set(frameworks)
     php_web, php_cli, force_php_lib = _detect_php_archetype_signals(project_root)
+    go_main, node_bin, go_node_sdk = _detect_go_or_node_archetype_signals(project_root)
     has_web = (bool((fw_set | dep_names) & _WEB_FRAMEWORKS) or php_web) and not force_php_lib
     has_worker = bool(dep_names & _WORKER_PACKAGES)
     has_cli = (
         bool((fw_set | dep_names) & _CLI_PACKAGES)
         or _has_python_cli_entrypoints(project_root, src_dirs)
+        or node_bin
         or (php_cli and not has_web)
+        or (go_main and not has_web)
     )
-    has_sdk = force_php_lib or _has_python_sdk_surface(
-        project_root,
-        src_dirs,
-        is_service=(has_web or has_worker),
+    has_sdk = (
+        force_php_lib
+        or (go_node_sdk and not has_web)
+        or _has_python_sdk_surface(
+            project_root,
+            src_dirs,
+            is_service=(has_web or has_worker),
+        )
     )
 
     types: list[RuntimeArchetype] = []

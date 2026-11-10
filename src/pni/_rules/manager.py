@@ -12,6 +12,7 @@
 from __future__ import annotations
 
 import contextlib
+import json
 import shutil
 from pathlib import Path
 from typing import Final, Optional
@@ -19,14 +20,20 @@ from typing import Final, Optional
 from pni._rules.base_model import RuleInfo
 
 BUILTIN_RULES_DIR = Path(__file__).resolve().parent
-SUPPORTED_LANGUAGES: Final[tuple[str, ...]] = ("python", "java", "php")
+SUPPORTED_LANGUAGES: Final[tuple[str, ...]] = (
+    "python",
+    "java",
+    "php",
+    "go",
+    "typescript",
+    "javascript",
+)
 
 _MANIFEST_LANGUAGE_RULES: Final[tuple[tuple[str, tuple[str, ...]], ...]] = (
     ("python", ("pyproject.toml", "setup.py", "requirements.txt")),
     ("java", ("pom.xml", "build.gradle", "build.gradle.kts", "settings.gradle", "settings.gradle.kts")),
     ("php", ("composer.json", "wp-config.php", "wp-config-sample.php", "artisan", "phpunit.xml", "phpunit.xml.dist")),
-    ("typescript", ("package.json", "tsconfig.json")),
-    ("go", ("go.mod",)),
+    ("go", ("go.mod", "go.work")),
 )
 
 
@@ -51,6 +58,69 @@ def _has_php_sources(project_root: Path) -> bool:
     return False
 
 
+def _has_go_sources(project_root: Path) -> bool:
+    """Return True if root or standard Go directories contain .go source files."""
+    if any(project_root.glob("*.go")):
+        return True
+    for dir_name in ("cmd", "pkg", "internal", "src"):
+        sub = project_root / dir_name
+        if sub.is_dir() and any(sub.rglob("*.go")):
+            return True
+    return False
+
+
+def _has_ts_sources(project_root: Path) -> bool:
+    """Return True if root or standard directories contain .ts or .tsx source files (excluding .d.ts)."""
+    for pat in ("*.ts", "*.tsx"):
+        for f in project_root.glob(pat):
+            if not f.name.endswith(".d.ts"):
+                return True
+    for dir_name in ("src", "app", "lib", "packages", "pages", "components"):
+        sub = project_root / dir_name
+        if not sub.is_dir():
+            continue
+        for pat in ("*.ts", "*.tsx"):
+            for f in sub.rglob(pat):
+                if not f.name.endswith(".d.ts"):
+                    return True
+    return False
+
+
+def _has_js_sources(project_root: Path) -> bool:
+    """Return True if root or standard directories contain .js, .jsx, .mjs, or .cjs source files."""
+    js_exts = ("*.js", "*.jsx", "*.mjs", "*.cjs")
+    if any(any(project_root.glob(pat)) for pat in js_exts):
+        return True
+    for dir_name in ("src", "app", "lib", "packages", "pages", "components", "bin"):
+        sub = project_root / dir_name
+        if sub.is_dir() and any(any(sub.rglob(pat)) for pat in js_exts):
+            return True
+    return False
+
+
+def _detect_node_language(project_root: Path) -> str | None:
+    """Distinguish 'typescript' vs 'javascript' for Node/Frontend projects."""
+    if (project_root / "tsconfig.json").exists() or (project_root / "tsconfig.base.json").exists():
+        return "typescript"
+    if (project_root / "jsconfig.json").exists():
+        return "javascript"
+
+    pkg_json = project_root / "package.json"
+    if not pkg_json.exists():
+        return None
+
+    with contextlib.suppress(Exception):
+        data = json.loads(pkg_json.read_text(encoding="utf-8"))
+        if isinstance(data, dict):
+            deps = data.get("dependencies") if isinstance(data.get("dependencies"), dict) else {}
+            dev_deps = data.get("devDependencies") if isinstance(data.get("devDependencies"), dict) else {}
+            if "typescript" in deps or "typescript" in dev_deps:
+                return "typescript"
+    if _has_ts_sources(project_root) or not _has_js_sources(project_root):
+        return "typescript"
+    return "javascript"
+
+
 def detect_active_language(project_root: Path) -> str:
     """Detect the primary programming language for the project.
 
@@ -58,16 +128,25 @@ def detect_active_language(project_root: Path) -> str:
         project_root: Target project directory.
 
     Returns:
-        str: Language keyword ('python', 'java', 'php', 'typescript', 'go', etc.).
+        str: Language keyword ('python', 'java', 'php', 'go', 'typescript', 'javascript').
     """
     for lang, manifests in _MANIFEST_LANGUAGE_RULES:
         if any((project_root / mf).exists() for mf in manifests):
             return lang
 
-    if _has_java_sources(project_root):
-        return "java"
-    if _has_php_sources(project_root):
-        return "php"
+    node_lang = _detect_node_language(project_root)
+    if node_lang is not None:
+        return node_lang
+
+    for check_fn, detected_lang in (
+        (_has_java_sources, "java"),
+        (_has_php_sources, "php"),
+        (_has_go_sources, "go"),
+        (_has_ts_sources, "typescript"),
+        (_has_js_sources, "javascript"),
+    ):
+        if check_fn(project_root):
+            return detected_lang
 
     return "python"
 

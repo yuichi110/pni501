@@ -302,6 +302,22 @@ def _resolve_maven_pom_non_core(pom_path: Path) -> set[str]:
     return non_core_keys - prod_keys
 
 
+def _resolve_package_json_non_core(pkg_json_path: Path) -> set[str]:
+    """Extract direct `devDependencies` not declared in `dependencies` from `package.json`."""
+    if not pkg_json_path.is_file():
+        return set()
+    payload: object = None
+    with contextlib.suppress(Exception):
+        payload = json.loads(pkg_json_path.read_text(encoding="utf-8"))
+    if not isinstance(payload, dict):
+        return set()
+    deps = payload.get("dependencies")
+    dev_deps = payload.get("devDependencies")
+    prod_set = {normalize_vuln_pkg_key(str(k)) for k in deps} if isinstance(deps, dict) else set()
+    dev_set = {normalize_vuln_pkg_key(str(k)) for k in dev_deps} if isinstance(dev_deps, dict) else set()
+    return dev_set - prod_set
+
+
 def discover_non_core_packages(target_dir: Path) -> set[str]:
     """Discover normalized package names proven to belong only to dev/optional dependency groups."""
     non_core: set[str] = set()
@@ -319,5 +335,6 @@ def discover_non_core_packages(target_dir: Path) -> set[str]:
 
     non_core.update(_resolve_composer_lock_non_core(target_dir / "composer.lock"))
     non_core.update(_resolve_npm_lock_non_core(target_dir / "package-lock.json"))
+    non_core.update(_resolve_package_json_non_core(target_dir / "package.json"))
     non_core.update(_resolve_maven_pom_non_core(target_dir / "pom.xml"))
     return non_core

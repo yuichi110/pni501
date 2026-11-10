@@ -123,6 +123,48 @@ _PHP_FRAMEWORK_PATTERNS: Final[tuple[tuple[str, str], ...]] = (
     ("phpstan", "phpstan/phpstan"),
     ("psalm", "vimeo/psalm"),
 )
+_GO_FRAMEWORK_PATTERNS: Final[tuple[tuple[str, str], ...]] = (
+    ("gin", "github.com/gin-gonic/gin"),
+    ("echo", "github.com/labstack/echo"),
+    ("fiber", "github.com/gofiber/fiber"),
+    ("chi", "github.com/go-chi/chi"),
+    ("gorilla-mux", "github.com/gorilla/mux"),
+    ("grpc", "google.golang.org/grpc"),
+    ("gorm", "gorm.io/gorm"),
+    ("sqlx", "github.com/jmoiron/sqlx"),
+    ("ent", "entgo.io/ent"),
+    ("cobra", "github.com/spf13/cobra"),
+    ("urfave-cli", "github.com/urfave/cli"),
+    ("zap", "go.uber.org/zap"),
+    ("zerolog", "github.com/rs/zerolog"),
+    ("testify", "github.com/stretchr/testify"),
+)
+_NODE_FRAMEWORK_PATTERNS: Final[tuple[tuple[str, str], ...]] = (
+    ("nextjs", "next"),
+    ("react", "react"),
+    ("vue", "vue"),
+    ("nuxt", "nuxt"),
+    ("angular", "@angular/core"),
+    ("svelte", "svelte"),
+    ("express", "express"),
+    ("fastify", "fastify"),
+    ("nestjs", "@nestjs/core"),
+    ("hono", "hono"),
+    ("koa", "koa"),
+    ("prisma", "@prisma/client"),
+    ("drizzle", "drizzle-orm"),
+    ("typeorm", "typeorm"),
+    ("mongoose", "mongoose"),
+    ("zod", "zod"),
+    ("commander", "commander"),
+    ("yargs", "yargs"),
+    ("vitest", "vitest"),
+    ("jest", "jest"),
+    ("mocha", "mocha"),
+    ("playwright", "@playwright/test"),
+    ("eslint", "eslint"),
+    ("biome", "@biomejs/biome"),
+)
 _WP_PLUGIN_HEADER_RE = re.compile(r"(?mi)^\s*\*?\s*Plugin Name\s*:\s*\S+")
 _WP_THEME_HEADER_RE = re.compile(r"(?mi)^\s*\*?\s*Theme Name\s*:\s*\S+")
 
@@ -208,6 +250,14 @@ def _is_ignored_rel(project_root: Path, file_path: Path) -> bool:
     return any(part in IGNORED_PATH_PARTS or part.startswith(".") for part in rel_parts[:-1])
 
 
+def _matches_filename_pattern(file_path: Path, patterns: tuple[str, ...]) -> bool:
+    """Return True if file_path.name matches any glob pattern in patterns."""
+    if not patterns:
+        return False
+    name = file_path.name
+    return any(file_path.match(pat) or name.endswith(".d.ts") and pat == "*.d.ts" for pat in patterns)
+
+
 def _count_matching_files(
     project_root: Path,
     rel_dirs: list[str],
@@ -215,12 +265,20 @@ def _count_matching_files(
     *,
     exclude_dirs: Optional[list[str]] = None,
     exclude_globs: Optional[list[str]] = None,
+    exclude_patterns: tuple[str, ...] = (),
 ) -> int:
     """Count unique matching files across relative target directories or file paths."""
+    target_roots = {
+        (project_root / r).resolve()
+        for r in rel_dirs
+        if (project_root / r).exists()
+    }
     excluded_roots = {
-        (project_root / ex).resolve()
+        ex_res
         for ex in (exclude_dirs or [])
         if ex != "." and (project_root / ex).exists()
+        and (ex_res := (project_root / ex).resolve()) not in target_roots
+        and not any(t_root.is_relative_to(ex_res) for t_root in target_roots)
     }
     globs = exclude_globs or []
     matched: set[Path] = set()
@@ -231,13 +289,19 @@ def _count_matching_files(
                 for found in candidate.rglob(pat):
                     if _is_ignored_rel(project_root, found):
                         continue
+                    if _matches_filename_pattern(found, exclude_patterns):
+                        continue
                     resolved = found.resolve()
                     if any(resolved.is_relative_to(ex_root) for ex_root in excluded_roots):
                         continue
                     if matches_exclude_globs(found, project_root, globs):
                         continue
                     matched.add(found)
-        elif candidate.is_file() and not matches_exclude_globs(candidate, project_root, globs):
+        elif (
+            candidate.is_file()
+            and not _matches_filename_pattern(candidate, exclude_patterns)
+            and not matches_exclude_globs(candidate, project_root, globs)
+        ):
             matched.add(candidate)
     return len(matched)
 
@@ -674,6 +738,144 @@ def _inspect_php_manifests(project_root: Path) -> _ManifestInspection:
     return res
 
 
+def _parse_go_mod_require_line(raw_line: str, res: _ManifestInspection) -> None:
+    """Parse a single require spec line from go.mod into direct or indirect dependencies."""
+    is_indirect = bool(re.search(r"//\s*indirect\b", raw_line))
+    code_part = raw_line.split("//", 1)[0].strip()
+    if code_part.startswith("require "):
+        code_part = code_part.removeprefix("require ").strip()
+    parts = code_part.split()
+    if len(parts) < 2:
+        return
+    mod_name, mod_ver = parts[0], parts[1]
+    entry = f"{mod_name} {mod_ver}"
+    if is_indirect:
+        res.dev_dependencies.append(entry)
+    else:
+        res.dependencies.append(entry)
+        if mod_ver in {"v0.0.0", "latest", "master", "main"}:
+            res.unpinned_dependencies.append(mod_name)
+
+
+def _apply_go_mod_line(stripped: str, in_require: bool, res: _ManifestInspection) -> bool:
+    """Apply a single non-empty go.mod line to _ManifestInspection and return updated in_require state."""
+    code_part = stripped.split("//", 1)[0].strip()
+    if code_part.startswith("module "):
+        mod_path = code_part.removeprefix("module ").strip().strip('"')
+        if mod_path:
+            res.project_name = mod_path.rsplit("/", 1)[-1] or mod_path
+    elif code_part.startswith("go "):
+        go_ver = code_part.removeprefix("go ").strip()
+        if go_ver:
+            res.language_version_constraint = go_ver
+    elif code_part.startswith("require ("):
+        return True
+    elif in_require and code_part == ")":
+        return False
+    elif in_require or code_part.startswith("require "):
+        _parse_go_mod_require_line(stripped, res)
+    return in_require
+
+
+def _inspect_go_manifests(project_root: Path) -> _ManifestInspection:
+    """Inspect Go go.mod and go.work manifests."""
+    go_candidates = ("go.mod", "go.work")
+    manifests = [m for m in go_candidates if (project_root / m).is_file()]
+    go_mod = project_root / "go.mod"
+    if not go_mod.is_file():
+        return _ManifestInspection(
+            project_name=project_root.name,
+            build_system="raw_go",
+            manifest_files=manifests,
+        )
+
+    res = _ManifestInspection(
+        project_name=project_root.name,
+        build_system="go_mod",
+        manifest_files=manifests,
+    )
+    in_require_block = False
+    with contextlib.suppress(Exception):
+        for raw_line in go_mod.read_text(encoding="utf-8").splitlines():
+            stripped = raw_line.strip()
+            if stripped and not stripped.startswith("//"):
+                in_require_block = _apply_go_mod_line(stripped, in_require_block, res)
+    return res
+
+
+def _populate_package_json_deps(
+    section: object,
+    target_list: list[str],
+    unpinned_list: Optional[list[str]] = None,
+) -> None:
+    """Collect npm dependencies from a package.json section."""
+    if not isinstance(section, dict):
+        return
+    for raw_pkg, raw_ver in section.items():
+        if not isinstance(raw_pkg, str) or not isinstance(raw_ver, str):
+            continue
+        pkg = raw_pkg.strip()
+        ver = raw_ver.strip()
+        target_list.append(f"{pkg}@{ver}")
+        if unpinned_list is not None and (
+            ver in {"*", "latest", "next", "canary", ""}
+            or ver.startswith(("git+", "github:", "http:", "https:"))
+        ):
+            unpinned_list.append(pkg)
+
+
+def _apply_package_json_metadata(data: dict[str, object], build_sys: str, res: _ManifestInspection) -> None:
+    """Populate _ManifestInspection fields from parsed package.json dictionary."""
+    name = data.get("name")
+    if isinstance(name, str) and name.strip():
+        res.project_name = name.strip()
+    version = data.get("version")
+    if isinstance(version, str) and version.strip():
+        res.version = version.strip()
+    pkg_mgr = data.get("packageManager")
+    if isinstance(pkg_mgr, str) and build_sys == "npm":
+        if pkg_mgr.startswith("pnpm"):
+            res.build_system = "pnpm"
+        elif pkg_mgr.startswith("yarn"):
+            res.build_system = "yarn"
+    engines = data.get("engines")
+    if isinstance(engines, dict):
+        node_ver = engines.get("node")
+        if isinstance(node_ver, str) and node_ver.strip():
+            res.language_version_constraint = node_ver.strip()
+    _populate_package_json_deps(data.get("dependencies"), res.dependencies, res.unpinned_dependencies)
+    _populate_package_json_deps(data.get("devDependencies"), res.dev_dependencies)
+
+
+def _inspect_node_manifests(project_root: Path) -> _ManifestInspection:
+    """Inspect Node.js / TypeScript / JavaScript package.json and tsconfig/jsconfig manifests."""
+    node_candidates = ("package.json", "tsconfig.json", "jsconfig.json")
+    manifests = [m for m in node_candidates if (project_root / m).is_file()]
+    pkg_path = project_root / "package.json"
+    if (project_root / "pnpm-lock.yaml").is_file():
+        build_sys = "pnpm"
+    elif (project_root / "yarn.lock").is_file():
+        build_sys = "yarn"
+    elif pkg_path.is_file():
+        build_sys = "npm"
+    else:
+        build_sys = "raw_node"
+
+    res = _ManifestInspection(
+        project_name=project_root.name,
+        build_system=build_sys,
+        manifest_files=manifests,
+    )
+    if not pkg_path.is_file():
+        return res
+
+    with contextlib.suppress(Exception):
+        data = json.loads(pkg_path.read_text(encoding="utf-8"))
+        if isinstance(data, dict):
+            _apply_package_json_metadata(data, build_sys, res)
+    return res
+
+
 def _detect_php_frameworks(project_root: Path, deps: list[str], dev_deps: list[str]) -> list[str]:
     """Detect active PHP frameworks and QA tools from Composer packages and WordPress/Laravel files."""
     detected: list[str] = []
@@ -699,6 +901,30 @@ def _detect_php_frameworks(project_root: Path, deps: list[str], dev_deps: list[s
     return detected
 
 
+def _detect_node_frameworks(deps: list[str], dev_deps: list[str]) -> list[str]:
+    """Detect active Node.js / TypeScript / JavaScript frameworks from package.json dependencies."""
+    detected: list[str] = []
+    pkg_names = {
+        (d.rsplit("@", 1)[0] if "@" in d[1:] else d.split()[0]).strip().lower()
+        for d in [*deps, *dev_deps]
+        if d.strip()
+    }
+    for fw_id, pkg_key in _NODE_FRAMEWORK_PATTERNS:
+        if pkg_key in pkg_names and fw_id not in detected:
+            detected.append(fw_id)
+    return detected
+
+
+def _match_needle_frameworks(combined: list[str], patterns: tuple[tuple[str, str], ...]) -> list[str]:
+    """Match framework patterns against lowercased combined dependency strings."""
+    joined = "\n".join(combined).lower()
+    detected: list[str] = []
+    for fw_id, needle in patterns:
+        if needle in joined and fw_id not in detected:
+            detected.append(fw_id)
+    return detected
+
+
 def _detect_frameworks(
     lang: str,
     deps: list[str],
@@ -706,17 +932,17 @@ def _detect_frameworks(
     project_root: Optional[Path] = None,
 ) -> list[str]:
     """Detect active frameworks and libraries from declared dependencies."""
-    detected: list[str] = []
     combined = [*deps, *dev_deps]
     if lang == "java":
-        joined = "\n".join(combined).lower()
-        for fw_id, needle in _JAVA_FRAMEWORK_PATTERNS:
-            if needle in joined and fw_id not in detected:
-                detected.append(fw_id)
-        return detected
+        return _match_needle_frameworks(combined, _JAVA_FRAMEWORK_PATTERNS)
     if lang == "php":
         return _detect_php_frameworks(project_root or Path("."), deps, dev_deps)
+    if lang == "go":
+        return _match_needle_frameworks(combined, _GO_FRAMEWORK_PATTERNS)
+    if lang in {"typescript", "javascript"}:
+        return _detect_node_frameworks(deps, dev_deps)
 
+    detected: list[str] = []
     norm_names = {normalize_python_dep_name(d) for d in combined}
     for fw_id, pkg_key in _PYTHON_FRAMEWORK_KEYS:
         if pkg_key in norm_names and fw_id not in detected:
@@ -737,8 +963,29 @@ def _is_ignored_or_fixture_rel(project_root: Path, file_path: Path) -> bool:
     return any(part.lower() in _FIXTURE_PATH_PARTS for part in rel_parts[:-1])
 
 
+def _is_tsconfig_strict(project_root: Path) -> Optional[bool]:
+    """Return True if tsconfig.json enables strict mode or extends a strict preset."""
+    tsconfig_path = project_root / "tsconfig.json"
+    if not tsconfig_path.is_file():
+        return None
+    with contextlib.suppress(Exception):
+        raw = tsconfig_path.read_text(encoding="utf-8")
+        cleaned = re.sub(r"//.*?$|/\*.*?\*/", "", raw, flags=re.MULTILINE | re.DOTALL)
+        cleaned = re.sub(r",\s*([}\]])", r"\1", cleaned)
+        parsed = json.loads(cleaned)
+        if isinstance(parsed, dict):
+            opts = parsed.get("compilerOptions")
+            if isinstance(opts, dict) and isinstance(opts.get("strict"), bool):
+                return bool(opts["strict"])
+            if isinstance(parsed.get("extends"), str):
+                return True
+    return False
+
+
 def _check_type_marker(project_root: Path, lang: str, src_dirs: list[str]) -> Optional[bool]:
-    """Check language package type-completeness marker (e.g. PEP 561 py.typed for Python)."""
+    """Check language package type-completeness marker (e.g. PEP 561 py.typed or tsconfig strict)."""
+    if lang == "typescript":
+        return _is_tsconfig_strict(project_root)
     if lang != "python":
         return None
     for rel in src_dirs:
@@ -885,6 +1132,68 @@ def _detect_php_tooling_issues(
     return issues
 
 
+def _detect_go_tooling_issues(
+    project_root: Path,
+    info: _ManifestInspection,
+    lockfiles: list[str],
+) -> list[str]:
+    """Identify objective Go module, go.sum lockfile, and toolchain version issues."""
+    issues: list[str] = []
+    go_mod = project_root / "go.mod"
+    if not go_mod.is_file():
+        issues.append("Missing go.mod — project is not using Go Modules")
+        return issues
+
+    if (info.dependencies or info.dev_dependencies) and "go.sum" not in lockfiles:
+        issues.append("Missing go.sum checksum file for reproducible Go module verification")
+    if not info.language_version_constraint:
+        issues.append("Missing 'go <version>' directive in go.mod")
+    else:
+        ver_match = re.match(r"^1\.(\d+)", info.language_version_constraint.strip())
+        if ver_match and int(ver_match.group(1)) < 21:
+            issues.append(
+                f"Aging Go toolchain directive 'go {info.language_version_constraint}' — "
+                "consider upgrading to Go 1.22+"
+            )
+    return issues
+
+
+def _detect_node_tooling_issues(
+    project_root: Path,
+    active_lang: str,
+    info: _ManifestInspection,
+    lockfiles: list[str],
+    frameworks: list[str],
+) -> list[str]:
+    """Identify objective Node.js / TypeScript / JavaScript manifest, lockfile, and strictness issues."""
+    issues: list[str] = []
+    pkg_json = project_root / "package.json"
+    if not pkg_json.is_file():
+        issues.append("Missing package.json — dependencies and scripts are unmanaged")
+        return issues
+
+    node_locks = {"package-lock.json", "pnpm-lock.yaml", "yarn.lock"}
+    if (info.dependencies or info.dev_dependencies) and not (set(lockfiles) & node_locks):
+        issues.append(
+            "Missing Node lockfile (package-lock.json / pnpm-lock.yaml / yarn.lock) for reproducible installs"
+        )
+    if active_lang == "typescript":
+        strict_state = _is_tsconfig_strict(project_root)
+        if strict_state is None:
+            issues.append("Missing tsconfig.json for TypeScript compiler configuration")
+        elif strict_state is False:
+            issues.append("TypeScript 'compilerOptions.strict' is not enabled in tsconfig.json")
+
+    if "eslint" not in frameworks and "biome" not in frameworks:
+        has_linter_cfg = any(
+            (project_root / cfg).exists()
+            for cfg in ("eslint.config.js", "eslint.config.mjs", ".eslintrc.json", ".eslintrc.js", "biome.json")
+        )
+        if not has_linter_cfg:
+            issues.append("No static linter (ESLint / Biome) configured in package.json or repository root")
+    return issues
+
+
 def _resolve_default_dirs(project_root: Path, lang: str) -> tuple[list[str], list[str]]:
     """Return default (source_dirs, test_dirs) appropriate for the target language."""
     if lang == "java":
@@ -902,6 +1211,17 @@ def _resolve_default_dirs(project_root: Path, lang: str) -> tuple[list[str], lis
         modern_dirs = [d for d in ("app", "src", "routes", "includes", "public") if (project_root / d).is_dir()]
         combined_src = list(dict.fromkeys([*psr4_src, *modern_dirs]))
         return (combined_src or ["src"]), tst
+    if lang == "go":
+        go_dirs = [d for d in ("cmd", "internal", "pkg") if (project_root / d).is_dir()]
+        has_root_go = any(project_root.glob("*.go"))
+        src = ["."] if has_root_go or not go_dirs else go_dirs
+        return src, list(src)
+    if lang in {"typescript", "javascript"}:
+        node_src = [d for d in ("src", "app", "lib", "pages", "components") if (project_root / d).is_dir()]
+        src = node_src or ["."]
+        node_tst = [d for d in ("tests", "test", "__tests__") if (project_root / d).is_dir()]
+        tst = list(dict.fromkeys([*node_tst, *src]))
+        return src, tst
     return ["src"], ["tests"]
 
 
@@ -921,6 +1241,10 @@ def _dispatch_manifest_inspect(project_root: Path, active_lang: str) -> _Manifes
         res = _inspect_java_manifests(project_root)
     elif active_lang == "php":
         res = _inspect_php_manifests(project_root)
+    elif active_lang == "go":
+        res = _inspect_go_manifests(project_root)
+    elif active_lang in {"typescript", "javascript"}:
+        res = _inspect_node_manifests(project_root)
     else:
         res = _inspect_python_manifests(project_root)
     if res.version == "0.0.0":
@@ -936,6 +1260,27 @@ def _source_and_test_patterns(active_lang: str) -> tuple[tuple[str, ...], tuple[
         return ("*.java",), ("*Test.java", "*Tests.java", "Test*.java", "*IT.java")
     if active_lang == "php":
         return ("*.php", "*.phtml"), ("*Test.php", "Test*.php", "*_test.php")
+    if active_lang == "go":
+        return ("*.go",), ("*_test.go",)
+    if active_lang == "typescript":
+        return (
+            ("*.ts", "*.tsx"),
+            ("*.test.ts", "*.spec.ts", "*.test.tsx", "*.spec.tsx", "*_test.ts", "test_*.ts"),
+        )
+    if active_lang == "javascript":
+        return (
+            ("*.js", "*.jsx", "*.mjs", "*.cjs"),
+            (
+                "*.test.js",
+                "*.spec.js",
+                "*.test.jsx",
+                "*.spec.jsx",
+                "*.test.mjs",
+                "*.spec.mjs",
+                "*_test.js",
+                "test_*.js",
+            ),
+        )
     return ("*.py",), ("test_*.py", "*_test.py")
 
 
@@ -952,6 +1297,10 @@ def _dispatch_tooling_issues(
         return _detect_java_tooling_issues(manifest_info, frameworks)
     if active_lang == "php":
         return _detect_php_tooling_issues(project_root, manifest_info, lockfiles, frameworks)
+    if active_lang == "go":
+        return _detect_go_tooling_issues(project_root, manifest_info, lockfiles)
+    if active_lang in {"typescript", "javascript"}:
+        return _detect_node_tooling_issues(project_root, active_lang, manifest_info, lockfiles, frameworks)
     return _detect_python_tooling_issues(manifest_info, lockfiles, runtime_types)
 
 
@@ -969,7 +1318,8 @@ def _filter_project_opt_outs(
     filtered_tooling: list[str] = []
     for issue in tooling_issues:
         check_ids: list[str] = [f"{active_lang}/tooling", "common/dependencies"]
-        if "Missing lockfile" in issue or "Missing composer.lock" in issue:
+        lock_tokens = ("Missing lockfile", "Missing composer.lock", "Missing go.sum", "Missing Node lockfile")
+        if any(tok in issue for tok in lock_tokens):
             check_ids.extend(["python/lockfile_committed", "common/lockfile_committed"])
         matched = match_opt_out(opt_outs, check_ids, "pyproject.toml")
         if matched is not None:
@@ -1009,7 +1359,7 @@ def run_project_inspect(
         source_dirs: Relative source code directories or files (language-aware defaults if omitted).
         test_dirs: Relative test directories (language-aware defaults if omitted).
         doc_files: Documentation files to check (defaults to ['README.md', 'README.rst']).
-        lang: Optional explicit language override ('python', 'java', 'php', etc.).
+        lang: Optional explicit language override ('python', 'java', 'php', 'go', 'typescript', 'javascript').
         exclude_globs: Optional glob patterns excluded from source and test file counts.
 
     Returns:
@@ -1103,6 +1453,7 @@ def run_project_inspect(
             src_patterns,
             exclude_dirs=eff_tst,
             exclude_globs=eff_excludes,
+            exclude_patterns=(*test_patterns, "*.d.ts"),
         ),
         test_files_count=_count_matching_files(
             project_root,

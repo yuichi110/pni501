@@ -94,6 +94,36 @@ _PYTHON_TOUCHPOINT_RULES: Final[tuple[_PatternRule, ...]] = (
     ),
 )
 
+_GO_TOUCHPOINT_RULES: Final[tuple[_PatternRule, ...]] = (
+    (
+        "persistence_db",
+        re.compile(r"\b(sql\.Open|gorm\.Open|pgx\.Connect|sqlx\.Connect)\b"),
+        "Direct database/ORM connection call ({symbol})",
+        "Isolate behind Go interface Repository Port and infrastructure DB Adapter",
+    ),
+    (
+        "external_http_rpc",
+        re.compile(r"\b(http\.(?:Get|Post|PostForm|DefaultClient\.Do)|grpc\.Dial|grpc\.NewClient)\b"),
+        "Direct outbound HTTP/gRPC call ({symbol})",
+        "Abstract behind Outbound Client Port with context.Context deadline and explicit http.Client timeout",
+    ),
+)
+
+_NODE_TOUCHPOINT_RULES: Final[tuple[_PatternRule, ...]] = (
+    (
+        "persistence_db",
+        re.compile(r"\b(new\s+PrismaClient|mongoose\.connect|createConnection|new\s+Pool|knex)\b"),
+        "Direct database/ORM client call ({symbol})",
+        "Isolate behind Repository interface Port and Persistence Adapter",
+    ),
+    (
+        "external_http_rpc",
+        re.compile(r"\b(axios\.(?:get|post|put|delete|request)|fetch|got)\s*\("),
+        "Direct outbound HTTP call ({symbol})",
+        "Isolate behind Outbound Gateway Port with AbortSignal.timeout and typed response validation",
+    ),
+)
+
 _JAVA_BEAN_CLASS_RE: Final[re.Pattern[str]] = re.compile(r"@(?:RestController|Controller|Service|Component)\b")
 _JAVA_MUTABLE_FIELD_RE: Final[re.Pattern[str]] = re.compile(
     r"^\s*(?:private|protected|public)\s+(?!static\b)(?!final\b)"
@@ -108,6 +138,10 @@ def _rules_for_language(language: str) -> tuple[_PatternRule, ...]:
         return _JAVA_TOUCHPOINT_RULES
     if lang == "php":
         return _PHP_TOUCHPOINT_RULES
+    if lang == "go":
+        return _GO_TOUCHPOINT_RULES
+    if lang in ("typescript", "javascript"):
+        return _NODE_TOUCHPOINT_RULES
     return _PYTHON_TOUCHPOINT_RULES
 
 

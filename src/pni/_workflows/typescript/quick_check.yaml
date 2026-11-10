@@ -1,0 +1,22 @@
+id: quick_check
+category: audit
+name: Quick Health Check (TypeScript)
+description: Fast deterministic TypeScript AST and package.json/tsconfig check followed by AI interpretation and score output.
+
+targets:
+  source:
+    - "src"
+  tests:
+    - "tests"
+  docs:
+    - "README.md"
+
+steps:
+  - id: repo_and_deps
+    uses: repo_structure_audit
+
+  - id: ast_and_quality
+    uses: typescript_ast_audit
+
+  - id: output_score
+    uses: emit_score

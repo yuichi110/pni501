@@ -43,6 +43,9 @@ _FALLBACK_TOOL_BY_LANG: Final[dict[str, str]] = {
     "python": "pip",
     "java": "maven",
     "php": "composer",
+    "go": "go",
+    "typescript": "node",
+    "javascript": "node",
 }
 
 

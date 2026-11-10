@@ -206,6 +206,47 @@ def _check_python_unit(unit: ParsedUnit, min_ver: tuple[int, int], raw_constrain
     return mismatches
 
 
+_GO_121_PACKAGES: Final[frozenset[str]] = frozenset({"log/slog", "slices", "maps", "cmp"})
+_GO_123_PACKAGES: Final[frozenset[str]] = frozenset({"iter", "unique", "structs"})
+
+
+def _check_go_unit(unit: ParsedUnit, min_ver: tuple[int, int], raw_constraint: str) -> list[CodeLocation]:
+    """Inspect a Go CST unit for generics or stdlib packages newer than the declared `go` directive."""
+    mismatches: list[CodeLocation] = []
+    if min_ver < (1, 18):
+        for node in unit.root.find_all(kind="type_parameter_list"):
+            mismatches.append(
+                CodeLocation(
+                    file=unit.rel_path,
+                    line=node.range().start.line + 1,
+                    symbol="type_parameter_list",
+                    detail=f"Go 1.18+ generics syntax used while go.mod declares 'go {raw_constraint}'",
+                )
+            )
+    for spec in unit.root.find_all(kind="import_spec"):
+        path_node = spec.field("path")
+        pkg = (path_node.text() if path_node else spec.text()).strip().strip('"`')
+        if min_ver < (1, 21) and pkg in _GO_121_PACKAGES:
+            mismatches.append(
+                CodeLocation(
+                    file=unit.rel_path,
+                    line=spec.range().start.line + 1,
+                    symbol=pkg,
+                    detail=f"Go 1.21+ stdlib package '{pkg}' imported while go.mod declares 'go {raw_constraint}'",
+                )
+            )
+        elif min_ver < (1, 23) and pkg in _GO_123_PACKAGES:
+            mismatches.append(
+                CodeLocation(
+                    file=unit.rel_path,
+                    line=spec.range().start.line + 1,
+                    symbol=pkg,
+                    detail=f"Go 1.23+ stdlib package '{pkg}' imported while go.mod declares 'go {raw_constraint}'",
+                )
+            )
+    return mismatches
+
+
 def check_language_version_compatibility(
     language: str,
     declared_version: Optional[str],
@@ -224,6 +265,13 @@ def check_language_version_compatibility(
     min_ver = parse_min_language_version(raw)
     if min_ver is None:
         return []
-    checker = _check_php_unit if lang_low == "php" else (_check_python_unit if lang_low == "python" else None)
+    if lang_low == "php":
+        checker = _check_php_unit
+    elif lang_low == "python":
+        checker = _check_python_unit
+    elif lang_low == "go":
+        checker = _check_go_unit
+    else:
+        checker = None
     return [loc for u in units for loc in checker(u, min_ver, raw)] if checker is not None else []
 

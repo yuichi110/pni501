@@ -1,0 +1,10 @@
+id: go_test_audit
+name: Go Testing Standards Audit
+description: Evaluate Go *_test.go test suites, table-driven test patterns, isolation, and boundary coverage against go/testing standards.
+rules:
+  - go/testing
+primitives:
+  - type: ai_interpret
+    name: Evaluate Go Test Suite Completeness & Structure
+    prompt: |
+      Compare `source_files_count` vs `test_files_count` from ProjectFacts and inspect `*_test.go` files and AstFacts (`total_test_functions`, `assertion_free_tests`) to verify table-driven test structure, deterministic isolation, and boundary coverage according to `go/testing`.

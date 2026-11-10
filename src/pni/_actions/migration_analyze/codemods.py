@@ -114,21 +114,25 @@ def check_migration_preflight_hints(
     return hints
 
 
+_CROSS_STACK_TOKENS: dict[str, tuple[str, ...]] = {
+    "php": ("fastapi", "python", "spring boot", "golang", "typescript", "nestjs"),
+    "java": ("kotlin", "golang", "go へ", "python", "fastapi", "rust"),
+    "python": ("golang", "rust", "java 21", "spring boot", "typescript"),
+    "go": ("rust", "java 21", "spring boot", "python", "fastapi", "typescript"),
+    "typescript": ("golang", "rust", "java 21", "spring boot", "python", "fastapi"),
+    "javascript": ("golang", "rust", "java 21", "spring boot", "python", "fastapi"),
+}
+
+
 def _detect_cross_stack(source_lang: str, brief_low: str, frameworks: list[str]) -> bool:
     """Return True when the brief requests migrating across languages or from raw PHP to a full framework."""
     lang = source_lang.lower()
+    tokens = _CROSS_STACK_TOKENS.get(lang, ())
+    if any(tok in brief_low for tok in tokens):
+        return True
     if lang == "php":
-        if any(tok in brief_low for tok in ("fastapi", "python", "spring boot", "golang", "typescript", "nestjs")):
-            return True
         is_legacy_php = not any(fw in frameworks for fw in ("laravel", "symfony"))
-        if is_legacy_php and any(tok in brief_low for tok in ("laravel", "symfony")):
-            return True
-    elif lang == "java":
-        if any(tok in brief_low for tok in ("kotlin", "golang", "go へ", "python", "fastapi", "rust")):
-            return True
-    elif lang == "python":
-        if any(tok in brief_low for tok in ("golang", "rust", "java 21", "spring boot", "typescript")):
-            return True
+        return is_legacy_php and any(tok in brief_low for tok in ("laravel", "symfony"))
     return False
 
 
@@ -250,6 +254,43 @@ def _python_codemods(total_files: int, brief_low: str) -> list[CodemodRecipeMatc
     return recipes
 
 
+def _go_codemods(total_files: int) -> list[CodemodRecipeMatch]:
+    """Match Go toolchain and golangci-lint codemod recipes applicable to a Go project."""
+    return [
+        CodemodRecipeMatch(
+            tool="gofix",
+            recipe_id="go fix ./... && golangci-lint run --fix",
+            title="Modernize Go Toolchain APIs, Generics (`any`), & Lint Rules",
+            applicable_files_count=max(total_files, 1),
+            rationale="Rewrites legacy `interface{}` / `io/ioutil` APIs and enforces modern Go idioms.",
+        ),
+    ]
+
+
+def _node_codemods(total_files: int, lang: str) -> list[CodemodRecipeMatch]:
+    """Match ESLint / TypeScript codemod recipes applicable to a Node.js project."""
+    recipes = [
+        CodemodRecipeMatch(
+            tool="eslint",
+            recipe_id="eslint --fix .",
+            title="Standardize Modern ES Module Syntax & Async/Await Patterns",
+            applicable_files_count=max(total_files, 1),
+            rationale="Applies deterministic ESLint / Biome auto-fixes across source and test modules.",
+        ),
+    ]
+    if lang == "javascript":
+        recipes.append(
+            CodemodRecipeMatch(
+                tool="ts-migrate",
+                recipe_id="npx ts-migrate-full .",
+                title="Incremental JavaScript-to-TypeScript Strictness Migration",
+                applicable_files_count=max(total_files, 1),
+                rationale="Bootstraps tsconfig.json and explicit TypeScript annotations when upgrading JS modules.",
+            )
+        )
+    return recipes
+
+
 def match_codemod_recipes(
     source_lang: str,
     options: MigrationOptions,
@@ -269,6 +310,8 @@ def match_codemod_recipes(
         return _php_codemods(total_files, brief_low)
     if options.codemod_tool == "ruff" or (options.codemod_tool == "auto" and lang == "python"):
         return _python_codemods(total_files, brief_low)
+    if options.codemod_tool == "auto" and lang in ("go", "typescript", "javascript"):
+        return _go_codemods(total_files) if lang == "go" else _node_codemods(total_files, lang)
     return []
 
 

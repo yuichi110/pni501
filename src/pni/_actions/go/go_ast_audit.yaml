@@ -1,0 +1,20 @@
+id: go_ast_audit
+name: Go AST, Imports, Types, GoDoc, Error Handling & Security Audit
+description: Parse Go AST via ast-grep-py to extract import hygiene, interface{}/any & unsafe usage, GoDoc coverage, cognitive complexity, ignored errors, CWE sinks, and HTTP/gRPC route metrics.
+rules:
+  - common/architecture
+  - common/maintainability
+  - common/security
+  - common/security_vulnerability
+  - go/code_quality
+  - go/typing
+primitives:
+  - type: ast_analyze
+    name: Extract Deterministic Go AST & Package Metrics
+    with:
+      lang: "go"
+  - type: ai_interpret
+    name: Interpret Go AST Facts & Evaluate Quality/Typing/Error-Handling/Security
+    prompt: |
+      Inspect the deterministic AstFacts (`import_hygiene_coverage_pct`, `unsorted_imports`, `wildcard_imports`, `type_safety_coverage_pct`, `type_safety_issues`, `weak_type_usages`, `unscoped_type_ignores`, `docstring_coverage_pct`, `missing_docstrings`, `empty_docstrings`, `complex_functions`, `excessive_parameters`, `bug_risk_idioms`, `global_state_usages`, `circular_dependencies`, `unused_dependencies`, `undeclared_dependencies`, `missing_io_timeouts`, `scattered_env_access`, `unstructured_logging`, `hardcoded_secrets`, `dangerous_sinks`, `api_endpoints`).
+      Read the flagged `.go` files to evaluate package layering (`common/architecture`), SIG maintainability (`common/maintainability`), code security, CWE sinks & API boundaries (`common/security`, `common/security_vulnerability`), GoDoc & error handling (`go/code_quality`), and interface/generics type safety (`go/typing`).

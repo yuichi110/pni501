@@ -23,6 +23,8 @@ from pni._actions.project_inspect import ProjectFacts
 _PY_VER_RE = re.compile(r"3\.(\d+)")
 _PHP_VER_RE = re.compile(r"8\.(\d+)")
 _JAVA_VER_RE = re.compile(r"(?:1\.8|\b(?:8|11|17|21)\b)")
+_GO_VER_RE = re.compile(r"1\.(\d+)")
+_NODE_VER_RE = re.compile(r"\b(18|20|22|23)\b")
 _MAVEN_SKIP_FLAGS: Final[str] = (
     "-Dgit.commit.id.skip=true "
     "-Dlicense.skip=true "
@@ -94,20 +96,51 @@ def select_php_image_version(constraint: Optional[str]) -> str:
     return max(candidates, key=lambda ver: tuple(int(part) for part in ver.split(".")))
 
 
+def select_go_image_version(constraint: Optional[str]) -> str:
+    """Select an official Golang Bookworm container tag ('1.21', '1.22', '1.23', '1.24') from go.mod version."""
+    if not constraint or not constraint.strip():
+        return "1.22"
+    text = constraint.strip()
+    if "<1.22" in text or "==1.21" in text:
+        return "1.21"
+    matches = [int(m) for m in _GO_VER_RE.findall(text)]
+    if not matches:
+        return "1.22"
+    highest = max(matches)
+    if highest >= 24:
+        return "1.24"
+    if highest == 23:
+        return "1.23"
+    return "1.22"
+
+
+def select_node_image_version(constraint: Optional[str]) -> str:
+    """Select an official Node.js Bookworm container tag ('18', '20', '22') from engines.node constraint."""
+    if not constraint or not constraint.strip():
+        return "20"
+    text = constraint.strip()
+    if "<20" in text or "==18" in text or "~18" in text or "^18" in text or text.startswith("18"):
+        return "18"
+    matches = [int(m) for m in _NODE_VER_RE.findall(text)]
+    if matches and max(matches) >= 22:
+        return "22"
+    return "20"
+
+
 def select_harness_tool(pf: ProjectFacts) -> str:
-    """Determine the built-in harness Dockerfile tool name ('uv', 'poetry', 'pip', 'maven', 'composer', etc.)."""
+    """Determine built-in harness Dockerfile tool ('uv', 'poetry', 'pip', 'maven', 'composer', 'go', 'node')."""
     if pf.language == "java":
         is_gradle = pf.build_system == "gradle" or any("gradle" in m for m in pf.manifest_files)
         return "gradle" if is_gradle else "maven"
     if pf.language == "php":
         is_composer = pf.build_system == "composer" or "composer.json" in pf.manifest_files
         return "composer" if is_composer else "raw"
+    if pf.language in {"go", "typescript", "javascript"}:
+        return "go" if pf.language == "go" else "node"
 
     if pf.build_system == "uv" or "uv.lock" in pf.lockfiles_found:
         return "uv"
-    if pf.build_system == "poetry" or "poetry.lock" in pf.lockfiles_found:
-        return "poetry"
-    return "pip"
+    return "poetry" if (pf.build_system == "poetry" or "poetry.lock" in pf.lockfiles_found) else "pip"
 
 
 def _extract_dockerfile_arg_default(dockerfile_path: Optional[Path], arg_name: str) -> Optional[str]:
@@ -131,9 +164,8 @@ def compute_harness_build_args(
     """Build --build-arg key-value dictionary for the selected language harness."""
     if pf.language == "java":
         df_java = _extract_dockerfile_arg_default(harness_dockerfile, "JAVA_VERSION")
-        if df_java and df_java != "21":
-            return {"JAVA_VERSION": select_java_image_version(df_java)}
-        return {"JAVA_VERSION": select_java_image_version(pf.language_version_constraint)}
+        raw_java = df_java if (df_java and df_java != "21") else pf.language_version_constraint
+        return {"JAVA_VERSION": select_java_image_version(raw_java)}
     if pf.language == "php":
         php_args: dict[str, str] = {
             "PHP_VERSION": select_php_image_version(pf.language_version_constraint),
@@ -141,6 +173,14 @@ def compute_harness_build_args(
         if extra_apt_packages.strip():
             php_args["EXTRA_APT_PACKAGES"] = extra_apt_packages.strip()
         return php_args
+    if pf.language == "go":
+        df_go = _extract_dockerfile_arg_default(harness_dockerfile, "GO_VERSION")
+        raw_go = df_go if (df_go and df_go != "1.22") else pf.language_version_constraint
+        return {"GO_VERSION": select_go_image_version(raw_go)}
+    if pf.language in {"typescript", "javascript"}:
+        df_node = _extract_dockerfile_arg_default(harness_dockerfile, "NODE_VERSION")
+        raw_node = df_node if (df_node and df_node != "20") else pf.language_version_constraint
+        return {"NODE_VERSION": select_node_image_version(raw_node)}
 
     args: dict[str, str] = {
         "PYTHON_VERSION": select_python_image_version(pf.language_version_constraint),
@@ -232,6 +272,51 @@ def _build_java_test_command(tool: str) -> list[str]:
     return ["sh", "-c", script]
 
 
+def _build_go_test_and_vet_script() -> str:
+    """Build offline Go vet + Go test + coverprofile script."""
+    return (
+        "go vet ./... >/out/go_vet.txt 2>&1; "
+        "vet_rc=$?; "
+        'if [ "$vet_rc" -ne 0 ]; then cat /out/go_vet.txt >&2; exit "$vet_rc"; fi; '
+        "go test -v -coverprofile=/out/coverage.out ./... >/out/go_test.txt 2>&1; "
+        "rc=$?; "
+        "cat /out/go_test.txt; "
+        "exit $rc"
+    )
+
+
+def _build_node_test_and_lint_script(language: str) -> str:
+    """Build offline Node.js (TypeScript / JavaScript) test + coverage + syntax/type-check script."""
+    pkg_check = (
+        '"const p=require(\'./package.json\'); '
+        'process.exit(p.scripts&&p.scripts.test&&!p.scripts.test.includes(\'no test specified\')?0:1)"'
+    )
+    return (
+        'if [ -x ./node_modules/.bin/vitest ]; then '
+        '  cov_flags=""; '
+        '  if [ -d node_modules/@vitest/coverage-v8 ] || [ -d node_modules/@vitest/coverage-istanbul ]; then '
+        '    cov_flags="--coverage.enabled=true --coverage.reporter=json-summary --coverage.reportsDirectory=/out"; '
+        '  fi; '
+        '  ./node_modules/.bin/vitest run --reporter=default --reporter=junit '
+        '--outputFile.junit=/out/junit.xml $cov_flags >/out/node_test.txt 2>&1; '
+        '  rc=$?; cat /out/node_test.txt; exit $rc; '
+        'elif [ -x ./node_modules/.bin/jest ]; then '
+        '  ./node_modules/.bin/jest --ci --coverage --coverageReporters=json-summary '
+        '--coverageReporters=clover --coverageDirectory=/out >/out/node_test.txt 2>&1; '
+        '  rc=$?; cat /out/node_test.txt; exit $rc; '
+        f'elif [ -f package.json ] && node -e {pkg_check} >/dev/null 2>&1; then '
+        '  npm test >/out/node_test.txt 2>&1; '
+        '  rc=$?; cat /out/node_test.txt; exit $rc; '
+        f'elif [ "{language}" = "typescript" ] && [ -x ./node_modules/.bin/tsc ] && [ -f tsconfig.json ]; then '
+        '  ./node_modules/.bin/tsc --noEmit >/out/node_test.txt 2>&1; '
+        '  rc=$?; cat /out/node_test.txt; exit $rc; '
+        'else '
+        '  node --test >/out/node_test.txt 2>&1; '
+        '  rc=$?; cat /out/node_test.txt; exit $rc; '
+        'fi'
+    )
+
+
 def build_test_and_coverage_command(
     pf: ProjectFacts,
     tool: str,
@@ -252,6 +337,12 @@ def build_test_and_coverage_command(
 
     if pf.language == "java":
         return _prepend_pre_test_cmd(_build_java_test_command(tool), pre_test_cmd)
+
+    if pf.language == "go":
+        return _prepend_pre_test_cmd(["sh", "-c", _build_go_test_and_vet_script()], pre_test_cmd)
+
+    if pf.language in {"typescript", "javascript"}:
+        return _prepend_pre_test_cmd(["sh", "-c", _build_node_test_and_lint_script(pf.language)], pre_test_cmd)
 
     eff_sources = source_targets or ["src"]
     eff_tests = test_targets or ["tests"]

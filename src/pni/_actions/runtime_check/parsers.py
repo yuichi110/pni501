@@ -357,6 +357,295 @@ def parse_clover_xml(
     )
 
 
+_GO_TEST_OUTCOME_RE: Final[re.Pattern[str]] = re.compile(r"^\s*---\s+(PASS|FAIL|SKIP):\s+([^\s(]+)")
+_GO_PKG_FAIL_RE: Final[re.Pattern[str]] = re.compile(r"^FAIL\s+(\S+)\s+.*\[(build|setup)\s+failed\]")
+_GO_COVER_LINE_RE: Final[re.Pattern[str]] = re.compile(r"^(.+):(\d+)\.\d+,(\d+)\.\d+\s+(\d+)\s+(\d+)\s*$")
+_ANSI_ESCAPE_RE: Final[re.Pattern[str]] = re.compile(r"\x1b\[[0-9;]*[A-Za-z]")
+
+
+def parse_go_test_output(
+    go_test_path: Path,
+) -> tuple[int, int, int, int, int, list[FailedTestCase]]:
+    """Parse `go test -v` output into (total, passed, failed, errors, skipped, failures)."""
+    if not go_test_path.is_file():
+        return 0, 0, 0, 0, 0, []
+
+    with contextlib.suppress(Exception):
+        lines = go_test_path.read_text(encoding="utf-8", errors="replace").splitlines()
+    if not lines:
+        return 0, 0, 0, 0, 0, []
+
+    passed = 0
+    failed = 0
+    errors = 0
+    skipped = 0
+    failures: list[FailedTestCase] = []
+
+    for line in lines:
+        m = _GO_TEST_OUTCOME_RE.match(line)
+        if m:
+            status_tok, test_name = m.group(1), m.group(2)
+            if status_tok == "PASS":
+                passed += 1
+            elif status_tok == "SKIP":
+                skipped += 1
+            elif status_tok == "FAIL":
+                failed += 1
+                failures.append(
+                    FailedTestCase(
+                        classname="go.test",
+                        name=test_name,
+                        kind="failure",
+                        message=line.strip()[:240],
+                    )
+                )
+            continue
+
+        pkg_fail = _GO_PKG_FAIL_RE.match(line)
+        if pkg_fail:
+            errors += 1
+            failures.append(
+                FailedTestCase(
+                    classname=pkg_fail.group(1),
+                    name="build",
+                    kind="error",
+                    message=line.strip()[:240],
+                )
+            )
+
+    total = passed + failed + errors + skipped
+    return total, passed, failed, errors, skipped, failures[:_MAX_FAILURE_ITEMS]
+
+
+def _normalize_go_cover_path(raw_path: str, module_prefix: str) -> str:
+    """Strip Go module prefix from coverprofile file path when present."""
+    clean = raw_path.strip().replace("\\", "/")
+    if module_prefix:
+        pref = module_prefix.strip().rstrip("/") + "/"
+        if clean.startswith(pref):
+            return clean[len(pref) :]
+    return clean
+
+
+def _parse_go_cover_blocks(
+    lines: list[str],
+    module_prefix: str,
+) -> dict[tuple[str, int, int], tuple[int, int]]:
+    """Deduplicate Go coverprofile blocks by (file_path, start_line, end_line) keeping max count."""
+    blocks: dict[tuple[str, int, int], tuple[int, int]] = {}
+    for line in lines:
+        if line.startswith("mode:") or not line.strip():
+            continue
+        m = _GO_COVER_LINE_RE.match(line)
+        if not m:
+            continue
+        rel_file = _normalize_go_cover_path(m.group(1), module_prefix)
+        key = (rel_file, int(m.group(2)), int(m.group(3)))
+        num_stmt, cnt = int(m.group(4)), int(m.group(5))
+        prev = blocks.get(key)
+        if prev is None or cnt > prev[1]:
+            blocks[key] = (num_stmt, cnt)
+    return blocks
+
+
+def parse_go_coverprofile(
+    coverprofile_path: Path,
+    module_prefix: str = "",
+) -> CoverageResult:
+    """Parse Go `-coverprofile=/out/coverage.out` report into a canonical CoverageResult."""
+    if not coverprofile_path.is_file():
+        return CoverageResult()
+
+    lines: list[str] = []
+    with contextlib.suppress(Exception):
+        lines = coverprofile_path.read_text(encoding="utf-8", errors="replace").splitlines()
+    blocks = _parse_go_cover_blocks(lines, module_prefix)
+    if not blocks:
+        return CoverageResult()
+
+    file_stats: dict[str, list[int]] = {}
+    file_missing: dict[str, list[int]] = {}
+    for (rel_file, start_ln, _end_ln), (num_stmt, cnt) in sorted(blocks.items()):
+        stats = file_stats.setdefault(rel_file, [0, 0])
+        stats[1] += num_stmt
+        if cnt > 0:
+            stats[0] += num_stmt
+        else:
+            missed = file_missing.setdefault(rel_file, [])
+            if start_ln not in missed and len(missed) < _MAX_MISSING_LINES:
+                missed.append(start_ln)
+
+    total_cov = 0
+    total_stmts = 0
+    items: list[ModuleCoverageItem] = []
+    for rel_file, (fcov, fstmts) in file_stats.items():
+        total_cov += fcov
+        total_stmts += fstmts
+        items.append(
+            ModuleCoverageItem(
+                file_path=rel_file,
+                line_coverage_pct=_compute_line_pct(fcov, fstmts),
+                branch_coverage_pct=None,
+                covered_lines=fcov,
+                total_statements=fstmts,
+                missing_lines_preview=file_missing.get(rel_file, []),
+            )
+        )
+
+    items.sort(key=lambda m: (m.line_coverage_pct, -m.total_statements, m.file_path))
+    return CoverageResult(
+        measured=True,
+        tool="go-cover",
+        line_coverage_pct=_compute_line_pct(total_cov, total_stmts),
+        branch_coverage_pct=None,
+        covered_lines=total_cov,
+        total_statements=total_stmts,
+        lowest_covered_modules=items[:_MAX_LOWEST_MODULES],
+    )
+
+
+def _parse_jest_vitest_counts(clean_text: str) -> Optional[tuple[int, int, int, int]]:
+    """Extract (total, passed, failed, skipped) from Jest or Vitest `Tests:` summary line."""
+    for line in reversed(clean_text.splitlines()):
+        stripped = line.strip()
+        if not stripped.startswith("Tests:"):
+            continue
+        passed_m = re.search(r"(\d+)\s+passed", stripped)
+        failed_m = re.search(r"(\d+)\s+failed", stripped)
+        skipped_m = re.search(r"(\d+)\s+(?:skipped|todo|pending)", stripped)
+        total_m = re.search(r"(\d+)\s+total", stripped)
+        passed = int(passed_m.group(1)) if passed_m else 0
+        failed = int(failed_m.group(1)) if failed_m else 0
+        skipped = int(skipped_m.group(1)) if skipped_m else 0
+        total = int(total_m.group(1)) if total_m else (passed + failed + skipped)
+        if total > 0:
+            return total, passed, failed, skipped
+    return None
+
+
+def _parse_node_tap_counts(clean_text: str) -> Optional[tuple[int, int, int, int]]:
+    """Extract (total, passed, failed, skipped) from `node --test` summary output."""
+    tests_m = re.search(r"(?m)^(?:ℹ|#)\s+tests\s+(\d+)\b", clean_text)
+    pass_m = re.search(r"(?m)^(?:ℹ|#)\s+pass\s+(\d+)\b", clean_text)
+    fail_m = re.search(r"(?m)^(?:ℹ|#)\s+fail\s+(\d+)\b", clean_text)
+    skip_m = re.search(r"(?m)^(?:ℹ|#)\s+skipped\s+(\d+)\b", clean_text)
+    if tests_m or pass_m or fail_m:
+        passed = int(pass_m.group(1)) if pass_m else 0
+        failed = int(fail_m.group(1)) if fail_m else 0
+        skipped = int(skip_m.group(1)) if skip_m else 0
+        total = int(tests_m.group(1)) if tests_m else (passed + failed + skipped)
+        return total, passed, failed, skipped
+    return None
+
+
+def parse_node_test_output(
+    node_test_path: Path,
+) -> tuple[int, int, int, int, int, list[FailedTestCase]]:
+    """Parse Vitest / Jest / `node --test` text output when JUnit XML is absent."""
+    if not node_test_path.is_file():
+        return 0, 0, 0, 0, 0, []
+
+    with contextlib.suppress(Exception):
+        raw = node_test_path.read_text(encoding="utf-8", errors="replace")
+    if not raw.strip():
+        return 0, 0, 0, 0, 0, []
+
+    clean = _ANSI_ESCAPE_RE.sub("", raw)
+    counts = _parse_jest_vitest_counts(clean) or _parse_node_tap_counts(clean)
+    if counts is None:
+        return 0, 0, 0, 0, 0, []
+
+    total, passed, failed, skipped = counts
+    failures: list[FailedTestCase] = []
+    suite_fails: list[FailedTestCase] = []
+    if failed > 0:
+        for line in clean.splitlines():
+            s = line.strip()
+            if s.startswith(("✕ ", "× ", "✖ ")):
+                failures.append(
+                    FailedTestCase(
+                        classname="node.test",
+                        name=s[:80],
+                        kind="failure",
+                        message=s[:240],
+                    )
+                )
+            elif s.startswith("FAIL "):
+                suite_fails.append(
+                    FailedTestCase(
+                        classname="node.test",
+                        name=s[:80],
+                        kind="failure",
+                        message=s[:240],
+                    )
+                )
+    eff_failures = failures or suite_fails
+    return total, passed, failed, 0, skipped, eff_failures[:_MAX_FAILURE_ITEMS]
+
+
+def parse_istanbul_coverage_summary(
+    summary_json_path: Path,
+    workspace_prefix: str = "/workspace/",
+) -> CoverageResult:
+    """Parse Istanbul / V8 `coverage-summary.json` into a canonical CoverageResult."""
+    if not summary_json_path.is_file():
+        return CoverageResult()
+
+    try:
+        raw = json.loads(summary_json_path.read_text(encoding="utf-8"))
+    except Exception:
+        return CoverageResult()
+    if not isinstance(raw, dict):
+        return CoverageResult()
+
+    total_entry = raw.get("total")
+    if not isinstance(total_entry, dict):
+        return CoverageResult()
+
+    lines_dict = total_entry.get("lines") if isinstance(total_entry.get("lines"), dict) else {}
+    branches_dict = total_entry.get("branches") if isinstance(total_entry.get("branches"), dict) else {}
+    cov_lines = _as_int(lines_dict.get("covered"))
+    total_stmts = _as_int(lines_dict.get("total"))
+    cov_branches = _as_int(branches_dict.get("covered"))
+    total_branches = _as_int(branches_dict.get("total"))
+
+    items: list[ModuleCoverageItem] = []
+    for key, fdata in raw.items():
+        if key == "total" or not isinstance(fdata, dict):
+            continue
+        flines = fdata.get("lines") if isinstance(fdata.get("lines"), dict) else {}
+        fbranches = fdata.get("branches") if isinstance(fdata.get("branches"), dict) else {}
+        fcov = _as_int(flines.get("covered"))
+        ftotal = _as_int(flines.get("total"))
+        fbcov = _as_int(fbranches.get("covered"))
+        fbtotal = _as_int(fbranches.get("total"))
+        rel_path = str(key).replace("\\", "/").removeprefix(workspace_prefix).lstrip("/")
+        items.append(
+            ModuleCoverageItem(
+                file_path=rel_path,
+                line_coverage_pct=_compute_line_pct(fcov, ftotal),
+                branch_coverage_pct=_compute_line_pct(fbcov, fbtotal) if fbtotal > 0 else None,
+                covered_lines=fcov,
+                total_statements=ftotal,
+                missing_lines_preview=[],
+            )
+        )
+
+    if total_stmts == 0 and not items:
+        return CoverageResult()
+
+    items.sort(key=lambda m: (m.line_coverage_pct, -m.total_statements, m.file_path))
+    return CoverageResult(
+        measured=True,
+        tool="istanbul-summary",
+        line_coverage_pct=_compute_line_pct(cov_lines, total_stmts),
+        branch_coverage_pct=_compute_line_pct(cov_branches, total_branches) if total_branches > 0 else None,
+        covered_lines=cov_lines,
+        total_statements=total_stmts,
+        lowest_covered_modules=items[:_MAX_LOWEST_MODULES],
+    )
+
+
 _NOISE_ERROR_PATTERNS: Final[tuple[str, ...]] = (
     "[help 1]",
     "to see the full stack trace",
@@ -377,6 +666,12 @@ _CORE_DIAGNOSTIC_MARKERS: Final[tuple[str, ...]] = (
     "modulenotfounderror",
     "importerror",
     "traceback",
+    "cannot use ",
+    "undefined:",
+    "error ts",
+    "referenceerror",
+    "typeerror",
+    "err_module_not_found",
     "[error]",
     "error:",
 )

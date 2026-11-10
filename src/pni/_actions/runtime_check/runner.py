@@ -35,8 +35,12 @@ from pni._actions.runtime_check.models import (
 )
 from pni._actions.runtime_check.parsers import (
     parse_clover_xml,
+    parse_go_coverprofile,
+    parse_go_test_output,
+    parse_istanbul_coverage_summary,
     parse_jacoco_xml,
     parse_junit_xml_files,
+    parse_node_test_output,
     parse_pytest_coverage_json,
 )
 from pni._actions.runtime_check.selector import (
@@ -176,6 +180,11 @@ def _execute_test_and_coverage_stage(
         xml_files.extend(sorted((out_dir / "surefire").glob("*.xml")))
 
     total, passed, failed, errors, skipped, failures = parse_junit_xml_files(xml_files)
+    if total == 0 and pf.language == "go":
+        total, passed, failed, errors, skipped, failures = parse_go_test_output(out_dir / "go_test.txt")
+    elif total == 0 and pf.language in {"typescript", "javascript"}:
+        total, passed, failed, errors, skipped, failures = parse_node_test_output(out_dir / "node_test.txt")
+
     if res.timed_out:
         t_status: RuntimeStageStatus = "timeout"
     elif res.exit_code == 0 and failed == 0 and errors == 0:
@@ -198,15 +207,25 @@ def _execute_test_and_coverage_stage(
         log_tail=[] if t_status == "passed" else res.tail_lines(25),
     )
 
-    if pf.language == "java":
-        src_prefix = source_targets[0] if source_targets else "src/main/java"
-        cov_res = parse_jacoco_xml(out_dir / "jacoco.xml", source_root_prefix=src_prefix)
-    elif pf.language == "php":
-        cov_res = parse_clover_xml(out_dir / "clover.xml")
-    else:
-        cov_res = parse_pytest_coverage_json(out_dir / "coverage.json")
-
+    cov_res = _parse_stage_coverage(pf.language, source_targets, out_dir)
     return test_res, cov_res
+
+
+def _parse_stage_coverage(language: str, source_targets: list[str], out_dir: Path) -> CoverageResult:
+    """Parse language-specific coverage artifact from out_dir into a canonical CoverageResult."""
+    if language == "java":
+        src_prefix = source_targets[0] if source_targets else "src/main/java"
+        return parse_jacoco_xml(out_dir / "jacoco.xml", source_root_prefix=src_prefix)
+    if language == "php":
+        return parse_clover_xml(out_dir / "clover.xml")
+    if language == "go":
+        return parse_go_coverprofile(out_dir / "coverage.out")
+    if language in {"typescript", "javascript"}:
+        cov_res = parse_istanbul_coverage_summary(out_dir / "coverage-summary.json")
+        if not cov_res.measured and (out_dir / "clover.xml").is_file():
+            return parse_clover_xml(out_dir / "clover.xml")
+        return cov_res
+    return parse_pytest_coverage_json(out_dir / "coverage.json")
 
 
 def _execute_smoke_stage(

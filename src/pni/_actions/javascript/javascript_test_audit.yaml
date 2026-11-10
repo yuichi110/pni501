@@ -1,0 +1,10 @@
+id: javascript_test_audit
+name: JavaScript Vitest / Jest / Node Testing Standards Audit
+description: Evaluate JavaScript test suites (*.test.js, *.spec.js), assertion completeness, isolation, and boundary coverage against javascript/testing standards.
+rules:
+  - javascript/testing
+primitives:
+  - type: ai_interpret
+    name: Evaluate JavaScript Test Suite Completeness & Structure
+    prompt: |
+      Compare `source_files_count` vs `test_files_count` from ProjectFacts and inspect test files and AstFacts (`total_test_functions`, `assertion_free_tests`) to verify Vitest/Jest/Node test structure, deterministic isolation, and boundary coverage according to `javascript/testing`.

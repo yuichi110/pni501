@@ -1,0 +1,19 @@
+id: repo_structure_audit
+name: Repository Structure & Package Manifest Audit (JavaScript)
+description: Deterministically inspect package.json, jsconfig.json, lockfiles, and documentation, then have AI evaluate against rules.
+rules:
+  - common/supply_chain
+  - common/documentation
+  - common/git_workflow
+  - common/security
+  - javascript/dependencies
+primitives:
+  - type: project_inspect
+    name: Extract JavaScript Package, Tooling & Supply-Chain Facts
+    with:
+      lang: "javascript"
+  - type: ai_interpret
+    name: Evaluate Node/JavaScript Build, Supply Chain & Dependencies
+    prompt: |
+      Review the deterministic ProjectFacts (`runtime_types`, `build_system`, `manifest_files`, `lockfiles_found`, `dependencies`, `unpinned_dependencies`, `dev_dependencies`, `tooling_issues`, `has_license`, `has_security_policy`, `has_dependency_automation`, `ci_supply_chain_issues`, `committed_secret_files`, `container_hygiene_issues`, `readme_headings`, `docs_inventory`, `has_gitignore`).
+      Verify compliance with `common/supply_chain`, `javascript/dependencies`, `common/documentation`, `common/git_workflow`, and `common/security`.

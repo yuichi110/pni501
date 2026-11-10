@@ -1,0 +1,10 @@
+id: typescript_test_audit
+name: TypeScript Vitest / Jest Testing Standards Audit
+description: Evaluate TypeScript test suites (*.test.ts, *.spec.ts), assertion completeness, isolation, and boundary coverage against typescript/testing standards.
+rules:
+  - typescript/testing
+primitives:
+  - type: ai_interpret
+    name: Evaluate TypeScript Test Suite Completeness & Structure
+    prompt: |
+      Compare `source_files_count` vs `test_files_count` from ProjectFacts and inspect test files and AstFacts (`total_test_functions`, `assertion_free_tests`) to verify Vitest/Jest test structure, deterministic isolation, and boundary coverage according to `typescript/testing`.

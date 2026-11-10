@@ -25,6 +25,7 @@ from pni._actions.ast_analyze.base import (
     BaseTestChecker,
     BaseTypingChecker,
 )
+from pni._actions.ast_analyze.go import GO_SUITE
 from pni._actions.ast_analyze.java import JAVA_SUITE
 from pni._actions.ast_analyze.models import (
     ApiEndpointFact,
@@ -37,13 +38,50 @@ from pni._actions.ast_analyze.models import (
 from pni._actions.ast_analyze.php import PHP_SUITE
 from pni._actions.ast_analyze.python import PYTHON_SUITE
 from pni._actions.ast_analyze.runner import LanguageAnalyzerSuite
+from pni._actions.ast_analyze.ts_js import JAVASCRIPT_SUITE, TYPESCRIPT_SUITE
 from pni._rules import detect_active_language
 
 SUITE_REGISTRY: Final[dict[str, LanguageAnalyzerSuite]] = {
     "python": PYTHON_SUITE,
     "java": JAVA_SUITE,
     "php": PHP_SUITE,
+    "go": GO_SUITE,
+    "typescript": TYPESCRIPT_SUITE,
+    "javascript": JAVASCRIPT_SUITE,
 }
+
+_EXT_TO_LANG: Final[dict[str, str]] = {
+    ".java": "java",
+    ".php": "php",
+    ".phtml": "php",
+    ".go": "go",
+    ".ts": "typescript",
+    ".tsx": "typescript",
+    ".js": "javascript",
+    ".jsx": "javascript",
+    ".mjs": "javascript",
+    ".cjs": "javascript",
+}
+
+
+def _detect_dir_language(candidate: Path) -> str | None:
+    """Detect language from source files inside a directory when no .py files exist."""
+    if any(candidate.rglob("*.py")):
+        return None
+    for pat, lang in (
+        ("*.java", "java"),
+        ("*.php", "php"),
+        ("*.phtml", "php"),
+        ("*.go", "go"),
+        ("*.tsx", "typescript"),
+    ):
+        if any(candidate.rglob(pat)):
+            return lang
+    if any(not f.name.endswith(".d.ts") for f in candidate.rglob("*.ts")):
+        return "typescript"
+    if any(any(candidate.rglob(pat)) for pat in ("*.js", "*.jsx", "*.mjs", "*.cjs")):
+        return "javascript"
+    return None
 
 
 def _detect_target_language(project_root: Path, targets: Optional[list[str]]) -> str:
@@ -52,16 +90,13 @@ def _detect_target_language(project_root: Path, targets: Optional[list[str]]) ->
         for target in targets:
             candidate = project_root / target
             if candidate.is_file():
-                if candidate.suffix == ".java":
-                    return "java"
-                if candidate.suffix in {".php", ".phtml"}:
-                    return "php"
-            if candidate.is_dir():
-                has_py = any(candidate.rglob("*.py"))
-                if not has_py and any(candidate.rglob("*.java")):
-                    return "java"
-                if not has_py and (any(candidate.rglob("*.php")) or any(candidate.rglob("*.phtml"))):
-                    return "php"
+                mapped = _EXT_TO_LANG.get(candidate.suffix.lower())
+                if mapped is not None:
+                    return mapped
+            elif candidate.is_dir():
+                dir_lang = _detect_dir_language(candidate)
+                if dir_lang is not None:
+                    return dir_lang
     return detect_active_language(project_root)
 
 
@@ -81,7 +116,7 @@ def run_ast_analyze(
         project_root: Target project root directory.
         targets: Relative source directory or file names inside project_root.
         display_root: Optional workspace root used to format file paths in CodeLocation.
-        lang: Optional explicit language override ('python', 'java', 'php'). Auto-detected if omitted.
+        lang: Optional explicit language override ('python', 'java', 'php', 'go', 'typescript', 'javascript').
         test_targets: Optional relative test directory names inside project_root.
         detected_frameworks: Optional pre-detected framework identifiers.
         declared_lang_version: Optional declared language version constraint from ProjectFacts.
@@ -104,10 +139,13 @@ def run_ast_analyze(
 
 
 __all__ = [
+    "GO_SUITE",
+    "JAVASCRIPT_SUITE",
     "JAVA_SUITE",
     "PHP_SUITE",
     "PYTHON_SUITE",
     "SUITE_REGISTRY",
+    "TYPESCRIPT_SUITE",
     "ApiEndpointFact",
     "AstFacts",
     "BaseDependencyChecker",

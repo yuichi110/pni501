@@ -198,8 +198,79 @@ class LanguageAnalyzerSuite:
     operational_checker: Optional[BaseOperationalChecker] = None
     security_checker: Optional[BaseSecurityChecker] = None
     default_test_dirs: tuple[str, ...] = ()
+    test_file_patterns: tuple[str, ...] = ()
+    excluded_source_suffixes: tuple[str, ...] = ()
     framework_checkers: tuple[BaseFrameworkChecker, ...] = ()
     source_preprocessor: Optional[Callable[[str], str]] = None
+
+    def _resolve_ast_grep_lang(self, src_file: Path) -> str:
+        """Resolve the ast-grep grammar name for src_file based on its extension."""
+        suffix = src_file.suffix.lower()
+        if suffix in {".tsx", ".jsx", ".js", ".mjs", ".cjs"}:
+            return "tsx"
+        if suffix == ".ts":
+            return "typescript"
+        return self.ast_grep_lang
+
+    def _is_test_file(self, file_path: Path, project_root: Path) -> bool:
+        """Return True if file_path matches test_file_patterns or resides in a __tests__ directory."""
+        if self.test_file_patterns and any(file_path.match(pat) for pat in self.test_file_patterns):
+            return True
+        if file_path.is_relative_to(project_root):
+            rel_parts = file_path.relative_to(project_root).parts[:-1]
+            if any(part.lower() == "__tests__" for part in rel_parts):
+                return True
+        return False
+
+    def _is_excluded_source_file(self, file_path: Path) -> bool:
+        """Return True if file_path ends with any excluded_source_suffixes (e.g. '.d.ts')."""
+        name_low = file_path.name.lower()
+        return any(name_low.endswith(sfx) for sfx in self.excluded_source_suffixes)
+
+    def _partition_source_and_test_files(
+        self,
+        raw_files: list[Path],
+        raw_test_files: list[Path],
+        eff_targets: list[str],
+        project_root: Path,
+    ) -> tuple[list[Path], list[Path]]:
+        """Separate production source files from co-located or dedicated test files."""
+        if self.test_file_patterns or self.excluded_source_suffixes:
+            colocated_tests = [
+                f for f in raw_files
+                if self._is_test_file(f, project_root) and not self._is_excluded_source_file(f)
+            ]
+            prod_files = [
+                f for f in raw_files
+                if not self._is_test_file(f, project_root) and not self._is_excluded_source_file(f)
+            ]
+            prod_set = set(prod_files)
+            candidate_tests = list(dict.fromkeys([*raw_test_files, *colocated_tests]))
+            test_files = [
+                tf
+                for tf in candidate_tests
+                if tf not in prod_set
+                and not self._is_excluded_source_file(tf)
+                and (
+                    self._is_test_file(tf, project_root)
+                    or (
+                        tf.is_relative_to(project_root)
+                        and any(
+                            p.lower() in {"test", "tests", "__tests__"}
+                            for p in tf.relative_to(project_root).parts[:-1]
+                        )
+                    )
+                )
+            ]
+            return prod_files, test_files
+
+        if "." in eff_targets and raw_test_files:
+            raw_test_set = set(raw_test_files)
+            files = [f for f in raw_files if f not in raw_test_set]
+            return files, raw_test_files
+
+        src_set = set(raw_files)
+        return raw_files, [tf for tf in raw_test_files if tf not in src_set]
 
     def _parse_units(self, files: list[Path], display_root: Path) -> list[ParsedUnit]:
         """Parse discovered source files once into immutable ParsedUnit instances."""
@@ -211,7 +282,8 @@ class LanguageAnalyzerSuite:
             if not source and not src_file.exists():
                 continue
             cst_source = self.source_preprocessor(source) if self.source_preprocessor is not None else source
-            root = SgRoot(cst_source, self.ast_grep_lang).root()
+            grammar = self._resolve_ast_grep_lang(src_file)
+            root = SgRoot(cst_source, grammar).root()
             if root.has(kind="ERROR"):
                 continue
             rel_str = (
@@ -305,20 +377,16 @@ class LanguageAnalyzerSuite:
             allow_root_glob=False,
             exclude_globs=eff_excludes,
         )
-        files = discover_source_files(
+        raw_files = discover_source_files(
             project_root,
             eff_targets,
             self.file_extensions,
             fallback_dirs=self.fallback_dirs,
             exclude_globs=eff_excludes,
         )
-        if "." in eff_targets and raw_test_files:
-            raw_test_set = set(raw_test_files)
-            files = [f for f in files if f not in raw_test_set]
-            test_files = raw_test_files
-        else:
-            src_set = set(files)
-            test_files = [tf for tf in raw_test_files if tf not in src_set]
+        files, test_files = self._partition_source_and_test_files(
+            raw_files, raw_test_files, eff_targets, project_root
+        )
 
         units = self._parse_units(files, base_display)
         test_units = self._parse_units(test_files, base_display)

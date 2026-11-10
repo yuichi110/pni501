@@ -42,11 +42,17 @@ _IMPORT_DI_TOKENS: Final[tuple[str, ...]] = (
     "ClassNotFoundException",
     "Circular reference",
     "PydanticUserError",
+    "Cannot find module",
+    "ERR_MODULE_NOT_FOUND",
+    "cannot find package",
+    "missing go.sum entry",
 )
 _CONFIG_TOKENS: Final[tuple[str, ...]] = (
     "PlaceholderCouldNotBeResolved",
     "Failed to bind properties",
     "Missing required environment",
+    "Missing required env",
+    "Invalid environment",
     "Field required",
     "No application encryption key has been specified",
 )
@@ -58,6 +64,10 @@ _EXTERNAL_IO_TOKENS: Final[tuple[str, ...]] = (
     "OperationalError",
     "SQLSTATE[HY000] [2002]",
     "mysqli_connect():",
+    "ECONNREFUSED",
+    "ENOTFOUND",
+    "ETIMEDOUT",
+    "dial tcp",
 )
 
 
@@ -352,6 +362,52 @@ def _build_python_smoke_plan(
     return archetype_label, None
 
 
+def _build_go_smoke_plan(
+    target_root: Path,
+    archetype_label: str,
+) -> tuple[str, Optional[list[str]]]:
+    """Construct Stage 3 compile/link smoke command for a Go module."""
+    if (target_root / "go.mod").is_file() or any(target_root.rglob("*.go")):
+        cmd = (
+            "go build ./... && "
+            'printf \'{"detail":"Go module packages compiled cleanly (go build ./...)"}\' >/out/smoke.json'
+        )
+        return archetype_label, ["sh", "-c", cmd]
+    return archetype_label, None
+
+
+def _build_node_smoke_plan(
+    target_root: Path,
+    pf: ProjectFacts,
+    archetype_label: str,
+) -> tuple[str, Optional[list[str]]]:
+    """Construct Stage 3 type-check / syntax smoke command for TypeScript and JavaScript projects."""
+    if pf.language == "typescript":
+        if (target_root / "tsconfig.json").is_file() or (target_root / "package.json").is_file():
+            cmd = (
+                "if [ -x ./node_modules/.bin/tsc ] && [ -f tsconfig.json ]; then "
+                "  ./node_modules/.bin/tsc --noEmit && "
+                '  printf \'{"detail":"TypeScript compiler verification (tsc --noEmit) exited 0"}\' >/out/smoke.json; '
+                "else "
+                "  node --version >/dev/null && "
+                '  printf \'{"detail":"Node.js TypeScript workspace verified"}\' >/out/smoke.json; '
+                "fi"
+            )
+            return archetype_label, ["sh", "-c", cmd]
+        return archetype_label, None
+
+    if (target_root / "package.json").is_file() or any(target_root.rglob("*.js")):
+        cmd = (
+            "for f in $(find . -name 'node_modules' -prune -o -name 'dist' -prune "
+            "-o \\( -name '*.js' -o -name '*.mjs' -o -name '*.cjs' \\) -print 2>/dev/null | head -n 25); do "
+            '  node --check "$f" || exit 1; '
+            "done && "
+            'printf \'{"detail":"Node.js syntax check (node --check) passed"}\' >/out/smoke.json'
+        )
+        return archetype_label, ["sh", "-c", cmd]
+    return archetype_label, None
+
+
 def build_smoke_plan(
     target_root: Path,
     pf: ProjectFacts,
@@ -373,6 +429,10 @@ def build_smoke_plan(
         return _build_java_smoke_plan(target_root, rtypes, archetype_label, source_targets, smoke_port)
     if pf.language == "php":
         return _build_php_smoke_plan(target_root, pf, rtypes, archetype_label, smoke_port)
+    if pf.language == "go":
+        return _build_go_smoke_plan(target_root, archetype_label)
+    if pf.language in {"typescript", "javascript"}:
+        return _build_node_smoke_plan(target_root, pf, archetype_label)
     return _build_python_smoke_plan(target_root, rtypes, archetype_label, source_targets)
 
 

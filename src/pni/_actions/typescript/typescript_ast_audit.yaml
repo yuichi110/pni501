@@ -1,0 +1,20 @@
+id: typescript_ast_audit
+name: TypeScript AST, Imports, Strict Types, TSDoc, Quality & Security Audit
+description: Parse TypeScript/TSX AST via ast-grep-py to extract import hygiene, type annotation coverage, any/@ts-ignore usage, TSDoc sync, cognitive complexity, bug idioms, CWE sinks, and API routes.
+rules:
+  - common/architecture
+  - common/maintainability
+  - common/security
+  - common/security_vulnerability
+  - typescript/code_quality
+  - typescript/typing
+primitives:
+  - type: ast_analyze
+    name: Extract Deterministic TypeScript AST & Module Metrics
+    with:
+      lang: "typescript"
+  - type: ai_interpret
+    name: Interpret TypeScript AST Facts & Evaluate Quality/Typing/Imports/Security
+    prompt: |
+      Inspect the deterministic AstFacts (`import_hygiene_coverage_pct`, `unsorted_imports`, `wildcard_imports`, `late_imports`, `type_safety_coverage_pct`, `type_safety_issues`, `weak_type_usages`, `unscoped_type_ignores`, `docstring_coverage_pct`, `missing_docstrings`, `empty_docstrings`, `doc_signature_mismatches`, `complex_functions`, `excessive_parameters`, `bug_risk_idioms`, `global_state_usages`, `circular_dependencies`, `unused_dependencies`, `undeclared_dependencies`, `missing_io_timeouts`, `scattered_env_access`, `unstructured_logging`, `hardcoded_secrets`, `dangerous_sinks`, `api_endpoints`).
+      Read the flagged `.ts`/`.tsx` files to evaluate module layering (`common/architecture`), SIG maintainability (`common/maintainability`), code security, CWE sinks & API boundaries (`common/security`, `common/security_vulnerability`), TSDoc & immutability (`typescript/code_quality`), and strict type safety (`typescript/typing`).

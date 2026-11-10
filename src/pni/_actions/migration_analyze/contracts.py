@@ -56,6 +56,18 @@ _PY_DICT_IN_RE: Final[re.Pattern[str]] = re.compile(
 _PY_ENV_RE: Final[re.Pattern[str]] = re.compile(
     r"\bos\.(?:getenv|environ\.get)\(\s*['\"]([^'\"]+)['\"](?:\s*,\s*(['\"][^'\"]*['\"]|\d+))?\s*\)"
 )
+_GO_IN_RE: Final[re.Pattern[str]] = re.compile(
+    r"\b(?:r\.URL\.Query\(\)\.Get|c\.Query|c\.Param|c\.PostForm|r\.FormValue)\(\s*\"([^\"]+)\"\s*\)"
+    r"|\b(?:c\.DefaultQuery|c\.DefaultPostForm)\(\s*\"([^\"]+)\"\s*,\s*(\"[^\"]*\"|\d+)\s*\)"
+)
+_GO_ENV_RE: Final[re.Pattern[str]] = re.compile(r"\bos\.(?:Getenv|LookupEnv)\(\s*\"([^\"]+)\"\s*\)")
+_NODE_IN_RE: Final[re.Pattern[str]] = re.compile(
+    r"\b(?:req|request|ctx)\.(?:body|query|params)\.([A-Za-z_]\w*)"
+    r"(?:\s*(?:\?\?|\|\|)\s*(['\"][^'\"]*['\"]|\d+))?"
+)
+_NODE_ENV_RE: Final[re.Pattern[str]] = re.compile(
+    r"\bprocess\.env\.([A-Z0-9_]+)\b(?:\s*(?:\?\?|\|\|)\s*(['\"][^'\"]*['\"]|\d+))?"
+)
 
 
 def _sanitize_default(name: str, raw_val: str | None) -> str | None:
@@ -70,9 +82,9 @@ def _sanitize_default(name: str, raw_val: str | None) -> str | None:
 
 def _infer_field_type(line_text: str, default_val: str | None) -> str:
     """Infer primitive contract type ('integer', 'boolean', 'string') from cast/parse context."""
-    if any(tok in line_text for tok in ("parseLong", "parseInt", "int(", "(int)", "Cents", "_id")):
+    if any(tok in line_text for tok in ("parseLong", "parseInt", "Atoi", "int(", "(int)", "Cents", "_id")):
         return "integer"
-    if any(tok in line_text for tok in ("parseBoolean", "bool(")):
+    if any(tok in line_text for tok in ("parseBoolean", "ParseBool", "bool(")):
         return "boolean"
     if default_val is not None and default_val.rstrip("Ll").isdigit():
         return "integer"
@@ -113,19 +125,37 @@ def _extract_java_fields(rel_path: str, source: str) -> tuple[list[ContractField
     return inputs, outputs
 
 
+def _patterns_for_dynamic_fields(language: str) -> tuple[re.Pattern[str], ...]:
+    """Return input extraction regex patterns for non-Java languages."""
+    if language == "php":
+        return (_PHP_SUPER_IN_RE, _PHP_LARAVEL_IN_RE)
+    if language == "go":
+        return (_GO_IN_RE,)
+    if language in ("typescript", "javascript"):
+        return (_NODE_IN_RE,)
+    return (_PY_DICT_IN_RE,)
+
+
 def _extract_php_or_py_fields(
     rel_path: str,
     source: str,
     language: str,
 ) -> tuple[list[ContractFieldSpec], list[ContractFieldSpec]]:
-    """Extract superglobal/request/dict input keys from PHP or Python files."""
+    """Extract superglobal/request/dict input keys from PHP, Go, TS/JS, or Python files."""
     inputs: list[ContractFieldSpec] = []
-    patterns = (_PHP_SUPER_IN_RE, _PHP_LARAVEL_IN_RE) if language == "php" else (_PY_DICT_IN_RE,)
+    patterns = _patterns_for_dynamic_fields(language)
     for line_no, line in enumerate(source.splitlines(), start=1):
         for pat in patterns:
             for match in pat.finditer(line):
-                key = match.group(1)
-                clean_def = _sanitize_default(key, match.group(2))
+                if language == "go":
+                    key = match.group(1) or match.group(2) or ""
+                    raw_def = match.group(3)
+                else:
+                    key = match.group(1)
+                    raw_def = match.group(2) if match.lastindex and match.lastindex >= 2 else None
+                if not key:
+                    continue
+                clean_def = _sanitize_default(key, raw_def)
                 inputs.append(
                     ContractFieldSpec(
                         key=key,
@@ -186,66 +216,85 @@ def _build_endpoint_contracts(
     return contracts
 
 
+def _extract_java_line_env(rel_path: str, lines: list[str], idx: int, line: str) -> list[EnvVarContract]:
+    """Extract Java System.getenv and @Value / getProperty contracts from a single line."""
+    found: list[EnvVarContract] = []
+    for m in _JAVA_ENV_RE.finditer(line):
+        name = m.group(1)
+        fallback: str | None = None
+        nearby = "\n".join(lines[idx : min(len(lines), idx + 4)])
+        fb_match = re.search(r'=\s*"([^"]+)"', nearby)
+        if fb_match is not None:
+            fallback = _sanitize_default(name, fb_match.group(1))
+        found.append(EnvVarContract(name=name, default_value=fallback, file=rel_path, line=idx, kind="env"))
+    for m in _JAVA_PROP_RE.finditer(line):
+        name = m.group(1)
+        found.append(
+            EnvVarContract(
+                name=name,
+                default_value=_sanitize_default(name, m.group(2)),
+                file=rel_path,
+                line=idx,
+                kind="config_property",
+            )
+        )
+    return found
+
+
+def _extract_php_line_env(rel_path: str, idx: int, line: str) -> list[EnvVarContract]:
+    """Extract PHP getenv/$_ENV and define() constant contracts from a single line."""
+    found: list[EnvVarContract] = []
+    for m in _PHP_ENV_RE.finditer(line):
+        name = m.group(1)
+        found.append(
+            EnvVarContract(
+                name=name,
+                default_value=_sanitize_default(name, m.group(2)),
+                file=rel_path,
+                line=idx,
+                kind="env",
+            )
+        )
+    for m in _PHP_DEFINE_RE.finditer(line):
+        name = m.group(1)
+        found.append(
+            EnvVarContract(
+                name=name,
+                default_value=_sanitize_default(name, m.group(2)),
+                file=rel_path,
+                line=idx,
+                kind="constant",
+            )
+        )
+    return found
+
+
 def _extract_file_env_contracts(rel_path: str, source: str, lang: str) -> list[EnvVarContract]:
     """Extract environment variable and config constant contracts from a single file."""
     found: list[EnvVarContract] = []
     lines = source.splitlines()
     for idx, line in enumerate(lines, start=1):
         if lang == "java":
-            for m in _JAVA_ENV_RE.finditer(line):
-                name = m.group(1)
-                fallback: str | None = None
-                nearby = "\n".join(lines[idx : min(len(lines), idx + 4)])
-                fb_match = re.search(r'=\s*"([^"]+)"', nearby)
-                if fb_match is not None:
-                    fallback = _sanitize_default(name, fb_match.group(1))
-                found.append(EnvVarContract(name=name, default_value=fallback, file=rel_path, line=idx, kind="env"))
-            for m in _JAVA_PROP_RE.finditer(line):
-                name = m.group(1)
-                found.append(
-                    EnvVarContract(
-                        name=name,
-                        default_value=_sanitize_default(name, m.group(2)),
-                        file=rel_path,
-                        line=idx,
-                        kind="config_property",
-                    )
-                )
+            found.extend(_extract_java_line_env(rel_path, lines, idx, line))
         elif lang == "php":
-            for m in _PHP_ENV_RE.finditer(line):
-                name = m.group(1)
-                found.append(
-                    EnvVarContract(
-                        name=name,
-                        default_value=_sanitize_default(name, m.group(2)),
-                        file=rel_path,
-                        line=idx,
-                        kind="env",
-                    )
-                )
-            for m in _PHP_DEFINE_RE.finditer(line):
-                name = m.group(1)
-                found.append(
-                    EnvVarContract(
-                        name=name,
-                        default_value=_sanitize_default(name, m.group(2)),
-                        file=rel_path,
-                        line=idx,
-                        kind="constant",
-                    )
-                )
+            found.extend(_extract_php_line_env(rel_path, idx, line))
+        elif lang == "go":
+            found.extend(
+                EnvVarContract(name=m.group(1), default_value=None, file=rel_path, line=idx, kind="env")
+                for m in _GO_ENV_RE.finditer(line)
+            )
         else:
-            for m in _PY_ENV_RE.finditer(line):
-                name = m.group(1)
-                found.append(
-                    EnvVarContract(
-                        name=name,
-                        default_value=_sanitize_default(name, m.group(2)),
-                        file=rel_path,
-                        line=idx,
-                        kind="env",
-                    )
+            env_re = _NODE_ENV_RE if lang in ("typescript", "javascript") else _PY_ENV_RE
+            found.extend(
+                EnvVarContract(
+                    name=m.group(1),
+                    default_value=_sanitize_default(m.group(1), m.group(2)),
+                    file=rel_path,
+                    line=idx,
+                    kind="env",
                 )
+                for m in env_re.finditer(line)
+            )
     return found
 
 

@@ -187,7 +187,29 @@ def _default_source_and_tests_for_lang(project_root: Path, lang: str) -> tuple[l
         src = list(dict.fromkeys([*psr4_src, *conv_src])) or ["src"]
         tst = psr4_tst or (["tests"] if (project_root / "tests").is_dir() else ["tests"])
         return src, tst
+    if lang == "go":
+        go_dirs = [d for d in ("cmd", "internal", "pkg") if (project_root / d).is_dir()]
+        has_root_go = any(project_root.glob("*.go"))
+        src = (["."] if has_root_go or not go_dirs else go_dirs)
+        return src, list(src)
+    if lang in {"typescript", "javascript"}:
+        conv_src = [d for d in ("src", "app", "lib", "pages", "components") if (project_root / d).is_dir()]
+        src = conv_src or ["src"]
+        conv_tst = [d for d in ("tests", "test", "__tests__") if (project_root / d).is_dir()]
+        tst = conv_tst or (["src"] if (project_root / "src").is_dir() else ["tests"])
+        return src, tst
     return ["src"], ["tests"]
+
+
+def _default_ignored_lock_literal(lang: str) -> str:
+    """Return comma-separated TOML array literal of lockfiles to keep scannable even when gitignored."""
+    if lang == "php":
+        return '"composer.lock"'
+    if lang == "go":
+        return '"go.sum"'
+    if lang in {"typescript", "javascript"}:
+        return '"package-lock.json", "pnpm-lock.yaml", "yarn.lock"'
+    return '"uv.lock"'
 
 
 def render_default_pni_toml(project_root: Path, *, lang: str = "python") -> str:
@@ -196,7 +218,7 @@ def render_default_pni_toml(project_root: Path, *, lang: str = "python") -> str:
     src_dirs, test_dirs = _default_source_and_tests_for_lang(project_root, lang)
     src_literal = ", ".join(f'"{s}"' for s in src_dirs)
     tst_literal = ", ".join(f'"{t}"' for t in test_dirs)
-    ignored_lock = "composer.lock" if lang == "php" else "uv.lock"
+    ignored_lock_literal = _default_ignored_lock_literal(lang)
     return (
         "# PNI Project Configuration Manifest (.pni/pni.toml)\n"
         "# Precedence: CLI / Workflow step `with:` > Workflow YAML > .pni/pni.toml > Built-in defaults\n\n"
@@ -213,7 +235,7 @@ def render_default_pni_toml(project_root: Path, *, lang: str = "python") -> str:
         "[scan]\n"
         "# Exclude untracked files matched by .gitignore (e.g. local developer .env) from filesystem/secret scans\n"
         "respect_gitignore = true\n"
-        f'include_gitignored = ["{ignored_lock}"]\n'
+        f"include_gitignored = [{ignored_lock_literal}]\n"
         'skip_files = [".env", ".env.*", "**/.env"]\n'
         'skip_dirs = ["reports", "reports_src"]\n\n'
         "[report]\n"
