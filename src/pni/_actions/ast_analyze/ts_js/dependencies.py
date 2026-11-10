@@ -90,10 +90,24 @@ def _unit_module_id(unit: ParsedUnit, project_root: Path) -> str:
     return rel
 
 
-def _iter_unit_module_specifiers(unit: ParsedUnit) -> list[tuple[str, int, bool]]:
-    """Return `(specifier, line_1based, is_type_only)` for ES `import`/`export ... from` and `require(...)`."""
-    specs: list[tuple[str, int, bool]] = []
+def _is_inline_type_only_clause(stmt_text: str) -> bool:
+    """Return True if an `import { ... }` or `export { ... }` clause contains only `type` specifiers."""
+    brace_start = stmt_text.find("{")
+    brace_end = stmt_text.find("}", brace_start + 1)
+    if brace_start < 0 or brace_end < 0:
+        return False
+    prefix = stmt_text[:brace_start].removeprefix("import").removeprefix("export").strip()
+    if prefix:
+        return False
+    items = [part.strip() for part in stmt_text[brace_start + 1 : brace_end].split(",") if part.strip()]
+    return bool(items) and all(item.startswith("type ") for item in items)
+
+
+def _iter_unit_module_specifiers(unit: ParsedUnit) -> list[tuple[str, int, bool, bool]]:
+    """Return `(specifier, line_1based, is_type_only, is_reexport)` for ES imports/exports and `require(...)`."""
+    specs: list[tuple[str, int, bool, bool]] = []
     for kind_name in ("import_statement", "export_statement"):
+        is_reexport = kind_name == "export_statement"
         for node in unit.root.find_all(kind=kind_name):
             src = node.field("source")
             if src is None:
@@ -102,8 +116,8 @@ def _iter_unit_module_specifiers(unit: ParsedUnit) -> list[tuple[str, int, bool]
             if not spec:
                 continue
             text = node.text().lstrip()
-            is_type_only = text.startswith(("import type ", "export type "))
-            specs.append((spec, node.range().start.line + 1, is_type_only))
+            is_type_only = text.startswith(("import type ", "export type ")) or _is_inline_type_only_clause(text)
+            specs.append((spec, node.range().start.line + 1, is_type_only, is_reexport))
 
     for call in unit.root.find_all(kind="call_expression"):
         fn = call.field("function")
@@ -116,7 +130,7 @@ def _iter_unit_module_specifiers(unit: ParsedUnit) -> list[tuple[str, int, bool]
         if str_node is not None:
             spec = str_node.text().strip().strip("'\"")
             if spec:
-                specs.append((spec, call.range().start.line + 1, False))
+                specs.append((spec, call.range().start.line + 1, False, False))
     return specs
 
 
@@ -174,9 +188,8 @@ def _extract_bare_pkg_name(spec: str) -> str:
     return spec.split("/", 1)[0]
 
 
-def _load_package_json_deps(project_root: Path) -> tuple[set[str], set[str]]:
-    """Return `(prod_deps, dev_deps)` from `package.json`."""
-    pkg_json = project_root / "package.json"
+def _read_single_package_json_deps(pkg_json: Path) -> tuple[set[str], set[str]]:
+    """Read `(prod_deps, dev_deps)` from a single `package.json` file."""
     if not pkg_json.is_file():
         return set(), set()
     with contextlib.suppress(Exception):
@@ -193,19 +206,57 @@ def _load_package_json_deps(project_root: Path) -> tuple[set[str], set[str]]:
     return set(), set()
 
 
+def _load_package_json_deps(
+    project_root: Path,
+    units: list[ParsedUnit] | tuple[ParsedUnit, ...] = (),
+) -> tuple[set[str], set[str]]:
+    """Return `(prod_deps, dev_deps)` from target package and workspace root `package.json` manifests."""
+    resolved_root = project_root.resolve()
+    prod_all: set[str] = set()
+    dev_all: set[str] = set()
+    seen_manifests: set[Path] = set()
+
+    for unit in units:
+        for parent in unit.file_path.resolve().parents:
+            cand = parent / "package.json"
+            if cand.is_file():
+                if cand not in seen_manifests:
+                    seen_manifests.add(cand)
+                    p_set, d_set = _read_single_package_json_deps(cand)
+                    prod_all.update(p_set)
+                    dev_all.update(d_set)
+                break
+            if parent == resolved_root:
+                break
+
+    root_pkg = resolved_root / "package.json"
+    if root_pkg.is_file() and root_pkg not in seen_manifests:
+        r_prod, r_dev = _read_single_package_json_deps(root_pkg)
+        if not seen_manifests:
+            prod_all.update(r_prod)
+        dev_all.update(r_prod | r_dev)
+    return prod_all, dev_all
+
+
+def _is_barrel_module_id(module_id: str) -> bool:
+    """Return True if `module_id` represents an `index` barrel module."""
+    return module_id == "index" or module_id.endswith("/index")
+
+
 class TsJsDependencyChecker(BaseDependencyChecker):
     """Build TS/JS internal module graph, cross-check `package.json` dependencies, and check boundaries."""
 
     def build_import_graph(self, units: list[ParsedUnit], project_root: Path) -> dict[str, list[str]]:
-        """Build adjacency list of internal TS/JS modules."""
+        """Build adjacency list of internal TS/JS runtime implementation modules (excluding barrel re-exports)."""
         id_map = {u.rel_path: _unit_module_id(u, project_root) for u in units}
         known_ids = set(id_map.values())
         edges: dict[str, set[str]] = {mid: set() for mid in known_ids}
 
         for unit in units:
             src_id = id_map[unit.rel_path]
-            for spec, _line, is_type_only in _iter_unit_module_specifiers(unit):
-                if is_type_only:
+            is_barrel = _is_barrel_module_id(src_id)
+            for spec, _line, is_type_only, is_reexport in _iter_unit_module_specifiers(unit):
+                if is_type_only or (is_barrel and is_reexport):
                     continue
                 target_id = _resolve_internal_target(src_id, spec, known_ids)
                 if target_id and target_id != src_id:
@@ -219,22 +270,23 @@ class TsJsDependencyChecker(BaseDependencyChecker):
         project_root: Path,
         runtime_cycles: list[list[str]],
     ) -> list[list[str]]:
-        """Detect cycles introduced by `import type` statements in TypeScript."""
+        """Detect cycles introduced by `import type` statements or `index.ts` barrel re-exports."""
         id_map = {u.rel_path: _unit_module_id(u, project_root) for u in units}
         known_ids = set(id_map.values())
         edges: dict[str, set[str]] = {mid: set() for mid in known_ids}
-        has_type_imports = False
+        has_extra_edges = False
 
         for unit in units:
             src_id = id_map[unit.rel_path]
-            for spec, _line, is_type_only in _iter_unit_module_specifiers(unit):
-                if is_type_only:
-                    has_type_imports = True
+            is_barrel = _is_barrel_module_id(src_id)
+            for spec, _line, is_type_only, is_reexport in _iter_unit_module_specifiers(unit):
+                if is_type_only or (is_barrel and is_reexport):
+                    has_extra_edges = True
                 target_id = _resolve_internal_target(src_id, spec, known_ids)
                 if target_id and target_id != src_id:
                     edges.setdefault(src_id, set()).add(target_id)
 
-        if not has_type_imports:
+        if not has_extra_edges:
             return []
         full_graph = {mid: sorted(targets) for mid, targets in sorted(edges.items())}
         all_cycles = self.detect_cycles(full_graph)
@@ -247,7 +299,7 @@ class TsJsDependencyChecker(BaseDependencyChecker):
         project_root: Path,
     ) -> tuple[list[str], list[CodeLocation]]:
         """Cross-check external npm package imports against `package.json`."""
-        prod_deps, dev_deps = _load_package_json_deps(project_root)
+        prod_deps, dev_deps = _load_package_json_deps(project_root, units)
         all_declared = prod_deps | dev_deps
         if not all_declared:
             return [], []
@@ -257,7 +309,7 @@ class TsJsDependencyChecker(BaseDependencyChecker):
         seen_undeclared: set[tuple[str, str]] = set()
 
         for unit in units:
-            for spec, line_no, _is_type in _iter_unit_module_specifiers(unit):
+            for spec, line_no, _is_type, _is_reexport in _iter_unit_module_specifiers(unit):
                 if spec.startswith((".", "/", "@/", "~/", "#")) or spec.startswith("node:"):
                     continue
                 pkg = _extract_bare_pkg_name(spec)
@@ -294,7 +346,7 @@ class TsJsDependencyChecker(BaseDependencyChecker):
         _ = project_root
         violations: list[CodeLocation] = []
         for unit in units:
-            for spec, line_no, _is_type in _iter_unit_module_specifiers(unit):
+            for spec, line_no, _is_type, _is_reexport in _iter_unit_module_specifiers(unit):
                 if spec.startswith("../../.."):
                     violations.append(
                         CodeLocation(

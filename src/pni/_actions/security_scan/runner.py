@@ -12,6 +12,7 @@
 from __future__ import annotations
 
 import hashlib
+from collections.abc import Sequence
 from pathlib import Path
 from typing import Optional
 
@@ -220,6 +221,33 @@ def _execute_image_scan_stage(
     return scanned_ok, (resolved_source if scanned_ok else "")
 
 
+def _partition_exclude_globs(
+    exclude_globs: Sequence[str],
+    target_dir: Path,
+) -> tuple[list[str], list[str]]:
+    """Convert target exclude globs (e.g. 'packages/bench/**') into Trivy (skip_dirs, skip_files)."""
+    extra_dirs: list[str] = []
+    extra_files: list[str] = []
+    for raw_pat in exclude_globs:
+        pat = raw_pat.strip().strip("/")
+        if not pat:
+            continue
+        if pat.endswith(("/**", "/*")):
+            prefix = pat[:-3].strip("/") if pat.endswith("/**") else pat[:-2].strip("/")
+            if prefix and "*" not in prefix and "?" not in prefix:
+                extra_dirs.append(prefix)
+            else:
+                extra_files.append(pat)
+        elif "*" not in pat and "?" not in pat:
+            if (target_dir / pat).is_dir() or "." not in Path(pat).name:
+                extra_dirs.append(pat)
+            else:
+                extra_files.append(pat)
+        else:
+            extra_files.append(pat)
+    return extra_dirs, extra_files
+
+
 def run_security_scan(
     workspace_root: Path,
     workflow_id: str,
@@ -227,6 +255,7 @@ def run_security_scan(
     target_root: str = ".",
     source_targets: Optional[list[str]] = None,
     test_targets: Optional[list[str]] = None,
+    exclude_targets: Optional[list[str]] = None,
     lang: Optional[str] = None,
     project_facts: Optional[ProjectFacts] = None,
     options: Optional[SecurityScanOptions] = None,
@@ -255,8 +284,10 @@ def run_security_scan(
         if pni_cfg.scan.respect_gitignore
         else ([], [])
     )
-    eff_skip_files = [*ignored_files, *pni_cfg.scan.skip_files]
-    eff_skip_dirs = [*ignored_dirs, *pni_cfg.scan.skip_dirs]
+    raw_excludes = [*(pni_cfg.targets.exclude or []), *(exclude_targets or [])]
+    ex_dirs, ex_files = _partition_exclude_globs(raw_excludes, target_dir)
+    eff_skip_files = list(dict.fromkeys([*ignored_files, *pni_cfg.scan.skip_files, *ex_files]))
+    eff_skip_dirs = list(dict.fromkeys([*ignored_dirs, *pni_cfg.scan.skip_dirs, *ex_dirs]))
 
     scanned_fs = False
     scanned_img = False
@@ -338,7 +369,7 @@ def run_security_scan(
             )
 
         is_harness_img = resolved_img_src.startswith(".pni/dockerfiles/")
-        non_core_pkgs = discover_non_core_packages(target_dir)
+        non_core_pkgs = discover_non_core_packages(target_dir, source_targets=source_targets or ())
         bundle = parse_trivy_reports(
             fs_json_path=sec_dir / "trivy_fs.json" if scanned_fs else None,
             image_json_path=sec_dir / "trivy_image.json" if scanned_img else None,

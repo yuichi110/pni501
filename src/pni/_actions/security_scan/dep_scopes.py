@@ -16,7 +16,10 @@ import contextlib
 import json
 import re
 import tomllib
+from collections.abc import Sequence
 from pathlib import Path
+
+import yaml
 
 _REQ_SPLIT_RE = re.compile(r"[<>=!~@;\s]")
 _EXTRAS_RE = re.compile(r"^([^\[\s<>=!~@;]+)\[([^\]]+)\]")
@@ -302,23 +305,189 @@ def _resolve_maven_pom_non_core(pom_path: Path) -> set[str]:
     return non_core_keys - prod_keys
 
 
-def _resolve_package_json_non_core(pkg_json_path: Path) -> set[str]:
-    """Extract direct `devDependencies` not declared in `dependencies` from `package.json`."""
+def _extract_package_json_sets(pkg_json_path: Path) -> tuple[set[str], set[str]]:
+    """Return `(prod_dependencies, dev_or_optional_dependencies)` from one `package.json`."""
     if not pkg_json_path.is_file():
-        return set()
+        return set(), set()
     payload: object = None
     with contextlib.suppress(Exception):
         payload = json.loads(pkg_json_path.read_text(encoding="utf-8"))
     if not isinstance(payload, dict):
-        return set()
+        return set(), set()
     deps = payload.get("dependencies")
     dev_deps = payload.get("devDependencies")
+    opt_deps = payload.get("optionalDependencies")
     prod_set = {normalize_vuln_pkg_key(str(k)) for k in deps} if isinstance(deps, dict) else set()
     dev_set = {normalize_vuln_pkg_key(str(k)) for k in dev_deps} if isinstance(dev_deps, dict) else set()
+    if isinstance(opt_deps, dict):
+        dev_set.update(normalize_vuln_pkg_key(str(k)) for k in opt_deps)
+    return prod_set, dev_set
+
+
+def _resolve_package_json_non_core(pkg_json_path: Path) -> set[str]:
+    """Extract direct `devDependencies` not declared in `dependencies` from `package.json`."""
+    prod_set, dev_set = _extract_package_json_sets(pkg_json_path)
     return dev_set - prod_set
 
 
-def discover_non_core_packages(target_dir: Path) -> set[str]:
+def _find_target_package_jsons(target_dir: Path, source_targets: Sequence[str]) -> list[Path]:
+    """Locate the nearest `package.json` manifest(s) governing configured `source_targets`."""
+    found: list[Path] = []
+    resolved_root = target_dir.resolve()
+    for raw_src in source_targets:
+        rel = Path(raw_src.strip().strip("/"))
+        for candidate_dir in (rel, *rel.parents):
+            pkg_json = (resolved_root / candidate_dir / "package.json").resolve()
+            if pkg_json.is_file():
+                if pkg_json not in found:
+                    found.append(pkg_json)
+                break
+    root_pkg = (resolved_root / "package.json").resolve()
+    if not found and root_pkg.is_file():
+        found.append(root_pkg)
+    return found
+
+
+def _extract_pnpm_pkg_name(raw_key: str) -> str:
+    """Extract and normalize the package name from a `pnpm-lock.yaml` package or snapshot key."""
+    cleaned = raw_key.strip().strip("'\"").lstrip("/").split("(", maxsplit=1)[0].strip()
+    if not cleaned:
+        return ""
+    if cleaned.startswith("@"):
+        slash_parts = cleaned.split("/")
+        if len(slash_parts) >= 2:
+            pkg_seg = slash_parts[1].split("@", maxsplit=1)[0]
+            return normalize_vuln_pkg_key(f"{slash_parts[0]}/{pkg_seg}")
+        return normalize_vuln_pkg_key(cleaned)
+    return normalize_vuln_pkg_key(re.split(r"[@/]", cleaned, maxsplit=1)[0])
+
+
+def _collect_pnpm_meta_edges(
+    pkg_norm: str,
+    meta: dict[str, object],
+    all_locked: set[str],
+    dep_graph: dict[str, set[str]],
+) -> None:
+    """Record dependency and optionalDependency edges for one pnpm package entry."""
+    for dep_field in ("dependencies", "optionalDependencies"):
+        raw_deps = meta.get(dep_field)
+        if not isinstance(raw_deps, dict):
+            continue
+        for dep_k in raw_deps:
+            if dep_norm := _extract_pnpm_pkg_name(str(dep_k)):
+                dep_graph.setdefault(pkg_norm, set()).add(dep_norm)
+                all_locked.add(dep_norm)
+
+
+def _collect_pnpm_section_graph(
+    section: object,
+    all_locked: set[str],
+    dep_graph: dict[str, set[str]],
+    explicit_dev: set[str],
+    explicit_prod: set[str],
+) -> None:
+    """Populate locked package names, dependency edges, and dev flags from a pnpm lockfile map."""
+    if not isinstance(section, dict):
+        return
+    for raw_key, meta in section.items():
+        pkg_norm = _extract_pnpm_pkg_name(str(raw_key))
+        if not pkg_norm:
+            continue
+        all_locked.add(pkg_norm)
+        if not isinstance(meta, dict):
+            continue
+        if meta.get("dev") is True:
+            explicit_dev.add(pkg_norm)
+        elif meta.get("dev") is False:
+            explicit_prod.add(pkg_norm)
+        _collect_pnpm_meta_edges(pkg_norm, meta, all_locked, dep_graph)
+
+
+def _collect_pnpm_importers(
+    importers: object,
+    all_locked: set[str],
+    explicit_dev: set[str],
+) -> None:
+    """Collect package names from workspace `importers` entries in `pnpm-lock.yaml`."""
+    if not isinstance(importers, dict):
+        return
+    for imp in importers.values():
+        if not isinstance(imp, dict):
+            continue
+        for dep_k in imp.get("devDependencies") or {}:
+            if d_norm := _extract_pnpm_pkg_name(str(dep_k)):
+                all_locked.add(d_norm)
+                explicit_dev.add(d_norm)
+        for dep_k in imp.get("dependencies") or {}:
+            if d_norm := _extract_pnpm_pkg_name(str(dep_k)):
+                all_locked.add(d_norm)
+
+
+def _resolve_pnpm_lock_non_core(pnpm_lock_path: Path, core_seeds: set[str] | None) -> set[str]:
+    """Identify dev/workspace-only packages in `pnpm-lock.yaml` unreachable from target `dependencies`."""
+    if not pnpm_lock_path.is_file():
+        return set()
+    payload: object = None
+    with contextlib.suppress(Exception):
+        payload = yaml.safe_load(pnpm_lock_path.read_text(encoding="utf-8"))
+    if not isinstance(payload, dict):
+        return set()
+
+    all_locked: set[str] = set()
+    dep_graph: dict[str, set[str]] = {}
+    explicit_dev: set[str] = set()
+    explicit_prod: set[str] = set()
+    _collect_pnpm_section_graph(payload.get("packages"), all_locked, dep_graph, explicit_dev, explicit_prod)
+    _collect_pnpm_section_graph(payload.get("snapshots"), all_locked, dep_graph, explicit_dev, explicit_prod)
+    _collect_pnpm_importers(payload.get("importers"), all_locked, explicit_dev)
+
+    if core_seeds is None:
+        return explicit_dev - explicit_prod
+    if not core_seeds:
+        return all_locked
+
+    reachable: set[str] = set()
+    queue: collections.deque[str] = collections.deque(core_seeds)
+    while queue:
+        curr = queue.popleft()
+        if curr not in reachable:
+            reachable.add(curr)
+            queue.extend(dep_graph.get(curr, set()) - reachable)
+
+    if dep_graph or isinstance(payload.get("importers"), dict):
+        return (all_locked - reachable) | (explicit_dev - reachable)
+    return (explicit_dev - explicit_prod) - reachable
+
+
+def _resolve_node_workspace_non_core(target_dir: Path, source_targets: Sequence[str]) -> set[str]:
+    """Resolve non-core Node.js packages across workspace manifests and lockfiles."""
+    target_pkg_jsons = _find_target_package_jsons(target_dir, source_targets)
+    core_seeds: set[str] | None = None
+    non_core: set[str] = set()
+
+    if target_pkg_jsons:
+        core_seeds = set()
+        for pj in target_pkg_jsons:
+            prod_set, dev_set = _extract_package_json_sets(pj)
+            core_seeds.update(prod_set)
+            non_core.update(dev_set)
+        for ws_pj in target_dir.glob("*/*/package.json"):
+            if "node_modules" not in ws_pj.parts and ws_pj.resolve() not in target_pkg_jsons:
+                ws_prod, ws_dev = _extract_package_json_sets(ws_pj)
+                non_core.update(ws_prod | ws_dev)
+        root_pj = (target_dir / "package.json").resolve()
+        if root_pj.is_file() and root_pj not in target_pkg_jsons:
+            r_prod, r_dev = _extract_package_json_sets(root_pj)
+            non_core.update(r_prod | r_dev)
+
+    non_core.update(_resolve_npm_lock_non_core(target_dir / "package-lock.json"))
+    non_core.update(_resolve_pnpm_lock_non_core(target_dir / "pnpm-lock.yaml", core_seeds))
+    if core_seeds is not None:
+        non_core -= core_seeds
+    return non_core
+
+
+def discover_non_core_packages(target_dir: Path, source_targets: Sequence[str] = ()) -> set[str]:
     """Discover normalized package names proven to belong only to dev/optional dependency groups."""
     non_core: set[str] = set()
     pyproject_path = target_dir / "pyproject.toml"
@@ -334,7 +503,7 @@ def discover_non_core_packages(target_dir: Path) -> set[str]:
         non_core.update(_resolve_poetry_lock_non_core(poetry_lock, core_seeds))
 
     non_core.update(_resolve_composer_lock_non_core(target_dir / "composer.lock"))
-    non_core.update(_resolve_npm_lock_non_core(target_dir / "package-lock.json"))
-    non_core.update(_resolve_package_json_non_core(target_dir / "package.json"))
+    non_core.update(_resolve_node_workspace_non_core(target_dir, source_targets))
     non_core.update(_resolve_maven_pom_non_core(target_dir / "pom.xml"))
     return non_core
+

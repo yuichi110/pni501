@@ -28,9 +28,10 @@ _TEST_CALL_NAMES: Final[frozenset[str]] = frozenset(
     {"it", "test", "it.only", "test.only", "it.concurrent", "test.concurrent"}
 )
 _TS_JS_ASSERT_RE: Final[re.Pattern[str]] = re.compile(
-    r"\b(?:expect|expectTypeOf|assert)\s*(?:\.\w+\s*)?\("
-    r"|\.(?:toBe|toEqual|toStrictEqual|toMatch|toThrow|toHaveBeenCalled|resolves|rejects|should)\b"
-    r"|\b(?:sinon\.assert| fc\.assert)\b"
+    r"\b(?:expect|expectTypeOf|assert|assertType|expectType|expectNotType|expectAssignable)\s*(?:\.\w+\s*)?(?:\(|<)"
+    r"|\.(?:toBe\w*|toEqual\w*|toStrictEqual|toMatch\w*|toThrow\w*|toHave\w*|resolves|rejects|should)\b"
+    r"|\b(?:sinon\.assert|fc\.assert|td\.verify)\b"
+    r"|@ts-expect-error"
 )
 
 

@@ -26,8 +26,14 @@ def _format_skip_dirs_arg(skip_dirs: Sequence[str]) -> str:
     items: list[str] = list(_SKIP_FS_DIRS.split(","))
     for raw in skip_dirs:
         cleaned = raw.strip().strip("/")
-        if cleaned and cleaned not in items:
+        if not cleaned:
+            continue
+        if cleaned not in items:
             items.append(cleaned)
+        if "/" in cleaned:
+            container_rel = f"/target/{cleaned}"
+            if container_rel not in items:
+                items.append(container_rel)
     return ",".join(items)
 
 

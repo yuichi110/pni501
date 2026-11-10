@@ -376,17 +376,39 @@ def _build_go_smoke_plan(
     return archetype_label, None
 
 
+def _find_preferred_tsconfig(target_root: Path, source_targets: list[str] | tuple[str, ...]) -> str:
+    """Resolve the nearest package tsconfig.json for configured source_targets or fallback to root."""
+    for raw_target in source_targets:
+        rel = Path(raw_target.strip().strip("/"))
+        for candidate_dir in (rel, *rel.parents):
+            if str(candidate_dir) in {"", "."}:
+                break
+            if (target_root / candidate_dir / "tsconfig.json").is_file():
+                return (candidate_dir / "tsconfig.json").as_posix()
+    return "tsconfig.json"
+
+
 def _build_node_smoke_plan(
     target_root: Path,
     pf: ProjectFacts,
     archetype_label: str,
+    source_targets: list[str] | tuple[str, ...] = (),
 ) -> tuple[str, Optional[list[str]]]:
     """Construct Stage 3 type-check / syntax smoke command for TypeScript and JavaScript projects."""
     if pf.language == "typescript":
-        if (target_root / "tsconfig.json").is_file() or (target_root / "package.json").is_file():
+        ts_cfg = _find_preferred_tsconfig(target_root, source_targets)
+        if (
+            (target_root / ts_cfg).is_file()
+            or (target_root / "tsconfig.json").is_file()
+            or (target_root / "package.json").is_file()
+        ):
             cmd = (
-                "if [ -x ./node_modules/.bin/tsc ] && [ -f tsconfig.json ]; then "
-                "  ./node_modules/.bin/tsc --noEmit && "
+                "if [ -x ./node_modules/.bin/tsc ]; then "
+                f'  if [ -f "{ts_cfg}" ]; then '
+                f'    ./node_modules/.bin/tsc --noEmit -p "{ts_cfg}" || ./node_modules/.bin/tsc --noEmit; '
+                "  elif [ -f tsconfig.json ]; then "
+                "    ./node_modules/.bin/tsc --noEmit; "
+                "  fi && "
                 '  printf \'{"detail":"TypeScript compiler verification (tsc --noEmit) exited 0"}\' >/out/smoke.json; '
                 "else "
                 "  node --version >/dev/null && "
@@ -432,7 +454,7 @@ def build_smoke_plan(
     if pf.language == "go":
         return _build_go_smoke_plan(target_root, archetype_label)
     if pf.language in {"typescript", "javascript"}:
-        return _build_node_smoke_plan(target_root, pf, archetype_label)
+        return _build_node_smoke_plan(target_root, pf, archetype_label, source_targets)
     return _build_python_smoke_plan(target_root, rtypes, archetype_label, source_targets)
 
 

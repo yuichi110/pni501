@@ -352,8 +352,10 @@ def test_ws5_lint_drawlib_chapters_and_strict_preflight(tmp_path: Path) -> None:
         "```\n",
         encoding="utf-8",
     )
+    fake_tok = "-".join(("xoxb", "123456789012", "ABCDEFGHIJKLMN"))
     bad_ch6.write_text(
         "# 6. Security\n\n"
+        f"Example Slack token: `{fake_tok}`\n\n"
         '```drawlib file=sec.png caption="Sec"\n'
         "chart = BarChart(xy=(12, 10), width=124, height=44)\n"
         "chart.add_series('Critical', [1, 0])\n"
@@ -361,6 +363,14 @@ def test_ws5_lint_drawlib_chapters_and_strict_preflight(tmp_path: Path) -> None:
         "chart.draw()\n"
         "chart.draw_legend(xy=(14, 56), orientation='horizontal')\n"
         "```\n",
+        encoding="utf-8",
+    )
+    token_warnings = lint_drawlib_chapters([bad_ch2, bad_ch6])
+    assert len(token_warnings) == 1
+    assert "GitHub Push Protection" in token_warnings[0]
+
+    bad_ch6.write_text(
+        bad_ch6.read_text(encoding="utf-8").replace(fake_tok, "<REDACTED_SLACK_TOKEN>"),
         encoding="utf-8",
     )
     assert lint_drawlib_chapters([bad_ch2, bad_ch6]) == []
@@ -374,6 +384,7 @@ def test_ws5_lint_drawlib_chapters_and_strict_preflight(tmp_path: Path) -> None:
             strict_preflight=True,
         )
     assert res.preflight_warnings == []
+    assert (src_dir / "_assets" / "ogp.png").is_file()
 
     guide = render_drawlib_report_guide(
         target="demo",
@@ -385,3 +396,4 @@ def test_ws5_lint_drawlib_chapters_and_strict_preflight(tmp_path: Path) -> None:
     )
     assert "chart.draw_legend" in guide
     assert "show_contour_lines=False" in guide
+

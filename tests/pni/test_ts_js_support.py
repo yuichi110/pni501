@@ -444,3 +444,151 @@ Tests:       1 failed, 1 skipped, 4 passed, 6 total
     js_init_dir.mkdir()
     init_project(js_init_dir, lang="javascript")
     assert any(a.id == "javascript_ast_audit" for a in list_actions(js_init_dir))
+
+
+def test_ts_js_monorepo_zod_refinements(tmp_path: Path) -> None:
+    """Verify Vitest /tmp/pni-cov, pnpm-lock monorepo scope, expectTypeOf<T>, and barrel cycle separation."""
+    mono_dir = tmp_path / "zod_mono"
+    pkg_zod = mono_dir / "packages" / "zod" / "src"
+    pkg_docs = mono_dir / "packages" / "docs"
+    pkg_zod.mkdir(parents=True)
+    pkg_docs.mkdir(parents=True)
+
+    (mono_dir / "package.json").write_text(
+        json.dumps(
+            {
+                "name": "zod-monorepo",
+                "private": True,
+                "packageManager": "nub@0.8.3",
+                "scripts": {"prepare": "husky", "test": "vitest run"},
+                "devDependencies": {"vitest": "^3.0.0", "typescript": "^5.5.0"},
+            }
+        ),
+        encoding="utf-8",
+    )
+    (mono_dir / "packages" / "zod" / "package.json").write_text(
+        json.dumps({"name": "zod", "version": "4.6.7", "dependencies": {}}),
+        encoding="utf-8",
+    )
+    (mono_dir / "packages" / "zod" / "tsconfig.json").write_text(
+        '{"compilerOptions": {"strict": true}}\n',
+        encoding="utf-8",
+    )
+    (pkg_docs / "package.json").write_text(
+        json.dumps({"name": "zod-docs", "dependencies": {"next": "14.1.0", "postcss": "8.4.30"}}),
+        encoding="utf-8",
+    )
+    (mono_dir / "pnpm-lock.yaml").write_text(
+        """lockfileVersion: '9.0'
+importers:
+  .:
+    devDependencies:
+      vitest:
+        specifier: ^3.0.0
+        version: 3.0.0
+  packages/zod: {}
+  packages/docs:
+    dependencies:
+      next:
+        specifier: 14.1.0
+        version: 14.1.0
+packages:
+  'next@14.1.0':
+    resolution: {integrity: sha512-abc}
+  '@next/env@14.1.0':
+    resolution: {integrity: sha512-def}
+  'vitest@3.0.0':
+    dev: true
+snapshots:
+  'next@14.1.0':
+    dependencies:
+      '@next/env': 14.1.0
+""",
+        encoding="utf-8",
+    )
+
+    # 1. Monorepo zero-dependency target package classifies workspace/docs lockfile deps as non-core
+    non_core = discover_non_core_packages(mono_dir, source_targets=["packages/zod/src"])
+    assert "next" in non_core
+    assert "@next/env" in non_core
+    assert "postcss" in non_core
+    assert "vitest" in non_core
+
+    # 2. Barrel index.ts re-export cycle vs implementation cycle + expectTypeOf<T> / assertType<T>
+    (pkg_zod / "index.ts").write_text(
+        'export * from "./schemas.js";\nexport * from "./checks.js";\n',
+        encoding="utf-8",
+    )
+    (pkg_zod / "schemas.ts").write_text(
+        """import { runCheck } from "./index.js";
+import { type CheckMeta } from "./checks.js";
+
+/**
+ * Parse schema value.
+ */
+export function parseSchema(val: string): string {
+  const _meta: CheckMeta | undefined = undefined;
+  return runCheck(val) + (_meta ? "" : "");
+}
+""",
+        encoding="utf-8",
+    )
+    (pkg_zod / "checks.ts").write_text(
+        """export interface CheckMeta {
+  id: string;
+}
+
+/**
+ * Run validation check.
+ */
+export function runCheck(input: string): string {
+  return input.trim();
+}
+""",
+        encoding="utf-8",
+    )
+    (pkg_zod / "schemas.test.ts").write_text(
+        """import { assertType, expectTypeOf, test } from "vitest";
+import { parseSchema } from "./schemas.js";
+
+test("generic expectTypeOf and assertType assertions", () => {
+  const out = parseSchema("ok");
+  expectTypeOf<string>(out).toEqualTypeOf<string>();
+  assertType<string>(out);
+});
+
+test("negative compile-time type check", () => {
+  // @ts-expect-error number is not assignable to string parameter
+  parseSchema(123);
+});
+""",
+        encoding="utf-8",
+    )
+
+    ast_facts = run_ast_analyze(
+        mono_dir,
+        targets=["packages/zod/src"],
+        test_targets=["packages/zod/src"],
+        lang="typescript",
+    )
+    assert ast_facts.test_functions_count == 2
+    assert ast_facts.assertion_free_tests == []
+    assert ast_facts.circular_dependencies == []
+    assert len(ast_facts.type_checking_cycles) >= 1
+
+    # 3. Runtime check commands and Dockerfile hardening
+    pf = run_project_inspect(mono_dir, source_dirs=["packages/zod/src"], lang="typescript")
+    test_cmd = build_test_and_coverage_command(pf, "node", ["packages/zod/src"], ["packages/zod/src"])
+    assert "--coverage.clean=false" in test_cmd[2]
+    assert "pni-cov" in test_cmd[2]
+
+    _arch, smoke_cmd = build_smoke_plan(mono_dir, pf, ["packages/zod/src"])
+    assert smoke_cmd is not None
+    assert "packages/zod/tsconfig.json" in smoke_cmd[2]
+
+    df_path, _ = ensure_target_dockerfile(mono_dir, ".", "typescript", "node")
+    df_text = df_path.read_text(encoding="utf-8")
+    assert "COREPACK_ENABLE_STRICT=0" in df_text
+    assert "@vitest/coverage-v8" in df_text
+    assert "USER pni" in df_text
+

@@ -444,6 +444,7 @@ def _execute_security_scan_json(
         target_root=run.targets.root,
         source_targets=run.targets.source,
         test_targets=run.targets.tests,
+        exclude_targets=run.targets.exclude,
         lang=step_lang,
         project_facts=prior_bundle.project_facts,
         options=_parse_security_scan_options(action.params),
@@ -1057,6 +1058,22 @@ def _format_action_guide(
             render_pre_score_digest_markdown(
                 compile_workflow_digest(all_actions, bundle, opt_outs=pni_cfg.opt_out)
             )
+        )
+    if action.primitive_type == PrimitiveType.WRITE_DRAWLIB_REPORT:
+        lines.extend(
+            [
+                "\n### Pre-Submission Mandatory Checklist (`write_drawlib_report`)",
+                "- [ ] **Cover Emblem (`00_cover.md`)**: Verify `00_cover.md` draws the PNI501 triangle emblem "
+                "via `from drawlib.utils import draw_pni_logo; draw_pni_logo((135, 48), width=9.0, dark=True)`.",
+                "- [ ] **Multi-Series Legends**: Every `BarChart` / `LineChart` with `>= 2` `.add_series(...)` calls "
+                "MUST invoke `chart.draw_legend(xy=(x, y), orientation='horizontal')`.",
+                "- [ ] **Overlay & Table Guardrails**: Every `ClassDiagram` + `HeatmapOverlay` sets `height >= 80` "
+                "and `show_contour_lines=False`; every `rule_id` table column has width `>= 38`.",
+                "- [ ] **Secret Redaction**: Mask any example secret tokens (`<REDACTED_SLACK_TOKEN>`, "
+                "`<REDACTED_GH_TOKEN>`) so GitHub Push Protection is never triggered.",
+                "- [ ] **Preflight & Link Build**: Run `pni report build` (with `--strict-preflight`) and confirm "
+                "0 broken links and 0 preflight warnings before calling `push-action`.",
+            ]
         )
 
     schema_str = get_expected_input_schema_json(action.primitive_type, action.params)

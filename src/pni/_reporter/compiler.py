@@ -37,15 +37,31 @@ _STARTER_SAMPLE_CHAPTERS = (
 _SAFE_LANG_RE: Final[re.Pattern[str]] = re.compile(r"^[A-Za-z0-9_-]{1,32}$")
 _DRAWLIB_FENCE_RE: Final[re.Pattern[str]] = re.compile(r"```drawlib([^\n]*)\n(.*?)```", re.DOTALL)
 _FENCE_FILE_ATTR_RE: Final[re.Pattern[str]] = re.compile(r"file=([^\s\"']+)")
+_PUSH_PROTECTION_SECRET_RE: Final[re.Pattern[str]] = re.compile(
+    r"\b(?:"
+    r"xox[baprs]-[0-9A-Za-z-]{10,}"
+    r"|gh[pousr]_[A-Za-z0-9_]{20,}"
+    r"|github_pat_[A-Za-z0-9_]{20,}"
+    r"|AKIA[0-9A-Z]{16}"
+    r"|sk-(?:live|test|proj)-[A-Za-z0-9_-]{16,}"
+    r")\b"
+)
 
 
 def lint_drawlib_chapters(chapters: Sequence[Path]) -> list[str]:
-    """Scan chapter Markdown drawlib blocks for missing multi-series legends and contour-line collisions."""
+    """Scan chapter Markdown drawlib blocks for missing legends, contour collisions, and unmasked tokens."""
     warnings: list[str] = []
     for md_path in chapters:
         if not md_path.is_file():
             continue
         content = md_path.read_text(encoding="utf-8")
+        secret_match = _PUSH_PROTECTION_SECRET_RE.search(content)
+        if secret_match is not None:
+            token_prefix = secret_match.group(0)[:10]
+            warnings.append(
+                f"{md_path.name}: unmasked token pattern '{token_prefix}...' detected; "
+                "replace with '<REDACTED_TOKEN>' to avoid GitHub Push Protection blocks"
+            )
         for match in _DRAWLIB_FENCE_RE.finditer(content):
             header, code = match.group(1), match.group(2)
             file_match = _FENCE_FILE_ATTR_RE.search(header)
@@ -353,7 +369,7 @@ def draw_pni_logo(
 
 
 def _ensure_report_brand_assets(src_dir: Path, *, clean_sample_chapters: bool = True) -> list[Path]:
-    """Copy bundled PNI501 logo/favicon assets into <src_dir>/_assets/ and inject draw_pni_logo() into utils.py."""
+    """Copy bundled PNI501 logo/favicon/ogp assets into <src_dir>/_assets/ and inject draw_pni_logo() into utils.py."""
     assets_dir = src_dir / "_assets"
     assets_dir.mkdir(parents=True, exist_ok=True)
     if clean_sample_chapters:
@@ -369,6 +385,12 @@ def _ensure_report_brand_assets(src_dir: Path, *, clean_sample_chapters: bool = 
             dest_asset = assets_dir / asset_name
             shutil.copy2(src_asset, dest_asset)
             copied.append(dest_asset)
+
+    ogp_dest = assets_dir / "ogp.png"
+    logo_src = _BUNDLED_ASSETS_DIR / "logo.png"
+    if not ogp_dest.is_file() and logo_src.is_file():
+        shutil.copy2(logo_src, ogp_dest)
+        copied.append(ogp_dest)
 
     utils_path = src_dir / "utils.py"
     if utils_path.is_file():
@@ -621,6 +643,7 @@ def compile_report_project(
         msg = f"Missing 'drawlib.toml' in '{src_dir}'. Run 'pni report init {clean_target} --force' first."
         raise ValueError(msg)
 
+    _ensure_report_brand_assets(src_dir, clean_sample_chapters=False)
     default_lang, langs = _read_drawlib_i18n_config(src_dir)
     chapters = _find_chapter_markdown_files(src_dir, fallback_lang=default_lang)
     if not chapters:
