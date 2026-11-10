@@ -14,6 +14,8 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
+from ast_grep_py import SgRoot
+
 from pni._actions import (
     CategoryScores,
     ScoreResult,
@@ -22,8 +24,8 @@ from pni._actions import (
     run_ast_analyze,
     run_project_inspect,
 )
-from pni._actions.ast_analyze.php._helpers import normalize_php_source_for_cst
-from pni._actions.runtime_check.parsers import parse_clover_xml
+from pni._actions.ast_analyze.php._helpers import iter_php_callables, normalize_php_source_for_cst
+from pni._actions.runtime_check.parsers import parse_clover_xml, parse_junit_xml_files
 from pni._actions.runtime_check.selector import (
     build_test_and_coverage_command,
     compute_harness_build_args,
@@ -31,6 +33,7 @@ from pni._actions.runtime_check.selector import (
     select_php_image_version,
 )
 from pni._actions.runtime_check.smoke import build_smoke_plan, classify_boot_failure
+from pni._config import load_pni_config
 from pni._dockerfiles import ensure_target_dockerfile
 from pni._rules.manager import detect_active_language
 from pni._workflows import (
@@ -700,4 +703,242 @@ class OrderController
     assert len(facts.missing_io_timeouts) == 3
     assert len(facts.scattered_env_access) == 2
     assert any("var_dump" in loc.detail for loc in facts.unstructured_logging)
+
+
+def test_php_slim_audit_regressions(tmp_path: Path) -> None:
+    """Verify all 9 PHP audit improvements discovered against slimphp/Slim (v4.15.3)."""
+    # (6) Union constraint version selection
+    assert (
+        select_php_image_version("~7.4.0 || ~8.0.0 || ~8.1.0 || ~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0")
+        == "8.4"
+    )
+    assert select_php_image_version("^7.4 || ^8.0") == "8.3"
+    assert select_php_image_version(">=8.1 <8.4") == "8.3"
+
+    # (2) Nested <testsuite> JUnit XML parsing without double/triple counting
+    junit_nested = tmp_path / "phpunit_junit.xml"
+    junit_nested.write_text(
+        """<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Slim/phpunit.xml.dist" tests="2" assertions="4" errors="0" failures="0" skipped="0">
+    <testsuite name="Slim Test Suite" tests="2" assertions="4" errors="0" failures="0" skipped="0">
+      <testsuite name="Slim\\Tests\\AppTest" tests="2" assertions="4" errors="0" failures="0" skipped="0">
+        <testcase name="testRun" class="Slim\\Tests\\AppTest" classname="Slim.Tests.AppTest" time="0.01"/>
+        <testcase name="testRespond" class="Slim\\Tests\\AppTest" classname="Slim.Tests.AppTest" time="0.01"/>
+      </testsuite>
+    </testsuite>
+  </testsuite>
+</testsuites>
+""",
+        encoding="utf-8",
+    )
+    total, passed, failed, errors, skipped, failures = parse_junit_xml_files([junit_nested])
+    assert (total, passed, failed, errors, skipped, failures) == (2, 2, 0, 0, 0, [])
+
+    # Set up a Slim-like repository in a nested directory (without `"version"` in composer.json)
+    slim_dir = tmp_path / "slim_repo"
+    (slim_dir / "Slim").mkdir(parents=True)
+    (slim_dir / "tests").mkdir(parents=True)
+    (slim_dir / "composer.json").write_text(
+        json.dumps(
+            {
+                "name": "slim/slim",
+                "require": {
+                    "php": "~7.4.0 || ~8.0.0 || ~8.1.0 || ~8.2.0 || ~8.3.0 || ~8.4.0",
+                    "nikic/fast-route": "^1.3",
+                    "psr/log": "^1.1 || ^2.0 || ^3.0",
+                    "fig/http-message-util": "^1.1",
+                },
+                "require-dev": {
+                    "phpunit/phpunit": "^10.5",
+                    "phpstan/phpstan": "^1.11",
+                    "phpspec/prophecy-phpunit": "^2.2",
+                },
+                "autoload": {"psr-4": {"Slim\\": "Slim/"}},
+                "autoload-dev": {"psr-4": {"Slim\\Tests\\": "tests/"}},
+            }
+        ),
+        encoding="utf-8",
+    )
+    (slim_dir / "composer.lock").write_text(
+        json.dumps(
+            {
+                "packages": [
+                    {
+                        "name": "fig/http-message-util",
+                        "autoload": {"psr-4": {"Fig\\Http\\Message\\": "src/"}},
+                    }
+                ]
+            }
+        ),
+        encoding="utf-8",
+    )
+
+    # (9) PSR-3 Logger implementation calling error_log()
+    (slim_dir / "Slim" / "Logger.php").write_text(
+        """<?php
+
+declare(strict_types=1);
+
+namespace Slim;
+
+use Psr\\Log\\AbstractLogger;
+
+/**
+ * Default PSR-3 logger implementation.
+ */
+class Logger extends AbstractLogger
+{
+    /**
+     * Log a message with arbitrary level.
+     *
+     * @param string $level Log level.
+     * @param string $message Log message.
+     */
+    public function log(string $level, string $message): void
+    {
+        error_log(sprintf('[%s] %s', $level, $message));
+    }
+}
+""",
+        encoding="utf-8",
+    )
+
+    # (3) FastRoute + Fig imports & (5) Anonymous class inside MiddlewareDispatcher::addDeferred
+    (slim_dir / "Slim" / "MiddlewareDispatcher.php").write_text(
+        """<?php
+
+declare(strict_types=1);
+
+namespace Slim;
+
+use FastRoute\\Dispatcher;
+use Fig\\Http\\Message\\StatusCodeInterface;
+
+/**
+ * Dispatches middleware stack.
+ */
+class MiddlewareDispatcher
+{
+    /**
+     * Wrap a deferred callable in an anonymous handler class.
+     *
+     * @param string $middleware Deferred middleware name.
+     */
+    public function addDeferred(string $middleware): object
+    {
+        return new class ($middleware) {
+            private string $mw;
+
+            public function __construct(string $mw)
+            {
+                $this->mw = $mw;
+            }
+
+            public function handle(int $flag): int
+            {
+                if ($flag === 1) {
+                    if ($this->mw !== '') {
+                        return StatusCodeInterface::STATUS_OK;
+                    }
+                } elseif ($flag === 2) {
+                    return Dispatcher::FOUND;
+                }
+                return 0;
+            }
+        };
+    }
+
+    /**
+     * Handle outer request.
+     *
+     * @param int $code Input code.
+     */
+    public function handle(int $code): int
+    {
+        return $code;
+    }
+}
+""",
+        encoding="utf-8",
+    )
+
+    # (4) Prophecy and PHPUnit expectOutputString / ->expects() assertions
+    (slim_dir / "tests" / "MiddlewareDispatcherTest.php").write_text(
+        """<?php
+
+declare(strict_types=1);
+
+namespace Slim\\Tests;
+
+use PHPUnit\\Framework\\TestCase;
+
+final class MiddlewareDispatcherTest extends TestCase
+{
+    public function testProphecyExpectation(): void
+    {
+        $prophecy = $this->prophesize(\\Slim\\Logger::class);
+        $prophecy->log('info', 'hello')->shouldBeCalledOnce();
+    }
+
+    public function testOutputExpectation(): void
+    {
+        $this->expectOutputString('hello');
+        echo 'hello';
+    }
+
+    public function testPhpunitMockExpects(): void
+    {
+        $mock = $this->createMock(\\Slim\\Logger::class);
+        $mock->expects($this->once())->method('log');
+    }
+}
+""",
+        encoding="utf-8",
+    )
+
+    # (7) & (8) `pni init --lang php` scaffolds PSR-4 source=["Slim"] and include_gitignored=["composer.lock"]
+    init_project(slim_dir, lang="php")
+    cfg = load_pni_config(slim_dir)
+    assert cfg.targets.source == ["Slim"]
+    assert cfg.targets.tests == ["tests"]
+    assert "composer.lock" in cfg.scan.include_gitignored
+
+    # Verify [project] version override in .pni/pni.toml
+    toml_path = slim_dir / ".pni" / "pni.toml"
+    toml_path.write_text(
+        toml_path.read_text(encoding="utf-8").replace('# version = "0.1.0"', 'version = "4.15.3"'),
+        encoding="utf-8",
+    )
+
+    pf = run_project_inspect(slim_dir)
+    assert pf.version == "4.15.3"
+    assert pf.source_files_count == 2
+    assert pf.test_files_count == 1
+
+    # (1) PHPUnit CLI command only appends positional test dir when falling back to /tmp/pni_phpunit.xml
+    cmd = build_test_and_coverage_command(pf, "composer", ["Slim"], ["tests"])
+    assert 'tst_arg="tests"' in cmd[2]
+    assert "--coverage-clover /out/clover.xml $tst_arg" in cmd[2]
+
+    mw_root = SgRoot((slim_dir / "Slim" / "MiddlewareDispatcher.php").read_text(encoding="utf-8"), "php").root()
+    callable_syms = [sym for sym, _ in iter_php_callables(mw_root)]
+    assert "MiddlewareDispatcher::addDeferred" in callable_syms
+    assert "MiddlewareDispatcher::handle" in callable_syms
+    assert any(
+        sym.startswith("MiddlewareDispatcher::addDeferred::<anon@L") and sym.endswith(">::handle")
+        for sym in callable_syms
+    )
+
+    ast_facts = run_ast_analyze(slim_dir, lang="php")
+    assert ast_facts.total_files == 2
+    assert ast_facts.undeclared_dependencies == []
+    assert ast_facts.unused_dependencies == []
+    assert ast_facts.assertion_free_tests == []
+    assert ast_facts.unstructured_logging == []
+    assert ast_facts.missing_docstrings == []
+    assert ast_facts.complex_functions == []
+    mw_inv = next(m for m in ast_facts.module_inventory if m.file.endswith("MiddlewareDispatcher.php"))
+    assert mw_inv.public_callables == ["MiddlewareDispatcher::addDeferred", "MiddlewareDispatcher::handle"]
+
 

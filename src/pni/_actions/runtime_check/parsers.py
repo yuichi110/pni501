@@ -62,7 +62,7 @@ def _extract_case_failure(case_elem: ET.Element) -> Optional[FailedTestCase]:
 def _collect_suites(root: ET.Element) -> list[ET.Element]:
     """Return all <testsuite> elements whether root is <testsuite> or <testsuites>."""
     if root.tag == "testsuite":
-        return [root]
+        return [root, *root.findall(".//testsuite")]
     return list(root.findall(".//testsuite"))
 
 
@@ -100,7 +100,7 @@ def parse_junit_xml_files(
                         else:
                             failed += 1
                         failures.append(fail_item)
-            else:
+            elif suite.find("testsuite") is None:
                 total += int(suite.attrib.get("tests", "0") or 0)
                 failed += int(suite.attrib.get("failures", "0") or 0)
                 errors += int(suite.attrib.get("errors", "0") or 0)

@@ -11,8 +11,9 @@
 
 from __future__ import annotations
 
+import contextlib
 from abc import ABC, abstractmethod
-from typing import ClassVar
+from typing import ClassVar, Final
 
 from ast_grep_py import SgNode
 
@@ -26,6 +27,41 @@ from pni._actions.ast_analyze.models import (
     ParsedUnit,
     QualityResult,
 )
+
+_NESTED_CALLABLE_BOUNDARY_KINDS: Final[frozenset[str]] = frozenset(
+    {
+        "function_definition",
+        "method_declaration",
+        "constructor_declaration",
+        "anonymous_class",
+    }
+)
+
+
+def _is_owned_by_callable(node: SgNode, callable_start_index: int) -> bool:
+    """Return True if `node` is not enclosed by a nested callable or anonymous class inside the outer callable."""
+    curr = node.parent()
+    while curr is not None and curr.range().start.index > callable_start_index:
+        if curr.kind() in _NESTED_CALLABLE_BOUNDARY_KINDS:
+            return False
+        curr = curr.parent()
+    return True
+
+
+def _effective_callable_lines(node: SgNode) -> int:
+    """Return line span of `node` excluding lines belonging to nested `method_declaration` or `anonymous_class`."""
+    total_lines = node.range().end.line - node.range().start.line + 1
+    if node.kind() != "method_declaration":
+        return total_lines
+    callable_start = node.range().start.index
+    nested_lines: set[int] = set()
+    for nkind in ("method_declaration", "anonymous_class"):
+        with contextlib.suppress(RuntimeError):
+            for sub in node.find_all(kind=nkind):
+                if sub.range().start.index <= callable_start:
+                    continue
+                nested_lines.update(range(sub.range().start.line + 1, sub.range().end.line + 1))
+    return max(1, total_lines - len(nested_lines))
 
 
 class BaseQualityChecker(ABC):
@@ -106,6 +142,8 @@ class BaseQualityChecker(ABC):
         score = 0
         for bkind in self.branch_node_kinds:
             for bnode in node.find_all(kind=bkind):
+                if not _is_owned_by_callable(bnode, callable_start):
+                    continue
                 depth = 0
                 curr = bnode.parent()
                 while curr is not None and curr.range().start.index > callable_start:
@@ -117,8 +155,14 @@ class BaseQualityChecker(ABC):
 
     def evaluate_complexity(self, node: SgNode, symbol: str, rel_path: str) -> CodeLocation | None:
         """Check whether a callable exceeds line length, McCabe branch, or cognitive thresholds."""
-        func_len = node.range().end.line - node.range().start.line + 1
-        branches = sum(len(node.find_all(kind=bkind)) for bkind in self.branch_node_kinds)
+        callable_start = node.range().start.index
+        func_len = _effective_callable_lines(node)
+        branches = sum(
+            1
+            for bkind in self.branch_node_kinds
+            for bnode in node.find_all(kind=bkind)
+            if _is_owned_by_callable(bnode, callable_start)
+        )
         cognitive = self.compute_cognitive_complexity(node)
         if (
             func_len > self.max_function_lines

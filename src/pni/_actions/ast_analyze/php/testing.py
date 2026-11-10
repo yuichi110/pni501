@@ -23,11 +23,24 @@ from pni._actions.ast_analyze.php._helpers import (
     extract_node_name,
     find_preceding_phpdoc,
     get_visibility,
+    iter_direct_type_methods,
     iter_php_types,
 )
 
 _ASSERTION_RE: Final[re.Pattern[str]] = re.compile(
-    r"(?:\bassert[A-Z_][A-Za-z0-9_]*\s*\(|\bexpectException[A-Za-z]*\s*\(|\bexpect\s*\(|\bassertDatabase[A-Za-z]*\s*\(|\bassertStatus\s*\(|\bassertJson[A-Za-z]*\s*\(|\bmock\s*\(|\bshouldReceive\s*\()"
+    r"(?:\bassert[A-Z_][A-Za-z0-9_]*\s*\("
+    r"|\bexpectException[A-Za-z]*\s*\("
+    r"|\bexpectOutput(?:String|Regex)\s*\("
+    r"|\bexpectNotToPerformAssertions\s*\("
+    r"|->\s*expects\s*\("
+    r"|\bexpect\s*\("
+    r"|\bassertDatabase[A-Za-z]*\s*\("
+    r"|\bassertStatus\s*\("
+    r"|\bassertJson[A-Za-z]*\s*\("
+    r"|\bmock\s*\("
+    r"|\bshouldReceive\s*\("
+    r"|\bshouldHaveReceived[A-Za-z]*\s*\("
+    r"|\bshould(?:Not)?(?:Be|HaveBeen)Called[A-Za-z]*\s*\()"
 )
 _PEST_TEST_CALL_NAMES: Final[frozenset[str]] = frozenset({"test", "it"})
 
@@ -53,7 +66,7 @@ class PhpTestChecker(BaseTestChecker):
         """Count PHPUnit/Pest test callables in a single test file and append assertion-free cases."""
         unit_count = 0
         for type_name, tnode in iter_php_types(tunit.root):
-            for mnode in tnode.find_all(kind="method_declaration"):
+            for mnode in iter_direct_type_methods(tnode):
                 if not _is_phpunit_test_method(mnode):
                     continue
                 unit_count += 1

@@ -217,16 +217,57 @@ def iter_php_types(root: SgNode) -> list[tuple[str, SgNode]]:
     return found
 
 
-def iter_php_callables(root: SgNode) -> list[tuple[str, SgNode]]:
-    """Return (symbol, cst_node) pairs for all top-level functions and class/trait methods in root."""
-    callables: list[tuple[str, SgNode]] = []
-    for fn_node in root.find_all(kind="function_definition"):
-        callables.append((extract_node_name(fn_node), fn_node))
+def enclosing_anon_class_node(node: SgNode) -> Optional[SgNode]:
+    """Return the enclosing anonymous class CST node (`anonymous_class` or `object_creation_expression`), if any."""
+    curr = node.parent()
+    while curr is not None:
+        ckind = curr.kind()
+        if ckind in {"anonymous_class", "object_creation_expression"}:
+            return curr
+        if ckind in TYPE_DECL_KINDS:
+            return None
+        curr = curr.parent()
+    return None
 
-    for type_name, tnode in iter_php_types(root):
-        for mnode in tnode.find_all(kind="method_declaration"):
-            mname = extract_node_name(mnode)
-            callables.append((f"{type_name}::{mname}", mnode))
+
+def iter_direct_type_methods(tnode: SgNode) -> list[SgNode]:
+    """Return direct `method_declaration` nodes of `tnode`, excluding methods inside anonymous classes."""
+    return [m for m in tnode.find_all(kind="method_declaration") if enclosing_anon_class_node(m) is None]
+
+
+def format_method_symbol(mnode: SgNode) -> str:
+    """Format a PHP `method_declaration` symbol, qualifying methods inside anonymous classes."""
+    mname = extract_node_name(mnode)
+    anon_line: Optional[int] = None
+    outer_callable: Optional[str] = None
+    owner_type: Optional[str] = None
+    curr = mnode.parent()
+    while curr is not None:
+        ckind = curr.kind()
+        if ckind in {"anonymous_class", "object_creation_expression"} and anon_line is None:
+            parent = curr.parent()
+            anchor = parent if parent is not None and parent.kind() == "object_creation_expression" else curr
+            anon_line = anchor.range().start.line + 1
+        elif ckind in {"method_declaration", "function_definition"} and outer_callable is None:
+            outer_callable = extract_node_name(curr)
+        elif ckind in TYPE_DECL_KINDS and owner_type is None:
+            owner_type = extract_node_name(curr)
+        curr = curr.parent()
+
+    if anon_line is not None:
+        anon_tag = f"<anon@L{anon_line}>"
+        parts = [p for p in (owner_type, outer_callable, anon_tag, mname) if p]
+        return "::".join(parts)
+    return f"{owner_type}::{mname}" if owner_type else mname
+
+
+def iter_php_callables(root: SgNode) -> list[tuple[str, SgNode]]:
+    """Return (symbol, cst_node) pairs for all top-level functions and class/trait/anonymous methods in root."""
+    callables: list[tuple[str, SgNode]] = [
+        (extract_node_name(fn_node), fn_node) for fn_node in root.find_all(kind="function_definition")
+    ]
+    for mnode in root.find_all(kind="method_declaration"):
+        callables.append((format_method_symbol(mnode), mnode))
 
     callables.sort(key=lambda item: item[1].range().start.index)
     return callables
@@ -257,18 +298,16 @@ def find_preceding_phpdoc(node: SgNode) -> Optional[str]:
 def enclosing_callable_symbol(node: SgNode) -> Optional[str]:
     """Return the enclosing function or `ClassName::method` symbol for node, if any."""
     curr = node.parent()
-    method_name: Optional[str] = None
     while curr is not None:
         ckind = curr.kind()
         if ckind == "function_definition":
             return extract_node_name(curr)
-        if ckind == "method_declaration" and method_name is None:
-            method_name = extract_node_name(curr)
+        if ckind == "method_declaration":
+            return format_method_symbol(curr)
         if ckind in TYPE_DECL_KINDS:
-            tname = extract_node_name(curr)
-            return f"{tname}::{method_name}" if method_name else tname
+            return extract_node_name(curr)
         curr = curr.parent()
-    return method_name
+    return None
 
 
 def strip_php_quotes(raw: str) -> str:

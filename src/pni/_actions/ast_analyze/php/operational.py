@@ -14,6 +14,8 @@ from __future__ import annotations
 import re
 from typing import Final
 
+from ast_grep_py import SgNode
+
 from pni._actions.ast_analyze.base import BaseOperationalChecker
 from pni._actions.ast_analyze.models import CodeLocation, ParsedUnit
 from pni._actions.ast_analyze.php._helpers import (
@@ -23,6 +25,9 @@ from pni._actions.ast_analyze.php._helpers import (
 
 _DEBUG_PRINT_FUNCS: Final[frozenset[str]] = frozenset(
     {"var_dump", "print_r", "var_export", "dd", "dump", "debug_zval_dump"}
+)
+_PSR3_LOGGER_BASE_RE: Final[re.Pattern[str]] = re.compile(
+    r"\b(?:AbstractLogger|LoggerInterface|LoggerTrait)\b"
 )
 _CONFIG_FILE_HINTS: Final[tuple[str, ...]] = ("config/", "config.php", "settings.php", "wp-config")
 _DEFINE_CALL_RE: Final[re.Pattern[str]] = re.compile(
@@ -37,6 +42,22 @@ def _is_config_module(rel_path: str) -> bool:
     """Return True if rel_path represents a dedicated configuration file."""
     low = rel_path.lower()
     return any(hint in low for hint in _CONFIG_FILE_HINTS)
+
+
+def _is_inside_psr3_logger_class(node: SgNode) -> bool:
+    """Return True if `node` is inside a class implementing/extending PSR-3 `LoggerInterface` or `AbstractLogger`."""
+    curr = node.parent()
+    while curr is not None:
+        if curr.kind() in {"class_declaration", "anonymous_class"}:
+            for child in curr.children():
+                if child.kind() in {"base_clause", "class_interface_clause"} and _PSR3_LOGGER_BASE_RE.search(
+                    child.text()
+                ):
+                    return True
+            if any(_PSR3_LOGGER_BASE_RE.search(u.text()) for u in curr.find_all(kind="use_declaration")):
+                return True
+        curr = curr.parent()
+    return False
 
 
 class PhpOperationalChecker(BaseOperationalChecker):
@@ -148,6 +169,8 @@ class PhpOperationalChecker(BaseOperationalChecker):
             children = fcall.children()
             callee = children[0].text().strip().lstrip("\\").lower() if children else ""
             if callee in _DEBUG_PRINT_FUNCS or callee == "error_log":
+                if callee == "error_log" and _is_inside_psr3_logger_class(fcall):
+                    continue
                 line = fcall.range().start.line + 1
                 findings.append(
                     CodeLocation(

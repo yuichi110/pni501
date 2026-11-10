@@ -23,6 +23,7 @@ from pni._actions.ast_analyze.php._helpers import (
     extract_node_name,
     find_preceding_phpdoc,
     get_visibility,
+    iter_direct_type_methods,
     iter_php_types,
 )
 
@@ -82,7 +83,7 @@ class PhpDocChecker(BaseDocChecker):
             else:
                 documented += 1
 
-            for mnode in tnode.find_all(kind="method_declaration"):
+            for mnode in iter_direct_type_methods(tnode):
                 if get_visibility(mnode) != "public" or _has_override_attribute(mnode):
                     continue
                 mname = extract_node_name(mnode)

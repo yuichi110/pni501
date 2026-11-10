@@ -43,7 +43,7 @@ from pni._actions.ast_analyze.models import (
 )
 from pni._actions.ast_analyze.version_compat import check_language_version_compatibility
 from pni._actions.project_inspect import run_project_inspect
-from pni._config import OptOutEntry, load_pni_config, match_opt_out
+from pni._config import OptOutEntry, extract_composer_psr4_dirs, load_pni_config, match_opt_out
 
 
 def _bug_risk_check_ids(detail: str) -> tuple[str, ...]:
@@ -278,15 +278,20 @@ class LanguageAnalyzerSuite:
         """
         base_display = display_root or project_root
         pni_cfg = load_pni_config(base_display)
+        psr4_src, psr4_tst = (
+            extract_composer_psr4_dirs(project_root) if self.language == "php" else ([], [])
+        )
+        default_src = list(dict.fromkeys([*psr4_src, *self.default_target_dirs]))
+        default_tst = psr4_tst or list(self.default_test_dirs)
         eff_targets = (
             targets
             if targets is not None
-            else (list(pni_cfg.targets.source) if pni_cfg.targets.source else list(self.default_target_dirs))
+            else (list(pni_cfg.targets.source) if pni_cfg.targets.source else default_src)
         )
         eff_test_dirs = (
             test_targets
             if test_targets is not None
-            else (list(pni_cfg.targets.tests) if pni_cfg.targets.tests else list(self.default_test_dirs))
+            else (list(pni_cfg.targets.tests) if pni_cfg.targets.tests else default_tst)
         )
         eff_excludes = (
             exclude_globs

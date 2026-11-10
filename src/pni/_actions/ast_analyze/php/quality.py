@@ -24,6 +24,7 @@ from pni._actions.ast_analyze.php._helpers import (
     extract_formal_param_nodes,
     extract_node_name,
     get_visibility,
+    iter_direct_type_methods,
     iter_php_callables,
     iter_php_types,
 )
@@ -104,7 +105,7 @@ class PhpQualityChecker(BaseQualityChecker):
             extract_node_name(fn) for fn in unit.root.find_all(kind="function_definition")
         ]
         for type_name, tnode in iter_php_types(unit.root):
-            for mnode in tnode.find_all(kind="method_declaration"):
+            for mnode in iter_direct_type_methods(tnode):
                 if get_visibility(mnode) == "public":
                     pub_callables.append(f"{type_name}::{extract_node_name(mnode)}")
         return pub_types, sorted(set(pub_callables))

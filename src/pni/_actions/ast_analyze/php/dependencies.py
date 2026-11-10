@@ -91,6 +91,63 @@ def _extract_included_resolved_paths(unit: ParsedUnit, project_root: Path) -> li
     return targets
 
 
+def _extract_psr4_heads(autoload_obj: object) -> set[str]:
+    """Extract top-level namespace prefixes from a Composer `autoload` or `autoload-dev` object."""
+    heads: set[str] = set()
+    if not isinstance(autoload_obj, dict):
+        return heads
+    for section_key in ("psr-4", "psr-0"):
+        mapping = autoload_obj.get(section_key)
+        if isinstance(mapping, dict):
+            for ns_prefix in mapping:
+                head = str(ns_prefix).strip("\\").split("\\", maxsplit=1)[0]
+                if head:
+                    heads.add(head)
+    return heads
+
+
+def _load_lock_namespace_map(lock_path: Path) -> dict[str, str]:
+    """Map lowercase PSR-4 top-level namespaces to package names from `composer.lock` if present."""
+    ns_to_pkg: dict[str, str] = {}
+    if not lock_path.is_file():
+        return ns_to_pkg
+    with contextlib.suppress(Exception):
+        data = json.loads(lock_path.read_text(encoding="utf-8"))
+        if not isinstance(data, dict):
+            return ns_to_pkg
+        for key in ("packages", "packages-dev"):
+            pkgs = data.get(key)
+            if not isinstance(pkgs, list):
+                continue
+            for entry in pkgs:
+                if not isinstance(entry, dict):
+                    continue
+                pkg_name = str(entry.get("name", "")).strip().lower()
+                if "/" not in pkg_name:
+                    continue
+                for head in _extract_psr4_heads(entry.get("autoload")):
+                    ns_to_pkg.setdefault(head.lower(), pkg_name)
+    return ns_to_pkg
+
+
+def _matches_declared_composer_pkg(
+    top_low: str,
+    top_clean: str,
+    mapped: str,
+    declared_pkgs: set[str],
+) -> bool:
+    """Return True if an imported top-level namespace matches any declared Composer package."""
+    for pkg in declared_pkgs:
+        if pkg.startswith(mapped):
+            return True
+        parts = pkg.split("/")
+        if top_low in parts or any(top_clean == part.replace("-", "").replace("_", "") for part in parts):
+            return True
+        if top_clean == pkg.replace("/", "").replace("-", "").replace("_", ""):
+            return True
+    return False
+
+
 class PhpDependencyChecker(BaseDependencyChecker):
     """Build PHP namespace + procedural include graphs, detect cycles, and audit Composer dependencies."""
 
@@ -135,13 +192,8 @@ class PhpDependencyChecker(BaseDependencyChecker):
                 req = data.get("require")
                 if isinstance(req, dict):
                     declared_pkgs.update(str(p).strip().lower() for p in req if "/" in str(p))
-                autoload = data.get("autoload")
-                psr4 = autoload.get("psr-4") if isinstance(autoload, dict) else None
-                if isinstance(psr4, dict):
-                    for ns_prefix in psr4:
-                        head = str(ns_prefix).strip("\\").split("\\", maxsplit=1)[0]
-                        if head:
-                            internal_roots.add(head)
+                internal_roots.update(_extract_psr4_heads(data.get("autoload")))
+                internal_roots.update(_extract_psr4_heads(data.get("autoload-dev")))
 
         for unit in units:
             ns = extract_php_namespace(unit.root)
@@ -160,6 +212,7 @@ class PhpDependencyChecker(BaseDependencyChecker):
             return [], []
 
         declared_pkgs, internal_roots = self._load_composer_manifest_info(composer_path, units)
+        lock_ns_to_pkg = _load_lock_namespace_map(project_root / "composer.lock")
         used_vendors: set[str] = set()
         undeclared: list[CodeLocation] = []
         for unit in units:
@@ -170,10 +223,13 @@ class PhpDependencyChecker(BaseDependencyChecker):
                 if top_ns in internal_roots:
                     continue
                 top_low = top_ns.lower()
+                top_clean = top_low.replace("-", "").replace("_", "")
                 used_vendors.add(top_low)
-                mapped = _VENDOR_PREFIX_MAP.get(top_low, top_low)
-                if declared_pkgs and not any(
-                    pkg.startswith(mapped) or top_low in pkg.split("/") for pkg in declared_pkgs
+                used_vendors.add(top_clean)
+                mapped = _VENDOR_PREFIX_MAP.get(top_low, lock_ns_to_pkg.get(top_low, top_low))
+                used_vendors.add(mapped)
+                if declared_pkgs and not _matches_declared_composer_pkg(
+                    top_low, top_clean, mapped, declared_pkgs
                 ):
                     undeclared.append(
                         CodeLocation(
@@ -193,7 +249,9 @@ class PhpDependencyChecker(BaseDependencyChecker):
             vendor, short = pkg.split("/", maxsplit=1)
             short_clean = short.replace("-", "").replace("_", "")
             if (
-                vendor not in used_vendors
+                pkg not in used_vendors
+                and vendor not in used_vendors
+                and short_clean not in used_vendors
                 and vendor not in all_source_lower
                 and short_clean not in all_source_lower.replace("_", "")
             ):

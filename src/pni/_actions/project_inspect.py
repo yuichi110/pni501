@@ -29,7 +29,9 @@ from pni._actions._repo_governance import (
 )
 from pni._config import (
     OptOutEntry,
+    detect_git_tag_version,
     discover_gitignored_paths,
+    extract_composer_psr4_dirs,
     load_pni_config,
     match_opt_out,
 )
@@ -833,14 +835,16 @@ def _resolve_default_dirs(project_root: Path, lang: str) -> tuple[list[str], lis
         tst = ["src/test/java"] if (project_root / "src" / "test" / "java").exists() else ["test", "tests"]
         return src, tst
     if lang == "php":
-        tst = ["tests"] if (project_root / "tests").is_dir() else ["test", "tests"]
+        psr4_src, psr4_tst = extract_composer_psr4_dirs(project_root)
+        tst = psr4_tst or (["tests"] if (project_root / "tests").is_dir() else ["test", "tests"])
         has_root_php = any(
             p.name != "artisan" for p in project_root.glob("*.php")
         ) or any(project_root.glob("*.phtml"))
-        if has_root_php:
+        if has_root_php and not psr4_src:
             return ["."], tst
         modern_dirs = [d for d in ("app", "src", "routes", "includes", "public") if (project_root / d).is_dir()]
-        return (modern_dirs or ["src"]), tst
+        combined_src = list(dict.fromkeys([*psr4_src, *modern_dirs]))
+        return (combined_src or ["src"]), tst
     return ["src"], ["tests"]
 
 
@@ -857,10 +861,16 @@ def _inspect_readme(project_root: Path, doc_files: list[str]) -> tuple[bool, int
 def _dispatch_manifest_inspect(project_root: Path, active_lang: str) -> _ManifestInspection:
     """Dispatch manifest inspection according to active project language."""
     if active_lang == "java":
-        return _inspect_java_manifests(project_root)
-    if active_lang == "php":
-        return _inspect_php_manifests(project_root)
-    return _inspect_python_manifests(project_root)
+        res = _inspect_java_manifests(project_root)
+    elif active_lang == "php":
+        res = _inspect_php_manifests(project_root)
+    else:
+        res = _inspect_python_manifests(project_root)
+    if res.version == "0.0.0":
+        git_ver = detect_git_tag_version(project_root)
+        if git_ver:
+            res.version = git_ver
+    return res
 
 
 def _source_and_test_patterns(active_lang: str) -> tuple[tuple[str, ...], tuple[str, ...]]:
@@ -1014,7 +1024,7 @@ def run_project_inspect(
 
     return ProjectFacts(
         project_name=pni_cfg.project.name or manifest_info.project_name,
-        version=manifest_info.version,
+        version=pni_cfg.project.version or manifest_info.version,
         language=active_lang,
         runtime_types=archetypes,
         build_system=manifest_info.build_system,

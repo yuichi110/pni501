@@ -49,21 +49,33 @@ def select_java_image_version(constraint: Optional[str]) -> str:
     return "21"
 
 
-def select_php_image_version(constraint: Optional[str]) -> str:
-    """Select an active official PHP CLI container tag ('8.1', '8.2', '8.3', '8.4') from version constraint."""
-    if not constraint:
-        return "8.3"
-    text = constraint.strip()
-    if re.search(r"(?:^|\D)(?:5\.\d+|7\.\d+|8\.0)(?:\D|$)", text):
+def _select_single_php_branch_version(branch: str) -> str:
+    """Select an active PHP CLI container tag ('8.1', '8.2', '8.3', '8.4') for a single constraint branch."""
+    if re.search(r"(?:^|\D)(?:5\.\d+|7\.\d+)(?:\D|$)", branch) or re.search(
+        r"(?:~|==|=|<)\s*8\.0\b|\b8\.0\.\*", branch
+    ):
         return "8.2"
-    if "<8.2" in text or "~8.1" in text or "==8.1" in text or "8.1.*" in text:
+    if "<8.2" in branch or "~8.1" in branch or "==8.1" in branch or "8.1.*" in branch:
         return "8.1"
-    if "<8.3" in text or "~8.2" in text or "==8.2" in text or "8.2.*" in text:
+    if "<8.3" in branch or "~8.2" in branch or "==8.2" in branch or "8.2.*" in branch:
         return "8.2"
-    matches = [int(m) for m in _PHP_VER_RE.findall(text)]
-    if matches and min(matches) >= 4:
+    if "<8.4" in branch or "~8.3" in branch or "==8.3" in branch or "8.3.*" in branch:
+        return "8.3"
+    matches = [int(m) for m in _PHP_VER_RE.findall(branch)]
+    if matches and max(matches) >= 4:
         return "8.4"
     return "8.3"
+
+
+def select_php_image_version(constraint: Optional[str]) -> str:
+    """Select an active official PHP CLI container tag ('8.1', '8.2', '8.3', '8.4') from version constraint."""
+    if not constraint or not constraint.strip():
+        return "8.3"
+    branches = [b.strip() for b in re.split(r"\|\|?", constraint.strip()) if b.strip()]
+    if not branches:
+        return "8.3"
+    candidates = [_select_single_php_branch_version(b) for b in branches]
+    return max(candidates, key=lambda ver: tuple(int(part) for part in ver.split(".")))
 
 
 def select_harness_tool(pf: ProjectFacts) -> str:
@@ -134,12 +146,14 @@ def _build_php_test_and_lint_script(source_targets: list[str], test_targets: lis
         "done; "
         'if [ "$has_tests" -eq 1 ] && command -v phpunit >/dev/null 2>&1; then '
         '  cfg_flag=""; '
-        "  if [ ! -f phpunit.xml ] && [ ! -f phpunit.xml.dist ]; then "
+        '  tst_arg=""; '
+        "  if [ ! -f phpunit.xml ] && [ ! -f phpunit.xml.dist ] && [ ! -f phpunit.dist.xml ]; then "
         f"    printf '%s' '{fallback_xml}' >/tmp/pni_phpunit.xml; "
         '    cfg_flag="-c /tmp/pni_phpunit.xml"; '
+        f'    tst_arg="{eff_tst}"; '
         "  fi; "
         "  phpunit $cfg_flag -d pcov.enabled=1 -d pcov.directory=. "
-        f"--log-junit /out/junit.xml --coverage-clover /out/clover.xml {eff_tst}; "
+        "--log-junit /out/junit.xml --coverage-clover /out/clover.xml $tst_arg; "
         "  exit $?; "
         "fi; "
         "echo 'PHP syntax gate (php -l) passed; no PHPUnit tests executed.'; exit 0"

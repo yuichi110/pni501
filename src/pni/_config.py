@@ -13,6 +13,7 @@ from __future__ import annotations
 
 import contextlib
 import fnmatch
+import json
 import shutil
 import subprocess  # noqa: S404
 import tomllib
@@ -40,9 +41,10 @@ _CHECK_ID_ALIASES: Final[dict[str, tuple[str, ...]]] = {
 
 
 class PniProjectConfig(BaseModel):
-    """Project identity and optional runtime archetype overrides in .pni/pni.toml."""
+    """Project identity, optional version, and runtime archetype overrides in .pni/pni.toml."""
 
     name: Optional[str] = None
+    version: Optional[str] = None
     archetypes: Optional[list[RuntimeArchetype]] = None
 
 
@@ -60,7 +62,7 @@ class PniScanConfig(BaseModel):
     """Filesystem and secret scan scope controls in .pni/pni.toml."""
 
     respect_gitignore: bool = True
-    include_gitignored: list[str] = Field(default_factory=lambda: ["uv.lock"])
+    include_gitignored: list[str] = Field(default_factory=lambda: ["uv.lock", "composer.lock"])
     skip_files: list[str] = Field(default_factory=list)
     skip_dirs: list[str] = Field(default_factory=list)
 
@@ -138,6 +140,40 @@ def load_pni_config(workspace_root: Path) -> PniConfig:
     return PniConfig.model_validate(raw)
 
 
+def _collect_autoload_dirs(project_root: Path, autoload_obj: object) -> list[str]:
+    """Extract existing relative directory paths from a Composer `autoload` or `autoload-dev` block."""
+    found: list[str] = []
+    if not isinstance(autoload_obj, dict):
+        return found
+    for key in ("psr-4", "psr-0"):
+        mapping = autoload_obj.get(key)
+        if not isinstance(mapping, dict):
+            continue
+        for raw_val in mapping.values():
+            items = raw_val if isinstance(raw_val, list) else [raw_val]
+            for item in items:
+                if not isinstance(item, str):
+                    continue
+                rel = item.strip().strip("/\\")
+                if rel and rel != "." and (project_root / rel).is_dir() and rel not in found:
+                    found.append(rel)
+    return found
+
+
+def extract_composer_psr4_dirs(project_root: Path) -> tuple[list[str], list[str]]:
+    """Return `(source_dirs, test_dirs)` discovered from `composer.json` PSR-4/PSR-0 autoload mappings."""
+    composer_path = project_root / "composer.json"
+    if not composer_path.is_file():
+        return [], []
+    with contextlib.suppress(Exception):
+        data = json.loads(composer_path.read_text(encoding="utf-8"))
+        if isinstance(data, dict):
+            src_dirs = _collect_autoload_dirs(project_root, data.get("autoload"))
+            tst_dirs = _collect_autoload_dirs(project_root, data.get("autoload-dev"))
+            return src_dirs, tst_dirs
+    return [], []
+
+
 def _default_source_and_tests_for_lang(project_root: Path, lang: str) -> tuple[list[str], list[str]]:
     """Return sensible default source and test directory lists for initial pni.toml scaffolding."""
     if lang == "java":
@@ -145,8 +181,11 @@ def _default_source_and_tests_for_lang(project_root: Path, lang: str) -> tuple[l
         tst = ["src/test/java"] if (project_root / "src" / "test" / "java").is_dir() else ["tests"]
         return src, tst
     if lang == "php":
-        src = [d for d in ("app", "src", "routes", "public") if (project_root / d).is_dir()] or ["src"]
-        return src, ["tests"]
+        psr4_src, psr4_tst = extract_composer_psr4_dirs(project_root)
+        conv_src = [d for d in ("app", "src", "routes", "public") if (project_root / d).is_dir()]
+        src = list(dict.fromkeys([*psr4_src, *conv_src])) or ["src"]
+        tst = psr4_tst or (["tests"] if (project_root / "tests").is_dir() else ["tests"])
+        return src, tst
     return ["src"], ["tests"]
 
 
@@ -156,11 +195,13 @@ def render_default_pni_toml(project_root: Path, *, lang: str = "python") -> str:
     src_dirs, test_dirs = _default_source_and_tests_for_lang(project_root, lang)
     src_literal = ", ".join(f'"{s}"' for s in src_dirs)
     tst_literal = ", ".join(f'"{t}"' for t in test_dirs)
+    ignored_lock = "composer.lock" if lang == "php" else "uv.lock"
     return (
         "# PNI Project Configuration Manifest (.pni/pni.toml)\n"
         "# Precedence: CLI / Workflow step `with:` > Workflow YAML > .pni/pni.toml > Built-in defaults\n\n"
         "[project]\n"
         f'name = "{proj_name}"\n'
+        '# version = "0.1.0"\n'
         '# archetypes = ["library", "cli"]\n\n'
         "[targets]\n"
         'root = "."\n'
@@ -171,7 +212,7 @@ def render_default_pni_toml(project_root: Path, *, lang: str = "python") -> str:
         "[scan]\n"
         "# Exclude untracked files matched by .gitignore (e.g. local developer .env) from filesystem/secret scans\n"
         "respect_gitignore = true\n"
-        'include_gitignored = ["uv.lock"]\n'
+        f'include_gitignored = ["{ignored_lock}"]\n'
         'skip_files = [".env", ".env.*", "**/.env"]\n'
         'skip_dirs = ["reports", "reports_src"]\n\n'
         "[report]\n"
@@ -380,3 +421,27 @@ def discover_gitignored_paths(
         _apply_gitignore_patterns(resolved_root, patterns, include_gitignored, ignored_files, ignored_dirs)
 
     return sorted(ignored_files), sorted(ignored_dirs)
+
+
+def detect_git_tag_version(target_dir: Path) -> Optional[str]:
+    """Return latest Git tag version (via `git describe --tags --abbrev=0`) if `target_dir/.git` exists."""
+    if not (target_dir / ".git").exists():
+        return None
+    git_bin = shutil.which("git")
+    if git_bin is None:
+        return None
+    with contextlib.suppress(OSError, subprocess.SubprocessError):
+        proc = subprocess.run(  # noqa: S603
+            [git_bin, "-C", str(target_dir), "describe", "--tags", "--abbrev=0"],
+            capture_output=True,
+            text=True,
+            timeout=3.0,
+            check=False,
+        )
+        if proc.returncode == 0 and proc.stdout:
+            raw_tag = proc.stdout.strip()
+            if len(raw_tag) > 1 and raw_tag[0] in {"v", "V"} and raw_tag[1].isdigit():
+                return raw_tag[1:]
+            if raw_tag:
+                return raw_tag
+    return None
