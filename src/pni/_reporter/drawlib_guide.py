@@ -332,7 +332,7 @@ def render_drawlib_report_guide(
             f"(all prose & labels in `{primary_lang}`):"
         ),
         *chapter_block,
-        "   - **Step 3d — Drawlib `doc` Authoring Rules (Mandatory)**:",
+       "   - **Step 3d — Drawlib `doc` Authoring Rules (Mandatory)**:",
         (
             f"     - **Never create `navbar.md`** inside `{src_dir}/` or `{chapter_dir}/` "
             "(preserves single-page `doc` + PDF ToC after `00_cover.md`)."
@@ -344,6 +344,15 @@ def render_drawlib_report_guide(
         ),
         "       MUST each start with `# N. Title`, lead prose, and **2+ diagrams** (first diagram at lines 5–15).",
         "       Every ```` ```drawlib ```` fence MUST set `file=<name>.png` and `caption=\"...\"`.",
+        "     - **Exact `drawlib` (`v0.3.9+`) Import & Style Cheat Sheet (Prevent Hallucinations)**:",
+        "       - Chart imports use submodules (`from drawlib.charts.bar import BarChart`,",
+        "         `from drawlib.charts.radar import RadarChart`, `from drawlib.charts.heatmap import HeatmapChart`).",
+        "       - Neutral warning/danger fills come from `Styles.*` (`Styles.WarningNeutral.shape_fill_color`,",
+        "         `Styles.DangerNeutral.shape_fill_color`, `Styles.SuccessNeutral.shape_fill_color` —",
+        "         do NOT invent non-existent `Colors.AmberNeutral` attributes).",
+        "     - **Multi-Language (`en` / `ja`) Image Parity**: When multiple languages are configured in",
+        "       `drawlib.toml`, every language directory MUST contain the exact same chapter filenames",
+        "       and identical `file=<name>.png` diagram counts.",
         "     - **Landscape aspect ratios & typography**: Prefer `setup(width=146, height=64, dpi=150)`,",
         "       `text_size >= 9.5`, and `50%+` neutral fills (`Styles.Neutral`, `Styles.PrimaryNeutral`).",
         "     - **Coordinate Anchors (Origin `(0, 0)` is Bottom-Left)**:",

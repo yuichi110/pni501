@@ -11,15 +11,29 @@
 
 from __future__ import annotations
 
+import contextlib
 import re
 import shlex
 from collections.abc import Sequence
-from typing import Optional
+from pathlib import Path
+from typing import Final, Optional
 
 from pni._actions.project_inspect import ProjectFacts
 
 _PY_VER_RE = re.compile(r"3\.(\d+)")
 _PHP_VER_RE = re.compile(r"8\.(\d+)")
+_JAVA_VER_RE = re.compile(r"(?:1\.8|\b(?:8|11|17|21)\b)")
+_MAVEN_SKIP_FLAGS: Final[str] = (
+    "-Dgit.commit.id.skip=true "
+    "-Dlicense.skip=true "
+    "-Dformatter.skip=true "
+    "-Dimpsort.skip=true "
+    "-Drat.skip=true "
+    "-Dcheckstyle.skip=true "
+    "-Denforcer.skip=true "
+    "-Dspotless.check.skip=true "
+    "-Dmodernizer.skip=true"
+)
 
 
 def select_python_image_version(constraint: Optional[str]) -> str:
@@ -40,11 +54,13 @@ def select_java_image_version(constraint: Optional[str]) -> str:
     if not constraint:
         return "21"
     raw = constraint.strip()
-    if raw in {"1.8", "8"}:
+    match = _JAVA_VER_RE.search(raw)
+    ver_str = match.group(0) if match else raw
+    if ver_str in {"1.8", "8"}:
         return "8"
-    if raw == "11":
+    if ver_str == "11":
         return "11"
-    if raw == "17":
+    if ver_str == "17":
         return "17"
     return "21"
 
@@ -94,13 +110,29 @@ def select_harness_tool(pf: ProjectFacts) -> str:
     return "pip"
 
 
+def _extract_dockerfile_arg_default(dockerfile_path: Optional[Path], arg_name: str) -> Optional[str]:
+    """Extract `ARG <arg_name>=<default>` value from a harness Dockerfile if present."""
+    if dockerfile_path is None or not dockerfile_path.is_file():
+        return None
+    with contextlib.suppress(Exception):
+        text = dockerfile_path.read_text(encoding="utf-8", errors="ignore")
+        match = re.search(rf"(?m)^\s*ARG\s+{re.escape(arg_name)}\s*=\s*([^\s#]+)", text)
+        if match:
+            return match.group(1).strip().strip("'\"")
+    return None
+
+
 def compute_harness_build_args(
     pf: ProjectFacts,
     *,
     extra_apt_packages: str = "",
+    harness_dockerfile: Optional[Path] = None,
 ) -> dict[str, str]:
     """Build --build-arg key-value dictionary for the selected language harness."""
     if pf.language == "java":
+        df_java = _extract_dockerfile_arg_default(harness_dockerfile, "JAVA_VERSION")
+        if df_java and df_java != "21":
+            return {"JAVA_VERSION": select_java_image_version(df_java)}
         return {"JAVA_VERSION": select_java_image_version(pf.language_version_constraint)}
     if pf.language == "php":
         php_args: dict[str, str] = {
@@ -187,10 +219,10 @@ def _build_java_test_command(tool: str) -> list[str]:
         return ["sh", "-c", script]
 
     script = (
-        "mvn -B -o -Dmaven.repo.local=/m2repo "
+        f"mvn -B -o -Dmaven.repo.local=/m2repo {_MAVEN_SKIP_FLAGS} "
         "org.jacoco:jacoco-maven-plugin:0.8.12:prepare-agent -DfailIfNoTests=false test; "
         "rc=$?; "
-        "mvn -B -o -Dmaven.repo.local=/m2repo "
+        f"mvn -B -o -Dmaven.repo.local=/m2repo {_MAVEN_SKIP_FLAGS} "
         "org.jacoco:jacoco-maven-plugin:0.8.12:report >/dev/null 2>&1 || true; "
         "mkdir -p /out/surefire; "
         "cp target/surefire-reports/TEST-*.xml /out/surefire/ 2>/dev/null || true; "

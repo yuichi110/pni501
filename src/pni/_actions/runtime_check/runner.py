@@ -316,7 +316,6 @@ def run_runtime_check(
         lang=lang,
     )
     tool = select_harness_tool(pf)
-    build_args = compute_harness_build_args(pf, extra_apt_packages=opts.extra_apt_packages)
     rt_dir, out_dir = _prepare_runtime_dirs(ws_root, workflow_id)
 
     harness_df, template_id = ensure_target_dockerfile(
@@ -326,6 +325,11 @@ def run_runtime_check(
         tool,
         explicit_dockerfile=opts.dockerfile,
         force_regenerate=opts.force_regenerate_dockerfile,
+    )
+    build_args = compute_harness_build_args(
+        pf,
+        extra_apt_packages=opts.extra_apt_packages,
+        harness_dockerfile=harness_df,
     )
     harness_df_rel = harness_df.resolve().relative_to(ws_root).as_posix()
     rt_rel = default_runtime_rel_dir(workflow_id)

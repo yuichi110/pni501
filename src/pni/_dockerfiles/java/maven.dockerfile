@@ -14,6 +14,15 @@ WORKDIR /workspace
 COPY . /workspace
 
 RUN mvn -B -Dmaven.repo.local=/m2repo \
+      -Dgit.commit.id.skip=true \
+      -Dlicense.skip=true \
+      -Dformatter.skip=true \
+      -Dimpsort.skip=true \
+      -Drat.skip=true \
+      -Dcheckstyle.skip=true \
+      -Denforcer.skip=true \
+      -Dspotless.check.skip=true \
+      -Dmodernizer.skip=true \
       org.jacoco:jacoco-maven-plugin:${JACOCO_VERSION}:prepare-agent \
       test \
       -DfailIfNoTests=false \

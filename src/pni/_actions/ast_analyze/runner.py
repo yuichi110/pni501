@@ -391,6 +391,48 @@ class LanguageAnalyzerSuite:
             lambda _loc: ("ast/hardcoded_secrets", "common/security"),
             opt_out_counts,
         )
+        filtered_unstructured_logging = _filter_locations_by_opt_out(
+            op_res.unstructured_logging,
+            opt_outs,
+            lambda _loc: (
+                "ast/unstructured_logging",
+                "ast/console_output",
+                "common/operational_readiness",
+                "common/code_quality",
+            ),
+            opt_out_counts,
+            already_counted_positions=counted_positions,
+        )
+        filtered_missing_timeouts = _filter_locations_by_opt_out(
+            op_res.missing_io_timeouts,
+            opt_outs,
+            lambda _loc: ("ast/missing_io_timeouts", "common/operational_readiness"),
+            opt_out_counts,
+        )
+        filtered_scattered_env = _filter_locations_by_opt_out(
+            op_res.scattered_env_access,
+            opt_outs,
+            lambda _loc: ("ast/scattered_env_access", "common/operational_readiness"),
+            opt_out_counts,
+        )
+        filtered_type_issues = _filter_locations_by_opt_out(
+            typing_res.type_safety_issues,
+            opt_outs,
+            lambda _loc: ("ast/type_safety_issues", "common/type_safety"),
+            opt_out_counts,
+        )
+        filtered_weak_types = _filter_locations_by_opt_out(
+            typing_res.weak_type_usages,
+            opt_outs,
+            lambda _loc: ("ast/weak_type_usages", "common/type_safety"),
+            opt_out_counts,
+        )
+        filtered_assertion_free = _filter_locations_by_opt_out(
+            test_res.assertion_free_tests,
+            opt_outs,
+            lambda _loc: ("ast/assertion_free_tests", "common/test_quality"),
+            opt_out_counts,
+        )
 
         return AstFacts(
             language=self.language,
@@ -404,9 +446,9 @@ class LanguageAnalyzerSuite:
             wildcard_imports=import_res.wildcard_imports,
             late_imports=import_res.late_imports,
             type_safety_coverage_pct=typing_res.type_safety_coverage_pct,
-            type_safety_issues=typing_res.type_safety_issues,
+            type_safety_issues=filtered_type_issues,
             omitted_init_return_annotations=typing_res.omitted_init_return_annotations,
-            weak_type_usages=typing_res.weak_type_usages,
+            weak_type_usages=filtered_weak_types,
             unscoped_type_ignores=typing_res.unscoped_type_ignores,
             docstring_coverage_pct=doc_res.docstring_coverage_pct,
             annotated_doc_functions_count=doc_res.annotated_doc_functions_count,
@@ -425,14 +467,14 @@ class LanguageAnalyzerSuite:
             boundary_violations=filtered_boundary,
             test_functions_count=test_res.test_functions_count,
             module_test_coverage_pct=test_res.module_test_coverage_pct,
-            assertion_free_tests=test_res.assertion_free_tests,
+            assertion_free_tests=filtered_assertion_free,
             test_harness_notes=test_res.test_harness_notes,
             framework_issues=fw_res.framework_issues,
             modernization_hints=fw_res.modernization_hints,
             language_version_mismatches=ver_mismatches,
-            missing_io_timeouts=op_res.missing_io_timeouts,
-            scattered_env_access=op_res.scattered_env_access,
-            unstructured_logging=op_res.unstructured_logging,
+            missing_io_timeouts=filtered_missing_timeouts,
+            scattered_env_access=filtered_scattered_env,
+            unstructured_logging=filtered_unstructured_logging,
             hardcoded_secrets=filtered_hardcoded_secrets,
             dangerous_sinks=filtered_sinks,
             api_endpoints=sec_res.api_endpoints,

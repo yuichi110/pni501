@@ -28,6 +28,11 @@ from pni._actions import (
 from pni._actions.ast_analyze import BaseDependencyChecker, ParsedUnit
 from pni._actions.ast_analyze.java import JavaTypingChecker
 from pni._actions.ast_analyze.python import PythonTypingChecker
+from pni._actions.runtime_check.selector import (
+    build_test_and_coverage_command,
+    compute_harness_build_args,
+)
+from pni._actions.security_scan.dep_scopes import discover_non_core_packages
 from pni._workflows import (
     RunStatus,
     WorkflowStateDB,
@@ -435,3 +440,189 @@ def test_isolated_checker_subclasses_on_parsed_unit() -> None:
 
     cycles = BaseDependencyChecker.detect_cycles({"a": ["b"], "b": ["c"], "c": ["a"]})
     assert ["a", "b", "c", "a"] in cycles
+
+
+def test_java_mybatis_ast_regressions(tmp_path: Path) -> None:
+    """Test Map.Entry<K,V> generics, @interface inventory, AssertJ BDD + helper tests, and logger System.out."""
+    src_pkg = tmp_path / "src" / "main" / "java" / "org" / "apache" / "ibatis"
+    ann_pkg = src_pkg / "annotations"
+    log_pkg = src_pkg / "logging" / "stdout"
+    cache_pkg = src_pkg / "cache"
+    test_pkg = tmp_path / "src" / "test" / "java" / "org" / "apache" / "ibatis"
+    for p in (ann_pkg, log_pkg, cache_pkg, test_pkg):
+        p.mkdir(parents=True)
+
+    # 1.1 Map.Entry<Object, Object> must NOT be flagged as raw generic type Map
+    (cache_pkg / "LruCache.java").write_text(
+        """package org.apache.ibatis.cache;
+
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+/** LRU Cache decorator. */
+public class LruCache {
+    /** Initialize internal key map. */
+    public Map<Object, Object> createKeyMap() {
+        return new LinkedHashMap<Object, Object>(16, 0.75f, true) {
+            @Override
+            protected boolean removeEldestEntry(Map.Entry<Object, Object> eldest) {
+                return size() > 1024;
+            }
+        };
+    }
+}
+""",
+        encoding="utf-8",
+    )
+
+    # 1.2 @interface annotation type must be counted in public_types, public_callables, and total_classes
+    (ann_pkg / "Select.java").write_text(
+        """package org.apache.ibatis.annotations;
+
+/**
+ * Specify SQL SELECT statement.
+ */
+public @interface Select {
+    String[] value();
+}
+""",
+        encoding="utf-8",
+    )
+
+    # 1.5 Console logger adapter implementing Log should not trigger unstructured_logging
+    (log_pkg / "StdOutImpl.java").write_text(
+        """package org.apache.ibatis.logging.stdout;
+
+/**
+ * Standard out logger implementation.
+ */
+public class StdOutImpl implements Log {
+    /** Print debug log line. */
+    public void debug(String s) {
+        System.out.println(s);
+    }
+}
+""",
+        encoding="utf-8",
+    )
+
+    # 1.3 JUnit tests using AssertJ BDD then(...) and 1-hop intra-class helper method
+    (test_pkg / "TypeAliasRegistryTest.java").write_text(
+        """package org.apache.ibatis;
+
+import org.junit.jupiter.api.Test;
+import static org.assertj.core.api.BDDAssertions.then;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+class TypeAliasRegistryTest {
+    @Test
+    void shouldVerifyWithBddThen() {
+        then("mybatis").isEqualTo("mybatis");
+    }
+
+    @Test
+    void shouldDelegateToHelper() {
+        registerAndResolveTypeAlias("string", String.class);
+    }
+
+    private void registerAndResolveTypeAlias(String alias, Class<?> expected) {
+        assertEquals(String.class, expected);
+    }
+}
+""",
+        encoding="utf-8",
+    )
+
+    facts = run_ast_analyze(tmp_path, targets=["src/main/java"], test_targets=["src/test/java"])
+    assert facts.total_files == 3
+    assert facts.total_classes == 3
+    assert facts.type_safety_coverage_pct == 100.0
+    assert facts.type_safety_issues == []
+    assert facts.unstructured_logging == []
+    assert facts.bug_risk_idioms == []
+    assert facts.test_functions_count == 2
+    assert facts.assertion_free_tests == []
+
+    inv_by_file = {entry.file: entry for entry in facts.module_inventory}
+    select_inv = inv_by_file["src/main/java/org/apache/ibatis/annotations/Select.java"]
+    assert select_inv.public_types == ["Select"]
+    assert select_inv.public_callables == ["value"]
+    assert select_inv.loc > 0
+
+
+def test_java_maven_parent_props_optional_provided_and_runtime_harness(tmp_path: Path) -> None:
+    """Test Maven <JavaVersion>, optional/provided deps, dependencies-lock.json, and harness skip flags."""
+    (tmp_path / "pom.xml").write_text(
+        """<project xmlns="http://maven.apache.org/POM/4.0.0">
+  <parent>
+    <groupId>org.mybatis</groupId>
+    <artifactId>mybatis-parent</artifactId>
+    <version>40</version>
+  </parent>
+  <groupId>org.mybatis</groupId>
+  <artifactId>mybatis</artifactId>
+  <version>3.6.0</version>
+  <properties>
+    <JavaVersion>17</JavaVersion>
+    <slf4j.version>2.0.13</slf4j.version>
+  </properties>
+  <dependencies>
+    <dependency>
+      <groupId>org.ow2.asm</groupId>
+      <artifactId>asm</artifactId>
+      <version>${asm.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
+      <version>${slf4j.version}</version>
+      <optional>true</optional>
+    </dependency>
+    <dependency>
+      <groupId>jakarta.transaction</groupId>
+      <artifactId>jakarta.transaction-api</artifactId>
+      <version>2.0.1</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter-engine</artifactId>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+</project>
+""",
+        encoding="utf-8",
+    )
+    (tmp_path / "dependencies-lock.json").write_text("{}\n", encoding="utf-8")
+
+    pf = run_project_inspect(tmp_path)
+    assert pf.language == "java"
+    assert pf.language_version_constraint == "17"
+    assert "dependencies-lock.json" in pf.lockfiles_found
+    # Mandatory runtime dependency with external parent ${asm.version} resolved cleanly without raw ${...}
+    assert pf.dependencies == ["org.ow2.asm:asm"]
+    # Optional, provided, and test dependencies routed to dev_dependencies
+    assert "org.slf4j:slf4j-api:2.0.13" in pf.dev_dependencies
+    assert "jakarta.transaction:jakarta.transaction-api:2.0.1" in pf.dev_dependencies
+    assert "org.junit.jupiter:junit-jupiter-engine" in pf.dev_dependencies
+
+    non_core = discover_non_core_packages(tmp_path)
+    assert "slf4j_api" in non_core
+    assert "jakarta_transaction_api" in non_core
+    assert "asm" not in non_core
+
+    build_args = compute_harness_build_args(pf)
+    assert build_args == {"JAVA_VERSION": "17"}
+
+    custom_df = tmp_path / "harness.dockerfile"
+    custom_df.write_text("ARG JAVA_VERSION=17\nFROM maven:3.9-eclipse-temurin-${JAVA_VERSION}\n", encoding="utf-8")
+    pf_unknown_ver = pf.model_copy(update={"language_version_constraint": None})
+    assert compute_harness_build_args(pf_unknown_ver, harness_dockerfile=custom_df) == {"JAVA_VERSION": "17"}
+
+    cmd = build_test_and_coverage_command(pf, "maven", ["src/main/java"], ["src/test/java"])
+    joined_cmd = " ".join(cmd)
+    assert "-Dgit.commit.id.skip=true" in joined_cmd
+    assert "-Dlicense.skip=true" in joined_cmd
+    assert "jacoco-maven-plugin:0.8.12:prepare-agent" in joined_cmd
+

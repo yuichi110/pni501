@@ -67,6 +67,31 @@ def _find_broad_suppress_all(decl: SgNode) -> str | None:
     return None
 
 
+def _is_scope_qualifier_or_parameterized(tid: SgNode) -> bool:
+    """Return True if a type_identifier is an enclosing scope prefix (e.g. Map in Map.Entry) or parameterized."""
+    parent = tid.parent()
+    if parent is None:
+        return False
+    if parent.kind() == "scoped_type_identifier":
+        named = parent.named_children()
+        if not named or named[-1].range().start.index != tid.range().start.index:
+            return True
+        grandparent = parent.parent()
+        first_gp_child = grandparent.child(0) if grandparent is not None else None
+        return (
+            grandparent is not None
+            and grandparent.kind() == "generic_type"
+            and first_gp_child is not None
+            and first_gp_child.range().start.index == parent.range().start.index
+        )
+    first_child = parent.child(0)
+    return (
+        parent.kind() == "generic_type"
+        and first_child is not None
+        and first_child.range().start.index == tid.range().start.index
+    )
+
+
 def _find_raw_generics_in_type(type_node: SgNode | None) -> list[str]:
     """Find unparameterized raw generic type identifiers inside a Java type node."""
     if type_node is None:
@@ -84,15 +109,7 @@ def _find_raw_generics_in_type(type_node: SgNode | None) -> list[str]:
         tname = tid.text()
         if tname not in _COMMON_GENERIC_TYPES:
             continue
-        parent = tid.parent()
-        first_child = parent.child(0) if parent is not None else None
-        is_parameterized = (
-            parent is not None
-            and parent.kind() == "generic_type"
-            and first_child is not None
-            and first_child.range().start.index == idx
-        )
-        if not is_parameterized:
+        if not _is_scope_qualifier_or_parameterized(tid):
             raw_names.append(tname)
     return raw_names
 

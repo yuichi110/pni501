@@ -263,6 +263,45 @@ def _resolve_npm_lock_non_core(npm_lock_path: Path) -> set[str]:
     return dev_names - prod_names
 
 
+def _resolve_maven_pom_non_core(pom_path: Path) -> set[str]:
+    """Extract test, provided, and optional-only Maven dependencies from `pom.xml`."""
+    if not pom_path.is_file():
+        return set()
+    cleaned = ""
+    with contextlib.suppress(Exception):
+        raw = pom_path.read_text(encoding="utf-8", errors="ignore")
+        cleaned = re.sub(
+            r"<!--.*?-->|<(dependencyManagement|build|profiles|reporting)>.*?</\1>",
+            "",
+            raw,
+            flags=re.DOTALL,
+        )
+    if not cleaned:
+        return set()
+    prod_keys: set[str] = set()
+    non_core_keys: set[str] = set()
+    for dep_match in re.finditer(r"<dependency>(.*?)</dependency>", cleaned, flags=re.DOTALL):
+        block = dep_match.group(1)
+        g_match = re.search(r"<groupId>\s*([^<]*?)\s*</groupId>", block, flags=re.DOTALL)
+        a_match = re.search(r"<artifactId>\s*([^<]*?)\s*</artifactId>", block, flags=re.DOTALL)
+        s_match = re.search(r"<scope>\s*([^<]*?)\s*</scope>", block, flags=re.DOTALL)
+        o_match = re.search(r"<optional>\s*([^<]*?)\s*</optional>", block, flags=re.DOTALL)
+        if not a_match:
+            continue
+        gid = g_match.group(1).strip() if g_match else ""
+        aid = a_match.group(1).strip()
+        scope = s_match.group(1).strip().lower() if s_match else ""
+        is_opt = (o_match.group(1).strip().lower() == "true") if o_match else False
+        keys = {normalize_vuln_pkg_key(aid)}
+        if gid:
+            keys.add(normalize_vuln_pkg_key(f"{gid}:{aid}"))
+        if scope in {"test", "provided"} or is_opt:
+            non_core_keys.update(keys)
+        else:
+            prod_keys.update(keys)
+    return non_core_keys - prod_keys
+
+
 def discover_non_core_packages(target_dir: Path) -> set[str]:
     """Discover normalized package names proven to belong only to dev/optional dependency groups."""
     non_core: set[str] = set()
@@ -280,4 +319,5 @@ def discover_non_core_packages(target_dir: Path) -> set[str]:
 
     non_core.update(_resolve_composer_lock_non_core(target_dir / "composer.lock"))
     non_core.update(_resolve_npm_lock_non_core(target_dir / "package-lock.json"))
+    non_core.update(_resolve_maven_pom_non_core(target_dir / "pom.xml"))
     return non_core

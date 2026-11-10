@@ -20,6 +20,7 @@ from pni._actions.ast_analyze.java._helpers import (
     JAVA_CALLABLE_KINDS,
     JAVA_TYPE_KINDS,
     callable_symbol_name,
+    is_console_or_logger_unit,
     modifier_tokens,
 )
 from pni._actions.ast_analyze.models import CodeLocation, ParsedUnit
@@ -92,18 +93,31 @@ def _find_java_idiom_risks(unit: ParsedUnit) -> list[CodeLocation]:
                 )
             )
 
-    for inv in unit.root.find_all(kind="method_invocation"):
-        obj = inv.field("object")
-        if obj is not None and obj.text() in {"System.out", "System.err"}:
-            findings.append(
-                CodeLocation(
-                    file=unit.rel_path,
-                    line=inv.range().start.line + 1,
-                    symbol=obj.text(),
-                    detail=f"Direct console output via {obj.text()}; use structured logger (SLF4J)",
+    if not is_console_or_logger_unit(unit):
+        for inv in unit.root.find_all(kind="method_invocation"):
+            obj = inv.field("object")
+            if obj is not None and obj.text() in {"System.out", "System.err"}:
+                findings.append(
+                    CodeLocation(
+                        file=unit.rel_path,
+                        line=inv.range().start.line + 1,
+                        symbol=obj.text(),
+                        detail=f"Direct console output via {obj.text()}; use structured logger (SLF4J)",
+                    )
                 )
-            )
     return findings
+
+
+def _collect_type_public_callables(tnode: SgNode, tkind: str, pub_methods: set[str]) -> None:
+    """Populate implicitly public annotation elements and interface methods into pub_methods."""
+    if tkind == "annotation_type_declaration":
+        for enode in tnode.find_all(kind="annotation_type_element_declaration"):
+            if (en := enode.field("name")) is not None:
+                pub_methods.add(en.text())
+    elif tkind == "interface_declaration":
+        for mnode in tnode.find_all(kind="method_declaration"):
+            if "private" not in modifier_tokens(mnode):
+                pub_methods.add(callable_symbol_name(mnode))
 
 
 class JavaQualityChecker(BaseQualityChecker):
@@ -128,7 +142,7 @@ class JavaQualityChecker(BaseQualityChecker):
         return _count_java_loc(unit.source)
 
     def count_classes(self, unit: ParsedUnit) -> int:
-        """Count class, interface, enum, and record declarations in a Java unit."""
+        """Count class, interface, enum, record, and annotation (@interface) declarations in a Java unit."""
         return sum(len(unit.root.find_all(kind=tkind)) for tkind in JAVA_TYPE_KINDS)
 
     def iter_callables(self, unit: ParsedUnit) -> list[tuple[str, SgNode]]:
@@ -152,8 +166,11 @@ class JavaQualityChecker(BaseQualityChecker):
         pub_methods: set[str] = set()
         for tkind in JAVA_TYPE_KINDS:
             for tnode in unit.root.find_all(kind=tkind):
-                if "public" in modifier_tokens(tnode) and (n := tnode.field("name")) is not None:
+                if "public" not in modifier_tokens(tnode):
+                    continue
+                if (n := tnode.field("name")) is not None:
                     pub_types.add(n.text())
+                _collect_type_public_callables(tnode, tkind, pub_methods)
         for mkind in JAVA_CALLABLE_KINDS:
             for mnode in unit.root.find_all(kind=mkind):
                 if "public" in modifier_tokens(mnode):

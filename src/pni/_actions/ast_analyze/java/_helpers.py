@@ -22,10 +22,27 @@ JAVA_TYPE_KINDS: Final[tuple[str, ...]] = (
     "interface_declaration",
     "enum_declaration",
     "record_declaration",
+    "annotation_type_declaration",
 )
 JAVA_CALLABLE_KINDS: Final[tuple[str, ...]] = (
     "method_declaration",
     "constructor_declaration",
+)
+_CONSOLE_OR_CLI_SUFFIXES: Final[tuple[str, ...]] = (
+    "Main",
+    "Cli",
+    "Command",
+    "Console",
+    "StdOut",
+    "StdOutImpl",
+    "ConsoleLogger",
+    "ConsoleAppender",
+)
+_LOGGER_SUPERTYPE_TOKENS: Final[tuple[str, ...]] = (
+    "Log",
+    "Logger",
+    "Appender",
+    "Handler",
 )
 
 
@@ -88,3 +105,18 @@ def callable_symbol_name(m_node: SgNode) -> str:
     """Return method or constructor name for a Java callable CST node."""
     name_node = m_node.field("name")
     return name_node.text() if name_node is not None else "<init>"
+
+
+def is_console_or_logger_unit(unit: ParsedUnit) -> bool:
+    """Return True if the compilation unit is a CLI entrypoint or console/logger adapter implementation."""
+    stem = unit.file_path.stem
+    lower_stem = stem.lower()
+    if stem.endswith(_CONSOLE_OR_CLI_SUFFIXES) or "stdout" in lower_stem or "console" in lower_stem:
+        return True
+    for cnode in unit.root.find_all(kind="class_declaration"):
+        for field_name in ("interfaces", "superclass"):
+            sup_node = cnode.field(field_name)
+            if sup_node is not None and any(tok in sup_node.text() for tok in _LOGGER_SUPERTYPE_TOKENS):
+                return True
+    return False
+

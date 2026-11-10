@@ -41,10 +41,11 @@ _CHECK_ID_ALIASES: Final[dict[str, tuple[str, ...]]] = {
 
 
 class PniProjectConfig(BaseModel):
-    """Project identity, optional version, and runtime archetype overrides in .pni/pni.toml."""
+    """Project identity, optional version, language version, and runtime archetype overrides in .pni/pni.toml."""
 
     name: Optional[str] = None
     version: Optional[str] = None
+    language_version: Optional[str] = None
     archetypes: Optional[list[RuntimeArchetype]] = None
 
 

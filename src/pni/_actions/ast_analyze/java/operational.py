@@ -14,6 +14,7 @@ from __future__ import annotations
 from typing import Final
 
 from pni._actions.ast_analyze.base.operational import BaseOperationalChecker
+from pni._actions.ast_analyze.java._helpers import is_console_or_logger_unit
 from pni._actions.ast_analyze.models import CodeLocation, ParsedUnit
 
 _JAVA_CONFIG_CLASS_SUFFIXES: Final[tuple[str, ...]] = (
@@ -25,7 +26,6 @@ _JAVA_CONFIG_CLASS_SUFFIXES: Final[tuple[str, ...]] = (
     "Main",
     "Cli",
 )
-_JAVA_CLI_CLASS_SUFFIXES: Final[tuple[str, ...]] = ("Main", "Cli", "Command")
 
 
 class JavaOperationalChecker(BaseOperationalChecker):
@@ -87,9 +87,8 @@ class JavaOperationalChecker(BaseOperationalChecker):
         return findings
 
     def find_unstructured_logging(self, unit: ParsedUnit) -> list[CodeLocation]:
-        """Detect System.out/err prints and Throwable.printStackTrace() in non-CLI Java classes."""
-        stem = unit.file_path.stem
-        if stem.endswith(_JAVA_CLI_CLASS_SUFFIXES):
+        """Detect System.out/err prints and Throwable.printStackTrace() in non-CLI/non-logger Java classes."""
+        if is_console_or_logger_unit(unit):
             return []
 
         findings: list[CodeLocation] = []

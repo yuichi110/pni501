@@ -34,6 +34,29 @@ _ASSERTION_PREFIXES: Final[tuple[str, ...]] = (
     "check",
     "should",
     "assume",
+    "then",
+)
+_ASSERTION_FLUENT_METHODS: Final[frozenset[str]] = frozenset(
+    {
+        "isequalto",
+        "isnotequalto",
+        "isinstanceof",
+        "issameas",
+        "isnotsameas",
+        "isnull",
+        "isnotnull",
+        "istrue",
+        "isfalse",
+        "isempty",
+        "isnotempty",
+        "hassize",
+        "hasmessage",
+        "hasmessagecontaining",
+        "contains",
+        "containsexactly",
+        "doesnotthrowanyexception",
+        "matches",
+    }
 )
 
 
@@ -46,6 +69,16 @@ def _is_junit_test_method(mnode: SgNode) -> bool:
     return any(ann in text for ann in _TEST_ANNOTATIONS)
 
 
+def _extract_method_callees(mnode: SgNode) -> set[str]:
+    """Return all invoked method names inside a Java method declaration."""
+    callees: set[str] = set()
+    for inv in mnode.find_all(kind="method_invocation"):
+        name_node = inv.field("name")
+        if name_node is not None:
+            callees.add(name_node.text())
+    return callees
+
+
 def _method_has_assertion(mnode: SgNode) -> bool:
     """Return True if a Java test method invokes an assertion/verification helper or @Test(expected=...)."""
     mods = get_modifiers_node(mnode)
@@ -56,9 +89,37 @@ def _method_has_assertion(mnode: SgNode) -> bool:
     for inv in mnode.find_all(kind="method_invocation"):
         name_node = inv.field("name")
         callee = (name_node.text() if name_node is not None else inv.text()).lower()
-        if callee.startswith(_ASSERTION_PREFIXES):
+        if callee.startswith(_ASSERTION_PREFIXES) or callee in _ASSERTION_FLUENT_METHODS:
             return True
     return False
+
+
+def _collect_unit_asserting_methods(tunit: ParsedUnit) -> tuple[list[SgNode], set[str], dict[int, set[str]]]:
+    """Collect all method nodes, transitive intra-class asserting method names, and per-node callees."""
+    methods = list(tunit.root.find_all(kind="method_declaration"))
+    asserting_names: set[str] = set()
+    callees_by_idx: dict[int, set[str]] = {}
+    name_by_idx: dict[int, str] = {}
+
+    for mnode in methods:
+        idx = mnode.range().start.index
+        mname = callable_symbol_name(mnode)
+        name_by_idx[idx] = mname
+        callees_by_idx[idx] = _extract_method_callees(mnode)
+        if _method_has_assertion(mnode):
+            asserting_names.add(mname)
+
+    for _ in range(3):
+        added = False
+        for idx, callees in callees_by_idx.items():
+            mname = name_by_idx[idx]
+            if mname not in asserting_names and (callees & asserting_names):
+                asserting_names.add(mname)
+                added = True
+        if not added:
+            break
+
+    return methods, asserting_names, callees_by_idx
 
 
 def _collect_covered_source_fqns(
@@ -100,11 +161,14 @@ class JavaTestChecker(BaseTestChecker):
         assertion_free: list[CodeLocation] = []
 
         for tunit in test_units:
-            for mnode in tunit.root.find_all(kind="method_declaration"):
+            methods, asserting_names, callees_by_idx = _collect_unit_asserting_methods(tunit)
+            for mnode in methods:
                 if not _is_junit_test_method(mnode):
                     continue
                 test_count += 1
-                if not _method_has_assertion(mnode):
+                idx = mnode.range().start.index
+                has_assert = _method_has_assertion(mnode) or bool(callees_by_idx.get(idx, set()) & asserting_names)
+                if not has_assert:
                     mname = callable_symbol_name(mnode)
                     assertion_free.append(
                         CodeLocation(

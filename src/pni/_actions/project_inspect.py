@@ -43,6 +43,7 @@ LOCKFILE_CANDIDATES: Final[tuple[str, ...]] = (
     "pdm.lock",
     "Pipfile.lock",
     "gradle.lockfile",
+    "dependencies-lock.json",
     "mvnw",
     "gradlew",
     "composer.lock",
@@ -336,11 +337,31 @@ def _xml_tag_value(block: str, tag: str) -> str:
 
 
 def _resolve_maven_prop(value: str, props: dict[str, str]) -> str:
-    """Resolve simple ${property} placeholders defined in Maven <properties>."""
-    if value.startswith("${") and value.endswith("}"):
-        key = value[2:-1].strip()
-        return props.get(key, value)
-    return value
+    """Resolve ${property} placeholders (up to 3 hops) defined in Maven <properties>."""
+    resolved = value
+    for _ in range(3):
+        if "${" not in resolved:
+            break
+        next_val = re.sub(
+            r"\$\{([^}]+)\}",
+            lambda m: props.get(m.group(1).strip(), m.group(0)),
+            resolved,
+        )
+        if next_val == resolved:
+            break
+        resolved = next_val
+    return resolved
+
+
+def _extract_maven_props_dict(cleaned_xml: str) -> dict[str, str]:
+    """Extract top-level Maven <properties> key-value pairs (excluding <profiles> overrides)."""
+    without_profiles = re.sub(r"<profiles>.*?</profiles>", "", cleaned_xml, flags=re.DOTALL)
+    props: dict[str, str] = {}
+    props_match = re.search(r"<properties>(.*?)</properties>", without_profiles, flags=re.DOTALL)
+    if props_match:
+        for pmatch in re.finditer(r"<([A-Za-z0-9_.-]+)>\s*([^<]*?)\s*</\1>", props_match.group(1)):
+            props[pmatch.group(1)] = pmatch.group(2).strip()
+    return props
 
 
 def _is_unpinned_java_version(version: str, *, managed_by_bom: bool) -> bool:
@@ -357,23 +378,31 @@ def _parse_maven_dependencies(
     *,
     managed_by_bom: bool,
 ) -> tuple[list[str], list[str], list[str]]:
-    """Extract compile/runtime dependencies, unpinned dependencies, and test dependencies from pom.xml."""
-    without_mgmt = re.sub(r"<dependencyManagement>.*?</dependencyManagement>", "", cleaned_pom, flags=re.DOTALL)
+    """Extract compile/runtime dependencies, unpinned dependencies, and test/provided/optional deps."""
+    without_mgmt = re.sub(
+        r"<(dependencyManagement|build|profiles|reporting)>.*?</\1>",
+        "",
+        cleaned_pom,
+        flags=re.DOTALL,
+    )
     deps: list[str] = []
     unpinned: list[str] = []
     dev_deps: list[str] = []
 
     for dep_match in re.finditer(r"<dependency>(.*?)</dependency>", without_mgmt, flags=re.DOTALL):
         dep_block = dep_match.group(1)
-        group_id = _xml_tag_value(dep_block, "groupId")
-        artifact_id = _xml_tag_value(dep_block, "artifactId")
+        group_id = _resolve_maven_prop(_xml_tag_value(dep_block, "groupId"), props)
+        artifact_id = _resolve_maven_prop(_xml_tag_value(dep_block, "artifactId"), props)
         if not artifact_id:
             continue
         raw_ver = _resolve_maven_prop(_xml_tag_value(dep_block, "version"), props)
+        if raw_ver.startswith("${") and raw_ver.endswith("}"):
+            raw_ver = ""
         scope = _xml_tag_value(dep_block, "scope").lower()
+        is_optional = _xml_tag_value(dep_block, "optional").lower() == "true"
         coord = f"{group_id}:{artifact_id}:{raw_ver}" if raw_ver else f"{group_id}:{artifact_id}"
 
-        if scope == "test":
+        if scope in {"test", "provided"} or is_optional:
             dev_deps.append(coord)
         else:
             deps.append(coord)
@@ -383,11 +412,29 @@ def _parse_maven_dependencies(
     return deps, unpinned, dev_deps
 
 
-def _extract_maven_java_version(props: dict[str, str]) -> Optional[str]:
-    """Extract target Java release/version from Maven <properties> if configured."""
-    for key in ("java.version", "maven.compiler.release", "maven.compiler.target", "maven.compiler.source"):
-        if props.get(key):
-            return props[key]
+def _extract_maven_java_version(props: dict[str, str], cleaned_pom: str = "") -> Optional[str]:
+    """Extract target Java release/version from Maven <properties> or maven-compiler-plugin."""
+    for key in (
+        "maven.compiler.release",
+        "java.version",
+        "JavaVersion",
+        "jdk.version",
+        "JdkVersion",
+        "maven.compiler.target",
+        "maven.compiler.source",
+    ):
+        val = _resolve_maven_prop(props.get(key, ""), props).strip()
+        if val and not val.startswith("${"):
+            return val
+
+    if cleaned_pom:
+        for plugin_match in re.finditer(r"<plugin>(.*?)</plugin>", cleaned_pom, flags=re.DOTALL):
+            pblock = plugin_match.group(1)
+            if _xml_tag_value(pblock, "artifactId") == "maven-compiler-plugin":
+                for tag in ("release", "target", "source"):
+                    val = _resolve_maven_prop(_xml_tag_value(pblock, tag), props).strip()
+                    if val and not val.startswith("${"):
+                        return val
     return None
 
 
@@ -398,17 +445,27 @@ def _inspect_maven_pom(pom_path: Path, manifests: list[str], default_name: str) 
         raw = pom_path.read_text(encoding="utf-8")
         cleaned = re.sub(r"<!--.*?-->", "", raw, flags=re.DOTALL)
 
-        props: dict[str, str] = {}
-        props_match = re.search(r"<properties>(.*?)</properties>", cleaned, flags=re.DOTALL)
-        if props_match:
-            for pmatch in re.finditer(r"<([A-Za-z0-9_.-]+)>\s*([^<]*?)\s*</\1>", props_match.group(1)):
-                props[pmatch.group(1)] = pmatch.group(2).strip()
-        res.language_version_constraint = _extract_maven_java_version(props)
-
         parent_ver = ""
+        parent_props: dict[str, str] = {}
         parent_match = re.search(r"<parent>(.*?)</parent>", cleaned, flags=re.DOTALL)
         if parent_match:
-            parent_ver = _xml_tag_value(parent_match.group(1), "version")
+            pblock = parent_match.group(1)
+            parent_ver = _xml_tag_value(pblock, "version")
+            rel_parent = _xml_tag_value(pblock, "relativePath") or "../pom.xml"
+            parent_pom = (pom_path.parent / rel_parent).resolve()
+            if parent_pom.is_file():
+                parent_raw = re.sub(
+                    r"<!--.*?-->",
+                    "",
+                    parent_pom.read_text(encoding="utf-8", errors="ignore"),
+                    flags=re.DOTALL,
+                )
+                parent_props = _extract_maven_props_dict(parent_raw)
+
+        props = {**parent_props, **_extract_maven_props_dict(cleaned)}
+        for k, v in list(props.items()):
+            props[k] = _resolve_maven_prop(v, props)
+        res.language_version_constraint = _extract_maven_java_version(props, cleaned)
 
         header = re.sub(
             r"<(parent|dependencies|dependencyManagement|build|profiles|reporting)>.*?</\1>",
@@ -998,6 +1055,8 @@ def run_project_inspect(
     archetypes: list[RuntimeArchetype] = (
         list(pni_cfg.project.archetypes) if pni_cfg.project.archetypes else inferred_archetypes
     )
+    if pni_cfg.project.language_version:
+        manifest_info.language_version_constraint = pni_cfg.project.language_version
     raw_tooling_issues = _dispatch_tooling_issues(
         project_root, active_lang, manifest_info, lockfiles, frameworks, archetypes
     )
