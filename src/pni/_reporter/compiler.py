@@ -79,6 +79,11 @@ def lint_drawlib_chapters(chapters: Sequence[Path]) -> list[str]:
                     f"{md_path.name} ({fig_name}): ClassDiagram + HeatmapOverlay uses show_contour_lines=True; "
                     "set show_contour_lines=False to avoid contour label collisions"
                 )
+            if ("ClassDiagram(" in code or "ClassNode(" in code) and "Styles.White" in code:
+                warnings.append(
+                    f"{md_path.name} ({fig_name}): ClassDiagram/ClassNode uses Styles.White "
+                    "(white text_color renders attributes/methods invisible); use Styles.Neutral instead"
+                )
     return warnings
 
 
@@ -528,17 +533,23 @@ def _collect_deliverables(
     return deliverables
 
 
-def _verify_links(html_dir: Path, *, strict: bool) -> tuple[int, int, list[BrokenLinkRecord]]:
+def _verify_links(
+    html_dir: Path,
+    *,
+    strict: bool,
+    link_check_root: Path | None = None,
+) -> tuple[int, int, list[BrokenLinkRecord]]:
     """Scan generated HTML files for broken links and raise ValueError when strict is enabled."""
     drawlib_tools = _get_drawlib_tools()
-    files_scanned, links_checked, raw_broken = drawlib_tools.scan_broken_links(str(html_dir))
+    scan_dir = link_check_root.resolve() if link_check_root is not None else html_dir
+    files_scanned, links_checked, raw_broken = drawlib_tools.scan_broken_links(str(scan_dir))
     records = [
         BrokenLinkRecord(html_file=rel_html, tag=tag, target_url=url)
         for rel_html, tag, url in raw_broken
     ]
     if strict and records:
         details = ", ".join(f"{r.html_file} -> {r.target_url} ({r.tag})" for r in records[:5])
-        msg = f"Broken internal links or assets detected in '{html_dir}': {details}"
+        msg = f"Broken internal links or assets detected in '{scan_dir}': {details}"
         raise ValueError(msg)
     return files_scanned, links_checked, records
 
@@ -602,6 +613,7 @@ def compile_report_project(
     src_base_dir: Path = Path(DEFAULT_REPORT_SRC_DIR),
     output_dir: Path = Path(DEFAULT_REPORT_OUTPUT_DIR),
     html_output_dir: Path | None = None,
+    link_check_root: Path | None = None,
     formats: Sequence[str] = DEFAULT_REPORT_FORMATS,
     generate_toc: bool = True,
     page_break: bool = True,
@@ -616,6 +628,7 @@ def compile_report_project(
         src_base_dir: Base directory containing '<target>_src/' (default 'reports_src').
         output_dir: Destination directory for compiled deliverables (default 'reports').
         html_output_dir: Optional custom destination directory for compiled HTML output.
+        link_check_root: Optional root directory for HTML relative link verification in multi-portal layouts.
         formats: Output formats to build (defaults to ('pdf',); supports 'pdf', 'html', 'markdown', 'images').
         generate_toc: Inject automatic Table of Contents after 00_cover.md in PDF output.
         page_break: Insert page breaks between chapters in PDF output.
@@ -695,7 +708,11 @@ def compile_report_project(
 
     scanned, checked, broken = (0, 0, [])
     if html_dir is not None:
-        scanned, checked, broken = _verify_links(html_dir, strict=strict_links)
+        scanned, checked, broken = _verify_links(
+            html_dir,
+            strict=strict_links,
+            link_check_root=link_check_root,
+        )
 
     deliverables = _collect_deliverables(pdf_file, html_index, markdown_dir, images_dir)
     return ReportBuildResult(

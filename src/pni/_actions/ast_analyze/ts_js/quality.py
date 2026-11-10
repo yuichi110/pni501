@@ -18,6 +18,7 @@ from ast_grep_py import SgNode
 from pni._actions.ast_analyze.base import BaseQualityChecker
 from pni._actions.ast_analyze.models import CodeLocation, ParsedUnit
 from pni._actions.ast_analyze.ts_js._helpers import (
+    extract_companion_dts_types,
     get_ts_js_params,
     iter_ts_js_callables,
     iter_ts_js_type_declarations,
@@ -92,8 +93,10 @@ class TsJsQualityChecker(BaseQualityChecker):
         return count
 
     def count_classes(self, unit: ParsedUnit) -> int:
-        """Count class, interface, type alias, and enum declarations in unit."""
-        return len(iter_ts_js_type_declarations(unit))
+        """Count class, interface, type alias, and enum declarations in unit (plus companion .d.ts types)."""
+        own_names = {tname for tname, _tkind, _is_exp, _node, _anchor in iter_ts_js_type_declarations(unit)}
+        dts_names = set(extract_companion_dts_types(unit))
+        return len(own_names | dts_names)
 
     def iter_callables(self, unit: ParsedUnit) -> list[tuple[str, SgNode]]:
         """Return `(qualified_name, fn_node)` for all functions and methods in unit."""
@@ -107,6 +110,7 @@ class TsJsQualityChecker(BaseQualityChecker):
         """Extract sorted `(exported_types, exported_callables)` for module_inventory."""
         pub_types = sorted(
             {tname for tname, _tkind, is_exp, _node, _anchor in iter_ts_js_type_declarations(unit) if is_exp}
+            | set(extract_companion_dts_types(unit))
         )
         pub_fns = sorted(
             {qual for qual, _short, is_exp, _node, _anchor in iter_ts_js_callables(unit) if is_exp}

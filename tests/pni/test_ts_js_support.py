@@ -27,6 +27,7 @@ from pni._actions.migration_analyze.touchpoints import extract_boundary_touchpoi
 from pni._actions.pentest.server_plan import build_live_server_plan
 from pni._actions.runtime_check.parsers import (
     parse_istanbul_coverage_summary,
+    parse_lcov_info,
     parse_node_test_output,
 )
 from pni._actions.runtime_check.selector import (
@@ -37,7 +38,10 @@ from pni._actions.runtime_check.selector import (
 )
 from pni._actions.runtime_check.smoke import build_smoke_plan
 from pni._actions.security_scan.dep_scopes import discover_non_core_packages
+from pni._actions.security_scan.parsers import parse_trivy_reports
 from pni._dockerfiles import ensure_target_dockerfile
+from pni._reporter.compiler import lint_drawlib_chapters
+from pni._reporter.drawlib_guide import render_drawlib_report_guide
 from pni._rules.manager import detect_active_language
 from pni._workflows import load_workflow
 from pni.cli import init_project
@@ -591,4 +595,253 @@ test("negative compile-time type check", () => {
     assert "COREPACK_ENABLE_STRICT=0" in df_text
     assert "@vitest/coverage-v8" in df_text
     assert "USER pni" in df_text
+
+
+def test_javascript_iife_htmx_refinements(tmp_path: Path) -> None:
+    """Verify IIFE + ES2022 class AST extraction, .d.ts companions, test/ discovery, and Trivy/lcov fixes."""
+    htmx_dir = tmp_path / "htmx_proj"
+    src_dir = htmx_dir / "src"
+    test_unit_dir = htmx_dir / "test" / "tests" / "unit"
+    test_attr_dir = htmx_dir / "test" / "tests" / "attributes"
+    test_util_dir = htmx_dir / "test" / "util"
+    src_dir.mkdir(parents=True)
+    test_unit_dir.mkdir(parents=True)
+    test_attr_dir.mkdir(parents=True)
+    test_util_dir.mkdir(parents=True)
+
+    (htmx_dir / "package.json").write_text(
+        json.dumps(
+            {
+                "name": "htmx.org",
+                "version": "4.0.1",
+                "types": "./dist/htmx.d.ts",
+                "dependencies": {},
+                "devDependencies": {
+                    "@web/test-runner": "^0.18.0",
+                    "@web/test-runner-playwright": "^0.11.0",
+                    "chai": "^4.3.0",
+                },
+            }
+        ),
+        encoding="utf-8",
+    )
+    (htmx_dir / "package-lock.json").write_text(
+        json.dumps(
+            {
+                "lockfileVersion": 3,
+                "packages": {
+                    "": {"name": "htmx.org", "devDependencies": {"@web/test-runner": "^0.18.0"}},
+                    "node_modules/@web/test-runner": {"version": "0.18.0"},
+                    "node_modules/koa": {"version": "2.15.0"},
+                },
+            }
+        ),
+        encoding="utf-8",
+    )
+    (htmx_dir / "yarn.lock").write_text(
+        '"sinon@^15.0.0":\n  version "15.2.0"\n',
+        encoding="utf-8",
+    )
+
+    # Task 1: Zero-dependency lockfiles + Trivy image global toolchain path scope
+    non_core = discover_non_core_packages(htmx_dir)
+    assert "@web/test-runner" in non_core
+    assert "koa" in non_core
+    assert "sinon" in non_core
+
+    trivy_img = tmp_path / "trivy_img.json"
+    trivy_img.write_text(
+        json.dumps(
+            {
+                "Results": [
+                    {
+                        "Target": "Node.js",
+                        "Class": "lang-pkgs",
+                        "Type": "node-pkg",
+                        "Vulnerabilities": [
+                            {
+                                "VulnerabilityID": "CVE-2026-0001",
+                                "PkgName": "tar",
+                                "InstalledVersion": "6.2.1",
+                                "FixedVersion": "6.2.2",
+                                "Severity": "HIGH",
+                                "PkgPath": "usr/local/lib/node_modules/npm/node_modules/tar/package.json",
+                            }
+                        ],
+                    }
+                ]
+            }
+        ),
+        encoding="utf-8",
+    )
+    bundle = parse_trivy_reports(image_json_path=trivy_img, is_harness_image=True)
+    assert bundle.core_app_vuln_counts.high == 0
+    assert bundle.harness_os_vuln_counts.high == 1
+
+    # Task 2: IIFE + ES2022 classes (#private methods) + companion .d.ts
+    (src_dir / "htmx.js").write_text(
+        """var htmx = (() => {
+  class HCON {
+    parse(str) {
+      return str ? str.trim() : "";
+    }
+  }
+
+  class Htmx {
+    #resolveTarget(elt, sel) {
+      if (!sel) {
+        return elt;
+      }
+      return document.querySelector(sel) || elt;
+    }
+
+    /**
+     * Issue an AJAX request.
+     */
+    ajax(method, path, context) {
+      if (!method || !path) {
+        return Promise.resolve();
+      }
+      const target = this.#resolveTarget(context, "body");
+      return fetch(path, { method, signal: AbortSignal.timeout(5000), headers: { "X-Target": String(target) } });
+    }
+  }
+
+  return new Htmx();
+})();
+""",
+        encoding="utf-8",
+    )
+    (src_dir / "htmx.d.ts").write_text(
+        """export interface HtmxConfig {
+  defaultSwapStyle: string;
+}
+
+export declare class HCON {
+  parse(str: string): string;
+}
+
+export declare class Htmx {
+  ajax(method: string, path: string, context?: unknown): Promise<Response | void>;
+}
+""",
+        encoding="utf-8",
+    )
+
+    # Task 3: Suffix-less test files under test/, excluded helper.js, custom assert*/verify*/check*
+    (htmx_dir / "web-test-runner.config.js").write_text(
+        'export default { testRunnerHtml: (f) => `<script src="https://unpkg.com/idiomorph@0.7.3"></script>` };\n',
+        encoding="utf-8",
+    )
+    (test_util_dir / "helper.js").write_text(
+        """export function assertTextContentIs(el, expected) {
+  if (el !== expected) throw new Error("Mismatch");
+}
+""",
+        encoding="utf-8",
+    )
+    (test_unit_dir / "morph.js").write_text(
+        """describe("htmx morph unit tests", () => {
+  it("parses HCON and verifies state", () => {
+    const res = htmx.ajax("GET", "/items");
+    assertTextContentIs(String(Boolean(res)), "true");
+  });
+});
+""",
+        encoding="utf-8",
+    )
+    (test_attr_dir / "hx-get.js").write_text(
+        """describe("hx-get attribute", () => {
+  it("checks GET request handling", () => {
+    htmx.ajax("GET", "/test");
+    verifyRequest("/test");
+  });
+});
+""",
+        encoding="utf-8",
+    )
+
+    pf = run_project_inspect(htmx_dir, lang="javascript")
+    assert pf.has_type_marker is True
+    assert pf.source_files_count == 1
+    assert pf.test_files_count == 2
+
+    ast_facts = run_ast_analyze(htmx_dir, lang="javascript")
+    assert ast_facts.total_classes == 3
+    assert ast_facts.total_functions == 3
+    assert ast_facts.type_safety_coverage_pct == 100.0
+    assert "HtmxConfig" in ast_facts.module_inventory[0].public_types
+    assert "Htmx.ajax" in ast_facts.module_inventory[0].public_callables
+    assert ast_facts.test_functions_count == 2
+    assert ast_facts.assertion_free_tests == []
+    assert ast_facts.module_test_coverage_pct == 100.0
+    assert any("External CDN" in note for note in ast_facts.test_harness_notes)
+
+    # Task 4: Playwright auto-install in Dockerfile, lcov.info parser, WTR/Mocha test parser
+    df_path, _ = ensure_target_dockerfile(htmx_dir, ".", "javascript", "node")
+    df_text = df_path.read_text(encoding="utf-8")
+    assert "PLAYWRIGHT_BROWSERS_PATH=/ms-playwright" in df_text
+    assert "playwright install --with-deps chromium" in df_text
+
+    wtr_out = tmp_path / "wtr.txt"
+    wtr_out.write_text("Chrome: |████████████████████| 18/18 test files | 256 passed, 2 skipped\n", encoding="utf-8")
+    assert parse_node_test_output(wtr_out)[:5] == (258, 256, 0, 0, 2)
+
+    mocha_out = tmp_path / "mocha.txt"
+    mocha_out.write_text("  256 passing (4s)\n  1 pending\n  2 failing\n", encoding="utf-8")
+    assert parse_node_test_output(mocha_out)[:5] == (259, 256, 2, 0, 1)
+
+    lcov_file = tmp_path / "lcov.info"
+    lcov_file.write_text(
+        """TN:
+SF:/workspace/src/htmx.js
+DA:1,1
+DA:2,1
+DA:3,0
+LF:3
+LH:2
+BRDA:2,0,0,1
+BRDA:2,0,1,0
+BRF:2
+BRH:1
+end_of_record
+""",
+        encoding="utf-8",
+    )
+    lcov_cov = parse_lcov_info(lcov_file)
+    assert lcov_cov.measured is True
+    assert lcov_cov.tool == "lcov"
+    assert lcov_cov.total_statements == 3
+    assert lcov_cov.covered_lines == 2
+    assert lcov_cov.line_coverage_pct == 66.7
+    assert lcov_cov.branch_coverage_pct == 50.0
+    assert lcov_cov.lowest_covered_modules[0].file_path == "src/htmx.js"
+
+    # Task 5: Drawlib report guide + lint_drawlib_chapters ClassDiagram Styles.White warning
+    guide = render_drawlib_report_guide(
+        target="full_audit",
+        score_path=".pni/cache/score/full_audit.json",
+        facts_path=".pni/cache/facts/full_audit.json",
+        target_root=".",
+        source_targets=["src"],
+        doc_targets=["README.md"],
+    )
+    assert "Styles.Neutral" in guide
+    assert "--link-check-root" in guide
+
+    ch_dir = tmp_path / "chapters"
+    ch_dir.mkdir()
+    bad_ch = ch_dir / "01_uml.md"
+    bad_ch.write_text(
+        """# UML
+```drawlib
+from drawlib.v0_2.apis import *
+d = ClassDiagram(style=Styles.White)
+```
+""",
+        encoding="utf-8",
+    )
+    warnings = lint_drawlib_chapters([bad_ch])
+    assert any("Styles.White" in w for w in warnings)
+
 

@@ -40,6 +40,7 @@ from pni._actions.runtime_check.parsers import (
     parse_istanbul_coverage_summary,
     parse_jacoco_xml,
     parse_junit_xml_files,
+    parse_lcov_info,
     parse_node_test_output,
     parse_pytest_coverage_json,
 )
@@ -211,6 +212,16 @@ def _execute_test_and_coverage_stage(
     return test_res, cov_res
 
 
+def _parse_node_stage_coverage(out_dir: Path) -> CoverageResult:
+    """Parse Istanbul coverage-summary.json, LCOV lcov.info, or Clover XML from out_dir."""
+    cov_res = parse_istanbul_coverage_summary(out_dir / "coverage-summary.json")
+    if not cov_res.measured and (out_dir / "lcov.info").is_file():
+        return parse_lcov_info(out_dir / "lcov.info")
+    if not cov_res.measured and (out_dir / "clover.xml").is_file():
+        return parse_clover_xml(out_dir / "clover.xml")
+    return cov_res
+
+
 def _parse_stage_coverage(language: str, source_targets: list[str], out_dir: Path) -> CoverageResult:
     """Parse language-specific coverage artifact from out_dir into a canonical CoverageResult."""
     if language == "java":
@@ -221,10 +232,7 @@ def _parse_stage_coverage(language: str, source_targets: list[str], out_dir: Pat
     if language == "go":
         return parse_go_coverprofile(out_dir / "coverage.out")
     if language in {"typescript", "javascript"}:
-        cov_res = parse_istanbul_coverage_summary(out_dir / "coverage-summary.json")
-        if not cov_res.measured and (out_dir / "clover.xml").is_file():
-            return parse_clover_xml(out_dir / "clover.xml")
-        return cov_res
+        return _parse_node_stage_coverage(out_dir)
     return parse_pytest_coverage_json(out_dir / "coverage.json")
 
 

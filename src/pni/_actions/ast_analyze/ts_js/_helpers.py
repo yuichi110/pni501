@@ -11,10 +11,13 @@
 
 from __future__ import annotations
 
+import contextlib
+import json
 import re
+from pathlib import Path
 from typing import Final, Optional
 
-from ast_grep_py import SgNode
+from ast_grep_py import SgNode, SgRoot
 
 from pni._actions.ast_analyze.models import ParsedUnit
 
@@ -35,8 +38,90 @@ _JSDOC_RETURN_RE: Final[re.Pattern[str]] = re.compile(r"@returns?\s*\{([^}]*)\}"
 _JSDOC_TYPE_RE: Final[re.Pattern[str]] = re.compile(r"@type\s*\{([^}]*)\}")
 
 
+def _unwrap_parens_and_unary(node: Optional[SgNode]) -> Optional[SgNode]:
+    """Unwrap `parenthesized_expression` and prefix `unary_expression` wrappers around an AST node."""
+    curr = node
+    for _ in range(4):
+        if curr is None:
+            return None
+        kind = curr.kind()
+        if kind == "parenthesized_expression":
+            inner = next((c for c in curr.children() if c.kind() not in {"(", ")"}), None)
+            if inner is None:
+                return curr
+            curr = inner
+        elif kind == "unary_expression":
+            operand = curr.field("argument")
+            if operand is None:
+                return curr
+            curr = operand
+        else:
+            return curr
+    return curr
+
+
+def _extract_call_iife_bodies(call_node: SgNode) -> list[SgNode]:
+    """Return `statement_block` bodies from an IIFE or UMD `call_expression`."""
+    fn_node = _unwrap_parens_and_unary(call_node.field("function"))
+    if fn_node is None or fn_node.kind() not in _FN_VALUE_KINDS:
+        return []
+    bodies: list[SgNode] = []
+    fn_body = fn_node.field("body")
+    if fn_body is not None and fn_body.kind() == "statement_block":
+        bodies.append(fn_body)
+    args_node = call_node.field("arguments")
+    if args_node is not None:
+        for arg in args_node.children():
+            unwrapped_arg = _unwrap_parens_and_unary(arg)
+            if unwrapped_arg is not None and unwrapped_arg.kind() in _FN_VALUE_KINDS:
+                arg_body = unwrapped_arg.field("body")
+                if arg_body is not None and arg_body.kind() == "statement_block":
+                    bodies.append(arg_body)
+    return bodies
+
+
+def _extract_stmt_iife_bodies(stmt_node: SgNode) -> list[SgNode]:
+    """Extract IIFE/UMD `statement_block` bodies from a top-level expression or variable statement."""
+    kind = stmt_node.kind()
+    if kind == "expression_statement":
+        for child in stmt_node.children():
+            unwrapped = _unwrap_parens_and_unary(child)
+            if unwrapped is not None and unwrapped.kind() == "call_expression":
+                return _extract_call_iife_bodies(unwrapped)
+        return []
+    if kind in {"lexical_declaration", "variable_declaration"}:
+        bodies: list[SgNode] = []
+        for declarator in stmt_node.find_all(kind="variable_declarator"):
+            if declarator.parent() != stmt_node:
+                continue
+            val = _unwrap_parens_and_unary(declarator.field("value"))
+            if val is not None and val.kind() == "call_expression":
+                bodies.extend(_extract_call_iife_bodies(val))
+        return bodies
+    return []
+
+
+def iter_top_level_statements(
+    root: SgNode,
+    *,
+    _depth: int = 0,
+    _in_iife: bool = False,
+) -> list[tuple[SgNode, bool]]:
+    """Yield `(statement_node, in_iife)` across module root and unwrapped IIFE/UMD bodies."""
+    items: list[tuple[SgNode, bool]] = []
+    for child in root.children():
+        if _depth < 3:
+            iife_bodies = _extract_stmt_iife_bodies(child)
+            if iife_bodies:
+                for body in iife_bodies:
+                    items.extend(iter_top_level_statements(body, _depth=_depth + 1, _in_iife=True))
+                continue
+        items.append((child, _in_iife))
+    return items
+
+
 def _collect_named_exports(unit: ParsedUnit) -> set[str]:
-    """Collect identifiers exported via `export { a, b }` or `module.exports = ...`."""
+    """Collect identifiers exported via ES `export`, CommonJS `exports`, or IIFE `return`/`window`."""
     exported: set[str] = set()
     for exp in unit.root.find_all(kind="export_specifier"):
         name_node = exp.field("name")
@@ -49,6 +134,13 @@ def _collect_named_exports(unit: ParsedUnit) -> set[str]:
             ident = token.split(":", 1)[0].strip()
             if ident.isidentifier():
                 exported.add(ident)
+    for m in re.finditer(r"\breturn\s+new\s+([A-Za-z_$][\w$]*)\s*\(", unit.source):
+        exported.add(m.group(1))
+    for m in re.finditer(
+        r"\b(?:window|globalThis|self)\.[A-Za-z_$][\w$]*\s*=\s*(?:new\s+)?([A-Za-z_$][\w$]*)",
+        unit.source,
+    ):
+        exported.add(m.group(1))
     return exported
 
 
@@ -69,8 +161,9 @@ def _is_exported_node(node: SgNode, name: str, named_exports: set[str]) -> bool:
 def iter_ts_js_type_declarations(unit: ParsedUnit) -> list[tuple[str, str, bool, SgNode, SgNode]]:
     """Return `(name, kind_label, is_exported, decl_node, doc_anchor)` for all type/class declarations."""
     named_exports = _collect_named_exports(unit)
+    has_es_export = unit.root.find(kind="export_statement") is not None
     results: list[tuple[str, str, bool, SgNode, SgNode]] = []
-    for child in unit.root.children():
+    for child, in_iife in iter_top_level_statements(unit.root):
         target = child
         anchor = child
         if child.kind() == "export_statement":
@@ -86,7 +179,12 @@ def iter_ts_js_type_declarations(unit: ParsedUnit) -> list[tuple[str, str, bool,
         if name_node is None:
             continue
         tname = name_node.text().strip()
-        is_exp = anchor.kind() == "export_statement" or _is_exported_node(target, tname, named_exports)
+        is_iife_pub = in_iife and not has_es_export and not tname.startswith(("_", "#"))
+        is_exp = (
+            anchor.kind() == "export_statement"
+            or _is_exported_node(target, tname, named_exports)
+            or is_iife_pub
+        )
         results.append((tname, tkind, is_exp, target, anchor))
     return results
 
@@ -123,28 +221,36 @@ def _iter_var_callables(
     anchor: SgNode,
     is_exp_stmt: bool,
     named_exports: set[str],
+    *,
+    in_iife: bool = False,
+    has_es_export: bool = True,
 ) -> list[tuple[str, str, bool, SgNode, SgNode]]:
-    """Extract arrow_function / function_expression variable declarators from a lexical/variable declaration."""
+    """Extract arrow_function / function_expression / class declarators from a lexical/variable declaration."""
     found: list[tuple[str, str, bool, SgNode, SgNode]] = []
     for declarator in target.find_all(kind="variable_declarator"):
         if declarator.parent() != target:
             continue
         name_node = declarator.field("name")
         val_node = declarator.field("value")
-        if name_node is None or val_node is None or val_node.kind() not in _FN_VALUE_KINDS:
+        if name_node is None or val_node is None:
             continue
         vname = name_node.text().strip()
-        is_exp = is_exp_stmt or vname in named_exports
-        found.append((vname, vname, is_exp, val_node, anchor))
+        is_iife_pub = in_iife and not has_es_export and not vname.startswith(("_", "#"))
+        is_exp = is_exp_stmt or vname in named_exports or is_iife_pub
+        if val_node.kind() in _FN_VALUE_KINDS:
+            found.append((vname, vname, is_exp, val_node, anchor))
+        elif val_node.kind() == "class":
+            found.extend(_iter_class_methods(val_node, vname, is_exp))
     return found
 
 
 def iter_ts_js_callables(unit: ParsedUnit) -> list[tuple[str, str, bool, SgNode, SgNode]]:
     """Return `(qualified_name, short_name, is_exported, fn_node, doc_anchor)` for functions and methods."""
     named_exports = _collect_named_exports(unit)
+    has_es_export = unit.root.find(kind="export_statement") is not None
     callables: list[tuple[str, str, bool, SgNode, SgNode]] = []
 
-    for child in unit.root.children():
+    for child, in_iife in iter_top_level_statements(unit.root):
         target = child
         anchor = child
         is_exp_stmt = False
@@ -161,14 +267,25 @@ def iter_ts_js_callables(unit: ParsedUnit) -> list[tuple[str, str, bool, SgNode,
             if name_node is None:
                 continue
             fname = name_node.text().strip()
-            is_exp = is_exp_stmt or fname in named_exports
+            is_iife_pub = in_iife and not has_es_export and not fname.startswith(("_", "#"))
+            is_exp = is_exp_stmt or fname in named_exports or is_iife_pub
             callables.append((fname, fname, is_exp, target, anchor))
         elif kind in {"lexical_declaration", "variable_declaration"}:
-            callables.extend(_iter_var_callables(target, anchor, is_exp_stmt, named_exports))
+            callables.extend(
+                _iter_var_callables(
+                    target,
+                    anchor,
+                    is_exp_stmt,
+                    named_exports,
+                    in_iife=in_iife,
+                    has_es_export=has_es_export,
+                )
+            )
         elif kind in {"class_declaration", "abstract_class_declaration"}:
             cname_node = target.field("name")
             cname = cname_node.text().strip() if cname_node is not None else "AnonymousClass"
-            c_exp = is_exp_stmt or cname in named_exports
+            is_iife_pub = in_iife and not has_es_export and not cname.startswith(("_", "#"))
+            c_exp = is_exp_stmt or cname in named_exports or is_iife_pub
             callables.extend(_iter_class_methods(target, cname, c_exp))
 
     return callables
@@ -254,3 +371,55 @@ def parse_jsdoc_block(raw_jsdoc: str) -> tuple[str, dict[str, str], Optional[str
     ret_type = ret_match.group(1).strip() if ret_match is not None else None
     has_type_tag = _JSDOC_TYPE_RE.search(inner) is not None
     return summary, param_types, ret_type, has_type_tag
+
+
+def find_companion_dts_files(file_path: Path) -> list[Path]:
+    """Locate companion `.d.ts` files for a JavaScript source file (same stem or package.json `types`/`typings`)."""
+    if file_path.suffix.lower() in {".ts", ".tsx"}:
+        return []
+    found: list[Path] = []
+    direct = file_path.with_suffix(".d.ts")
+    if direct.is_file():
+        found.append(direct)
+
+    curr = file_path.parent
+    stem_low = file_path.stem.lower()
+    for _ in range(3):
+        pkg_json = curr / "package.json"
+        if pkg_json.is_file():
+            with contextlib.suppress(Exception):
+                data = json.loads(pkg_json.read_text(encoding="utf-8"))
+                if isinstance(data, dict):
+                    for key in ("types", "typings"):
+                        raw_rel = data.get(key)
+                        if isinstance(raw_rel, str) and raw_rel.strip():
+                            cand = (curr / raw_rel.strip()).resolve()
+                            dts_stem = cand.name[:-5].lower() if cand.name.lower().endswith(".d.ts") else ""
+                            if cand.is_file() and cand not in found and stem_low in {dts_stem, "index"}:
+                                found.append(cand)
+            break
+        if curr.parent == curr:
+            break
+        curr = curr.parent
+    return found
+
+
+def extract_companion_dts_types(unit: ParsedUnit) -> list[str]:
+    """Extract exported interface, type, class, and enum names from companion `.d.ts` files."""
+    dts_files = find_companion_dts_files(unit.file_path)
+    if not dts_files:
+        return []
+    names: set[str] = set()
+    for dts_path in dts_files:
+        with contextlib.suppress(Exception):
+            dts_src = dts_path.read_text(encoding="utf-8")
+            root = SgRoot(dts_src, "typescript").root()
+            for kind_key in _TYPE_DECL_KINDS:
+                for node in root.find_all(kind=kind_key):
+                    nm = node.field("name")
+                    if nm is not None:
+                        tname = nm.text().strip()
+                        if tname and not tname.startswith("_"):
+                            names.add(tname)
+    return sorted(names)
+

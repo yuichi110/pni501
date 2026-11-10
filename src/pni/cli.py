@@ -1224,6 +1224,11 @@ def report_build_cmd(
         "--html-output-dir",
         help="Optional custom destination directory for compiled HTML output (defaults to pni.toml if set).",
     ),
+    link_check_root: Optional[Path] = typer.Option(
+        None,
+        "--link-check-root",
+        help="Optional root directory for HTML relative link verification in multi-portal layouts.",
+    ),
     formats: Optional[list[str]] = typer.Option(
         None,
         "--format",
@@ -1260,6 +1265,7 @@ def report_build_cmd(
             src_base_dir=eff_src_dir,
             output_dir=eff_out_dir,
             html_output_dir=eff_html_dir,
+            link_check_root=link_check_root,
             formats=active_formats,
             generate_toc=toc,
             no_cache=no_cache,

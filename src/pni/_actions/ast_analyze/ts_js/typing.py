@@ -24,6 +24,7 @@ from pni._actions.ast_analyze.models import (
 )
 from pni._actions.ast_analyze.ts_js._helpers import (
     extract_preceding_jsdoc,
+    find_companion_dts_files,
     get_ts_js_params,
     has_ts_return_type,
     iter_ts_js_callables,
@@ -187,7 +188,14 @@ class TsJsTypingChecker(BaseTypingChecker):
         issues: list[CodeLocation] = []
         weak_usages: list[CodeLocation] = []
 
-        has_dts = unit.file_path.with_suffix(".d.ts").is_file() or bool(_TS_CHECK_HEADER_RE.search(unit.source[:500]))
+        has_ts_check = bool(_TS_CHECK_HEADER_RE.search(unit.source[:500]))
+        dts_files = find_companion_dts_files(unit.file_path)
+        dts_idents: set[str] = set()
+        for dts_path in dts_files:
+            try:
+                dts_idents.update(re.findall(r"\b[A-Za-z_$][\w$]*\b", dts_path.read_text(encoding="utf-8")))
+            except OSError:
+                continue
 
         for qual, short, is_exp, fn_node, anchor_node in callables:
             if is_ts_file:
@@ -196,8 +204,12 @@ class TsJsTypingChecker(BaseTypingChecker):
                 if is_safe:
                     safe_callables += 1
             else:
+                owner = qual.split(".", 1)[0]
+                covered_by_dts = has_ts_check or (
+                    bool(dts_files) and (not dts_idents or short in dts_idents or owner in dts_idents)
+                )
                 is_safe, fn_issues, fn_weak = _inspect_js_callable(
-                    qual, short, is_exp, fn_node, anchor_node, unit.rel_path, has_dts
+                    qual, short, is_exp, fn_node, anchor_node, unit.rel_path, covered_by_dts
                 )
                 issues.extend(fn_issues)
                 weak_usages.extend(fn_weak)

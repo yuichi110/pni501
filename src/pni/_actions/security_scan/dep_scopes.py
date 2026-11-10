@@ -238,8 +238,34 @@ def _resolve_composer_lock_non_core(composer_lock_path: Path) -> set[str]:
     return dev_pkgs - prod_pkgs
 
 
-def _resolve_npm_lock_non_core(npm_lock_path: Path) -> set[str]:
-    """Extract dev-only packages from `package-lock.json`."""
+_YARN_LOCK_HEADER_RE = re.compile(r'^"?(@?[A-Za-z0-9_.\-/]+)@')
+
+
+def _collect_npm_v1_deps(
+    deps_v1: object,
+    all_locked: set[str],
+    prod_names: set[str],
+    dev_names: set[str],
+) -> None:
+    """Populate package sets from a legacy v1/v2 `package-lock.json` `dependencies` dict."""
+    if not isinstance(deps_v1, dict):
+        return
+    for raw_name, meta in deps_v1.items():
+        if not isinstance(meta, dict):
+            continue
+        norm = normalize_vuln_pkg_key(str(raw_name))
+        all_locked.add(norm)
+        if meta.get("dev") is True:
+            dev_names.add(norm)
+        else:
+            prod_names.add(norm)
+
+
+def _resolve_npm_lock_non_core(
+    npm_lock_path: Path,
+    core_seeds: set[str] | None = None,
+) -> set[str]:
+    """Extract dev-only packages from `package-lock.json` (or all packages when core_seeds is empty)."""
     if not npm_lock_path.is_file():
         return set()
     payload: object = None
@@ -247,23 +273,47 @@ def _resolve_npm_lock_non_core(npm_lock_path: Path) -> set[str]:
         payload = json.loads(npm_lock_path.read_text(encoding="utf-8"))
     if not isinstance(payload, dict):
         return set()
-    packages = payload.get("packages")
-    if not isinstance(packages, dict):
-        return set()
+    all_locked: set[str] = set()
     prod_names: set[str] = set()
     dev_names: set[str] = set()
-    for path_key, meta in packages.items():
-        if not path_key or not isinstance(meta, dict):
-            continue
-        pkg_name = str(meta.get("name") or path_key.rsplit("node_modules/", maxsplit=1)[-1]).strip()
-        if not pkg_name:
-            continue
-        norm = normalize_vuln_pkg_key(pkg_name)
-        if meta.get("dev") is True or meta.get("devOptional") is True:
-            dev_names.add(norm)
-        else:
-            prod_names.add(norm)
+    packages = payload.get("packages")
+    if isinstance(packages, dict):
+        for path_key, meta in packages.items():
+            if not path_key or not isinstance(meta, dict):
+                continue
+            pkg_name = str(meta.get("name") or path_key.rsplit("node_modules/", maxsplit=1)[-1]).strip()
+            if not pkg_name:
+                continue
+            norm = normalize_vuln_pkg_key(pkg_name)
+            all_locked.add(norm)
+            if meta.get("dev") is True or meta.get("devOptional") is True:
+                dev_names.add(norm)
+            else:
+                prod_names.add(norm)
+    if not all_locked:
+        _collect_npm_v1_deps(payload.get("dependencies"), all_locked, prod_names, dev_names)
+    if core_seeds is not None and not core_seeds:
+        return all_locked
     return dev_names - prod_names
+
+
+def _resolve_yarn_lock_non_core(
+    yarn_lock_path: Path,
+    core_seeds: set[str] | None = None,
+) -> set[str]:
+    """Extract all locked packages from `yarn.lock` when the project has zero production dependencies."""
+    if core_seeds is None or core_seeds or not yarn_lock_path.is_file():
+        return set()
+    locked: set[str] = set()
+    with contextlib.suppress(Exception):
+        for raw_line in yarn_lock_path.read_text(encoding="utf-8", errors="ignore").splitlines():
+            if not raw_line or raw_line.startswith((" ", "\t", "#")):
+                continue
+            for spec in raw_line.rstrip(":").split(","):
+                m = _YARN_LOCK_HEADER_RE.match(spec.strip())
+                if m:
+                    locked.add(normalize_vuln_pkg_key(m.group(1)))
+    return locked
 
 
 def _resolve_maven_pom_non_core(pom_path: Path) -> set[str]:
@@ -480,8 +530,9 @@ def _resolve_node_workspace_non_core(target_dir: Path, source_targets: Sequence[
             r_prod, r_dev = _extract_package_json_sets(root_pj)
             non_core.update(r_prod | r_dev)
 
-    non_core.update(_resolve_npm_lock_non_core(target_dir / "package-lock.json"))
+    non_core.update(_resolve_npm_lock_non_core(target_dir / "package-lock.json", core_seeds))
     non_core.update(_resolve_pnpm_lock_non_core(target_dir / "pnpm-lock.yaml", core_seeds))
+    non_core.update(_resolve_yarn_lock_non_core(target_dir / "yarn.lock", core_seeds))
     if core_seeds is not None:
         non_core -= core_seeds
     return non_core

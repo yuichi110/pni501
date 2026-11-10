@@ -5,10 +5,11 @@ WORKDIR /workspace
 
 ENV CI=true \
     NODE_ENV=test \
-    COREPACK_ENABLE_STRICT=0
+    COREPACK_ENABLE_STRICT=0 \
+    PLAYWRIGHT_BROWSERS_PATH=/ms-playwright
 
 RUN useradd -m -u 10001 -s /bin/sh pni || true && \
-    mkdir -p /out && \
+    mkdir -p /out /ms-playwright && \
     corepack enable || true
 
 COPY . /workspace
@@ -29,6 +30,12 @@ RUN if [ -f pnpm-lock.yaml ]; then \
         npm install --ignore-scripts || npm install; \
     fi
 
+# Auto-provision Playwright Chromium + OS shared libraries when browser test runners are declared
+RUN if [ -f package.json ] && \
+       node -e 'const p=require("./package.json");const d=Object.assign({},p.dependencies,p.devDependencies);process.exit((d["playwright"]||d["@playwright/test"]||d["@web/test-runner-playwright"]||d["puppeteer"])?0:1)' 2>/dev/null; then \
+        npx playwright install --with-deps chromium || true; \
+    fi
+
 # Auto-provision @vitest/coverage-v8 matching installed vitest major.minor when missing
 RUN if [ -f node_modules/vitest/package.json ] && \
        [ ! -d node_modules/@vitest/coverage-v8 ] && \
@@ -44,7 +51,7 @@ RUN if [ -f node_modules/vitest/package.json ] && \
             fi; \
         fi; \
     fi && \
-    chmod -R a+rwX /workspace /out
+    chmod -R a+rwX /workspace /out /ms-playwright
 
 USER pni
 

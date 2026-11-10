@@ -29,9 +29,14 @@ _TEST_CALL_NAMES: Final[frozenset[str]] = frozenset(
 )
 _TS_JS_ASSERT_RE: Final[re.Pattern[str]] = re.compile(
     r"\b(?:expect|expectTypeOf|assert|assertType|expectType|expectNotType|expectAssignable)\s*(?:\.\w+\s*)?(?:\(|<)"
+    r"|\b(?:[Aa]ssert|[Vv]erify|[Cc]heck)[A-Za-z0-9_$]*\s*\("
     r"|\.(?:toBe\w*|toEqual\w*|toStrictEqual|toMatch\w*|toThrow\w*|toHave\w*|resolves|rejects|should)\b"
     r"|\b(?:sinon\.assert|fc\.assert|td\.verify)\b"
     r"|@ts-expect-error"
+)
+_EXTERNAL_CDN_SCRIPT_RE: Final[re.Pattern[str]] = re.compile(
+    r"(?:<script[^>]+src\s*=\s*['\"]|['\"])https?://(?:unpkg\.com|cdn\.jsdelivr\.net|cdnjs\.cloudflare\.com)/[^'\">\s]+",
+    re.IGNORECASE,
 )
 
 
@@ -67,6 +72,42 @@ def _collect_test_helper_names(test_units: list[ParsedUnit]) -> set[str]:
     return helpers
 
 
+_TEST_FILE_SUFFIXES: Final[tuple[str, ...]] = (
+    ".test.tsx",
+    ".spec.tsx",
+    ".test.ts",
+    ".spec.ts",
+    "_test.ts",
+    ".test.jsx",
+    ".spec.jsx",
+    ".test.mjs",
+    ".spec.mjs",
+    ".test.js",
+    ".spec.js",
+    "_test.js",
+)
+
+
+def _collect_unit_tested_stems(tu: ParsedUnit) -> set[str]:
+    """Extract tested module stems from a single test unit's filename and import/require statements."""
+    stems: set[str] = set()
+    fname = tu.file_path.name
+    base_stem = next(
+        (fname[: -len(sfx)].lower() for sfx in _TEST_FILE_SUFFIXES if fname.endswith(sfx)),
+        tu.file_path.stem.lower(),
+    )
+    stems.add(base_stem)
+    if base_stem.startswith("hx-"):
+        stems.add(base_stem.removeprefix("hx-"))
+    for m in re.finditer(r"from\s+['\"]([^'\"]+)['\"]|require\(\s*['\"]([^'\"]+)['\"]\s*\)", tu.source):
+        imp = (m.group(1) or m.group(2) or "").rsplit("/", 1)[-1]
+        for ext in (".ts", ".tsx", ".js", ".jsx", ".mjs"):
+            imp = imp.removesuffix(ext)
+        if imp:
+            stems.add(imp.lower())
+    return stems
+
+
 def _compute_ts_js_module_coverage(
     test_units: list[ParsedUnit],
     source_units: list[ParsedUnit],
@@ -77,32 +118,8 @@ def _compute_ts_js_module_coverage(
         return 100.0 if test_count > 0 else None
 
     tested_stems: set[str] = set()
-    suffixes = (
-        ".test.tsx",
-        ".spec.tsx",
-        ".test.ts",
-        ".spec.ts",
-        "_test.ts",
-        ".test.jsx",
-        ".spec.jsx",
-        ".test.mjs",
-        ".spec.mjs",
-        ".test.js",
-        ".spec.js",
-        "_test.js",
-    )
     for tu in test_units:
-        stem = tu.file_path.name
-        for sfx in suffixes:
-            if stem.endswith(sfx):
-                tested_stems.add(stem[: -len(sfx)].lower())
-                break
-        for m in re.finditer(r"from\s+['\"]([^'\"]+)['\"]|require\(\s*['\"]([^'\"]+)['\"]\s*\)", tu.source):
-            imp = (m.group(1) or m.group(2) or "").rsplit("/", 1)[-1]
-            for ext in (".ts", ".tsx", ".js", ".jsx", ".mjs"):
-                imp = imp.removesuffix(ext)
-            if imp:
-                tested_stems.add(imp.lower())
+        tested_stems.update(_collect_unit_tested_stems(tu))
 
     src_stems = {
         su.file_path.stem.lower()
@@ -111,8 +128,39 @@ def _compute_ts_js_module_coverage(
     }
     if not src_stems:
         return 100.0 if test_count > 0 else None
+
+    for missing_stem in list(src_stems - tested_stems):
+        if len(missing_stem) >= 3 and any(
+            re.search(rf"\b{re.escape(missing_stem)}\b", tu.source) for tu in test_units
+        ):
+            tested_stems.add(missing_stem)
+
     matched = len(src_stems & tested_stems)
     return round((matched / len(src_stems)) * 100.0, 1)
+
+
+def _scan_external_cdn_test_refs(project_root: Path) -> list[str]:
+    """Scan test configs and HTML fixtures for external CDN script URLs that break under --network=none."""
+    candidates: list[Path] = []
+    for pat in ("web-test-runner.config.*", "karma.conf.*", "playwright.config.*"):
+        candidates.extend(sorted(project_root.glob(pat)))
+    for tdir_name in ("test", "tests", "__tests__"):
+        tdir = project_root / tdir_name
+        if tdir.is_dir():
+            candidates.extend(sorted(tdir.rglob("*.html"))[:30])
+            candidates.extend(sorted(tdir.glob("*.config.*"))[:10])
+    flagged: list[str] = []
+    for path in candidates:
+        if not path.is_file():
+            continue
+        try:
+            text = path.read_text(encoding="utf-8", errors="ignore")
+        except OSError:
+            continue
+        if _EXTERNAL_CDN_SCRIPT_RE.search(text):
+            rel = path.relative_to(project_root).as_posix() if path.is_relative_to(project_root) else path.name
+            flagged.append(rel)
+    return flagged
 
 
 class TsJsTestChecker(BaseTestChecker):
@@ -125,7 +173,6 @@ class TsJsTestChecker(BaseTestChecker):
         project_root: Path,
     ) -> TestAstResult:
         """Count `it`/`test` blocks, detect assertion-free tests, and compute module coverage."""
-        _ = project_root
         helper_names = _collect_test_helper_names(test_units)
         test_count = 0
         assertion_free: list[CodeLocation] = []
@@ -169,6 +216,13 @@ class TsJsTestChecker(BaseTestChecker):
             notes.append(f"{only_count} focused `.only(...)` test/suite call(s) detected")
         if overmock_count > 0:
             notes.append(f"{overmock_count} test case(s) create >5 mocks (`vi.fn`/`jest.fn`)")
+        cdn_files = _scan_external_cdn_test_refs(project_root)
+        if cdn_files:
+            sample = ", ".join(cdn_files[:3])
+            notes.append(
+                f"External CDN `<script>` reference(s) in test harness ({sample}) — "
+                "prefetch and rewrite to local files during Docker build so `--network=none` tests succeed"
+            )
 
         return TestAstResult(
             test_functions_count=test_count,

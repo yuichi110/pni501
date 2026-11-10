@@ -112,6 +112,28 @@ def is_os_package_type(pkg_type: str, result_class: str = "") -> bool:
     return pkg_type.strip().lower() in _OS_PKG_TYPES
 
 
+_GLOBAL_IMAGE_TOOLCHAIN_PREFIXES: Final[tuple[str, ...]] = (
+    "usr/local/lib/node_modules",
+    "usr/lib/node_modules",
+    "usr/local/share",
+    "opt/",
+    "root/.cache",
+    "root/.npm",
+    "home/pni/.cache",
+)
+
+
+def _is_image_global_toolchain_path(target: str, pkg_path: str) -> bool:
+    """Return True if a Trivy image finding originates from a global base-image toolchain directory."""
+    for raw in (pkg_path, target):
+        if not raw:
+            continue
+        norm = raw.strip().replace("\\", "/").lstrip("/")
+        if any(norm == pref or norm.startswith(f"{pref.rstrip('/')}/") for pref in _GLOBAL_IMAGE_TOOLCHAIN_PREFIXES):
+            return True
+    return False
+
+
 def _classify_vuln_scope(
     pkg_name: str,
     pkg_type: str,
@@ -120,10 +142,13 @@ def _classify_vuln_scope(
     from_image: bool,
     is_harness_image: bool,
     non_core_packages: set[str] | frozenset[str],
+    target: str = "",
+    pkg_path: str = "",
 ) -> VulnScope:
     """Classify a vulnerability into runtime_core, dev_or_optional, os_package, or harness_os."""
     is_os = is_os_package_type(pkg_type, res_class)
-    if is_os or (from_image and is_harness_image and pkg_type.strip().lower() == "gobinary"):
+    is_global_tool = from_image and _is_image_global_toolchain_path(target, pkg_path)
+    if is_os or is_global_tool or (from_image and is_harness_image and pkg_type.strip().lower() == "gobinary"):
         return "harness_os" if (from_image and is_harness_image) else "os_package"
     if normalize_vuln_pkg_key(pkg_name) in non_core_packages:
         return "dev_or_optional"
@@ -226,6 +251,7 @@ def _parse_result_vulns(
         installed = str(raw_v.get("InstalledVersion") or "").strip()
         if not vuln_id or not pkg_name:
             continue
+        pkg_path = str(raw_v.get("PkgPath") or "").strip()
         unpinned = is_symbolic_or_unpinned_version(installed)
         scope = _classify_vuln_scope(
             pkg_name,
@@ -234,6 +260,8 @@ def _parse_result_vulns(
             from_image=from_image,
             is_harness_image=is_harness_image,
             non_core_packages=non_core_packages,
+            target=target,
+            pkg_path=pkg_path,
         )
         item = VulnerabilityItem(
             vuln_id=vuln_id,

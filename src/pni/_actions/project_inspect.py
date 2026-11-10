@@ -258,6 +258,46 @@ def _matches_filename_pattern(file_path: Path, patterns: tuple[str, ...]) -> boo
     return any(file_path.match(pat) or name.endswith(".d.ts") and pat == "*.d.ts" for pat in patterns)
 
 
+_NON_TEST_HELPER_TOKENS: Final[tuple[str, ...]] = ("helper", "setup", "mock", "config", "fixture")
+_TS_JS_TEST_CALL_RE: Final[re.Pattern[str]] = re.compile(r"\b(?:describe|it|test)\s*(?:\.\w+\s*)?\(")
+
+
+def _is_dedicated_ts_js_test_file(project_root: Path, file_path: Path) -> bool:
+    """Return True if file_path is inside test/tests/__tests__ and contains describe/it/test blocks."""
+    if not file_path.is_relative_to(project_root):
+        return False
+    rel_parts = file_path.relative_to(project_root).parts[:-1]
+    if not any(part.lower() in {"test", "tests", "__tests__"} for part in rel_parts):
+        return False
+    name_low = file_path.name.lower()
+    if name_low.endswith((".d.ts", ".min.js")) or any(tok in name_low for tok in _NON_TEST_HELPER_TOKENS):
+        return False
+    with contextlib.suppress(Exception):
+        return bool(_TS_JS_TEST_CALL_RE.search(file_path.read_text(encoding="utf-8", errors="ignore")))
+    return False
+
+
+def _collect_dedicated_ts_js_tests(
+    project_root: Path,
+    rel_dirs: list[str],
+    src_patterns: tuple[str, ...],
+    globs: list[str],
+) -> set[Path]:
+    """Collect suffix-less TS/JS test files residing under dedicated test directories."""
+    extra: set[Path] = set()
+    for rel in rel_dirs:
+        candidate = project_root / rel
+        if not candidate.is_dir():
+            continue
+        for pat in src_patterns:
+            for found in candidate.rglob(pat):
+                if _is_ignored_rel(project_root, found) or matches_exclude_globs(found, project_root, globs):
+                    continue
+                if _is_dedicated_ts_js_test_file(project_root, found):
+                    extra.add(found)
+    return extra
+
+
 def _count_matching_files(
     project_root: Path,
     rel_dirs: list[str],
@@ -304,6 +344,23 @@ def _count_matching_files(
         ):
             matched.add(candidate)
     return len(matched)
+
+
+def _count_test_files(
+    project_root: Path,
+    rel_dirs: list[str],
+    test_patterns: tuple[str, ...],
+    src_patterns: tuple[str, ...],
+    active_lang: str,
+    exclude_globs: Optional[list[str]],
+) -> int:
+    """Count test files including suffix-less TS/JS suites under dedicated test directories."""
+    base_count = _count_matching_files(project_root, rel_dirs, test_patterns, exclude_globs=exclude_globs)
+    if active_lang not in {"typescript", "javascript"}:
+        return base_count
+    extra = _collect_dedicated_ts_js_tests(project_root, rel_dirs, src_patterns, exclude_globs or [])
+    unmatched_extra = [p for p in extra if not _matches_filename_pattern(p, test_patterns)]
+    return base_count + len(unmatched_extra)
 
 
 def _detect_python_build_system(project_root: Path, data: dict[str, object]) -> str:
@@ -982,10 +1039,34 @@ def _is_tsconfig_strict(project_root: Path) -> Optional[bool]:
     return False
 
 
+def _has_javascript_type_marker(project_root: Path, src_dirs: list[str]) -> Optional[bool]:
+    """Return True if a JavaScript project bundles `.d.ts` declarations or declares `types`/`typings`."""
+    pkg_json = project_root / "package.json"
+    if pkg_json.is_file():
+        with contextlib.suppress(Exception):
+            data = json.loads(pkg_json.read_text(encoding="utf-8"))
+            if isinstance(data, dict):
+                for key in ("types", "typings"):
+                    val = data.get(key)
+                    if isinstance(val, str) and val.strip() and (project_root / val.strip()).is_file():
+                        return True
+    for rel in src_dirs:
+        candidate = project_root / rel
+        if candidate.is_dir() and any(
+            not _is_ignored_rel(project_root, p) for p in candidate.rglob("*.d.ts")
+        ):
+            return True
+    if any(not _is_ignored_or_fixture_rel(project_root, p) for p in project_root.rglob("*.d.ts")):
+        return True
+    return None
+
+
 def _check_type_marker(project_root: Path, lang: str, src_dirs: list[str]) -> Optional[bool]:
-    """Check language package type-completeness marker (e.g. PEP 561 py.typed or tsconfig strict)."""
+    """Check language package type-completeness marker (e.g. PEP 561 py.typed, tsconfig strict, or .d.ts)."""
     if lang == "typescript":
         return _is_tsconfig_strict(project_root)
+    if lang == "javascript":
+        return _has_javascript_type_marker(project_root, src_dirs)
     if lang != "python":
         return None
     for rel in src_dirs:
@@ -1455,11 +1536,13 @@ def run_project_inspect(
             exclude_globs=eff_excludes,
             exclude_patterns=(*test_patterns, "*.d.ts"),
         ),
-        test_files_count=_count_matching_files(
+        test_files_count=_count_test_files(
             project_root,
             eff_tst,
             test_patterns,
-            exclude_globs=eff_excludes,
+            src_patterns,
+            active_lang,
+            eff_excludes,
         ),
         has_readme=has_readme,
         readme_line_count=readme_lines,

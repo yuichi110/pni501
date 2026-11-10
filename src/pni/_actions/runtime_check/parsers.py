@@ -538,10 +538,36 @@ def _parse_node_tap_counts(clean_text: str) -> Optional[tuple[int, int, int, int
     return None
 
 
+def _parse_wtr_or_mocha_counts(clean_text: str) -> Optional[tuple[int, int, int, int]]:
+    """Extract (total, passed, failed, skipped) from `@web/test-runner` or Mocha summary output."""
+    for line in reversed(clean_text.splitlines()):
+        stripped = line.strip()
+        if "|" in stripped or "failed" in stripped:
+            pass_m = re.search(r"(\d+)\s+passed\b", stripped)
+            if pass_m and not stripped.lower().startswith("tests:"):
+                passed = int(pass_m.group(1))
+                fail_m = re.search(r"(\d+)\s+failed\b", stripped)
+                skip_m = re.search(r"(\d+)\s+(?:skipped|pending)\b", stripped)
+                failed = int(fail_m.group(1)) if fail_m else 0
+                skipped = int(skip_m.group(1)) if skip_m else 0
+                total = passed + failed + skipped
+                if total > 0:
+                    return total, passed, failed, skipped
+    mocha_pass = re.search(r"(?m)^\s*(\d+)\s+passing\b", clean_text)
+    if mocha_pass:
+        passed = int(mocha_pass.group(1))
+        mocha_fail = re.search(r"(?m)^\s*(\d+)\s+failing\b", clean_text)
+        mocha_pend = re.search(r"(?m)^\s*(\d+)\s+pending\b", clean_text)
+        failed = int(mocha_fail.group(1)) if mocha_fail else 0
+        skipped = int(mocha_pend.group(1)) if mocha_pend else 0
+        return passed + failed + skipped, passed, failed, skipped
+    return None
+
+
 def parse_node_test_output(
     node_test_path: Path,
 ) -> tuple[int, int, int, int, int, list[FailedTestCase]]:
-    """Parse Vitest / Jest / `node --test` text output when JUnit XML is absent."""
+    """Parse Vitest / Jest / `@web/test-runner` / Mocha / `node --test` text output when JUnit XML is absent."""
     if not node_test_path.is_file():
         return 0, 0, 0, 0, 0, []
 
@@ -551,7 +577,11 @@ def parse_node_test_output(
         return 0, 0, 0, 0, 0, []
 
     clean = _ANSI_ESCAPE_RE.sub("", raw)
-    counts = _parse_jest_vitest_counts(clean) or _parse_node_tap_counts(clean)
+    counts = (
+        _parse_jest_vitest_counts(clean)
+        or _parse_node_tap_counts(clean)
+        or _parse_wtr_or_mocha_counts(clean)
+    )
     if counts is None:
         return 0, 0, 0, 0, 0, []
 
@@ -561,7 +591,7 @@ def parse_node_test_output(
     if failed > 0:
         for line in clean.splitlines():
             s = line.strip()
-            if s.startswith(("✕ ", "× ", "✖ ")):
+            if s.startswith(("✕ ", "× ", "✖ ", "❌ ")):
                 failures.append(
                     FailedTestCase(
                         classname="node.test",
@@ -610,6 +640,10 @@ def parse_istanbul_coverage_summary(
     total_branches = _as_int(branches_dict.get("total"))
 
     items: list[ModuleCoverageItem] = []
+    sum_fcov = 0
+    sum_ftotal = 0
+    sum_fbcov = 0
+    sum_fbtotal = 0
     for key, fdata in raw.items():
         if key == "total" or not isinstance(fdata, dict):
             continue
@@ -619,6 +653,10 @@ def parse_istanbul_coverage_summary(
         ftotal = _as_int(flines.get("total"))
         fbcov = _as_int(fbranches.get("covered"))
         fbtotal = _as_int(fbranches.get("total"))
+        sum_fcov += fcov
+        sum_ftotal += ftotal
+        sum_fbcov += fbcov
+        sum_fbtotal += fbtotal
         rel_path = str(key).replace("\\", "/").removeprefix(workspace_prefix).lstrip("/")
         items.append(
             ModuleCoverageItem(
@@ -631,6 +669,10 @@ def parse_istanbul_coverage_summary(
             )
         )
 
+    if items and sum_ftotal > 0:
+        cov_lines, total_stmts = sum_fcov, sum_ftotal
+        cov_branches, total_branches = sum_fbcov, sum_fbtotal
+
     if total_stmts == 0 and not items:
         return CoverageResult()
 
@@ -641,6 +683,125 @@ def parse_istanbul_coverage_summary(
         line_coverage_pct=_compute_line_pct(cov_lines, total_stmts),
         branch_coverage_pct=_compute_line_pct(cov_branches, total_branches) if total_branches > 0 else None,
         covered_lines=cov_lines,
+        total_statements=total_stmts,
+        lowest_covered_modules=items[:_MAX_LOWEST_MODULES],
+    )
+
+
+def _finalize_lcov_record(
+    sf_path: str,
+    da_hits: dict[int, int],
+    lf_val: int,
+    lh_val: int,
+    brda_hits: list[int],
+    brf_val: int,
+    brh_val: int,
+    workspace_prefix: str,
+) -> tuple[ModuleCoverageItem, int, int]:
+    """Build a ModuleCoverageItem and (covered_branches, total_branches) from one LCOV `SF:` block."""
+    rel_path = sf_path.replace("\\", "/").removeprefix(workspace_prefix).lstrip("/")
+    ftotal = lf_val if lf_val > 0 else len(da_hits)
+    fcov = lh_val if lf_val > 0 else sum(1 for h in da_hits.values() if h > 0)
+    fbtotal = brf_val if brf_val > 0 else len(brda_hits)
+    fbcov = brh_val if brf_val > 0 else sum(1 for h in brda_hits if h > 0)
+    missing = sorted(ln for ln, h in da_hits.items() if h == 0)[:_MAX_MISSING_LINES]
+    item = ModuleCoverageItem(
+        file_path=rel_path,
+        line_coverage_pct=_compute_line_pct(fcov, ftotal),
+        branch_coverage_pct=_compute_line_pct(fbcov, fbtotal) if fbtotal > 0 else None,
+        covered_lines=fcov,
+        total_statements=ftotal,
+        missing_lines_preview=missing,
+    )
+    return item, fbcov, fbtotal
+
+
+def _apply_lcov_line(
+    line: str,
+    da_hits: dict[int, int],
+    brda_hits: list[int],
+    counters: list[int],
+) -> None:
+    """Apply a single DA/LF/LH/BRDA/BRF/BRH line into active LCOV record accumulators."""
+    if line.startswith("DA:"):
+        parts = line[3:].split(",")
+        if len(parts) >= 2:
+            with contextlib.suppress(ValueError):
+                da_hits[int(parts[0])] = int(parts[1])
+    elif line.startswith("LF:"):
+        counters[0] = _as_int(line[3:])
+    elif line.startswith("LH:"):
+        counters[1] = _as_int(line[3:])
+    elif line.startswith("BRDA:"):
+        parts = line[5:].split(",")
+        if len(parts) >= 4:
+            taken = parts[3].strip()
+            brda_hits.append(0 if taken in {"-", "0"} else _as_int(taken))
+    elif line.startswith("BRF:"):
+        counters[2] = _as_int(line[4:])
+    elif line.startswith("BRH:"):
+        counters[3] = _as_int(line[4:])
+
+
+def parse_lcov_info(
+    lcov_path: Path,
+    workspace_prefix: str = "/workspace/",
+) -> CoverageResult:
+    """Parse LCOV `lcov.info` report into a canonical CoverageResult with unified module and total counts."""
+    if not lcov_path.is_file():
+        return CoverageResult()
+
+    lines: list[str] = []
+    with contextlib.suppress(Exception):
+        lines = lcov_path.read_text(encoding="utf-8", errors="replace").splitlines()
+    if not lines:
+        return CoverageResult()
+
+    items: list[ModuleCoverageItem] = []
+    total_bcov = 0
+    total_btotal = 0
+    sf_path = ""
+    da_hits: dict[int, int] = {}
+    brda_hits: list[int] = []
+    counters = [0, 0, 0, 0]  # [lf, lh, brf, brh]
+
+    for raw in lines:
+        line = raw.strip()
+        if line.startswith("SF:"):
+            sf_path = line[3:].strip()
+            da_hits = {}
+            brda_hits = []
+            counters = [0, 0, 0, 0]
+        elif line == "end_of_record" and sf_path:
+            item, bcov, btotal = _finalize_lcov_record(
+                sf_path,
+                da_hits,
+                counters[0],
+                counters[1],
+                brda_hits,
+                counters[2],
+                counters[3],
+                workspace_prefix,
+            )
+            items.append(item)
+            total_bcov += bcov
+            total_btotal += btotal
+            sf_path = ""
+        elif sf_path:
+            _apply_lcov_line(line, da_hits, brda_hits, counters)
+
+    if not items:
+        return CoverageResult()
+
+    total_cov = sum(m.covered_lines for m in items)
+    total_stmts = sum(m.total_statements for m in items)
+    items.sort(key=lambda m: (m.line_coverage_pct, -m.total_statements, m.file_path))
+    return CoverageResult(
+        measured=True,
+        tool="lcov",
+        line_coverage_pct=_compute_line_pct(total_cov, total_stmts),
+        branch_coverage_pct=_compute_line_pct(total_bcov, total_btotal) if total_btotal > 0 else None,
+        covered_lines=total_cov,
         total_statements=total_stmts,
         lowest_covered_modules=items[:_MAX_LOWEST_MODULES],
     )

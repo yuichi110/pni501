@@ -259,6 +259,10 @@ class LanguageAnalyzerSuite:
                             p.lower() in {"test", "tests", "__tests__"}
                             for p in tf.relative_to(project_root).parts[:-1]
                         )
+                        and not any(
+                            tok in tf.name.lower()
+                            for tok in ("helper", "setup", "mock", "config", "fixture")
+                        )
                     )
                 )
             ]
