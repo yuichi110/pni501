@@ -50,12 +50,13 @@
     <div class="doc-layout">
         <aside class="sidebar">
             <div class="sidebar-header">
-                <a href="{{ index_url | default('index.html') }}" class="sidebar-brand" aria-label="{{ site_title | default('Drawlib') }}">
+                <a href="{{ index_url | default('index.html') }}" class="sidebar-brand" aria-label="{{ site_title | default('PNI501') }}">
                     {% if logo_href %}
-                    <img src="{{ logo_href }}" alt="{{ site_title | default('Drawlib') }}" class="sidebar-logo sidebar-logo-light">
-                    <img src="{{ logo_dark_href | default(logo_href) }}" alt="{{ site_title | default('Drawlib') }}" class="sidebar-logo sidebar-logo-dark">
+                    <img src="{{ logo_href }}" alt="{{ site_title | default('PNI501') }}" class="sidebar-logo sidebar-logo-light">
+                    <img src="{{ logo_dark_href | default(logo_href) }}" alt="{{ site_title | default('PNI501') }}" class="sidebar-logo sidebar-logo-dark">
+                    <span class="sidebar-brand-text">PNI501</span>
                     {% else %}
-                    {{ site_title | default("Drawlib") }}
+                    {{ site_title | default("PNI501") }}
                     {% endif %}
                 </a>
                 <div class="sidebar-header-actions">
