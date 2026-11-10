@@ -1,0 +1,600 @@
+<!--
+ Copyright (c) 2026 Yuichi Ito (yuichi@yuichi.com)
+
+ This software is licensed under the Apache License, Version 2.0.
+ For more information, please visit: https://github.com/yuichi110/drawlib
+
+ This software is provided "as is", without warranty of any kind,
+ express or implied, including but not limited to the warranties of
+ merchantability, fitness for a particular purpose and noninfringement.
+-->
+<!DOCTYPE html>
+<html lang="ja" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>クイックスタートガイド</title>
+    <script>
+        (function() {
+            const saved = localStorage.getItem('drawlib-theme');
+            if (saved === 'dark' || (!saved && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                document.documentElement.setAttribute('data-theme', 'dark');
+            } else {
+                document.documentElement.setAttribute('data-theme', 'light');
+            }
+        })();
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+    
+    
+    <link rel="alternate" hreflang="en" href="https://www.pni501.com/en/01_getting_started/quickstart.html">
+    
+    <link rel="alternate" hreflang="ja" href="https://www.pni501.com/ja/01_getting_started/quickstart.html">
+    
+    <link rel="alternate" hreflang="x-default" href="https://www.pni501.com/en/01_getting_started/quickstart.html">
+    
+    
+    
+    <meta name="description" content="数分で pni501 (v0.1.3) の導入から初回レポート生成までを体験できます。本ガイドでは、CLI のインストール、対象リポジトリでの .pni/ 初期化、Pre-Flight 準備ゲートの確認、そしてステートフル Pull-Push ワークフローループを実行して7軸スコア JSON と7章構成 A4…">
+    <link rel="canonical" href="https://www.pni501.com/ja/01_getting_started/quickstart.html">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="pni501 ドキュメント">
+    <meta property="og:title" content="クイックスタートガイド — pni501 ドキュメント">
+    <meta property="og:description" content="数分で pni501 (v0.1.3) の導入から初回レポート生成までを体験できます。本ガイドでは、CLI のインストール、対象リポジトリでの .pni/ 初期化、Pre-Flight 準備ゲートの確認、そしてステートフル Pull-Push ワークフローループを実行して7軸スコア JSON と7章構成 A4…">
+    <meta property="og:url" content="https://www.pni501.com/ja/01_getting_started/quickstart.html">
+    <meta property="og:image" content="https://www.pni501.com/_assets/logo.png">
+    <meta property="og:locale" content="ja_JP">
+    <meta property="og:locale:alternate" content="en_US">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="クイックスタートガイド — pni501 ドキュメント">
+    <meta name="twitter:description" content="数分で pni501 (v0.1.3) の導入から初回レポート生成までを体験できます。本ガイドでは、CLI のインストール、対象リポジトリでの .pni/ 初期化、Pre-Flight 準備ゲートの確認、そしてステートフル Pull-Push ワークフローループを実行して7軸スコア JSON と7章構成 A4…">
+    <meta name="twitter:image" content="https://www.pni501.com/_assets/logo.png">
+    
+    
+    <link rel="icon" type="image/png" href="../../_assets/favicon.png">
+    
+    
+    <link rel="stylesheet" href="../style.css">
+    
+    
+</head>
+<body>
+    
+    <div class="doc-layout">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <a href="../index.html" class="sidebar-brand" aria-label="pni501 ドキュメント">
+                    
+                    <img src="../../_assets/logo.png" alt="pni501 ドキュメント" class="sidebar-logo sidebar-logo-light">
+                    <img src="../../_assets/logo_dark.png" alt="pni501 ドキュメント" class="sidebar-logo sidebar-logo-dark">
+                    
+                </a>
+                <div class="sidebar-header-actions">
+                    <button type="button" id="theme-toggle" class="theme-toggle-btn" aria-label="Toggle theme">
+                        <svg class="icon-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+                        <svg class="icon-moon" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+                    </button>
+                    <button type="button" id="menu-toggle" class="menu-toggle-btn" aria-label="Toggle navigation" aria-expanded="false">
+                        <svg class="icon-hamburger" viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+                        <svg class="icon-close" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                    </button>
+                </div>
+            </div>
+            <div class="sidebar-menu">
+                
+                    
+                        
+                        <ul class="nav-list">
+                            
+                            <li class="nav-item ">
+                                <a href="../index.html" >概要 (Overview)</a>
+                            </li>
+                            
+                        </ul>
+                    
+                        
+                        <div class="sidebar-heading">1. はじめに (Getting Started)</div>
+                        
+                        <ul class="nav-list">
+                            
+                            <li class="nav-item ">
+                                <a href="concepts.html" >背景とコアコンセプト</a>
+                            </li>
+                            
+                            <li class="nav-item active">
+                                <a href="quickstart.html" >クイックスタートガイド</a>
+                            </li>
+                            
+                            <li class="nav-item ">
+                                <a href="use_cases.html" >3つの主要ユースケース</a>
+                            </li>
+                            
+                        </ul>
+                    
+                        
+                        <div class="sidebar-heading">2. アーキテクチャ (Architecture)</div>
+                        
+                        <ul class="nav-list">
+                            
+                            <li class="nav-item ">
+                                <a href="../02_architecture/domain_architecture.html" >ドメイン構造と3層カスケード</a>
+                            </li>
+                            
+                            <li class="nav-item ">
+                                <a href="../02_architecture/stateful_engine.html" >ステートフル Pull-Push エンジン</a>
+                            </li>
+                            
+                        </ul>
+                    
+                        
+                        <div class="sidebar-heading">3. ワークフローとアクション</div>
+                        
+                        <ul class="nav-list">
+                            
+                            <li class="nav-item ">
+                                <a href="../03_workflows_and_actions/workflows_guide.html" >ワークフローと Pre-Flight ゲート</a>
+                            </li>
+                            
+                            <li class="nav-item ">
+                                <a href="../03_workflows_and_actions/actions_pipeline.html" >15 アクションと 12 プリミティブ</a>
+                            </li>
+                            
+                            <li class="nav-item ">
+                                <a href="../03_workflows_and_actions/analyzers_and_pentest.html" >決定論的解析器とペネトレーションテスト</a>
+                            </li>
+                            
+                        </ul>
+                    
+                        
+                        <div class="sidebar-heading">4. スコアリングとレポート</div>
+                        
+                        <ul class="nav-list">
+                            
+                            <li class="nav-item ">
+                                <a href="../04_scoring_and_reports/scoring_model.html" >7軸品質スコアリングモデル</a>
+                            </li>
+                            
+                            <li class="nav-item ">
+                                <a href="../04_scoring_and_reports/drawlib_reporter.html" >Drawlib ビジュアルレポーター</a>
+                            </li>
+                            
+                        </ul>
+                    
+                        
+                        <div class="sidebar-heading">5. 対応言語とリファレンス</div>
+                        
+                        <ul class="nav-list">
+                            
+                            <li class="nav-item ">
+                                <a href="../05_languages_and_reference/supported_languages.html" >対応 6 言語マトリクス</a>
+                            </li>
+                            
+                            <li class="nav-item ">
+                                <a href="../05_languages_and_reference/rules_and_cli.html" >ルール拡張と CLI リファレンス</a>
+                            </li>
+                            
+                        </ul>
+                    
+                        
+                        <div class="sidebar-heading">外部リンク (External Links)</div>
+                        
+                        <ul class="nav-list">
+                            
+                            <li class="nav-item ">
+                                <a href="https://github.com/yuichi110/pni501" target="_blank" rel="noopener noreferrer">GitHub リポジトリ<svg class="nav-external-icon" viewBox="0 0 24 24" aria-hidden="true"><line x1="7" y1="17" x2="17" y2="7"></line><polyline points="7 7 17 7 17 17"></polyline></svg></a>
+                            </li>
+                            
+                            <li class="nav-item ">
+                                <a href="https://pypi.org/project/pni501/" target="_blank" rel="noopener noreferrer">PyPI パッケージ<svg class="nav-external-icon" viewBox="0 0 24 24" aria-hidden="true"><line x1="7" y1="17" x2="17" y2="7"></line><polyline points="7 7 17 7 17 17"></polyline></svg></a>
+                            </li>
+                            
+                        </ul>
+                    
+                
+            </div>
+        </aside>
+        <div class="content-wrapper">
+            <header class="top-bar">
+                <div class="breadcrumbs">
+                    <span class="crumb">Docs</span>
+                    <span class="crumb-separator">&raquo;</span>
+                    <span class="crumb active">クイックスタートガイド</span>
+                </div>
+                
+                <div class="lang-switcher">
+                    <details class="lang-dropdown">
+                        <summary class="lang-dropdown-btn" aria-label="Select language">
+                            <svg class="lang-globe-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+                            <span class="lang-current-label">日本語</span>
+                            <svg class="lang-caret-icon" viewBox="0 0 24 24" aria-hidden="true"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                        </summary>
+                        <div class="lang-dropdown-menu" role="menu">
+                            
+                            <a href="../../en/01_getting_started/quickstart.html" class="lang-option" lang="en" hreflang="en" >
+                                <span>English</span>
+                                
+                            </a>
+                            
+                            <a href="quickstart.html" class="lang-option active" lang="ja" hreflang="ja" aria-current="page">
+                                <span>日本語</span>
+                                
+                                <svg class="lang-check-icon" viewBox="0 0 24 24" aria-hidden="true"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                                
+                            </a>
+                            
+                        </div>
+                    </details>
+                </div>
+                
+            </header>
+            <main class="main-content">
+                <h1>クイックスタートガイド</h1>
+<p>数分で <code>pni501</code> (<code>v0.1.3</code>) の導入から初回レポート生成までを体験できます。本ガイドでは、CLI のインストール、対象リポジトリでの <code>.pni/</code> 初期化、Pre-Flight 準備ゲートの確認、そしてステートフル Pull-Push ワークフローループを実行して7軸スコア JSON と7章構成 A4 PDF レポートを生成するまでの手順を解説します。</p>
+<figure class="drawlib-image" style="text-align: center;">
+  <img src="../../images/01_getting_started/quickstart/pni_quickstart_flow.png" alt="quickstart_1" />
+  <figcaption class="drawlib-caption">4ステップのクイックスタートライフサイクル：pni init から検証済み7軸スコア・7章構成 A4 PDF レポート生成まで</figcaption>
+</figure>
+<details class="drawlib-code-details">
+<summary>Source Code</summary>
+<pre><code class="language-python"><span class="kn">from</span><span class="w"> </span><span class="nn">drawlib.canvas</span><span class="w"> </span><span class="kn">import</span> <span class="n">save</span><span class="p">,</span> <span class="n">setup</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">drawlib.icons</span><span class="w"> </span><span class="kn">import</span> <span class="n">phosphor</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">drawlib.smartarts</span><span class="w"> </span><span class="kn">import</span> <span class="n">CardList</span><span class="p">,</span> <span class="n">ChevronProcess</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">drawlib.styles</span><span class="w"> </span><span class="kn">import</span> <span class="n">Styles</span>
+
+<span class="n">setup</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="mi">156</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">70</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">150</span><span class="p">)</span>
+
+<span class="n">pipeline</span> <span class="o">=</span> <span class="n">ChevronProcess</span><span class="p">(</span>
+    <span class="n">style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">PrimaryNeutral</span><span class="p">,</span>
+    <span class="n">text_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">DarkBold</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">text_size</span><span class="o">=</span><span class="mf">10.5</span><span class="p">),</span>
+    <span class="n">description_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">Dark</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">text_size</span><span class="o">=</span><span class="mf">10.0</span><span class="p">),</span>
+    <span class="n">corner_angle</span><span class="o">=</span><span class="mf">65.0</span><span class="p">,</span>
+    <span class="n">spacing</span><span class="o">=</span><span class="mf">1.8</span><span class="p">,</span>
+    <span class="n">flat_left_end</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">pipeline</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+    <span class="s2">"1. Install &amp; Init"</span><span class="p">,</span>
+    <span class="n">description</span><span class="o">=</span><span class="s2">"pip install pni501</span><span class="se">\n</span><span class="s2">pni init"</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">pipeline</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+    <span class="s2">"2. Inspect &amp; Tailor"</span><span class="p">,</span>
+    <span class="n">description</span><span class="o">=</span><span class="s2">"Edit .pni/workflows/</span><span class="se">\n</span><span class="s2">pni workflows show"</span><span class="p">,</span>
+    <span class="n">style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">Neutral</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">pipeline</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+    <span class="s2">"3. Pull-Push Loop"</span><span class="p">,</span>
+    <span class="n">description</span><span class="o">=</span><span class="s2">"start -&gt; get-action</span><span class="se">\n</span><span class="s2">&lt;-&gt; push-action"</span><span class="p">,</span>
+    <span class="n">style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">PrimaryFlat</span><span class="p">,</span>
+    <span class="n">text_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">WhiteBold</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">text_size</span><span class="o">=</span><span class="mf">10.5</span><span class="p">),</span>
+    <span class="n">description_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">White</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">text_size</span><span class="o">=</span><span class="mf">10.0</span><span class="p">),</span>
+<span class="p">)</span>
+<span class="n">pipeline</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+    <span class="s2">"4. Build PDF Report"</span><span class="p">,</span>
+    <span class="n">description</span><span class="o">=</span><span class="s2">"pni report init/build</span><span class="se">\n</span><span class="s2">reports/&lt;target&gt;.pdf"</span><span class="p">,</span>
+    <span class="n">style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">SuccessFlat</span><span class="p">,</span>
+    <span class="n">text_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">WhiteBold</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">text_size</span><span class="o">=</span><span class="mf">10.5</span><span class="p">),</span>
+    <span class="n">description_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">White</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">text_size</span><span class="o">=</span><span class="mf">10.0</span><span class="p">),</span>
+<span class="p">)</span>
+<span class="n">pipeline</span><span class="o">.</span><span class="n">draw</span><span class="p">(</span><span class="n">xy</span><span class="o">=</span><span class="p">(</span><span class="mf">3.0</span><span class="p">,</span> <span class="mf">43.0</span><span class="p">),</span> <span class="n">width</span><span class="o">=</span><span class="mf">150.0</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mf">23.0</span><span class="p">)</span>
+
+<span class="n">commands</span> <span class="o">=</span> <span class="n">CardList</span><span class="p">(</span>
+    <span class="n">style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">Neutral</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">shape_r</span><span class="o">=</span><span class="mf">1.6</span><span class="p">),</span>
+    <span class="n">text_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">DarkBold</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">text_size</span><span class="o">=</span><span class="mf">10.5</span><span class="p">),</span>
+    <span class="n">description_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">Dark</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">text_size</span><span class="o">=</span><span class="mf">10.0</span><span class="p">),</span>
+    <span class="n">badge_shape</span><span class="o">=</span><span class="s2">"circle"</span><span class="p">,</span>
+    <span class="n">badge_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">PrimaryFlat</span><span class="p">,</span>
+    <span class="n">badge_text_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">WhiteBold</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">text_size</span><span class="o">=</span><span class="mf">10.0</span><span class="p">),</span>
+    <span class="n">icon_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">WhiteBold</span><span class="p">,</span>
+    <span class="n">direction</span><span class="o">=</span><span class="s2">"horizontal"</span><span class="p">,</span>
+    <span class="n">show_arrows</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">arrow_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">DarkBold</span><span class="p">,</span>
+    <span class="n">spacing</span><span class="o">=</span><span class="mf">3.0</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">commands</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+    <span class="s2">"Scaffold .pni/"</span><span class="p">,</span>
+    <span class="s2">"Auto-detects 6 languages</span><span class="se">\n</span><span class="s2">Creates rules &amp; workflows"</span><span class="p">,</span>
+    <span class="n">icon</span><span class="o">=</span><span class="n">phosphor</span><span class="o">.</span><span class="n">folder_plus</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">commands</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+    <span class="s2">"Verify Pre-Flight"</span><span class="p">,</span>
+    <span class="s2">"Checks target dirs, pentests</span><span class="se">\n</span><span class="s2">&amp; based_on prerequisites"</span><span class="p">,</span>
+    <span class="n">icon</span><span class="o">=</span><span class="n">phosphor</span><span class="o">.</span><span class="n">magnifying_glass</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">commands</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+    <span class="s2">"Execute Primitives"</span><span class="p">,</span>
+    <span class="s2">"Auto-runs AST/Docker/Trivy</span><span class="se">\n</span><span class="s2">Validates AI JSON schemas"</span><span class="p">,</span>
+    <span class="n">icon</span><span class="o">=</span><span class="n">phosphor</span><span class="o">.</span><span class="n">arrows_left_right</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">commands</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+    <span class="s2">"Deliver Artifacts"</span><span class="p">,</span>
+    <span class="s2">"Outputs *_score.json &amp;</span><span class="se">\n</span><span class="s2">7-chapter A4 vector PDF"</span><span class="p">,</span>
+    <span class="n">badge_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">SuccessFlat</span><span class="p">,</span>
+    <span class="n">icon</span><span class="o">=</span><span class="n">phosphor</span><span class="o">.</span><span class="n">file_pdf</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">commands</span><span class="o">.</span><span class="n">draw</span><span class="p">(</span><span class="n">xy</span><span class="o">=</span><span class="p">(</span><span class="mf">3.0</span><span class="p">,</span> <span class="mf">4.0</span><span class="p">),</span> <span class="n">width</span><span class="o">=</span><span class="mf">150.0</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mf">34.0</span><span class="p">)</span>
+<span class="n">save</span><span class="p">()</span>
+</code></pre>
+</details>
+<h2>1. 前提条件とインストール</h2>
+<p><code>pni501</code> の実行には <strong>Python 3.11 以上</strong>（<code>&gt;=3.11</code>）が必要です。また、隔離コンテナでのランタイム検証（<code>run_check</code>）、脆弱性スキャン（<code>security_scan</code>）、およびループバック Web ペネトレーションテスト（<code>web_pentest</code>）を実行する場合は、ホスト環境に <strong>Docker</strong> がインストールされている必要があります。</p>
+<p><code>pip</code> または <code>uv</code> を使用して PyPI から <code>pni501</code> をインストールし、バージョンを確認します：</p>
+<pre><code class="language-bash"><span class="c1"># 方法 A: pip でインストール</span>
+pip<span class="w"> </span>install<span class="w"> </span>pni501
+
+<span class="c1"># 方法 B: uv プロジェクトまたはツール環境に追加</span>
+uv<span class="w"> </span>add<span class="w"> </span>pni501
+
+<span class="c1"># インストールの確認と CLI サブコマンド一覧の表示</span>
+pni<span class="w"> </span>version
+pni<span class="w"> </span>--help
+</code></pre>
+<h2>2. ステップ 1：対象リポジトリで <code>.pni/</code> を初期化する</h2>
+<p>評価対象となるリポジトリのルートディレクトリに移動し、<code>pni init</code> を実行します：</p>
+<pre><code class="language-bash">pni<span class="w"> </span>init
+</code></pre>
+<p><code>pni init</code> はマニフェストファイル（<code>pyproject.toml</code>、<code>pom.xml</code>、<code>build.gradle</code>、<code>composer.json</code>、<code>go.mod</code>、<code>package.json</code>、<code>tsconfig.json</code>）から対象リポジトリの主言語（<strong>Python</strong>、<strong>Java</strong>、<strong>PHP</strong>、<strong>Go</strong>、<strong>TypeScript</strong>、<strong>JavaScript</strong>）を自動検出し、<code>.pni/</code> ワークスペースディレクトリを生成します：</p>
+<ul>
+<li><code>.pni/pni.toml</code> — デフォルトの対象ディレクトリ（<code>[targets]</code>）および Drawlib レポート設定（<code>[report]</code>）を管理するプロジェクト設定ファイル。</li>
+<li><code>.pni/workflows/full_audit.yaml</code> &amp; <code>quick_check.yaml</code> — 自動検出された言語に対応するステートフルワークフロー定義（<strong>6言語の組み込みワークフローセット</strong> からコピー）。</li>
+<li><code>.pni/rules/</code> &amp; <code>.pni/actions/</code> — カスタムルールおよびコンポジットアクションのローカル上書き用ディレクトリ。</li>
+<li><code>.pni/instructions.md</code> — Code AI Agent 向けのブートストラップ手順書。</li>
+</ul>
+<h2>3. ステップ 2：ターゲット設定の確認と Pre-Flight 準備ゲートの検証</h2>
+<p>ワークフローを開始する前に、<code>.pni/workflows/&lt;id&gt;.yaml</code> 内の <code>targets.root</code>、<code>targets.source</code>、<code>targets.tests</code>、<code>targets.docs</code> が実際のリポジトリ構造と一致していることを確認し、<code>pni workflows show &lt;id&gt;</code> を実行して正規化されたプリミティブステップと Pre-Flight 準備ゲートを検査します：</p>
+<pre><code class="language-bash"><span class="c1"># ワークフロー一覧の表示と、正規化ステップ・Pre-Flight 状態の検査</span>
+pni<span class="w"> </span>workflows<span class="w"> </span>list
+pni<span class="w"> </span>workflows<span class="w"> </span>show<span class="w"> </span>full_audit
+</code></pre>
+<figure class="drawlib-image" style="text-align: center;">
+  <img src="../../images/01_getting_started/quickstart/pni_preflight_gates_flow.png" alt="quickstart_2" />
+  <figcaption class="drawlib-caption">pni workflows における Pre-Flight 準備ゲートとステートフル実行フローチャート</figcaption>
+</figure>
+<details class="drawlib-code-details">
+<summary>Source Code</summary>
+<pre><code class="language-python"><span class="kn">from</span><span class="w"> </span><span class="nn">drawlib.canvas</span><span class="w"> </span><span class="kn">import</span> <span class="n">save</span><span class="p">,</span> <span class="n">setup</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">drawlib.diagrams.flow</span><span class="w"> </span><span class="kn">import</span> <span class="n">Decision</span><span class="p">,</span> <span class="n">End</span><span class="p">,</span> <span class="n">FlowDiagram</span><span class="p">,</span> <span class="n">Process</span><span class="p">,</span> <span class="n">Start</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">drawlib.styles</span><span class="w"> </span><span class="kn">import</span> <span class="n">Styles</span>
+
+<span class="n">setup</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="mi">164</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">96</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">150</span><span class="p">)</span>
+
+<span class="n">flow</span> <span class="o">=</span> <span class="n">FlowDiagram</span><span class="p">(</span>
+    <span class="n">node_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">WhiteBordered</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span>
+        <span class="n">text_color</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">Dark</span><span class="o">.</span><span class="n">text_color</span><span class="p">,</span> <span class="n">shape_r</span><span class="o">=</span><span class="mf">1.6</span><span class="p">,</span> <span class="n">text_size</span><span class="o">=</span><span class="mf">10.0</span>
+    <span class="p">),</span>
+    <span class="n">edge_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">DarkBold</span><span class="p">,</span>
+    <span class="n">edge_text_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">DarkBold</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">text_size</span><span class="o">=</span><span class="mf">10.0</span><span class="p">),</span>
+    <span class="n">width</span><span class="o">=</span><span class="mf">158.0</span><span class="p">,</span>
+    <span class="n">height</span><span class="o">=</span><span class="mf">90.0</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="n">flow</span><span class="o">.</span><span class="n">add_lane</span><span class="p">(</span><span class="s2">"1. Setup &amp; Inspect"</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mf">44.0</span><span class="p">)</span>
+<span class="n">flow</span><span class="o">.</span><span class="n">add_lane</span><span class="p">(</span><span class="s2">"2. Pre-Flight Readiness Gates"</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mf">52.0</span><span class="p">)</span>
+<span class="n">flow</span><span class="o">.</span><span class="n">add_lane</span><span class="p">(</span><span class="s2">"3. Remedies &amp; Execution"</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mf">62.0</span><span class="p">)</span>
+
+<span class="n">n_init</span> <span class="o">=</span> <span class="n">flow</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+    <span class="n">Start</span><span class="p">(</span>
+        <span class="s2">"pni init &amp;</span><span class="se">\n</span><span class="s2">Tailor &lt;id&gt;.yaml"</span><span class="p">,</span>
+        <span class="n">width</span><span class="o">=</span><span class="mf">36.0</span><span class="p">,</span>
+        <span class="n">height</span><span class="o">=</span><span class="mf">13.0</span><span class="p">,</span>
+        <span class="n">style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">PrimaryNeutral</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">shape_r</span><span class="o">=</span><span class="mf">6.0</span><span class="p">),</span>
+        <span class="n">text_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">PrimaryBold</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">text_size</span><span class="o">=</span><span class="mf">10.2</span><span class="p">),</span>
+    <span class="p">),</span>
+    <span class="n">xy</span><span class="o">=</span><span class="p">(</span><span class="mf">22.0</span><span class="p">,</span> <span class="mf">72.0</span><span class="p">),</span>
+<span class="p">)</span>
+
+<span class="n">n_show</span> <span class="o">=</span> <span class="n">flow</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+    <span class="n">Process</span><span class="p">(</span>
+        <span class="s2">"pni workflows show &lt;id&gt;</span><span class="se">\n</span><span class="s2">(Expand &amp; Check Gates)"</span><span class="p">,</span>
+        <span class="n">width</span><span class="o">=</span><span class="mf">37.0</span><span class="p">,</span>
+        <span class="n">height</span><span class="o">=</span><span class="mf">14.0</span><span class="p">,</span>
+        <span class="n">style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">Neutral</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">shape_r</span><span class="o">=</span><span class="mf">1.6</span><span class="p">),</span>
+        <span class="n">text_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">DarkBold</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">text_size</span><span class="o">=</span><span class="mf">10.0</span><span class="p">),</span>
+    <span class="p">),</span>
+    <span class="n">xy</span><span class="o">=</span><span class="p">(</span><span class="mf">22.0</span><span class="p">,</span> <span class="mf">46.0</span><span class="p">),</span>
+<span class="p">)</span>
+
+<span class="n">g_pentest</span> <span class="o">=</span> <span class="n">flow</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+    <span class="n">Decision</span><span class="p">(</span>
+        <span class="s2">"Gate 1: web_pentest</span><span class="se">\n</span><span class="s2">Suite Ready?"</span><span class="p">,</span>
+        <span class="n">width</span><span class="o">=</span><span class="mf">39.0</span><span class="p">,</span>
+        <span class="n">height</span><span class="o">=</span><span class="mf">16.5</span><span class="p">,</span>
+        <span class="n">style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">SecondaryNeutral</span><span class="p">,</span>
+        <span class="n">text_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">DarkBold</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">text_size</span><span class="o">=</span><span class="mf">10.0</span><span class="p">),</span>
+    <span class="p">),</span>
+    <span class="n">xy</span><span class="o">=</span><span class="p">(</span><span class="mf">70.0</span><span class="p">,</span> <span class="mf">70.0</span><span class="p">),</span>
+<span class="p">)</span>
+
+<span class="n">r_pentest</span> <span class="o">=</span> <span class="n">flow</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+    <span class="n">Process</span><span class="p">(</span>
+        <span class="s2">"pni pentests init -w &lt;id&gt;</span><span class="se">\n</span><span class="s2">-&gt; run-action &lt;id&gt; web_pentest"</span><span class="p">,</span>
+        <span class="n">width</span><span class="o">=</span><span class="mf">46.0</span><span class="p">,</span>
+        <span class="n">height</span><span class="o">=</span><span class="mf">14.0</span><span class="p">,</span>
+        <span class="n">style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">DangerNeutral</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">shape_r</span><span class="o">=</span><span class="mf">1.6</span><span class="p">),</span>
+        <span class="n">text_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">DangerBold</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">text_size</span><span class="o">=</span><span class="mf">10.0</span><span class="p">),</span>
+    <span class="p">),</span>
+    <span class="n">xy</span><span class="o">=</span><span class="p">(</span><span class="mf">131.0</span><span class="p">,</span> <span class="mf">70.0</span><span class="p">),</span>
+<span class="p">)</span>
+
+<span class="n">g_based</span> <span class="o">=</span> <span class="n">flow</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+    <span class="n">Decision</span><span class="p">(</span>
+        <span class="s2">"Gate 2: based_on &amp;</span><span class="se">\n</span><span class="s2">Brief Ready?"</span><span class="p">,</span>
+        <span class="n">width</span><span class="o">=</span><span class="mf">39.0</span><span class="p">,</span>
+        <span class="n">height</span><span class="o">=</span><span class="mf">16.5</span><span class="p">,</span>
+        <span class="n">style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">SecondaryNeutral</span><span class="p">,</span>
+        <span class="n">text_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">DarkBold</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">text_size</span><span class="o">=</span><span class="mf">10.0</span><span class="p">),</span>
+    <span class="p">),</span>
+    <span class="n">xy</span><span class="o">=</span><span class="p">(</span><span class="mf">70.0</span><span class="p">,</span> <span class="mf">44.0</span><span class="p">),</span>
+<span class="p">)</span>
+
+<span class="n">r_based</span> <span class="o">=</span> <span class="n">flow</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+    <span class="n">Process</span><span class="p">(</span>
+        <span class="s2">"Complete Base Audit First</span><span class="se">\n</span><span class="s2">&amp; Pin Migration Brief YAML"</span><span class="p">,</span>
+        <span class="n">width</span><span class="o">=</span><span class="mf">46.0</span><span class="p">,</span>
+        <span class="n">height</span><span class="o">=</span><span class="mf">14.0</span><span class="p">,</span>
+        <span class="n">style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">WarningNeutral</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">shape_r</span><span class="o">=</span><span class="mf">1.6</span><span class="p">),</span>
+        <span class="n">text_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">DarkBold</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">text_size</span><span class="o">=</span><span class="mf">10.0</span><span class="p">),</span>
+    <span class="p">),</span>
+    <span class="n">xy</span><span class="o">=</span><span class="p">(</span><span class="mf">131.0</span><span class="p">,</span> <span class="mf">44.0</span><span class="p">),</span>
+<span class="p">)</span>
+
+<span class="n">n_start</span> <span class="o">=</span> <span class="n">flow</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+    <span class="n">Process</span><span class="p">(</span>
+        <span class="s2">"pni workflows start &lt;id&gt;</span><span class="se">\n</span><span class="s2">-&gt; Pull-Push Loop"</span><span class="p">,</span>
+        <span class="n">width</span><span class="o">=</span><span class="mf">39.0</span><span class="p">,</span>
+        <span class="n">height</span><span class="o">=</span><span class="mf">14.0</span><span class="p">,</span>
+        <span class="n">style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">PrimaryFlat</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">shape_r</span><span class="o">=</span><span class="mf">1.6</span><span class="p">),</span>
+        <span class="n">text_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">WhiteBold</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">text_size</span><span class="o">=</span><span class="mf">10.0</span><span class="p">),</span>
+    <span class="p">),</span>
+    <span class="n">xy</span><span class="o">=</span><span class="p">(</span><span class="mf">70.0</span><span class="p">,</span> <span class="mf">14.0</span><span class="p">),</span>
+<span class="p">)</span>
+
+<span class="n">n_done</span> <span class="o">=</span> <span class="n">flow</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+    <span class="n">End</span><span class="p">(</span>
+        <span class="s2">"COMPLETED</span><span class="se">\n</span><span class="s2">(JSON + A4 PDF)"</span><span class="p">,</span>
+        <span class="n">width</span><span class="o">=</span><span class="mf">42.0</span><span class="p">,</span>
+        <span class="n">height</span><span class="o">=</span><span class="mf">13.0</span><span class="p">,</span>
+        <span class="n">style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">SuccessNeutral</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">shape_r</span><span class="o">=</span><span class="mf">6.0</span><span class="p">),</span>
+        <span class="n">text_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">SuccessBold</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">text_size</span><span class="o">=</span><span class="mf">10.2</span><span class="p">),</span>
+    <span class="p">),</span>
+    <span class="n">xy</span><span class="o">=</span><span class="p">(</span><span class="mf">131.0</span><span class="p">,</span> <span class="mf">14.0</span><span class="p">),</span>
+<span class="p">)</span>
+
+<span class="n">n_init</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">n_show</span><span class="p">,</span> <span class="n">start_side</span><span class="o">=</span><span class="s2">"bottom"</span><span class="p">,</span> <span class="n">end_side</span><span class="o">=</span><span class="s2">"top"</span><span class="p">)</span>
+<span class="n">n_show</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">g_pentest</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">"Check"</span><span class="p">,</span> <span class="n">start_side</span><span class="o">=</span><span class="s2">"right"</span><span class="p">,</span> <span class="n">end_side</span><span class="o">=</span><span class="s2">"left"</span><span class="p">)</span>
+<span class="n">g_pentest</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">r_pentest</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">"Missing"</span><span class="p">,</span> <span class="n">start_side</span><span class="o">=</span><span class="s2">"right"</span><span class="p">,</span> <span class="n">end_side</span><span class="o">=</span><span class="s2">"left"</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">DangerBold</span><span class="p">)</span>
+<span class="n">g_pentest</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">g_based</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">"Pass"</span><span class="p">,</span> <span class="n">start_side</span><span class="o">=</span><span class="s2">"bottom"</span><span class="p">,</span> <span class="n">end_side</span><span class="o">=</span><span class="s2">"top"</span><span class="p">)</span>
+<span class="n">g_based</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">r_based</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">"Blocked"</span><span class="p">,</span> <span class="n">start_side</span><span class="o">=</span><span class="s2">"right"</span><span class="p">,</span> <span class="n">end_side</span><span class="o">=</span><span class="s2">"left"</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">WarningBold</span><span class="p">)</span>
+<span class="n">g_based</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">n_start</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">"Ready"</span><span class="p">,</span> <span class="n">start_side</span><span class="o">=</span><span class="s2">"bottom"</span><span class="p">,</span> <span class="n">end_side</span><span class="o">=</span><span class="s2">"top"</span><span class="p">)</span>
+<span class="n">n_start</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">n_done</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">"Done"</span><span class="p">,</span> <span class="n">start_side</span><span class="o">=</span><span class="s2">"right"</span><span class="p">,</span> <span class="n">end_side</span><span class="o">=</span><span class="s2">"left"</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">SuccessBold</span><span class="p">)</span>
+
+<span class="n">flow</span><span class="o">.</span><span class="n">draw</span><span class="p">(</span><span class="n">xy</span><span class="o">=</span><span class="p">(</span><span class="mf">3.0</span><span class="p">,</span> <span class="mf">3.0</span><span class="p">))</span>
+<span class="n">save</span><span class="p">()</span>
+</code></pre>
+</details>
+<p>ワークフローに動的 Web ペネトレーションテスト（<code>uses: web_penetration_audit</code>）が含まれる場合は、ステートフル実行を開始する前にペネトレーションテストスイートを初期化・単体検証します：</p>
+<pre><code class="language-bash"><span class="c1"># .pni/pentests/&lt;target&gt;/ を生成し、SQLite 準備なしで単体ステップを直接テスト</span>
+pni<span class="w"> </span>pentests<span class="w"> </span>init<span class="w"> </span>-w<span class="w"> </span>full_audit
+pni<span class="w"> </span>workflows<span class="w"> </span>run-action<span class="w"> </span>full_audit<span class="w"> </span>web_pentest
+</code></pre>
+<h2>4. ステップ 3：ステートフル Pull-Push ループの実行</h2>
+<p>ワークフローを開始して <code>.pni/cache/workflow_state.db</code> にセッション（<code>wf-&lt;8hex&gt;</code>）を作成し、<code>get-action</code> と <code>push-action</code> を繰り返します：</p>
+<pre><code class="language-bash"><span class="c1"># 1. ステートフルワークフローを開始（過去の未完了ランをキャンセルする場合は --supersede を付与）</span>
+pni<span class="w"> </span>workflows<span class="w"> </span>start<span class="w"> </span>full_audit<span class="w"> </span>--supersede
+
+<span class="c1"># 2. 現在のアクションを取得（決定論的アナライザを自動実行し、要求 JSON Schema を出力）</span>
+pni<span class="w"> </span>workflows<span class="w"> </span>get-action<span class="w"> </span>wf-1a2b3c4d
+
+<span class="c1"># 3. 現在のアクション ID (例: act-01) に対して検証済み AI JSON ペイロードを提出</span>
+pni<span class="w"> </span>workflows<span class="w"> </span>push-action<span class="w"> </span>wf-1a2b3c4d<span class="w"> </span>act-01<span class="w"> </span>--file<span class="w"> </span>payload.json
+
+<span class="c1"># 4. 任意のタイミングでステップ進捗状況を確認</span>
+pni<span class="w"> </span>workflows<span class="w"> </span>status<span class="w"> </span>wf-1a2b3c4d
+</code></pre>
+<p>Pull-Push ループ中、エンジンは以下の処理を自動で行います：</p>
+<ol>
+<li><strong>決定論的プリミティブの自動実行</strong>：<code>get-action</code> が <code>project_inspect</code>、<code>ast_analyze</code>、<code>run_check</code>、<code>security_scan</code>、<code>web_pentest</code>、<code>migration_analyze</code>、または <code>progress_analyze</code> に到達すると、<code>pni</code> は即座に解析器を実行して <code>.pni/cache/&lt;workflow_id&gt;/facts.json</code> に結果を保存し、次の AI ステップへと進めます。</li>
+<li><strong>Push 時の厳格なスキーマ・実在パス検証</strong>：<code>record_architecture</code>、<code>ai_interpret</code>、<code>emit_score</code>、<code>emit_migration_plan</code>、<code>emit_progress</code> では、<code>push-action</code> が Pydantic モデル検証と <code>module_inventory</code> 上のファイルパス実在確認を実施します。</li>
+</ol>
+<h2>5. ステップ 4：Drawlib ビジュアル PDF レポートのビルド</h2>
+<p>最終ステップの <code>write_drawlib_report</code> では、7章構成の Drawlib レポートプロジェクトを初期化し、座標グリッド（<code>-g</code>）による視覚検証を行った上で A4 ベクター PDF をビルドして完了報告を提出します：</p>
+<pre><code class="language-bash"><span class="c1"># reports_src/full_audit_src/ を初期化し、reports/full_audit.pdf をコンパイル</span>
+pni<span class="w"> </span>report<span class="w"> </span>init<span class="w"> </span>full_audit<span class="w"> </span>--src-dir<span class="w"> </span>reports_src<span class="w"> </span>--lang<span class="w"> </span>en<span class="w"> </span>--style<span class="w"> </span>google
+pni<span class="w"> </span>report<span class="w"> </span>build<span class="w"> </span>full_audit<span class="w"> </span>--src-dir<span class="w"> </span>reports_src<span class="w"> </span>--output-dir<span class="w"> </span>reports
+
+<span class="c1"># 最終完了ペイロードを提出してワークフローを COMPLETED に遷移</span>
+pni<span class="w"> </span>workflows<span class="w"> </span>push-action<span class="w"> </span>wf-1a2b3c4d<span class="w"> </span>act-12<span class="w"> </span><span class="s1">'{"generated_files": ["reports/full_audit.pdf"], "summary": "Compiled 7-chapter A4 PDF report."}'</span>
+</code></pre>
+<p>続いて <a href="use_cases.html">3つの主要ユースケース</a> または <a href="../03_workflows_and_actions/workflows_guide.html">ワークフローと Pre-Flight ゲート</a> に進んでください。</p>
+
+            </main>
+        </div>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Theme toggle
+            const themeBtn = document.getElementById('theme-toggle');
+            if (themeBtn) {
+                themeBtn.addEventListener('click', function() {
+                    const current = document.documentElement.getAttribute('data-theme');
+                    const next = current === 'dark' ? 'light' : 'dark';
+                    document.documentElement.setAttribute('data-theme', next);
+                    localStorage.setItem('drawlib-theme', next);
+                });
+            }
+
+            // Language dropdown outside-click & Escape close
+            const langDropdowns = document.querySelectorAll('.lang-dropdown');
+            if (langDropdowns.length > 0) {
+                document.addEventListener('click', function(e) {
+                    langDropdowns.forEach(function(dd) {
+                        if (dd.hasAttribute('open') && !dd.contains(e.target)) {
+                            dd.removeAttribute('open');
+                        }
+                    });
+                });
+                document.addEventListener('keydown', function(e) {
+                    if (e.key === 'Escape') {
+                        langDropdowns.forEach(function(dd) {
+                            dd.removeAttribute('open');
+                        });
+                    }
+                });
+            }
+
+            // Mobile menu toggle
+            const menuBtn = document.getElementById('menu-toggle');
+            const sidebar = document.querySelector('.sidebar');
+            if (menuBtn && sidebar) {
+                function setMenuOpen(open) {
+                    sidebar.classList.toggle('is-open', open);
+                    menuBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
+                    document.body.classList.toggle('menu-open', open);
+                    if (open) {
+                        const menu = sidebar.querySelector('.sidebar-menu');
+                        if (menu) {
+                            menu.scrollTop = 0;
+                        }
+                    }
+                }
+
+                menuBtn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    const willOpen = !sidebar.classList.contains('is-open');
+                    setMenuOpen(willOpen);
+                });
+
+                // Close menu when clicking outside sidebar
+                document.addEventListener('click', function(e) {
+                    if (sidebar.classList.contains('is-open') && !sidebar.contains(e.target)) {
+                        setMenuOpen(false);
+                    }
+                });
+
+                // Close menu when a navigation link is clicked
+                const navLinks = sidebar.querySelectorAll('.nav-item a');
+                navLinks.forEach(function(link) {
+                    link.addEventListener('click', function() {
+                        setMenuOpen(false);
+                    });
+                });
+
+                // Close on Escape key
+                document.addEventListener('keydown', function(e) {
+                    if (e.key === 'Escape' && sidebar.classList.contains('is-open')) {
+                        setMenuOpen(false);
+                    }
+                });
+
+                // Reset menu state when resized above mobile breakpoint
+                window.addEventListener('resize', function() {
+                    if (window.innerWidth > 768 && sidebar.classList.contains('is-open')) {
+                        setMenuOpen(false);
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>

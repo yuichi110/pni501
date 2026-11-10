@@ -1,0 +1,720 @@
+<!--
+ Copyright (c) 2026 Yuichi Ito (yuichi@yuichi.com)
+
+ This software is licensed under the Apache License, Version 2.0.
+ For more information, please visit: https://github.com/yuichi110/drawlib
+
+ This software is provided "as is", without warranty of any kind,
+ express or implied, including but not limited to the warranties of
+ merchantability, fitness for a particular purpose and noninfringement.
+-->
+<!DOCTYPE html>
+<html lang="ja" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ドメインアーキテクチャと3層カスケード解決</title>
+    <script>
+        (function() {
+            const saved = localStorage.getItem('drawlib-theme');
+            if (saved === 'dark' || (!saved && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                document.documentElement.setAttribute('data-theme', 'dark');
+            } else {
+                document.documentElement.setAttribute('data-theme', 'light');
+            }
+        })();
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+    
+    
+    <link rel="alternate" hreflang="en" href="https://www.pni501.com/en/02_architecture/domain_architecture.html">
+    
+    <link rel="alternate" hreflang="ja" href="https://www.pni501.com/ja/02_architecture/domain_architecture.html">
+    
+    <link rel="alternate" hreflang="x-default" href="https://www.pni501.com/en/02_architecture/domain_architecture.html">
+    
+    
+    
+    <meta name="description" content="pni501 (v0.1.3) は src/pni/ 配下の実装を、7つの垂直ドメインパッケージ（_workflows、_actions、_reporter、_rules、_pentests、_dockerfiles、_instructions）、プロジェクトマニフェストローダー（_config.py）、自己修復型キ…">
+    <link rel="canonical" href="https://www.pni501.com/ja/02_architecture/domain_architecture.html">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="pni501 ドキュメント">
+    <meta property="og:title" content="ドメインアーキテクチャと3層カスケード解決 — pni501 ドキュメント">
+    <meta property="og:description" content="pni501 (v0.1.3) は src/pni/ 配下の実装を、7つの垂直ドメインパッケージ（_workflows、_actions、_reporter、_rules、_pentests、_dockerfiles、_instructions）、プロジェクトマニフェストローダー（_config.py）、自己修復型キ…">
+    <meta property="og:url" content="https://www.pni501.com/ja/02_architecture/domain_architecture.html">
+    <meta property="og:image" content="https://www.pni501.com/_assets/logo.png">
+    <meta property="og:locale" content="ja_JP">
+    <meta property="og:locale:alternate" content="en_US">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="ドメインアーキテクチャと3層カスケード解決 — pni501 ドキュメント">
+    <meta name="twitter:description" content="pni501 (v0.1.3) は src/pni/ 配下の実装を、7つの垂直ドメインパッケージ（_workflows、_actions、_reporter、_rules、_pentests、_dockerfiles、_instructions）、プロジェクトマニフェストローダー（_config.py）、自己修復型キ…">
+    <meta name="twitter:image" content="https://www.pni501.com/_assets/logo.png">
+    
+    
+    <link rel="icon" type="image/png" href="../../_assets/favicon.png">
+    
+    
+    <link rel="stylesheet" href="../style.css">
+    
+    
+</head>
+<body>
+    
+    <div class="doc-layout">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <a href="../index.html" class="sidebar-brand" aria-label="pni501 ドキュメント">
+                    
+                    <img src="../../_assets/logo.png" alt="pni501 ドキュメント" class="sidebar-logo sidebar-logo-light">
+                    <img src="../../_assets/logo_dark.png" alt="pni501 ドキュメント" class="sidebar-logo sidebar-logo-dark">
+                    
+                </a>
+                <div class="sidebar-header-actions">
+                    <button type="button" id="theme-toggle" class="theme-toggle-btn" aria-label="Toggle theme">
+                        <svg class="icon-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+                        <svg class="icon-moon" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+                    </button>
+                    <button type="button" id="menu-toggle" class="menu-toggle-btn" aria-label="Toggle navigation" aria-expanded="false">
+                        <svg class="icon-hamburger" viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+                        <svg class="icon-close" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                    </button>
+                </div>
+            </div>
+            <div class="sidebar-menu">
+                
+                    
+                        
+                        <ul class="nav-list">
+                            
+                            <li class="nav-item ">
+                                <a href="../index.html" >概要 (Overview)</a>
+                            </li>
+                            
+                        </ul>
+                    
+                        
+                        <div class="sidebar-heading">1. はじめに (Getting Started)</div>
+                        
+                        <ul class="nav-list">
+                            
+                            <li class="nav-item ">
+                                <a href="../01_getting_started/concepts.html" >背景とコアコンセプト</a>
+                            </li>
+                            
+                            <li class="nav-item ">
+                                <a href="../01_getting_started/quickstart.html" >クイックスタートガイド</a>
+                            </li>
+                            
+                            <li class="nav-item ">
+                                <a href="../01_getting_started/use_cases.html" >3つの主要ユースケース</a>
+                            </li>
+                            
+                        </ul>
+                    
+                        
+                        <div class="sidebar-heading">2. アーキテクチャ (Architecture)</div>
+                        
+                        <ul class="nav-list">
+                            
+                            <li class="nav-item active">
+                                <a href="domain_architecture.html" >ドメイン構造と3層カスケード</a>
+                            </li>
+                            
+                            <li class="nav-item ">
+                                <a href="stateful_engine.html" >ステートフル Pull-Push エンジン</a>
+                            </li>
+                            
+                        </ul>
+                    
+                        
+                        <div class="sidebar-heading">3. ワークフローとアクション</div>
+                        
+                        <ul class="nav-list">
+                            
+                            <li class="nav-item ">
+                                <a href="../03_workflows_and_actions/workflows_guide.html" >ワークフローと Pre-Flight ゲート</a>
+                            </li>
+                            
+                            <li class="nav-item ">
+                                <a href="../03_workflows_and_actions/actions_pipeline.html" >15 アクションと 12 プリミティブ</a>
+                            </li>
+                            
+                            <li class="nav-item ">
+                                <a href="../03_workflows_and_actions/analyzers_and_pentest.html" >決定論的解析器とペネトレーションテスト</a>
+                            </li>
+                            
+                        </ul>
+                    
+                        
+                        <div class="sidebar-heading">4. スコアリングとレポート</div>
+                        
+                        <ul class="nav-list">
+                            
+                            <li class="nav-item ">
+                                <a href="../04_scoring_and_reports/scoring_model.html" >7軸品質スコアリングモデル</a>
+                            </li>
+                            
+                            <li class="nav-item ">
+                                <a href="../04_scoring_and_reports/drawlib_reporter.html" >Drawlib ビジュアルレポーター</a>
+                            </li>
+                            
+                        </ul>
+                    
+                        
+                        <div class="sidebar-heading">5. 対応言語とリファレンス</div>
+                        
+                        <ul class="nav-list">
+                            
+                            <li class="nav-item ">
+                                <a href="../05_languages_and_reference/supported_languages.html" >対応 6 言語マトリクス</a>
+                            </li>
+                            
+                            <li class="nav-item ">
+                                <a href="../05_languages_and_reference/rules_and_cli.html" >ルール拡張と CLI リファレンス</a>
+                            </li>
+                            
+                        </ul>
+                    
+                        
+                        <div class="sidebar-heading">外部リンク (External Links)</div>
+                        
+                        <ul class="nav-list">
+                            
+                            <li class="nav-item ">
+                                <a href="https://github.com/yuichi110/pni501" target="_blank" rel="noopener noreferrer">GitHub リポジトリ<svg class="nav-external-icon" viewBox="0 0 24 24" aria-hidden="true"><line x1="7" y1="17" x2="17" y2="7"></line><polyline points="7 7 17 7 17 17"></polyline></svg></a>
+                            </li>
+                            
+                            <li class="nav-item ">
+                                <a href="https://pypi.org/project/pni501/" target="_blank" rel="noopener noreferrer">PyPI パッケージ<svg class="nav-external-icon" viewBox="0 0 24 24" aria-hidden="true"><line x1="7" y1="17" x2="17" y2="7"></line><polyline points="7 7 17 7 17 17"></polyline></svg></a>
+                            </li>
+                            
+                        </ul>
+                    
+                
+            </div>
+        </aside>
+        <div class="content-wrapper">
+            <header class="top-bar">
+                <div class="breadcrumbs">
+                    <span class="crumb">Docs</span>
+                    <span class="crumb-separator">&raquo;</span>
+                    <span class="crumb active">ドメインアーキテクチャと3層カスケード解決</span>
+                </div>
+                
+                <div class="lang-switcher">
+                    <details class="lang-dropdown">
+                        <summary class="lang-dropdown-btn" aria-label="Select language">
+                            <svg class="lang-globe-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+                            <span class="lang-current-label">日本語</span>
+                            <svg class="lang-caret-icon" viewBox="0 0 24 24" aria-hidden="true"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                        </summary>
+                        <div class="lang-dropdown-menu" role="menu">
+                            
+                            <a href="../../en/02_architecture/domain_architecture.html" class="lang-option" lang="en" hreflang="en" >
+                                <span>English</span>
+                                
+                            </a>
+                            
+                            <a href="domain_architecture.html" class="lang-option active" lang="ja" hreflang="ja" aria-current="page">
+                                <span>日本語</span>
+                                
+                                <svg class="lang-check-icon" viewBox="0 0 24 24" aria-hidden="true"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                                
+                            </a>
+                            
+                        </div>
+                    </details>
+                </div>
+                
+            </header>
+            <main class="main-content">
+                <h1>ドメインアーキテクチャと3層カスケード解決</h1>
+<p><code>pni501</code> (<code>v0.1.3</code>) は <code>src/pni/</code> 配下の実装を、<strong>7つの垂直ドメインパッケージ</strong>（<code>_workflows</code>、<code>_actions</code>、<code>_reporter</code>、<code>_rules</code>、<code>_pentests</code>、<code>_dockerfiles</code>、<code>_instructions</code>）、プロジェクトマニフェストローダー（<code>_config.py</code>）、自己修復型キャッシュユーティリティ（<code>_cache.py</code>）、および軽量な Typer + Rich 製 CLI オーケストレーター（<code>cli.py</code>）に編成しています。各ドメインは <strong>対応6言語</strong>（<code>python</code>、<code>java</code>、<code>php</code>、<code>go</code>、<code>typescript</code>、<code>javascript</code>）にわたる Pydantic v2 スキーマ、実行・解決ロジック、組み込みの <code>.md</code> / <code>.yaml</code> / <code>.dockerfile</code> / <code>.tmpl</code> アセットを同一パッケージ内に同居（コロケーション）させ、モジュールレベルの厳密な有向非巡回グラフ（<code>circular_dependencies = []</code>）を維持しています。</p>
+<figure class="drawlib-image" style="text-align: center;">
+  <img src="../../images/02_architecture/domain_architecture/domain_layer_hierarchy.png" alt="domain_architecture_1" />
+  <figcaption class="drawlib-caption">src/pni/ における高凝集ドメインパッケージ階層とモジュールレベル依存関係 DAG</figcaption>
+</figure>
+<details class="drawlib-code-details">
+<summary>Source Code</summary>
+<pre><code class="language-python"><span class="kn">from</span><span class="w"> </span><span class="nn">drawlib.canvas</span><span class="w"> </span><span class="kn">import</span> <span class="n">save</span><span class="p">,</span> <span class="n">setup</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">drawlib.diagrams.class_diagram</span><span class="w"> </span><span class="kn">import</span> <span class="n">ClassDiagram</span><span class="p">,</span> <span class="n">ClassNode</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">drawlib.styles</span><span class="w"> </span><span class="kn">import</span> <span class="n">Colors</span><span class="p">,</span> <span class="n">Styles</span>
+
+<span class="n">setup</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="mi">172</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">108</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">150</span><span class="p">)</span>
+
+<span class="n">diagram</span> <span class="o">=</span> <span class="n">ClassDiagram</span><span class="p">(</span>
+    <span class="n">node_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">Neutral</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">text_size</span><span class="o">=</span><span class="mf">10.0</span><span class="p">),</span>
+    <span class="n">header_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">PrimaryNeutral</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">text_size</span><span class="o">=</span><span class="mf">10.5</span><span class="p">),</span>
+    <span class="n">edge_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">DarkBold</span><span class="p">,</span>
+    <span class="n">edge_text_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">PrimaryBold</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">text_size</span><span class="o">=</span><span class="mf">10.0</span><span class="p">),</span>
+<span class="p">)</span>
+
+<span class="n">inst_node</span> <span class="o">=</span> <span class="n">ClassNode</span><span class="p">(</span>
+    <span class="s2">"pni._instructions &amp; _config"</span><span class="p">,</span>
+    <span class="n">width</span><span class="o">=</span><span class="mf">48.0</span><span class="p">,</span>
+    <span class="n">header_height</span><span class="o">=</span><span class="mf">5.6</span><span class="p">,</span>
+    <span class="n">row_height</span><span class="o">=</span><span class="mf">3.8</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">inst_node</span><span class="o">.</span><span class="n">add_attribute</span><span class="p">(</span><span class="s2">"_config.py"</span><span class="p">,</span> <span class="s2">".pni/pni.toml &amp; [[opt_out]]"</span><span class="p">)</span>
+<span class="n">inst_node</span><span class="o">.</span><span class="n">add_attribute</span><span class="p">(</span><span class="s2">"manager.py"</span><span class="p">,</span> <span class="s2">"agent.md cascade"</span><span class="p">)</span>
+<span class="n">diagram</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">inst_node</span><span class="p">,</span> <span class="n">xy</span><span class="o">=</span><span class="p">(</span><span class="mf">29.0</span><span class="p">,</span> <span class="mf">93.5</span><span class="p">))</span>
+
+<span class="n">cli_node</span> <span class="o">=</span> <span class="n">ClassNode</span><span class="p">(</span>
+    <span class="s2">"pni.cli (CLI Orchestrator)"</span><span class="p">,</span>
+    <span class="n">width</span><span class="o">=</span><span class="mf">52.0</span><span class="p">,</span>
+    <span class="n">header_height</span><span class="o">=</span><span class="mf">5.6</span><span class="p">,</span>
+    <span class="n">row_height</span><span class="o">=</span><span class="mf">3.8</span><span class="p">,</span>
+    <span class="n">header_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">PrimaryFlat</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">text_color</span><span class="o">=</span><span class="n">Colors</span><span class="o">.</span><span class="n">White</span><span class="p">,</span> <span class="n">text_size</span><span class="o">=</span><span class="mf">10.5</span><span class="p">),</span>
+<span class="p">)</span>
+<span class="n">cli_node</span><span class="o">.</span><span class="n">add_attribute</span><span class="p">(</span><span class="s2">"sub-apps"</span><span class="p">,</span> <span class="s2">"rules, workflows, report, pentests"</span><span class="p">)</span>
+<span class="n">cli_node</span><span class="o">.</span><span class="n">add_attribute</span><span class="p">(</span><span class="s2">"commands"</span><span class="p">,</span> <span class="s2">"init, instructions, validate-*, version"</span><span class="p">)</span>
+<span class="n">diagram</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">cli_node</span><span class="p">,</span> <span class="n">xy</span><span class="o">=</span><span class="p">(</span><span class="mf">86.0</span><span class="p">,</span> <span class="mf">93.5</span><span class="p">))</span>
+
+<span class="n">pentest_node</span> <span class="o">=</span> <span class="n">ClassNode</span><span class="p">(</span>
+    <span class="s2">"pni._pentests"</span><span class="p">,</span>
+    <span class="n">width</span><span class="o">=</span><span class="mf">48.0</span><span class="p">,</span>
+    <span class="n">header_height</span><span class="o">=</span><span class="mf">5.6</span><span class="p">,</span>
+    <span class="n">row_height</span><span class="o">=</span><span class="mf">3.8</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">pentest_node</span><span class="o">.</span><span class="n">add_attribute</span><span class="p">(</span><span class="s2">"manager.py"</span><span class="p">,</span> <span class="s2">".pni/pentests/&lt;target&gt;/"</span><span class="p">)</span>
+<span class="n">pentest_node</span><span class="o">.</span><span class="n">add_attribute</span><span class="p">(</span><span class="s2">"surface_codegen.py"</span><span class="p">,</span> <span class="s2">"AST route probes"</span><span class="p">)</span>
+<span class="n">pentest_node</span><span class="o">.</span><span class="n">add_attribute</span><span class="p">(</span><span class="s2">"templates (2)"</span><span class="p">,</span> <span class="s2">"conftest &amp; baseline .tmpl"</span><span class="p">)</span>
+<span class="n">diagram</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">pentest_node</span><span class="p">,</span> <span class="n">xy</span><span class="o">=</span><span class="p">(</span><span class="mf">29.0</span><span class="p">,</span> <span class="mf">66.5</span><span class="p">))</span>
+
+<span class="n">wf_node</span> <span class="o">=</span> <span class="n">ClassNode</span><span class="p">(</span>
+    <span class="s2">"pni._workflows"</span><span class="p">,</span>
+    <span class="n">width</span><span class="o">=</span><span class="mf">52.0</span><span class="p">,</span>
+    <span class="n">header_height</span><span class="o">=</span><span class="mf">5.6</span><span class="p">,</span>
+    <span class="n">row_height</span><span class="o">=</span><span class="mf">3.8</span><span class="p">,</span>
+    <span class="n">style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">PrimaryNeutral</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">text_size</span><span class="o">=</span><span class="mf">10.0</span><span class="p">),</span>
+<span class="p">)</span>
+<span class="n">wf_node</span><span class="o">.</span><span class="n">add_attribute</span><span class="p">(</span><span class="s2">"engine + state_db"</span><span class="p">,</span> <span class="s2">"SQLite + migration/progress"</span><span class="p">)</span>
+<span class="n">wf_node</span><span class="o">.</span><span class="n">add_attribute</span><span class="p">(</span><span class="s2">"aggregator + adhoc"</span><span class="p">,</span> <span class="s2">"digest, run-action, status"</span><span class="p">)</span>
+<span class="n">wf_node</span><span class="o">.</span><span class="n">add_attribute</span><span class="p">(</span><span class="s2">"assets (12)"</span><span class="p">,</span> <span class="s2">"6 langs x {full_audit, quick}"</span><span class="p">)</span>
+<span class="n">diagram</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">wf_node</span><span class="p">,</span> <span class="n">xy</span><span class="o">=</span><span class="p">(</span><span class="mf">86.0</span><span class="p">,</span> <span class="mf">66.5</span><span class="p">))</span>
+
+<span class="n">rep_node</span> <span class="o">=</span> <span class="n">ClassNode</span><span class="p">(</span>
+    <span class="s2">"pni._reporter"</span><span class="p">,</span>
+    <span class="n">width</span><span class="o">=</span><span class="mf">48.0</span><span class="p">,</span>
+    <span class="n">header_height</span><span class="o">=</span><span class="mf">5.6</span><span class="p">,</span>
+    <span class="n">row_height</span><span class="o">=</span><span class="mf">3.8</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">rep_node</span><span class="o">.</span><span class="n">add_attribute</span><span class="p">(</span><span class="s2">"blueprint.py"</span><span class="p">,</span> <span class="s2">"audit &amp; migration specs"</span><span class="p">)</span>
+<span class="n">rep_node</span><span class="o">.</span><span class="n">add_attribute</span><span class="p">(</span><span class="s2">"drawlib_guide.py"</span><span class="p">,</span> <span class="s2">"7-chapter report prompt"</span><span class="p">)</span>
+<span class="n">rep_node</span><span class="o">.</span><span class="n">add_attribute</span><span class="p">(</span><span class="s2">"compiler.py"</span><span class="p">,</span> <span class="s2">"lazy drawlib.tools build"</span><span class="p">)</span>
+<span class="n">diagram</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">rep_node</span><span class="p">,</span> <span class="n">xy</span><span class="o">=</span><span class="p">(</span><span class="mf">143.0</span><span class="p">,</span> <span class="mf">66.5</span><span class="p">))</span>
+
+<span class="n">docker_node</span> <span class="o">=</span> <span class="n">ClassNode</span><span class="p">(</span>
+    <span class="s2">"pni._dockerfiles"</span><span class="p">,</span>
+    <span class="n">width</span><span class="o">=</span><span class="mf">48.0</span><span class="p">,</span>
+    <span class="n">header_height</span><span class="o">=</span><span class="mf">5.6</span><span class="p">,</span>
+    <span class="n">row_height</span><span class="o">=</span><span class="mf">3.8</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">docker_node</span><span class="o">.</span><span class="n">add_attribute</span><span class="p">(</span><span class="s2">"manager.py"</span><span class="p">,</span> <span class="s2">".pni/dockerfiles/ harness"</span><span class="p">)</span>
+<span class="n">docker_node</span><span class="o">.</span><span class="n">add_attribute</span><span class="p">(</span><span class="s2">"templates (10)"</span><span class="p">,</span> <span class="s2">"py/java/php/go/ts/js"</span><span class="p">)</span>
+<span class="n">diagram</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">docker_node</span><span class="p">,</span> <span class="n">xy</span><span class="o">=</span><span class="p">(</span><span class="mf">29.0</span><span class="p">,</span> <span class="mf">39.0</span><span class="p">))</span>
+
+<span class="n">act_node</span> <span class="o">=</span> <span class="n">ClassNode</span><span class="p">(</span>
+    <span class="s2">"pni._actions"</span><span class="p">,</span>
+    <span class="n">width</span><span class="o">=</span><span class="mf">52.0</span><span class="p">,</span>
+    <span class="n">header_height</span><span class="o">=</span><span class="mf">5.6</span><span class="p">,</span>
+    <span class="n">row_height</span><span class="o">=</span><span class="mf">3.8</span><span class="p">,</span>
+    <span class="n">style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">SecondaryNeutral</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">text_size</span><span class="o">=</span><span class="mf">10.0</span><span class="p">),</span>
+    <span class="n">header_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">SecondaryNeutral</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">text_size</span><span class="o">=</span><span class="mf">10.5</span><span class="p">),</span>
+<span class="p">)</span>
+<span class="n">act_node</span><span class="o">.</span><span class="n">add_attribute</span><span class="p">(</span><span class="s2">"models + ai_actions"</span><span class="p">,</span> <span class="s2">"12 core PrimitiveTypes"</span><span class="p">)</span>
+<span class="n">act_node</span><span class="o">.</span><span class="n">add_attribute</span><span class="p">(</span><span class="s2">"analyzers (6+)"</span><span class="p">,</span> <span class="s2">"inspect, ast, run, sec, pen, mig"</span><span class="p">)</span>
+<span class="n">act_node</span><span class="o">.</span><span class="n">add_attribute</span><span class="p">(</span><span class="s2">"assets (15/lang)"</span><span class="p">,</span> <span class="s2">"common (12) + 6 langs (3 ea)"</span><span class="p">)</span>
+<span class="n">diagram</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">act_node</span><span class="p">,</span> <span class="n">xy</span><span class="o">=</span><span class="p">(</span><span class="mf">86.0</span><span class="p">,</span> <span class="mf">39.0</span><span class="p">))</span>
+
+<span class="n">cache_node</span> <span class="o">=</span> <span class="n">ClassNode</span><span class="p">(</span>
+    <span class="s2">"pni._cache (_cache.py)"</span><span class="p">,</span>
+    <span class="n">width</span><span class="o">=</span><span class="mf">48.0</span><span class="p">,</span>
+    <span class="n">header_height</span><span class="o">=</span><span class="mf">5.6</span><span class="p">,</span>
+    <span class="n">row_height</span><span class="o">=</span><span class="mf">3.8</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">cache_node</span><span class="o">.</span><span class="n">add_attribute</span><span class="p">(</span><span class="s2">"self-healing"</span><span class="p">,</span> <span class="s2">".gitignore + CACHEDIR.TAG"</span><span class="p">)</span>
+<span class="n">cache_node</span><span class="o">.</span><span class="n">add_attribute</span><span class="p">(</span><span class="s2">"workflow_state.db"</span><span class="p">,</span> <span class="s2">"SQLite + trivy-cache/"</span><span class="p">)</span>
+<span class="n">cache_node</span><span class="o">.</span><span class="n">add_attribute</span><span class="p">(</span><span class="s2">"cache/&lt;wf&gt;/"</span><span class="p">,</span> <span class="s2">"facts, arch, blueprint, logs"</span><span class="p">)</span>
+<span class="n">diagram</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">cache_node</span><span class="p">,</span> <span class="n">xy</span><span class="o">=</span><span class="p">(</span><span class="mf">143.0</span><span class="p">,</span> <span class="mf">39.0</span><span class="p">))</span>
+
+<span class="n">rules_node</span> <span class="o">=</span> <span class="n">ClassNode</span><span class="p">(</span>
+    <span class="s2">"pni._rules"</span><span class="p">,</span>
+    <span class="n">width</span><span class="o">=</span><span class="mf">52.0</span><span class="p">,</span>
+    <span class="n">header_height</span><span class="o">=</span><span class="mf">5.6</span><span class="p">,</span>
+    <span class="n">row_height</span><span class="o">=</span><span class="mf">3.8</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">rules_node</span><span class="o">.</span><span class="n">add_attribute</span><span class="p">(</span><span class="s2">"base_model.py"</span><span class="p">,</span> <span class="s2">"RuleInfo (&lt;scope&gt;/&lt;name&gt;)"</span><span class="p">)</span>
+<span class="n">rules_node</span><span class="o">.</span><span class="n">add_attribute</span><span class="p">(</span><span class="s2">"manager.py"</span><span class="p">,</span> <span class="s2">"detect_active_language() (6)"</span><span class="p">)</span>
+<span class="n">rules_node</span><span class="o">.</span><span class="n">add_attribute</span><span class="p">(</span><span class="s2">"assets (50+)"</span><span class="p">,</span> <span class="s2">"common + py/java/php/go/ts/js"</span><span class="p">)</span>
+<span class="n">diagram</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">rules_node</span><span class="p">,</span> <span class="n">xy</span><span class="o">=</span><span class="p">(</span><span class="mf">86.0</span><span class="p">,</span> <span class="mf">12.0</span><span class="p">))</span>
+
+<span class="n">diagram</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">cli_node</span><span class="p">,</span> <span class="n">inst_node</span><span class="p">,</span> <span class="s2">"dependency"</span><span class="p">,</span> <span class="n">start_side</span><span class="o">=</span><span class="s2">"left"</span><span class="p">,</span> <span class="n">end_side</span><span class="o">=</span><span class="s2">"right"</span><span class="p">)</span>
+<span class="n">diagram</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">cli_node</span><span class="p">,</span> <span class="n">wf_node</span><span class="p">,</span> <span class="s2">"dependency"</span><span class="p">,</span> <span class="n">start_side</span><span class="o">=</span><span class="s2">"bottom"</span><span class="p">,</span> <span class="n">end_side</span><span class="o">=</span><span class="s2">"top"</span><span class="p">)</span>
+<span class="n">diagram</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">cli_node</span><span class="p">,</span> <span class="n">rep_node</span><span class="p">,</span> <span class="s2">"dependency"</span><span class="p">,</span> <span class="n">start_side</span><span class="o">=</span><span class="s2">"right"</span><span class="p">,</span> <span class="n">end_side</span><span class="o">=</span><span class="s2">"top"</span><span class="p">)</span>
+<span class="n">diagram</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">wf_node</span><span class="p">,</span> <span class="n">pentest_node</span><span class="p">,</span> <span class="s2">"dependency"</span><span class="p">,</span> <span class="n">start_side</span><span class="o">=</span><span class="s2">"left"</span><span class="p">,</span> <span class="n">end_side</span><span class="o">=</span><span class="s2">"right"</span><span class="p">)</span>
+<span class="n">diagram</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">wf_node</span><span class="p">,</span> <span class="n">rep_node</span><span class="p">,</span> <span class="s2">"dependency"</span><span class="p">,</span> <span class="n">start_side</span><span class="o">=</span><span class="s2">"right"</span><span class="p">,</span> <span class="n">end_side</span><span class="o">=</span><span class="s2">"left"</span><span class="p">)</span>
+<span class="n">diagram</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">wf_node</span><span class="p">,</span> <span class="n">act_node</span><span class="p">,</span> <span class="s2">"dependency"</span><span class="p">,</span> <span class="n">start_side</span><span class="o">=</span><span class="s2">"bottom"</span><span class="p">,</span> <span class="n">end_side</span><span class="o">=</span><span class="s2">"top"</span><span class="p">)</span>
+<span class="n">diagram</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">act_node</span><span class="p">,</span> <span class="n">docker_node</span><span class="p">,</span> <span class="s2">"dependency"</span><span class="p">,</span> <span class="n">start_side</span><span class="o">=</span><span class="s2">"left"</span><span class="p">,</span> <span class="n">end_side</span><span class="o">=</span><span class="s2">"right"</span><span class="p">)</span>
+<span class="n">diagram</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">act_node</span><span class="p">,</span> <span class="n">cache_node</span><span class="p">,</span> <span class="s2">"dependency"</span><span class="p">,</span> <span class="n">start_side</span><span class="o">=</span><span class="s2">"right"</span><span class="p">,</span> <span class="n">end_side</span><span class="o">=</span><span class="s2">"left"</span><span class="p">)</span>
+<span class="n">diagram</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">rep_node</span><span class="p">,</span> <span class="n">cache_node</span><span class="p">,</span> <span class="s2">"dependency"</span><span class="p">,</span> <span class="n">start_side</span><span class="o">=</span><span class="s2">"bottom"</span><span class="p">,</span> <span class="n">end_side</span><span class="o">=</span><span class="s2">"top"</span><span class="p">)</span>
+<span class="n">diagram</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">act_node</span><span class="p">,</span> <span class="n">rules_node</span><span class="p">,</span> <span class="s2">"dependency"</span><span class="p">,</span> <span class="n">start_side</span><span class="o">=</span><span class="s2">"bottom"</span><span class="p">,</span> <span class="n">end_side</span><span class="o">=</span><span class="s2">"top"</span><span class="p">)</span>
+
+<span class="n">diagram</span><span class="o">.</span><span class="n">draw</span><span class="p">(</span><span class="n">xy</span><span class="o">=</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">))</span>
+<span class="n">save</span><span class="p">()</span>
+</code></pre>
+</details>
+<hr />
+<h2>1. 高凝集な垂直ドメインパッケージ設計 (<code>src/pni/</code>)</h2>
+<p>従来の CLI コードベースでは、Pydantic モデルを <code>models/</code>、YAML/Markdown ローダーを <code>config/</code>、サブプロセス実行器を <code>executors/</code>、静的ファイルを <code>templates/</code> へと水平分割（レイヤー分割）しがちです。しかしこの構造では、1つの監査機能を追加・変更するたびに4つの離れたディレクトリを同時に編集する必要が生じ、人間のメンテナーにとっても AI コーディングエージェントにとってもコンテキスト負荷が増大します。</p>
+<p>これに対し <code>pni501</code> は、<code>src/pni/</code> を <strong>自己完結型の垂直ドメインパッケージ</strong> として構成しています。トップレベルの <code>src/pni/__init__.py</code> はパッケージ識別定数（<code>LIB_NAME = &quot;pni501&quot;</code>、<code>LIB_VERSION = &quot;0.1.3&quot;</code>、<code>__version__</code>）のみを公開し、各サブシステムが自身のスキーマ・オーケストレーションモジュール・組み込みテンプレートを単一の境界ディレクトリ内に同居させています。</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">パッケージ / モジュール</th>
+<th style="text-align:left">主要 Python モジュール</th>
+<th style="text-align:left">主なスキーマと責務</th>
+<th style="text-align:left">同梱の組み込みアセット</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left"><strong><code>cli.py</code></strong></td>
+<td style="text-align:left"><code>cli.py</code></td>
+<td style="text-align:left">Typer ルート <code>app</code> + サブアプリ（<code>rules</code>, <code>workflows</code>, <code>report</code>, <code>pentests</code>, <code>progress</code>）およびルートコマンド（<code>init</code>, <code>instructions</code>, <code>validate-score</code>, <code>validate-migration-plan</code>, <code>version</code>）</td>
+<td style="text-align:left">Rich CLI ヘルプエピローグ &amp; AI ブートストラップ案内</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong><code>_workflows/</code></strong></td>
+<td style="text-align:left"><code>base_model.py</code>, <code>state_db.py</code>, <code>manager.py</code>, <code>engine.py</code>, <code>_migration_engine.py</code>, <code>_progress_engine.py</code>, <code>aggregator.py</code>, <code>adhoc.py</code>, <code>inspector.py</code></td>
+<td style="text-align:left"><code>WorkflowDefinition</code>, <code>WorkflowFactsBundle</code>, <code>WorkflowStateDB</code>, <code>CompiledAuditDigest</code>。ステートフル Pull-Push エンジン、アドホック <code>run-action</code>、<code>rewind</code>、実行履歴の検査</td>
+<td style="text-align:left">6言語 × 2種のスターター（<code>{python,java,php,go,typescript,javascript}/{full_audit,quick_check}.yaml</code>、計 <code>12</code> ファイル）で6種のステートフルワークフローを支援</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong><code>_actions/</code></strong></td>
+<td style="text-align:left"><code>base_model.py</code>, <code>manager.py</code>, <code>ai_actions.py</code>, <code>project_inspect.py</code>, <code>_repo_governance.py</code>, および <code>ast_analyze/</code>, <code>runtime_check/</code>, <code>security_scan/</code>, <code>pentest/</code>, <code>migration_analyze/</code>, <code>progress_analyze/</code></td>
+<td style="text-align:left"><code>PrimitiveType</code>（主要 <code>12</code> プリミティブ）、<code>ScoreResult</code>（7軸）、<code>ArchitectureRecord</code>、<code>MigrationPlanResult</code>、および6言語対応の決定論的ファクト抽出器</td>
+<td style="text-align:left">言語あたり <code>15</code> 個の複合 YAML アクション（<code>common/</code> 共通 <code>12</code> 個 + 各 <code>&lt;lang&gt;/</code> 固有 <code>3</code> 個）</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong><code>_reporter/</code></strong></td>
+<td style="text-align:left"><code>base_model.py</code>, <code>blueprint.py</code>, <code>migration_blueprint.py</code>, <code>progress_blueprint.py</code>, <code>drawlib_guide.py</code>, <code>compiler.py</code></td>
+<td style="text-align:left"><code>ReportBlueprint</code>, <code>ReportScaffoldResult</code>, <code>ReportBuildResult</code>。7章構成の監査・移行ブループリントを事前編成し、<code>compiler.py</code> で <code>drawlib.tools</code> を遅延インポート</td>
+<td style="text-align:left">7章構成 Drawlib <code>doc</code> スキャフォールド &amp; 章リンター</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong><code>_rules/</code></strong></td>
+<td style="text-align:left"><code>base_model.py</code>, <code>manager.py</code></td>
+<td style="text-align:left"><code>RuleInfo</code>, <code>SUPPORTED_LANGUAGES = (&quot;python&quot;, &quot;java&quot;, &quot;php&quot;, &quot;go&quot;, &quot;typescript&quot;, &quot;javascript&quot;)</code>, <code>detect_active_language()</code>、および <code>&lt;scope&gt;/&lt;name&gt;</code> カスケード解決</td>
+<td style="text-align:left"><code>common/</code> と6言語パック（<code>python/</code>, <code>java/</code>, <code>php/</code>, <code>go/</code>, <code>typescript/</code>, <code>javascript/</code>）にわたる <code>50+</code> 個の Markdown ルール</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong><code>_pentests/</code></strong></td>
+<td style="text-align:left"><code>manager.py</code>, <code>surface_codegen.py</code></td>
+<td style="text-align:left">ターゲット別の <code>pytest + httpx</code> Web ペネトレーションテストを <code>.pni/pentests/&lt;target&gt;/</code> に生成・検証し、<code>AstFacts.api_endpoints</code> から <code>test_target_surface.py</code> を自動生成</td>
+<td style="text-align:left">プローブテンプレート <code>2</code> 種: <code>conftest.py.tmpl</code>, <code>test_baseline_http.py.tmpl</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><strong><code>_dockerfiles/</code></strong></td>
+<td style="text-align:left"><code>manager.py</code></td>
+<td style="text-align:left"><code>.pni/dockerfiles/_templates/</code> オーバーライドまたは組み込みコンテナハーネスを解決し、分離 <code>.dockerignore</code> とともに <code>.pni/dockerfiles/</code> に展開</td>
+<td style="text-align:left"><code>10</code> テンプレート: <code>python/{pip,poetry,uv}</code>, <code>java/{gradle,maven}</code>, <code>php/{composer,raw}</code>, <code>go/go</code>, <code>typescript/node</code>, <code>javascript/node.dockerfile</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><strong><code>_instructions/</code> &amp; <code>_config.py</code></strong></td>
+<td style="text-align:left"><code>base_model.py</code>, <code>manager.py</code>, <code>_config.py</code></td>
+<td style="text-align:left"><code>InstructionInfo</code>, <code>PniConfig</code>, <code>OptOutEntry</code>。<code>.pni/instructions.md</code> および <code>.pni/pni.toml</code> プロジェクトマニフェスト・<code>[[opt_out]]</code> 免除設定を解決</td>
+<td style="text-align:left"><code>agent.md</code> およびデフォルト <code>.pni/pni.toml</code> テンプレート</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong><code>_cache.py</code></strong></td>
+<td style="text-align:left"><code>_cache.py</code></td>
+<td style="text-align:left">自己修復型 <code>.pni/cache/</code> 初期化（<code>ensure_cache_dir</code>, <code>ensure_cache_parent</code>）とワークスペース安全なパス解決（<code>normalize_target_subpath</code>）</td>
+<td style="text-align:left">自動生成される <code>.pni/cache/.gitignore</code> (<code>*</code>) と <code>CACHEDIR.TAG</code></td>
+</tr>
+</tbody>
+</table>
+<p>Python モジュールと静的アセットを同一パッケージ内に配置することで、開発時の editable インストールでも配布用 wheel パッケージでも <code>BUILTIN_*_DIR = Path(__file__).resolve().parent</code> が常に決定論的に解決されます。</p>
+<hr />
+<h2>2. モジュールレベル依存関係階層と遅延ツーリング分離</h2>
+<p><code>src/pni/</code> 内のすべての import は厳密な <strong>モジュールレベル有向非巡回グラフ（DAG）</strong> を形成しており、<code>pni501</code> 自身の <code>src/pni/</code> ツリーに対する <code>ast_analyze</code> によって継続的に検証されています（<code>circular_dependencies = []</code>）。</p>
+<ol>
+<li><strong>CLI オーケストレーター (<code>src/pni/cli.py</code>)</strong>: ユーザー引数をパースし、Rich テーブルや Markdown パネルを整形して、<code>_workflows</code>、<code>_actions</code>、<code>_reporter</code>、<code>_rules</code>、<code>_pentests</code>、<code>_instructions</code>、<code>_config</code>、<code>_cache</code> へコマンドをディスパッチします。内部モジュールが <code>pni.cli</code> を逆インポートすることは一切ありません。</li>
+<li><strong>ステートフルワークフロー制御 (<code>src/pni/_workflows/</code>)</strong>:
+<ul>
+<li><code>engine.py</code>、<code>_migration_engine.py</code>、<code>_progress_engine.py</code> が SQLite 永続化（<code>state_db.py</code>）、Pre-Flight 前提条件ゲート（<code>based_on</code> 監査完了確認および <code>.pni/pentests/</code> 準備検証）、決定論的ステップ実行、パスグラウンディング検証、および <code>aggregator.py</code> による7軸スコア統合（<code>compile_workflow_digest</code>）を統括します。プロトコルの詳細は <a href="stateful_engine.html">ステートフル Pull-Push エンジン</a> を参照してください。</li>
+<li><code>adhoc.py</code>（<code>pni workflows run-action</code>）は SQLite の事前準備なしで単一アクションをオンメモリ実行し、<code>inspector.py</code> は生 SQL クエリを露出させずに <code>pni workflows status</code> や <code>inspect-action</code> を提供します。</li>
+</ul>
+</li>
+<li><strong>アクションサブシステムと補助ハーネス (<code>_actions/</code>, <code>_reporter/</code>, <code>_pentests/</code>, <code>_dockerfiles/</code>)</strong>:
+<ul>
+<li><code>_actions/base_model.py</code>、<code>_actions/ast_analyze/models.py</code>、<code>_actions/migration_analyze/models.py</code> 内の純粋な Pydantic データモデルが共有 Leaf スキーマ契約として機能し、実行ランナーの循環インポートを引き起こすことなく <code>_reporter/blueprint.py</code>、<code>_reporter/migration_blueprint.py</code>、<code>_pentests/surface_codegen.py</code> から安全に参照されます。</li>
+<li><code>_actions/runtime_check/</code>、<code>_actions/security_scan/</code>、<code>_actions/pentest/</code> の実行ランナーはコンテナハーネス構築を <code>_dockerfiles</code> に、プローブ生成を <code>_pentests</code> に委譲し、<code>_actions/ai_actions.py</code> はレポート作成プロンプトの生成を <code>_reporter/drawlib_guide.py</code> に委譲します。</li>
+<li><code>_reporter/compiler.py</code> は型付き <code>_DrawlibToolsProtocol</code> を介して <code>importlib.import_module(&quot;drawlib.tools&quot;)</code> を <strong>遅延ロード</strong> するため、<code>pni report</code> が呼ばれるまで Matplotlib/Cairo 描画スタックを読み込まず、<code>pni rules</code>、<code>pni workflows</code>、<code>pni init</code> を高速に保ちます。</li>
+</ul>
+</li>
+<li><strong>兄弟依存ゼロの基盤パッケージ (<code>_rules/</code>, <code>_instructions/</code>, <code>_cache.py</code>)</strong>: 他の <code>pni._*</code> パッケージを一切インポートせず、6言語の自動検出、Markdown カスケード検索、パストラバーサル防止付きキャッシュ管理を提供します。</li>
+</ol>
+<hr />
+<h2>3. 直交タクソノミー：普遍的アーキタイプ vs. 言語・フレームワークパック</h2>
+<p>静的解析ツールチェーンで陥りがちなアンチパターンは、アーキテクチャ・セキュリティ・運用ルールをプログラミング言語ごとに重複して書き直すことです。<code>pni501</code> では、ルール（<code>src/pni/_rules/</code>）と複合アクション（<code>src/pni/_actions/</code>）を2つの直交する軸で分離しています。</p>
+<ol>
+<li><strong>普遍的エンジニアリング標準 (<code>common/*</code>)</strong>: 実装言語に依存しない不変条件を規定します。レイヤー間の依存方向（<code>common/architecture</code>）、SIG 単位複雑度上限（<code>common/maintainability</code>）、OpenSSF ロックファイル・CI トークン衛生（<code>common/supply_chain</code>）、OWASP シークレット・インジェクション防御（<code>common/security</code>, <code>common/security_vulnerability</code>）、12-Factor ステートレス性（<code>common/twelve_factor</code>）、Google SRE I/O タイムアウト（<code>common/production_readiness</code>）、<code>clig.dev</code> CLI 人間工学（<code>common/cli_guidelines</code>）、公開ライブラリ API 契約（<code>common/library_guidelines</code>）、Diátaxis ドキュメント標準（<code>common/documentation</code>）が含まれます。</li>
+<li><strong>言語コアパック (<code>&lt;lang&gt;/*</code>)</strong>: <strong>Python、Java、PHP、Go、TypeScript、JavaScript</strong> の6言語それぞれについて、構文イディオム、コンパイラ・型チェッカーの厳格性、パッケージマネージャマニフェスト、単体テスト規約を規定し、3つの言語別複合アクション（<code>&lt;lang&gt;_ast_audit</code>、<code>&lt;lang&gt;_test_audit</code>、<code>repo_structure_audit</code>）と対になります。</li>
+<li><strong>フレームワークオーバーレイ (<code>&lt;lang&gt;/frameworks/*</code>)</strong>: <code>python/frameworks/fastapi</code>、<code>java/frameworks/spring_boot</code>、<code>php/frameworks/laravel</code>、<code>php/frameworks/wordpress</code> など、フレームワーク固有のライフサイクルや DI パターンを規定します。</li>
+</ol>
+<figure class="drawlib-image" style="text-align: center;">
+  <img src="../../images/02_architecture/domain_architecture/scope_orthogonality_composition.png" alt="domain_architecture_2" />
+  <figcaption class="drawlib-caption">3層ルール＆アクション合成：普遍的ガバナンス・ランタイムアーキタイプ・6言語＆フレームワークパックの組み合わせ</figcaption>
+</figure>
+<details class="drawlib-code-details">
+<summary>Source Code</summary>
+<pre><code class="language-python"><span class="kn">from</span><span class="w"> </span><span class="nn">drawlib.canvas</span><span class="w"> </span><span class="kn">import</span> <span class="n">save</span><span class="p">,</span> <span class="n">setup</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">drawlib.icons</span><span class="w"> </span><span class="kn">import</span> <span class="n">phosphor</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">drawlib.smartarts</span><span class="w"> </span><span class="kn">import</span> <span class="n">CardList</span><span class="p">,</span> <span class="n">Panel</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">drawlib.styles</span><span class="w"> </span><span class="kn">import</span> <span class="n">Styles</span>
+
+<span class="n">setup</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="mi">158</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">64</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">150</span><span class="p">)</span>
+
+<span class="n">panel</span> <span class="o">=</span> <span class="n">Panel</span><span class="p">(</span>
+    <span class="s2">"Composable Audit Formula = Common Foundation + Runtime Archetype + 6-Language/Framework Pack"</span><span class="p">,</span>
+    <span class="n">header_variant</span><span class="o">=</span><span class="s2">"filled"</span><span class="p">,</span>
+    <span class="n">style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">Neutral</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">shape_r</span><span class="o">=</span><span class="mf">2.0</span><span class="p">),</span>
+    <span class="n">header_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">PrimaryFlat</span><span class="p">,</span>
+    <span class="n">text_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">WhiteBold</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">text_size</span><span class="o">=</span><span class="mf">11.0</span><span class="p">),</span>
+<span class="p">)</span>
+<span class="n">panel</span><span class="o">.</span><span class="n">draw</span><span class="p">(</span><span class="n">xy</span><span class="o">=</span><span class="p">(</span><span class="mf">3.0</span><span class="p">,</span> <span class="mf">3.0</span><span class="p">),</span> <span class="n">width</span><span class="o">=</span><span class="mf">152.0</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mf">58.0</span><span class="p">)</span>
+
+<span class="n">layers</span> <span class="o">=</span> <span class="n">CardList</span><span class="p">(</span>
+    <span class="n">style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">PrimaryNeutral</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">shape_r</span><span class="o">=</span><span class="mf">1.6</span><span class="p">),</span>
+    <span class="n">text_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">DarkBold</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">text_size</span><span class="o">=</span><span class="mf">11.0</span><span class="p">),</span>
+    <span class="n">description_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">Dark</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">text_size</span><span class="o">=</span><span class="mf">10.0</span><span class="p">),</span>
+    <span class="n">badge_shape</span><span class="o">=</span><span class="s2">"rounded_rect"</span><span class="p">,</span>
+    <span class="n">badge_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">PrimaryFlat</span><span class="p">,</span>
+    <span class="n">badge_text_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">WhiteBold</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">text_size</span><span class="o">=</span><span class="mf">10.0</span><span class="p">),</span>
+    <span class="n">icon_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">WhiteBold</span><span class="p">,</span>
+    <span class="n">direction</span><span class="o">=</span><span class="s2">"horizontal"</span><span class="p">,</span>
+    <span class="n">show_arrows</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">arrow_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">PrimaryBold</span><span class="p">,</span>
+    <span class="n">spacing</span><span class="o">=</span><span class="mf">4.5</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">layers</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+    <span class="s2">"Layer 1: Universal Core"</span><span class="p">,</span>
+    <span class="s2">"common/architecture</span><span class="se">\n</span><span class="s2">common/maintainability</span><span class="se">\n</span><span class="s2">common/supply_chain</span><span class="se">\n</span><span class="s2">common/security &amp; docs"</span><span class="p">,</span>
+    <span class="n">icon</span><span class="o">=</span><span class="n">phosphor</span><span class="o">.</span><span class="n">shield_check</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">layers</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+    <span class="s2">"Layer 2: Runtime Archetype"</span><span class="p">,</span>
+    <span class="s2">"Library -&gt; library_guidelines</span><span class="se">\n</span><span class="s2">CLI Tool -&gt; cli_guidelines</span><span class="se">\n</span><span class="s2">Service -&gt; twelve_factor +</span><span class="se">\n</span><span class="s2">production_readiness"</span><span class="p">,</span>
+    <span class="n">style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">Neutral</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">shape_r</span><span class="o">=</span><span class="mf">1.6</span><span class="p">),</span>
+    <span class="n">badge_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">SecondaryFlat</span><span class="p">,</span>
+    <span class="n">icon</span><span class="o">=</span><span class="n">phosphor</span><span class="o">.</span><span class="n">cube</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">layers</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+    <span class="s2">"Layer 3: 6 Languages &amp; FW"</span><span class="p">,</span>
+    <span class="s2">"python, java, php</span><span class="se">\n</span><span class="s2">go, typescript, javascript</span><span class="se">\n</span><span class="s2">+ FastAPI, Spring Boot,</span><span class="se">\n</span><span class="s2">Laravel, WordPress"</span><span class="p">,</span>
+    <span class="n">style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">SecondaryNeutral</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">shape_r</span><span class="o">=</span><span class="mf">1.6</span><span class="p">),</span>
+    <span class="n">badge_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">SuccessFlat</span><span class="p">,</span>
+    <span class="n">icon</span><span class="o">=</span><span class="n">phosphor</span><span class="o">.</span><span class="n">brackets_curly</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">layers</span><span class="o">.</span><span class="n">draw</span><span class="p">(</span><span class="n">xy</span><span class="o">=</span><span class="p">(</span><span class="mf">7.0</span><span class="p">,</span> <span class="mf">8.0</span><span class="p">),</span> <span class="n">width</span><span class="o">=</span><span class="mf">144.0</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mf">43.0</span><span class="p">)</span>
+<span class="n">save</span><span class="p">()</span>
+</code></pre>
+</details>
+<hr />
+<h2>4. <code>.pni/</code> ワークスペース構成と3層カスケード解決</h2>
+<p><code>pni init [--lang/-l &lt;python|java|php|go|typescript|javascript&gt;] [--force/-f]</code> を実行すると、<code>src/pni/cli.py</code> の <code>init_project()</code> が呼び出され、検出された言語に応じた透明性の高い <code>.pni/</code> 設定ディレクトリを展開するとともに、自己修復型の <code>.pni/cache/</code> 階層を初期化します。</p>
+<figure class="drawlib-image" style="text-align: center;">
+  <img src="../../images/02_architecture/domain_architecture/cascade_resolution_layout.png" alt="domain_architecture_3" />
+  <figcaption class="drawlib-caption">.pni/ ワークスペース＆自己修復型キャッシュ階層と3層カスケード解決フロー</figcaption>
+</figure>
+<details class="drawlib-code-details">
+<summary>Source Code</summary>
+<pre><code class="language-python"><span class="kn">from</span><span class="w"> </span><span class="nn">drawlib.canvas</span><span class="w"> </span><span class="kn">import</span> <span class="n">save</span><span class="p">,</span> <span class="n">setup</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">drawlib.icons</span><span class="w"> </span><span class="kn">import</span> <span class="n">phosphor</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">drawlib.smartarts</span><span class="w"> </span><span class="kn">import</span> <span class="n">CardList</span><span class="p">,</span> <span class="n">Panel</span><span class="p">,</span> <span class="n">TreeNode</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">drawlib.styles</span><span class="w"> </span><span class="kn">import</span> <span class="n">Styles</span>
+
+<span class="n">setup</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="mi">162</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">82</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">150</span><span class="p">)</span>
+
+<span class="n">left_panel</span> <span class="o">=</span> <span class="n">Panel</span><span class="p">(</span>
+    <span class="s2">".pni/ Workspace &amp; Self-Healing Cache"</span><span class="p">,</span>
+    <span class="n">header_variant</span><span class="o">=</span><span class="s2">"filled"</span><span class="p">,</span>
+    <span class="n">style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">Neutral</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">shape_r</span><span class="o">=</span><span class="mf">2.0</span><span class="p">),</span>
+    <span class="n">header_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">PrimaryFlat</span><span class="p">,</span>
+    <span class="n">text_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">WhiteBold</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">text_size</span><span class="o">=</span><span class="mf">11.0</span><span class="p">),</span>
+<span class="p">)</span>
+<span class="n">left_panel</span><span class="o">.</span><span class="n">draw</span><span class="p">(</span><span class="n">xy</span><span class="o">=</span><span class="p">(</span><span class="mf">3.0</span><span class="p">,</span> <span class="mf">3.0</span><span class="p">),</span> <span class="n">width</span><span class="o">=</span><span class="mf">78.0</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mf">76.0</span><span class="p">)</span>
+
+<span class="n">root</span> <span class="o">=</span> <span class="n">TreeNode</span><span class="p">(</span>
+    <span class="s2">".pni/ (Committed Config + Isolated Cache)"</span><span class="p">,</span>
+    <span class="n">text_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">PrimaryBold</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">text_size</span><span class="o">=</span><span class="mf">10.5</span><span class="p">),</span>
+    <span class="n">line_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">DarkBold</span><span class="p">,</span>
+    <span class="n">line_horizontal_margin</span><span class="o">=</span><span class="mf">2.0</span><span class="p">,</span>
+    <span class="n">line_horizontal_length</span><span class="o">=</span><span class="mf">2.2</span><span class="p">,</span>
+    <span class="n">line_vertical_margin</span><span class="o">=</span><span class="mf">4.9</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">root</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="s2">"pni.toml &amp; instructions.md  (Manifest &amp; Agent)"</span><span class="p">,</span> <span class="n">text_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">DarkBold</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">text_size</span><span class="o">=</span><span class="mf">10.0</span><span class="p">))</span>
+<span class="n">root</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="s2">"rules/{common,&lt;lang&gt;}/  (*.md rules)"</span><span class="p">,</span> <span class="n">text_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">DarkBold</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">text_size</span><span class="o">=</span><span class="mf">10.0</span><span class="p">))</span>
+<span class="n">root</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="s2">"actions/*.yaml  (15 composite actions)"</span><span class="p">,</span> <span class="n">text_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">DarkBold</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">text_size</span><span class="o">=</span><span class="mf">10.0</span><span class="p">))</span>
+<span class="n">root</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="s2">"workflows/*.yaml  (full_audit, quick_check)"</span><span class="p">,</span> <span class="n">text_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">DarkBold</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">text_size</span><span class="o">=</span><span class="mf">10.0</span><span class="p">))</span>
+<span class="n">root</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="s2">"dockerfiles/ &amp; pentests/&lt;target&gt;/"</span><span class="p">,</span> <span class="n">text_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">DarkBold</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">text_size</span><span class="o">=</span><span class="mf">10.0</span><span class="p">))</span>
+<span class="n">cache_dir</span> <span class="o">=</span> <span class="n">root</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+    <span class="s2">"cache/  (.gitignore: '*' + CACHEDIR.TAG)"</span><span class="p">,</span>
+    <span class="n">text_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">SecondaryBold</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">text_size</span><span class="o">=</span><span class="mf">10.0</span><span class="p">),</span>
+<span class="p">)</span>
+<span class="n">cache_dir</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="s2">"workflow_state.db &amp; trivy-cache/"</span><span class="p">,</span> <span class="n">text_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">Dark</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">text_size</span><span class="o">=</span><span class="mf">10.0</span><span class="p">))</span>
+<span class="n">wf_cache</span> <span class="o">=</span> <span class="n">cache_dir</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="s2">"&lt;workflow_id&gt;/"</span><span class="p">,</span> <span class="n">text_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">SecondaryBold</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">text_size</span><span class="o">=</span><span class="mf">10.0</span><span class="p">))</span>
+<span class="n">wf_cache</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="s2">"facts.json, architecture.json, blueprint.json"</span><span class="p">,</span> <span class="n">text_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">Dark</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">text_size</span><span class="o">=</span><span class="mf">10.0</span><span class="p">))</span>
+<span class="n">wf_cache</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="s2">"runtime/, security/, pentest/  (logs &amp; XML)"</span><span class="p">,</span> <span class="n">text_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">Dark</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">text_size</span><span class="o">=</span><span class="mf">10.0</span><span class="p">))</span>
+<span class="n">root</span><span class="o">.</span><span class="n">draw</span><span class="p">(</span><span class="n">xy</span><span class="o">=</span><span class="p">(</span><span class="mf">6.0</span><span class="p">,</span> <span class="mf">67.5</span><span class="p">))</span>
+
+<span class="n">cascade_cards</span> <span class="o">=</span> <span class="n">CardList</span><span class="p">(</span>
+    <span class="n">style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">PrimaryNeutral</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">shape_r</span><span class="o">=</span><span class="mf">1.8</span><span class="p">),</span>
+    <span class="n">text_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">DarkBold</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">text_size</span><span class="o">=</span><span class="mf">11.0</span><span class="p">),</span>
+    <span class="n">description_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">Dark</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">text_size</span><span class="o">=</span><span class="mf">10.0</span><span class="p">),</span>
+    <span class="n">badge_shape</span><span class="o">=</span><span class="s2">"circle"</span><span class="p">,</span>
+    <span class="n">badge_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">PrimaryFlat</span><span class="p">,</span>
+    <span class="n">badge_text_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">WhiteBold</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">text_size</span><span class="o">=</span><span class="mf">10.5</span><span class="p">),</span>
+    <span class="n">icon_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">WhiteBold</span><span class="p">,</span>
+    <span class="n">direction</span><span class="o">=</span><span class="s2">"vertical"</span><span class="p">,</span>
+    <span class="n">spacing</span><span class="o">=</span><span class="mf">3.8</span><span class="p">,</span>
+    <span class="n">show_arrows</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">arrow_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">DarkBold</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">cascade_cards</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+    <span class="s2">"1. Local .pni/ Override"</span><span class="p">,</span>
+    <span class="s2">"Checks .pni/{pni.toml, instructions.md, rules/,</span><span class="se">\n</span><span class="s2">actions/, dockerfiles/_templates/} first."</span><span class="p">,</span>
+    <span class="n">icon</span><span class="o">=</span><span class="n">phosphor</span><span class="o">.</span><span class="n">folder_open</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">cascade_cards</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+    <span class="s2">"2. Language Scope (&lt;lang&gt;/)"</span><span class="p">,</span>
+    <span class="s2">"detect_active_language() resolves built-in</span><span class="se">\n</span><span class="s2">python, java, php, go, ts, or js packs."</span><span class="p">,</span>
+    <span class="n">style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">Neutral</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">shape_r</span><span class="o">=</span><span class="mf">1.8</span><span class="p">),</span>
+    <span class="n">icon</span><span class="o">=</span><span class="n">phosphor</span><span class="o">.</span><span class="n">code</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">cascade_cards</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+    <span class="s2">"3. Universal Fallback (common/)"</span><span class="p">,</span>
+    <span class="s2">"Falls back to language-agnostic common/ rules</span><span class="se">\n</span><span class="s2">and 12 universal composite actions."</span><span class="p">,</span>
+    <span class="n">style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">SecondaryNeutral</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">shape_r</span><span class="o">=</span><span class="mf">1.8</span><span class="p">),</span>
+    <span class="n">badge_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">SecondaryBold</span><span class="p">,</span>
+    <span class="n">icon</span><span class="o">=</span><span class="n">phosphor</span><span class="o">.</span><span class="n">globe</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">cascade_cards</span><span class="o">.</span><span class="n">draw</span><span class="p">(</span><span class="n">xy</span><span class="o">=</span><span class="p">(</span><span class="mf">85.0</span><span class="p">,</span> <span class="mf">3.0</span><span class="p">),</span> <span class="n">width</span><span class="o">=</span><span class="mf">74.0</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mf">76.0</span><span class="p">)</span>
+<span class="n">save</span><span class="p">()</span>
+</code></pre>
+</details>
+<h3>自己修復型キャッシュとターゲット別ワークスペース成果物</h3>
+<p>ホストプロジェクトのルート <code>.gitignore</code> を直接書き換える代わりに、<code>src/pni/_cache.py</code>（<code>ensure_cache_dir()</code> および <code>ensure_cache_parent()</code>）は <code>.pni/cache/</code> を <strong>自己修復型（Self-Healing）</strong> として管理します。</p>
+<ul>
+<li><strong>Git およびバックアップからの自動除外</strong>: <code>.pni/cache/</code> への書き込みが行われるたびに、<code>.pni/cache/.gitignore</code>（<code>*</code>）と標準 <code>CACHEDIR.TAG</code> シグネチャ（<code>8a477f597d28d172789f06886806bc55</code>）の存在が自動的に保証されます。これにより、<code>.pni/</code> を初期化していないリポジトリであっても、SQLite データベース、Trivy 脆弱性 DB キャッシュ（<code>trivy-cache/</code>）、JUnit XML レポート、コンテナログが Git ステータスやバックアップアーカイブに混入しません。</li>
+<li><strong>ワークフロー単位で分離された一時状態 (<code>.pni/cache/&lt;workflow_id&gt;/</code>)</strong>: 各ワークフローは、集約スナップショットを <code>facts.json</code>、グラウンディング検証済みの3側面アーキテクチャモデルを <code>architecture.json</code>、事前ソート済みレポート仕様を <code>blueprint.json</code>（または <code>migration_facts.json</code> / <code>migration_blueprint.json</code>）に出力し、各ステージの生ログを <code>runtime/</code>、<code>security/</code>、<code>pentest/</code> に格納します。</li>
+<li><strong>パストラバーサル防止付きマルチターゲットハーネス (<code>.pni/dockerfiles/</code> &amp; <code>.pni/pentests/</code>)</strong>: <code>normalize_target_subpath()</code> が絶対パスや <code>..</code> トラバーサルを拒否しつつ、モノレポ内のサブターゲットをクリーンにマッピングします（例: <code>targets.root: examples/php/legacy_shop_messy</code> は <code>.pni/dockerfiles/examples/php/legacy_shop_messy/Dockerfile</code> および <code>.pni/pentests/examples/php/legacy_shop_messy/</code> に展開されます）。</li>
+</ul>
+<h3>3層カスケードと6言語解決ルール</h3>
+<p>チームは <code>pni init</code> で生成された <code>.pni/</code> ファイル一式をそのままコミットして管理することも、未変更のファイルを削除してカスタマイズしたいオーバーライドファイルのみを残すことも可能です。</p>
+<ol>
+<li><strong>アクティブ言語の自動検出 (<code>_rules/manager.py</code>)</strong>: <code>detect_active_language(project_root)</code> は厳密な優先順位でマニフェストを検査します。Python（<code>pyproject.toml</code>, <code>setup.py</code>, <code>requirements.txt</code>）、Java（<code>pom.xml</code>, <code>build.gradle*</code>, <code>settings.gradle*</code>）、PHP（<code>composer.json</code>, <code>wp-config*.php</code>, <code>artisan</code>, <code>phpunit.xml*</code>）、Go（<code>go.mod</code>, <code>go.work</code>）、Node/フロントエンド（<code>tsconfig*.json</code>, <code>jsconfig.json</code>, <code>package.json</code> から <code>typescript</code> と <code>javascript</code> を判別）を順に確認し、該当しない場合はソースツリー内の拡張子ヒューリスティクス（<code>*.java</code>, <code>*.php</code>, <code>*.go</code>, <code>*.ts</code>/<code>*.tsx</code>, <code>*.js</code>/<code>*.jsx</code>）へフォールバックし、最終的に <code>&quot;python&quot;</code> をデフォルトとします。言語別解析器の詳細は <a href="../05_languages_and_reference/supported_languages.html">対応 6 言語マトリクス</a> を参照してください。</li>
+<li><strong>エンジニアリングルール (<code>local &gt; &lt;lang&gt; &gt; common</code>)</strong>: <code>list_rules()</code> は組み込みの <code>src/pni/_rules/</code> とローカルの <code>.pni/rules/</code> から <code>(&quot;common&quot;, active_lang)</code>（<code>--all</code> 指定時は全 <code>SUPPORTED_LANGUAGES</code>）の <code>(scope, name)</code> 候補を統合し、<code>.pni/rules/&lt;scope&gt;/&lt;name&gt;.md</code>（<code>is_local=True</code>）を優先します。<code>get_rule_content()</code> はハイフンとアンダースコアを正規化した上で、完全一致 <code>&lt;scope&gt;/&lt;name&gt;</code> -&gt; <code>&lt;active_lang&gt;/&lt;name&gt;</code> -&gt; <code>common/&lt;name&gt;</code> -&gt; 任意スコープの一致ルール名の4段階で解決します。</li>
+<li><strong>複合アクション (<code>local &gt; &lt;lang&gt; &gt; common</code>)</strong>: <code>load_composite_action()</code> は <code>.pni/actions/&lt;id&gt;.yaml</code>（またはスコープ付き <code>.pni/actions/&lt;scope&gt;/&lt;id&gt;.yaml</code>）を最優先で解決し、次に組み込みの <code>&lt;active_lang&gt;/&lt;id&gt;.yaml</code>（これにより <code>uses: repo_structure_audit</code> が自動的に <code>python/</code>, <code>java/</code>, <code>php/</code>, <code>go/</code>, <code>typescript/</code>, <code>javascript/</code> のいずれかにディスパッチされます）、最後に <code>common/&lt;id&gt;.yaml</code> へフォールバックします。全カタログは <a href="../03_workflows_and_actions/actions_pipeline.html">15 アクションと 12 プリミティブ</a> を参照してください。</li>
+<li><strong>コンテナハーネス・マニフェスト・エージェント指示書</strong>: <code>resolve_template_dockerfile()</code> は <code>.pni/dockerfiles/_templates/&lt;lang&gt;/&lt;tool&gt;.dockerfile</code> を組み込み <code>src/pni/_dockerfiles/&lt;lang&gt;/&lt;tool&gt;.dockerfile</code> より優先（言語別フォールバックは <code>pip</code>, <code>maven</code>, <code>composer</code>, <code>go</code>, <code>node</code>）し、<code>load_pni_config()</code> は <code>.pni/pni.toml</code> を読み込み、<code>get_instructions_info()</code> は <code>.pni/instructions.md</code> を <code>src/pni/_instructions/agent.md</code> より優先します。</li>
+</ol>
+<pre><code class="language-bash"><span class="c1"># アクティブなルール、複合アクション、カスケードのオーバーライド状態を確認</span>
+pni<span class="w"> </span>rules<span class="w"> </span>list<span class="w"> </span>--all
+pni<span class="w"> </span>rules<span class="w"> </span>show<span class="w"> </span>common/architecture
+pni<span class="w"> </span>workflows<span class="w"> </span>show<span class="w"> </span>full_audit
+</code></pre>
+
+            </main>
+        </div>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Theme toggle
+            const themeBtn = document.getElementById('theme-toggle');
+            if (themeBtn) {
+                themeBtn.addEventListener('click', function() {
+                    const current = document.documentElement.getAttribute('data-theme');
+                    const next = current === 'dark' ? 'light' : 'dark';
+                    document.documentElement.setAttribute('data-theme', next);
+                    localStorage.setItem('drawlib-theme', next);
+                });
+            }
+
+            // Language dropdown outside-click & Escape close
+            const langDropdowns = document.querySelectorAll('.lang-dropdown');
+            if (langDropdowns.length > 0) {
+                document.addEventListener('click', function(e) {
+                    langDropdowns.forEach(function(dd) {
+                        if (dd.hasAttribute('open') && !dd.contains(e.target)) {
+                            dd.removeAttribute('open');
+                        }
+                    });
+                });
+                document.addEventListener('keydown', function(e) {
+                    if (e.key === 'Escape') {
+                        langDropdowns.forEach(function(dd) {
+                            dd.removeAttribute('open');
+                        });
+                    }
+                });
+            }
+
+            // Mobile menu toggle
+            const menuBtn = document.getElementById('menu-toggle');
+            const sidebar = document.querySelector('.sidebar');
+            if (menuBtn && sidebar) {
+                function setMenuOpen(open) {
+                    sidebar.classList.toggle('is-open', open);
+                    menuBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
+                    document.body.classList.toggle('menu-open', open);
+                    if (open) {
+                        const menu = sidebar.querySelector('.sidebar-menu');
+                        if (menu) {
+                            menu.scrollTop = 0;
+                        }
+                    }
+                }
+
+                menuBtn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    const willOpen = !sidebar.classList.contains('is-open');
+                    setMenuOpen(willOpen);
+                });
+
+                // Close menu when clicking outside sidebar
+                document.addEventListener('click', function(e) {
+                    if (sidebar.classList.contains('is-open') && !sidebar.contains(e.target)) {
+                        setMenuOpen(false);
+                    }
+                });
+
+                // Close menu when a navigation link is clicked
+                const navLinks = sidebar.querySelectorAll('.nav-item a');
+                navLinks.forEach(function(link) {
+                    link.addEventListener('click', function() {
+                        setMenuOpen(false);
+                    });
+                });
+
+                // Close on Escape key
+                document.addEventListener('keydown', function(e) {
+                    if (e.key === 'Escape' && sidebar.classList.contains('is-open')) {
+                        setMenuOpen(false);
+                    }
+                });
+
+                // Reset menu state when resized above mobile breakpoint
+                window.addEventListener('resize', function() {
+                    if (window.innerWidth > 768 && sidebar.classList.contains('is-open')) {
+                        setMenuOpen(false);
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>

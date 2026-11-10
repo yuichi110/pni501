@@ -1,0 +1,794 @@
+<!--
+ Copyright (c) 2026 Yuichi Ito (yuichi@yuichi.com)
+
+ This software is licensed under the Apache License, Version 2.0.
+ For more information, please visit: https://github.com/yuichi110/drawlib
+
+ This software is provided "as is", without warranty of any kind,
+ express or implied, including but not limited to the warranties of
+ merchantability, fitness for a particular purpose and noninfringement.
+-->
+<!DOCTYPE html>
+<html lang="ja" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>15 アクションと 12 プリミティブ: 2層アクションパイプライン</title>
+    <script>
+        (function() {
+            const saved = localStorage.getItem('drawlib-theme');
+            if (saved === 'dark' || (!saved && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                document.documentElement.setAttribute('data-theme', 'dark');
+            } else {
+                document.documentElement.setAttribute('data-theme', 'light');
+            }
+        })();
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+    
+    
+    <link rel="alternate" hreflang="en" href="https://www.pni501.com/en/03_workflows_and_actions/actions_pipeline.html">
+    
+    <link rel="alternate" hreflang="ja" href="https://www.pni501.com/ja/03_workflows_and_actions/actions_pipeline.html">
+    
+    <link rel="alternate" hreflang="x-default" href="https://www.pni501.com/en/03_workflows_and_actions/actions_pipeline.html">
+    
+    
+    
+    <meta name="description" content="コード行数や複雑度、依存パッケージのバージョン、単体テスト通過率、CVE 件数、リファクタリングの影響範囲に対する LLM の憶測（ハルシネーション）を排除するため、pni501 は宣言的なワークフロー定義と実行メカニズムを分離しています。対応する 6…">
+    <link rel="canonical" href="https://www.pni501.com/ja/03_workflows_and_actions/actions_pipeline.html">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="pni501 ドキュメント">
+    <meta property="og:title" content="15 アクションと 12 プリミティブ: 2層アクションパイプライン — pni501 ドキュメント">
+    <meta property="og:description" content="コード行数や複雑度、依存パッケージのバージョン、単体テスト通過率、CVE 件数、リファクタリングの影響範囲に対する LLM の憶測（ハルシネーション）を排除するため、pni501 は宣言的なワークフロー定義と実行メカニズムを分離しています。対応する 6…">
+    <meta property="og:url" content="https://www.pni501.com/ja/03_workflows_and_actions/actions_pipeline.html">
+    <meta property="og:image" content="https://www.pni501.com/_assets/logo.png">
+    <meta property="og:locale" content="ja_JP">
+    <meta property="og:locale:alternate" content="en_US">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="15 アクションと 12 プリミティブ: 2層アクションパイプライン — pni501 ドキュメント">
+    <meta name="twitter:description" content="コード行数や複雑度、依存パッケージのバージョン、単体テスト通過率、CVE 件数、リファクタリングの影響範囲に対する LLM の憶測（ハルシネーション）を排除するため、pni501 は宣言的なワークフロー定義と実行メカニズムを分離しています。対応する 6…">
+    <meta name="twitter:image" content="https://www.pni501.com/_assets/logo.png">
+    
+    
+    <link rel="icon" type="image/png" href="../../_assets/favicon.png">
+    
+    
+    <link rel="stylesheet" href="../style.css">
+    
+    
+</head>
+<body>
+    
+    <div class="doc-layout">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <a href="../index.html" class="sidebar-brand" aria-label="pni501 ドキュメント">
+                    
+                    <img src="../../_assets/logo.png" alt="pni501 ドキュメント" class="sidebar-logo sidebar-logo-light">
+                    <img src="../../_assets/logo_dark.png" alt="pni501 ドキュメント" class="sidebar-logo sidebar-logo-dark">
+                    
+                </a>
+                <div class="sidebar-header-actions">
+                    <button type="button" id="theme-toggle" class="theme-toggle-btn" aria-label="Toggle theme">
+                        <svg class="icon-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+                        <svg class="icon-moon" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+                    </button>
+                    <button type="button" id="menu-toggle" class="menu-toggle-btn" aria-label="Toggle navigation" aria-expanded="false">
+                        <svg class="icon-hamburger" viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+                        <svg class="icon-close" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                    </button>
+                </div>
+            </div>
+            <div class="sidebar-menu">
+                
+                    
+                        
+                        <ul class="nav-list">
+                            
+                            <li class="nav-item ">
+                                <a href="../index.html" >概要 (Overview)</a>
+                            </li>
+                            
+                        </ul>
+                    
+                        
+                        <div class="sidebar-heading">1. はじめに (Getting Started)</div>
+                        
+                        <ul class="nav-list">
+                            
+                            <li class="nav-item ">
+                                <a href="../01_getting_started/concepts.html" >背景とコアコンセプト</a>
+                            </li>
+                            
+                            <li class="nav-item ">
+                                <a href="../01_getting_started/quickstart.html" >クイックスタートガイド</a>
+                            </li>
+                            
+                            <li class="nav-item ">
+                                <a href="../01_getting_started/use_cases.html" >3つの主要ユースケース</a>
+                            </li>
+                            
+                        </ul>
+                    
+                        
+                        <div class="sidebar-heading">2. アーキテクチャ (Architecture)</div>
+                        
+                        <ul class="nav-list">
+                            
+                            <li class="nav-item ">
+                                <a href="../02_architecture/domain_architecture.html" >ドメイン構造と3層カスケード</a>
+                            </li>
+                            
+                            <li class="nav-item ">
+                                <a href="../02_architecture/stateful_engine.html" >ステートフル Pull-Push エンジン</a>
+                            </li>
+                            
+                        </ul>
+                    
+                        
+                        <div class="sidebar-heading">3. ワークフローとアクション</div>
+                        
+                        <ul class="nav-list">
+                            
+                            <li class="nav-item ">
+                                <a href="workflows_guide.html" >ワークフローと Pre-Flight ゲート</a>
+                            </li>
+                            
+                            <li class="nav-item active">
+                                <a href="actions_pipeline.html" >15 アクションと 12 プリミティブ</a>
+                            </li>
+                            
+                            <li class="nav-item ">
+                                <a href="analyzers_and_pentest.html" >決定論的解析器とペネトレーションテスト</a>
+                            </li>
+                            
+                        </ul>
+                    
+                        
+                        <div class="sidebar-heading">4. スコアリングとレポート</div>
+                        
+                        <ul class="nav-list">
+                            
+                            <li class="nav-item ">
+                                <a href="../04_scoring_and_reports/scoring_model.html" >7軸品質スコアリングモデル</a>
+                            </li>
+                            
+                            <li class="nav-item ">
+                                <a href="../04_scoring_and_reports/drawlib_reporter.html" >Drawlib ビジュアルレポーター</a>
+                            </li>
+                            
+                        </ul>
+                    
+                        
+                        <div class="sidebar-heading">5. 対応言語とリファレンス</div>
+                        
+                        <ul class="nav-list">
+                            
+                            <li class="nav-item ">
+                                <a href="../05_languages_and_reference/supported_languages.html" >対応 6 言語マトリクス</a>
+                            </li>
+                            
+                            <li class="nav-item ">
+                                <a href="../05_languages_and_reference/rules_and_cli.html" >ルール拡張と CLI リファレンス</a>
+                            </li>
+                            
+                        </ul>
+                    
+                        
+                        <div class="sidebar-heading">外部リンク (External Links)</div>
+                        
+                        <ul class="nav-list">
+                            
+                            <li class="nav-item ">
+                                <a href="https://github.com/yuichi110/pni501" target="_blank" rel="noopener noreferrer">GitHub リポジトリ<svg class="nav-external-icon" viewBox="0 0 24 24" aria-hidden="true"><line x1="7" y1="17" x2="17" y2="7"></line><polyline points="7 7 17 7 17 17"></polyline></svg></a>
+                            </li>
+                            
+                            <li class="nav-item ">
+                                <a href="https://pypi.org/project/pni501/" target="_blank" rel="noopener noreferrer">PyPI パッケージ<svg class="nav-external-icon" viewBox="0 0 24 24" aria-hidden="true"><line x1="7" y1="17" x2="17" y2="7"></line><polyline points="7 7 17 7 17 17"></polyline></svg></a>
+                            </li>
+                            
+                        </ul>
+                    
+                
+            </div>
+        </aside>
+        <div class="content-wrapper">
+            <header class="top-bar">
+                <div class="breadcrumbs">
+                    <span class="crumb">Docs</span>
+                    <span class="crumb-separator">&raquo;</span>
+                    <span class="crumb active">15 アクションと 12 プリミティブ: 2層アクションパイプライン</span>
+                </div>
+                
+                <div class="lang-switcher">
+                    <details class="lang-dropdown">
+                        <summary class="lang-dropdown-btn" aria-label="Select language">
+                            <svg class="lang-globe-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+                            <span class="lang-current-label">日本語</span>
+                            <svg class="lang-caret-icon" viewBox="0 0 24 24" aria-hidden="true"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                        </summary>
+                        <div class="lang-dropdown-menu" role="menu">
+                            
+                            <a href="../../en/03_workflows_and_actions/actions_pipeline.html" class="lang-option" lang="en" hreflang="en" >
+                                <span>English</span>
+                                
+                            </a>
+                            
+                            <a href="actions_pipeline.html" class="lang-option active" lang="ja" hreflang="ja" aria-current="page">
+                                <span>日本語</span>
+                                
+                                <svg class="lang-check-icon" viewBox="0 0 24 24" aria-hidden="true"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                                
+                            </a>
+                            
+                        </div>
+                    </details>
+                </div>
+                
+            </header>
+            <main class="main-content">
+                <h1>15 アクションと 12 プリミティブ: 2層アクションパイプライン</h1>
+<p>コード行数や複雑度、依存パッケージのバージョン、単体テスト通過率、CVE 件数、リファクタリングの影響範囲に対する LLM の憶測（ハルシネーション）を排除するため、<code>pni501</code> は<strong>宣言的なワークフロー定義</strong>と<strong>実行メカニズム</strong>を分離しています。対応する 6 言語（<strong>Python、Java、PHP、Go、TypeScript、JavaScript</strong>）のそれぞれにおいて、ワークフローは <strong>15 個の標準複合 YAML アクション</strong>（<code>common/</code> の汎用アクション <code>12</code> 個 + <code>&lt;lang&gt;/</code> の言語別アクション <code>3</code> 個）を組み合わせ、それらを <strong>12 個の正規 <code>PrimitiveType</code> ステップ</strong>（自動実行される Python 解析器 <code>6</code> 個 + スキーマ検証・リポジトリ実在確認付き AI/ゲートプリミティブ <code>6</code> 個）へとフラットに展開します。</p>
+<figure class="drawlib-image" style="text-align: center;">
+  <img src="../../images/03_workflows_and_actions/actions_pipeline/two_tier_action_expansion.png" alt="actions_pipeline_1" />
+  <figcaption class="drawlib-caption">2層アクション展開アーキテクチャ: 言語あたり15個の複合アクションが6個の決定論的Python解析器と6個の根拠検証付きAI/ゲートプリミティブへ展開される</figcaption>
+</figure>
+<details class="drawlib-code-details">
+<summary>Source Code</summary>
+<pre><code class="language-python"><span class="kn">from</span><span class="w"> </span><span class="nn">drawlib.canvas</span><span class="w"> </span><span class="kn">import</span> <span class="n">save</span><span class="p">,</span> <span class="n">setup</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">drawlib.diagrams.architecture</span><span class="w"> </span><span class="kn">import</span> <span class="n">ArchitectureDiagram</span><span class="p">,</span> <span class="n">Node</span><span class="p">,</span> <span class="n">NodeGroup</span><span class="p">,</span> <span class="n">PhosphorIcon</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">drawlib.styles</span><span class="w"> </span><span class="kn">import</span> <span class="n">Styles</span>
+
+<span class="n">setup</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="mi">164</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">96</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">150</span><span class="p">)</span>
+
+<span class="n">diag</span> <span class="o">=</span> <span class="n">ArchitectureDiagram</span><span class="p">(</span>
+    <span class="n">node_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">PrimaryBold</span><span class="p">,</span>
+    <span class="n">node_text_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">DarkBold</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">text_size</span><span class="o">=</span><span class="mf">10.0</span><span class="p">),</span>
+    <span class="n">edge_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">DarkBold</span><span class="p">,</span>
+    <span class="n">edge_text_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">DarkBold</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">text_size</span><span class="o">=</span><span class="mf">10.0</span><span class="p">),</span>
+    <span class="n">node_card_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">WhiteBordered</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">shape_r</span><span class="o">=</span><span class="mf">1.6</span><span class="p">),</span>
+<span class="p">)</span>
+
+<span class="n">wf_node</span> <span class="o">=</span> <span class="n">diag</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+    <span class="n">Node</span><span class="p">(</span>
+        <span class="s2">"Workflow YAML</span><span class="se">\n</span><span class="s2">15 Composite Actions</span><span class="se">\n</span><span class="s2">(12 common + 3 &lt;lang&gt;)"</span><span class="p">,</span>
+        <span class="n">width</span><span class="o">=</span><span class="mf">35.0</span><span class="p">,</span>
+        <span class="n">height</span><span class="o">=</span><span class="mf">20.0</span><span class="p">,</span>
+        <span class="n">icon</span><span class="o">=</span><span class="n">PhosphorIcon</span><span class="o">.</span><span class="n">FILE_CODE</span><span class="p">,</span>
+        <span class="n">icon_size</span><span class="o">=</span><span class="mf">6.0</span><span class="p">,</span>
+    <span class="p">),</span>
+    <span class="n">xy</span><span class="o">=</span><span class="p">(</span><span class="mf">20.0</span><span class="p">,</span> <span class="mf">69.0</span><span class="p">),</span>
+<span class="p">)</span>
+
+<span class="n">mgr_node</span> <span class="o">=</span> <span class="n">diag</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+    <span class="n">Node</span><span class="p">(</span>
+        <span class="s2">"Action Manager</span><span class="se">\n</span><span class="s2">(Cascade &amp; Flatten)"</span><span class="p">,</span>
+        <span class="n">width</span><span class="o">=</span><span class="mf">35.0</span><span class="p">,</span>
+        <span class="n">height</span><span class="o">=</span><span class="mf">19.0</span><span class="p">,</span>
+        <span class="n">icon</span><span class="o">=</span><span class="n">PhosphorIcon</span><span class="o">.</span><span class="n">STACK</span><span class="p">,</span>
+        <span class="n">icon_size</span><span class="o">=</span><span class="mf">6.0</span><span class="p">,</span>
+        <span class="n">style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">WhiteBold</span><span class="p">,</span>
+        <span class="n">text_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">WhiteBold</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">text_size</span><span class="o">=</span><span class="mf">10.2</span><span class="p">),</span>
+        <span class="n">card_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">PrimaryFlat</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">shape_r</span><span class="o">=</span><span class="mf">1.6</span><span class="p">),</span>
+    <span class="p">),</span>
+    <span class="n">xy</span><span class="o">=</span><span class="p">(</span><span class="mf">20.0</span><span class="p">,</span> <span class="mf">27.0</span><span class="p">),</span>
+<span class="p">)</span>
+
+<span class="n">det_group</span> <span class="o">=</span> <span class="n">diag</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+    <span class="n">NodeGroup</span><span class="p">(</span>
+        <span class="n">title</span><span class="o">=</span><span class="s2">"6 Deterministic Auto-Executed Python Primitives"</span><span class="p">,</span>
+        <span class="n">width</span><span class="o">=</span><span class="mf">114.0</span><span class="p">,</span>
+        <span class="n">height</span><span class="o">=</span><span class="mf">43.0</span><span class="p">,</span>
+        <span class="n">style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">Neutral</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">shape_r</span><span class="o">=</span><span class="mf">2.0</span><span class="p">),</span>
+        <span class="n">text_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">PrimaryBold</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">text_size</span><span class="o">=</span><span class="mf">10.5</span><span class="p">,</span> <span class="n">halign</span><span class="o">=</span><span class="s2">"left"</span><span class="p">,</span> <span class="n">valign</span><span class="o">=</span><span class="s2">"top"</span><span class="p">),</span>
+    <span class="p">),</span>
+    <span class="n">xy</span><span class="o">=</span><span class="p">(</span><span class="mf">46.0</span><span class="p">,</span> <span class="mf">50.0</span><span class="p">),</span>
+<span class="p">)</span>
+
+<span class="n">d1</span> <span class="o">=</span> <span class="n">det_group</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+    <span class="n">Node</span><span class="p">(</span><span class="s2">"project_inspect"</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mf">24.5</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mf">13.5</span><span class="p">,</span> <span class="n">icon</span><span class="o">=</span><span class="n">PhosphorIcon</span><span class="o">.</span><span class="n">FILE_MAGNIFYING_GLASS</span><span class="p">,</span> <span class="n">icon_size</span><span class="o">=</span><span class="mf">5.2</span><span class="p">),</span>
+    <span class="n">xy</span><span class="o">=</span><span class="p">(</span><span class="mf">15.0</span><span class="p">,</span> <span class="mf">26.5</span><span class="p">),</span>
+<span class="p">)</span>
+<span class="n">d2</span> <span class="o">=</span> <span class="n">det_group</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+    <span class="n">Node</span><span class="p">(</span><span class="s2">"ast_analyze"</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mf">24.5</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mf">13.5</span><span class="p">,</span> <span class="n">icon</span><span class="o">=</span><span class="n">PhosphorIcon</span><span class="o">.</span><span class="n">TREE_STRUCTURE</span><span class="p">,</span> <span class="n">icon_size</span><span class="o">=</span><span class="mf">5.2</span><span class="p">),</span>
+    <span class="n">xy</span><span class="o">=</span><span class="p">(</span><span class="mf">43.5</span><span class="p">,</span> <span class="mf">26.5</span><span class="p">),</span>
+<span class="p">)</span>
+<span class="n">d3</span> <span class="o">=</span> <span class="n">det_group</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+    <span class="n">Node</span><span class="p">(</span><span class="s2">"run_check"</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mf">24.5</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mf">13.5</span><span class="p">,</span> <span class="n">icon</span><span class="o">=</span><span class="n">PhosphorIcon</span><span class="o">.</span><span class="n">TERMINAL_WINDOW</span><span class="p">,</span> <span class="n">icon_size</span><span class="o">=</span><span class="mf">5.2</span><span class="p">),</span>
+    <span class="n">xy</span><span class="o">=</span><span class="p">(</span><span class="mf">72.0</span><span class="p">,</span> <span class="mf">26.5</span><span class="p">),</span>
+<span class="p">)</span>
+<span class="n">d4</span> <span class="o">=</span> <span class="n">det_group</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+    <span class="n">Node</span><span class="p">(</span><span class="s2">"security_scan"</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mf">24.5</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mf">13.5</span><span class="p">,</span> <span class="n">icon</span><span class="o">=</span><span class="n">PhosphorIcon</span><span class="o">.</span><span class="n">SHIELD_WARNING</span><span class="p">,</span> <span class="n">icon_size</span><span class="o">=</span><span class="mf">5.2</span><span class="p">),</span>
+    <span class="n">xy</span><span class="o">=</span><span class="p">(</span><span class="mf">15.0</span><span class="p">,</span> <span class="mf">10.0</span><span class="p">),</span>
+<span class="p">)</span>
+<span class="n">d5</span> <span class="o">=</span> <span class="n">det_group</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+    <span class="n">Node</span><span class="p">(</span><span class="s2">"web_pentest"</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mf">24.5</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mf">13.5</span><span class="p">,</span> <span class="n">icon</span><span class="o">=</span><span class="n">PhosphorIcon</span><span class="o">.</span><span class="n">BUG</span><span class="p">,</span> <span class="n">icon_size</span><span class="o">=</span><span class="mf">5.2</span><span class="p">),</span>
+    <span class="n">xy</span><span class="o">=</span><span class="p">(</span><span class="mf">43.5</span><span class="p">,</span> <span class="mf">10.0</span><span class="p">),</span>
+<span class="p">)</span>
+<span class="n">d6</span> <span class="o">=</span> <span class="n">det_group</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+    <span class="n">Node</span><span class="p">(</span><span class="s2">"migration_analyze"</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mf">24.5</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mf">13.5</span><span class="p">,</span> <span class="n">icon</span><span class="o">=</span><span class="n">PhosphorIcon</span><span class="o">.</span><span class="n">GIT_DIFF</span><span class="p">,</span> <span class="n">icon_size</span><span class="o">=</span><span class="mf">5.2</span><span class="p">),</span>
+    <span class="n">xy</span><span class="o">=</span><span class="p">(</span><span class="mf">72.0</span><span class="p">,</span> <span class="mf">10.0</span><span class="p">),</span>
+<span class="p">)</span>
+<span class="n">facts_node</span> <span class="o">=</span> <span class="n">det_group</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+    <span class="n">Node</span><span class="p">(</span>
+        <span class="s2">".pni/cache/&lt;wf&gt;/</span><span class="se">\n</span><span class="s2">facts.json"</span><span class="p">,</span>
+        <span class="n">width</span><span class="o">=</span><span class="mf">22.5</span><span class="p">,</span>
+        <span class="n">height</span><span class="o">=</span><span class="mf">29.0</span><span class="p">,</span>
+        <span class="n">icon</span><span class="o">=</span><span class="n">PhosphorIcon</span><span class="o">.</span><span class="n">DATABASE</span><span class="p">,</span>
+        <span class="n">icon_size</span><span class="o">=</span><span class="mf">5.8</span><span class="p">,</span>
+        <span class="n">style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">SecondaryBold</span><span class="p">,</span>
+        <span class="n">card_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">SecondaryNeutral</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">shape_r</span><span class="o">=</span><span class="mf">1.6</span><span class="p">),</span>
+    <span class="p">),</span>
+    <span class="n">xy</span><span class="o">=</span><span class="p">(</span><span class="mf">100.0</span><span class="p">,</span> <span class="mf">18.2</span><span class="p">),</span>
+<span class="p">)</span>
+
+<span class="n">ai_group</span> <span class="o">=</span> <span class="n">diag</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+    <span class="n">NodeGroup</span><span class="p">(</span>
+        <span class="n">title</span><span class="o">=</span><span class="s2">"6 Schema-Guided &amp; Grounded AI / Gate Primitives"</span><span class="p">,</span>
+        <span class="n">width</span><span class="o">=</span><span class="mf">114.0</span><span class="p">,</span>
+        <span class="n">height</span><span class="o">=</span><span class="mf">43.0</span><span class="p">,</span>
+        <span class="n">style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">Neutral</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">shape_r</span><span class="o">=</span><span class="mf">2.0</span><span class="p">),</span>
+        <span class="n">text_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">SecondaryBold</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">text_size</span><span class="o">=</span><span class="mf">10.5</span><span class="p">,</span> <span class="n">halign</span><span class="o">=</span><span class="s2">"left"</span><span class="p">,</span> <span class="n">valign</span><span class="o">=</span><span class="s2">"top"</span><span class="p">),</span>
+    <span class="p">),</span>
+    <span class="n">xy</span><span class="o">=</span><span class="p">(</span><span class="mf">46.0</span><span class="p">,</span> <span class="mf">3.0</span><span class="p">),</span>
+<span class="p">)</span>
+
+<span class="n">a1</span> <span class="o">=</span> <span class="n">ai_group</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+    <span class="n">Node</span><span class="p">(</span><span class="s2">"load_rules"</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mf">33.0</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mf">13.5</span><span class="p">,</span> <span class="n">icon</span><span class="o">=</span><span class="n">PhosphorIcon</span><span class="o">.</span><span class="n">BOOK_OPEN_TEXT</span><span class="p">,</span> <span class="n">icon_size</span><span class="o">=</span><span class="mf">5.2</span><span class="p">),</span>
+    <span class="n">xy</span><span class="o">=</span><span class="p">(</span><span class="mf">20.0</span><span class="p">,</span> <span class="mf">26.5</span><span class="p">),</span>
+<span class="p">)</span>
+<span class="n">a2</span> <span class="o">=</span> <span class="n">ai_group</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+    <span class="n">Node</span><span class="p">(</span><span class="s2">"record_architecture"</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mf">33.0</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mf">13.5</span><span class="p">,</span> <span class="n">icon</span><span class="o">=</span><span class="n">PhosphorIcon</span><span class="o">.</span><span class="n">BLUEPRINT</span><span class="p">,</span> <span class="n">icon_size</span><span class="o">=</span><span class="mf">5.2</span><span class="p">),</span>
+    <span class="n">xy</span><span class="o">=</span><span class="p">(</span><span class="mf">57.0</span><span class="p">,</span> <span class="mf">26.5</span><span class="p">),</span>
+<span class="p">)</span>
+<span class="n">a3</span> <span class="o">=</span> <span class="n">ai_group</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+    <span class="n">Node</span><span class="p">(</span><span class="s2">"ai_interpret"</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mf">33.0</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mf">13.5</span><span class="p">,</span> <span class="n">icon</span><span class="o">=</span><span class="n">PhosphorIcon</span><span class="o">.</span><span class="n">BRAIN</span><span class="p">,</span> <span class="n">icon_size</span><span class="o">=</span><span class="mf">5.2</span><span class="p">),</span>
+    <span class="n">xy</span><span class="o">=</span><span class="p">(</span><span class="mf">94.0</span><span class="p">,</span> <span class="mf">26.5</span><span class="p">),</span>
+<span class="p">)</span>
+<span class="n">a4</span> <span class="o">=</span> <span class="n">ai_group</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+    <span class="n">Node</span><span class="p">(</span>
+        <span class="s2">"emit_score"</span><span class="p">,</span>
+        <span class="n">width</span><span class="o">=</span><span class="mf">33.0</span><span class="p">,</span>
+        <span class="n">height</span><span class="o">=</span><span class="mf">13.5</span><span class="p">,</span>
+        <span class="n">icon</span><span class="o">=</span><span class="n">PhosphorIcon</span><span class="o">.</span><span class="n">MEDAL</span><span class="p">,</span>
+        <span class="n">icon_size</span><span class="o">=</span><span class="mf">5.2</span><span class="p">,</span>
+        <span class="n">style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">PrimaryBold</span><span class="p">,</span>
+        <span class="n">card_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">PrimaryNeutral</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">shape_r</span><span class="o">=</span><span class="mf">1.6</span><span class="p">),</span>
+    <span class="p">),</span>
+    <span class="n">xy</span><span class="o">=</span><span class="p">(</span><span class="mf">20.0</span><span class="p">,</span> <span class="mf">10.0</span><span class="p">),</span>
+<span class="p">)</span>
+<span class="n">a5</span> <span class="o">=</span> <span class="n">ai_group</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+    <span class="n">Node</span><span class="p">(</span>
+        <span class="s2">"emit_migration_plan"</span><span class="p">,</span>
+        <span class="n">width</span><span class="o">=</span><span class="mf">33.0</span><span class="p">,</span>
+        <span class="n">height</span><span class="o">=</span><span class="mf">13.5</span><span class="p">,</span>
+        <span class="n">icon</span><span class="o">=</span><span class="n">PhosphorIcon</span><span class="o">.</span><span class="n">PATH</span><span class="p">,</span>
+        <span class="n">icon_size</span><span class="o">=</span><span class="mf">5.2</span><span class="p">,</span>
+        <span class="n">style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">PrimaryBold</span><span class="p">,</span>
+        <span class="n">card_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">PrimaryNeutral</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">shape_r</span><span class="o">=</span><span class="mf">1.6</span><span class="p">),</span>
+    <span class="p">),</span>
+    <span class="n">xy</span><span class="o">=</span><span class="p">(</span><span class="mf">57.0</span><span class="p">,</span> <span class="mf">10.0</span><span class="p">),</span>
+<span class="p">)</span>
+<span class="n">a6</span> <span class="o">=</span> <span class="n">ai_group</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+    <span class="n">Node</span><span class="p">(</span>
+        <span class="s2">"write_drawlib_report"</span><span class="p">,</span>
+        <span class="n">width</span><span class="o">=</span><span class="mf">33.0</span><span class="p">,</span>
+        <span class="n">height</span><span class="o">=</span><span class="mf">13.5</span><span class="p">,</span>
+        <span class="n">icon</span><span class="o">=</span><span class="n">PhosphorIcon</span><span class="o">.</span><span class="n">CHART_POLAR</span><span class="p">,</span>
+        <span class="n">icon_size</span><span class="o">=</span><span class="mf">5.2</span><span class="p">,</span>
+        <span class="n">style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">SuccessBold</span><span class="p">,</span>
+        <span class="n">card_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">SuccessNeutral</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">shape_r</span><span class="o">=</span><span class="mf">1.6</span><span class="p">),</span>
+    <span class="p">),</span>
+    <span class="n">xy</span><span class="o">=</span><span class="p">(</span><span class="mf">94.0</span><span class="p">,</span> <span class="mf">10.0</span><span class="p">),</span>
+<span class="p">)</span>
+
+<span class="n">diag</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">wf_node</span><span class="p">,</span> <span class="n">mgr_node</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">"normalize"</span><span class="p">,</span> <span class="n">routing</span><span class="o">=</span><span class="s2">"orthogonal"</span><span class="p">)</span>
+<span class="n">mgr_node</span><span class="o">.</span><span class="n">fork</span><span class="p">([</span><span class="n">det_group</span><span class="p">,</span> <span class="n">ai_group</span><span class="p">],</span> <span class="n">at_x</span><span class="o">=</span><span class="mf">41.5</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">PrimaryBold</span><span class="p">)</span>
+<span class="n">diag</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">d3</span><span class="p">,</span> <span class="n">facts_node</span><span class="p">,</span> <span class="n">routing</span><span class="o">=</span><span class="s2">"orthogonal"</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">SecondaryBold</span><span class="p">)</span>
+<span class="n">diag</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">d6</span><span class="p">,</span> <span class="n">facts_node</span><span class="p">,</span> <span class="n">routing</span><span class="o">=</span><span class="s2">"orthogonal"</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">SecondaryBold</span><span class="p">)</span>
+
+<span class="n">diag</span><span class="o">.</span><span class="n">draw</span><span class="p">(</span><span class="n">xy</span><span class="o">=</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">))</span>
+<span class="n">save</span><span class="p">()</span>
+</code></pre>
+</details>
+<hr />
+<h2>1. 2層アクション展開 (<code>15</code> 複合アクション -&gt; <code>12</code> プリミティブ)</h2>
+<p><code>.pni/workflows/*.yaml</code>（<code>WorkflowDefinition</code>）の記述が簡潔に保たれるのは、<code>src/pni/_actions/base_model.py</code> が再利用可能なドメイン監査バンドルと低レベルの実行ステップを分離しているためです。</p>
+<ol>
+<li><strong>Tier 1 — 複合アクション (<code>CompositeActionDefinition</code>)</strong>: <code>uses: &lt;action_id&gt;</code> で呼び出されるドメイン特化型の YAML 仕様です。デフォルトのエンジニアリング <code>rules</code>、順序付けられた <code>CompositePrimitiveSpec</code> リスト、デフォルトの <code>with</code> パラメータ、およびドメイン固有のプロンプト指示をバンドルします。</li>
+<li><strong>Tier 2 — 正規プリミティブ (<code>PrimitiveStep</code> &amp; <code>PrimitiveType</code>)</strong>: 複合 YAML の内部、またはワークフローステップの <code>action: &lt;primitive_type&gt;</code> で直接参照される <code>12</code> 個のコア実行プリミティブです。ステートフル実行と単発の <code>run-action</code> はすべて、フラットに展開された <code>PrimitiveStep</code> インスタンス上で動作します。</li>
+</ol>
+<h3>1.1 言語あたり 15 個の標準複合アクション一覧 (<code>01</code> 〜 <code>15</code>)</h3>
+<p>対象言語（<code>python</code>, <code>java</code>, <code>php</code>, <code>go</code>, <code>typescript</code>, <code>javascript</code>）ごとに、<code>src/pni/_actions/</code> は <strong>15 個の標準複合 YAML アクション</strong>（<code>common/</code> の汎用アクション <code>12</code> 個 + <code>&lt;lang&gt;/</code> の言語固有アクション <code>3</code> 個）を提供します。</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:center">ステージ</th>
+<th style="text-align:left">複合 <code>uses:</code> ID</th>
+<th style="text-align:left">スコープ</th>
+<th style="text-align:left">展開される <code>PrimitiveType</code> シーケンス</th>
+<th style="text-align:left">デフォルト適用ルールと役割</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center"><strong><code>01</code></strong></td>
+<td style="text-align:left"><strong><code>repo_structure_audit</code></strong><br><em>(01_project_inspect)</em></td>
+<td style="text-align:left"><code>&lt;lang&gt;/</code></td>
+<td style="text-align:left"><code>project_inspect</code> -&gt; <code>ai_interpret</code></td>
+<td style="text-align:left"><code>&lt;lang&gt;/dependencies</code>, <code>common/supply_chain</code>, <code>common/documentation</code>, <code>common/git_hygiene</code>, <code>common/security</code></td>
+</tr>
+<tr>
+<td style="text-align:center"><strong><code>02</code></strong></td>
+<td style="text-align:left"><strong><code>architecture_analysis</code></strong><br><em>(02_architecture)</em></td>
+<td style="text-align:left"><code>common/</code></td>
+<td style="text-align:left"><code>record_architecture</code> (<code>×3</code>: <code>purpose_and_stack</code>, <code>layers_and_modules</code>, <code>flows_and_state</code>)</td>
+<td style="text-align:left"><code>common/architecture</code> — 実在パス検証付きの 3 側面システム理解を <code>architecture.json</code> に保存</td>
+</tr>
+<tr>
+<td style="text-align:center"><strong><code>03</code></strong></td>
+<td style="text-align:left"><strong><code>&lt;lang&gt;_ast_audit</code></strong><br><em>(03_ast_quality)</em></td>
+<td style="text-align:left"><code>&lt;lang&gt;/</code></td>
+<td style="text-align:left"><code>ast_analyze</code> -&gt; <code>ai_interpret</code></td>
+<td style="text-align:left"><code>&lt;lang&gt;/code_quality</code>, <code>&lt;lang&gt;/typing</code>, <code>&lt;lang&gt;/modernization</code> および検出フレームワークルール</td>
+</tr>
+<tr>
+<td style="text-align:center"><strong><code>04</code></strong></td>
+<td style="text-align:left"><strong><code>&lt;lang&gt;_test_audit</code></strong><br><em>(04_test_suite)</em></td>
+<td style="text-align:left"><code>&lt;lang&gt;/</code></td>
+<td style="text-align:left"><code>ai_interpret</code> (<code>AstFacts</code> を参照)</td>
+<td style="text-align:left"><code>&lt;lang&gt;/testing</code> — テスト分離、ミラーディレクトリ構成、アサーション密度を評価</td>
+</tr>
+<tr>
+<td style="text-align:center"><strong><code>05</code></strong></td>
+<td style="text-align:left"><strong><code>supply_chain_audit</code></strong><br><em>(05_supply_chain)</em></td>
+<td style="text-align:left"><code>common/</code></td>
+<td style="text-align:left"><code>ai_interpret</code> (<code>ProjectFacts</code> を参照)</td>
+<td style="text-align:left"><code>common/supply_chain</code>, <code>common/git_hygiene</code>, <code>common/security</code> — OpenSSF &amp; CI/CD ガバナンス監査</td>
+</tr>
+<tr>
+<td style="text-align:center"><strong><code>06</code></strong></td>
+<td style="text-align:left"><strong><code>library_hygiene_audit</code></strong><br><em>(06_library_hygiene)</em></td>
+<td style="text-align:left"><code>common/</code></td>
+<td style="text-align:left"><code>ai_interpret</code></td>
+<td style="text-align:left"><code>common/library_hygiene</code>, <code>common/documentation</code> — SemVer 公開 API 境界と最小依存関係の評価</td>
+</tr>
+<tr>
+<td style="text-align:center"><strong><code>07</code></strong></td>
+<td style="text-align:left"><strong><code>cli_guidelines_audit</code></strong><br><em>(07_cli_guidelines)</em></td>
+<td style="text-align:left"><code>common/</code></td>
+<td style="text-align:left"><code>ai_interpret</code></td>
+<td style="text-align:left"><code>common/cli_guidelines</code>, <code>common/error_handling</code> — Clig.dev 操作性、<code>--help</code>、終了コード規約</td>
+</tr>
+<tr>
+<td style="text-align:center"><strong><code>08</code></strong></td>
+<td style="text-align:left"><strong><code>service_readiness_audit</code></strong><br><em>(08_service_readiness)</em></td>
+<td style="text-align:left"><code>common/</code></td>
+<td style="text-align:left"><code>ai_interpret</code></td>
+<td style="text-align:left"><code>common/twelve_factor</code>, <code>common/production_readiness</code>, <code>common/observability</code>, <code>common/resilience</code></td>
+</tr>
+<tr>
+<td style="text-align:center"><strong><code>09</code></strong></td>
+<td style="text-align:left"><strong><code>container_runtime_audit</code></strong><br><em>(09_runtime_check)</em></td>
+<td style="text-align:left"><code>common/</code></td>
+<td style="text-align:left"><code>run_check</code> -&gt; <code>ai_interpret</code></td>
+<td style="text-align:left"><code>common/container_hygiene</code>, <code>common/production_readiness</code> — <code>--network=none</code> テスト実行と起動プローブ</td>
+</tr>
+<tr>
+<td style="text-align:center"><strong><code>10</code></strong></td>
+<td style="text-align:left"><strong><code>security_vulnerability_audit</code></strong><br><em>(10_security_scan)</em></td>
+<td style="text-align:left"><code>common/</code></td>
+<td style="text-align:left"><code>security_scan</code> -&gt; <code>ai_interpret</code></td>
+<td style="text-align:left"><code>common/security</code>, <code>common/supply_chain</code>, <code>common/container_hygiene</code> — ソケットレス Trivy FS + イメージ tar スキャン</td>
+</tr>
+<tr>
+<td style="text-align:center"><strong><code>11</code></strong></td>
+<td style="text-align:left"><strong><code>web_penetration_audit</code></strong><br><em>(11_web_pentest)</em></td>
+<td style="text-align:left"><code>common/</code></td>
+<td style="text-align:left"><code>web_pentest</code> -&gt; <code>ai_interpret</code></td>
+<td style="text-align:left"><code>common/security</code>, <code>common/resilience</code> — ループバックコンテナ起動 + ライブ <code>httpx</code> セキュリティプローブ</td>
+</tr>
+<tr>
+<td style="text-align:center"><strong><code>12</code></strong></td>
+<td style="text-align:left"><strong><code>emit_score</code></strong><br><em>(12_emit_score)</em></td>
+<td style="text-align:left"><code>common/</code></td>
+<td style="text-align:left"><code>emit_score</code></td>
+<td style="text-align:left">指摘統合、ホットスポット算出、ルール準拠スタンプを行い <code>reports/&lt;target&gt;_score.json</code> を出力</td>
+</tr>
+<tr>
+<td style="text-align:center"><strong><code>13</code></strong></td>
+<td style="text-align:left"><strong><code>write_drawlib_report</code></strong><br><em>(13_audit_report)</em></td>
+<td style="text-align:left"><code>common/</code></td>
+<td style="text-align:left"><code>write_drawlib_report</code> (<code>report_kind: audit</code>)</td>
+<td style="text-align:left"><code>common/reporting</code> — <code>blueprint.json</code> を生成し、7章構成 A4 PDF 監査レポートを検証</td>
+</tr>
+<tr>
+<td style="text-align:center"><strong><code>14</code></strong></td>
+<td style="text-align:left"><strong><code>migration_proposal</code></strong><br><em>(14_migration_plan)</em></td>
+<td style="text-align:left"><code>common/</code></td>
+<td style="text-align:left"><code>migration_analyze</code> -&gt; <code>ai_interpret</code> -&gt; <code>emit_migration_plan</code></td>
+<td style="text-align:left"><code>common/migration_planning</code>, <code>common/architecture</code> — Wave 1..4、Tarjan SCC 切断、<code>*_migration_plan.json</code> 出力</td>
+</tr>
+<tr>
+<td style="text-align:center"><strong><code>15</code></strong></td>
+<td style="text-align:left"><strong><code>write_migration_report</code></strong><br><em>(15_migration_report)</em></td>
+<td style="text-align:left"><code>common/</code></td>
+<td style="text-align:left"><code>write_drawlib_report</code> (<code>report_kind: migration</code>)</td>
+<td style="text-align:left"><code>common/reporting</code>, <code>common/migration_planning</code> — 7章構成マイグレーション A4 PDF レポートをコンパイル</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p><strong>進捗トラッキング拡張 (<code>category: progress</code>)</strong>: 上記 15 個の標準監査・マイグレーションアクションに加え、<code>common/</code> にはベースライン監査およびマイグレーション計画に対する複数スプリントの改修進捗（Delta）を測定する <code>progress_assessment</code>（<code>progress_analyze</code> -&gt; <code>ai_interpret</code> -&gt; <code>emit_progress</code>）および <code>write_progress_report</code>（<code>report_kind: progress</code>）も用意されています。</p>
+</blockquote>
+<h3>1.2 3層カスケードとパラメータ統合 (<code>_actions/manager.py</code>)</h3>
+<p><code>normalize_workflow_steps()</code> がワークフローを展開する際、<code>expand_composite_action()</code> は <code>local (.pni/actions/) &gt; &lt;active_lang&gt;/ &gt; common/</code> の優先順で <code>uses:</code> を解決し、3 つの設定レイヤーをマージします。</p>
+<ul>
+<li><strong>パラメータ (<code>params</code>)</strong>: ワークフローレベルのターゲット/出力パス（<code>workflow_id</code>, <code>target_root</code>, <code>source_targets</code>, <code>test_targets</code>, <code>doc_targets</code>, <code>facts_path</code>, <code>score_path</code>, <code>output_dir</code>）がワークフローステップの <code>with:</code> ブロックと統合され、プリミティブ側のデフォルト <code>with:</code>（<code>{**prim.with_params, **override_params}</code>）を上書きします。</li>
+<li><strong>ルール (<code>rules</code>)</strong>: 複合アクションのルール、ワークフローステップの追加 <code>rules:</code>、およびプリミティブ固有のルールが宣言順に連結・重複排除（<code>dict.fromkeys</code>）されます。</li>
+<li><strong>由来追跡 ID (<code>Provenance IDs</code>)</strong>: ワークフローステップの <code>prompt:</code> 上書きはベースプロンプトの末尾に追記され、SQLite が連番の <code>act-01</code>, <code>act-02</code> を割り当てる前に <code>source_action=comp.id</code> を持つ複合ステップ ID（<code>{step_id}__{idx}_{prim.type.value}</code>）を生成します。</li>
+</ul>
+<pre><code class="language-yaml"><span class="nt">id</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">web_penetration_audit</span>
+<span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Live Web Application Penetration Testing Audit</span>
+<span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Starts the target web service in an isolated loopback container and executes Python + httpx security probes.</span>
+<span class="nt">rules</span><span class="p">:</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">common/security</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">common/resilience</span>
+<span class="nt">primitives</span><span class="p">:</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">web_pentest</span>
+<span class="w">    </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Execute Live Web Penetration Test Suite</span>
+<span class="w">    </span><span class="nt">with</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">pentest_timeout_sec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">180</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ai_interpret</span>
+<span class="w">    </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Evaluate Live Penetration Test Findings &amp; Attack Surface</span>
+<span class="w">    </span><span class="nt">prompt</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">|</span>
+<span class="w">      </span><span class="no">Review PentestFacts (discovered endpoints, failed security probes, CWE tags, and HTTP evidence).</span>
+<span class="w">      </span><span class="no">Cross-reference with AST dangerous_sinks and api_endpoints to prioritize P0-P2 remediations.</span>
+</code></pre>
+<hr />
+<h2>2. 12 個の正規プリミティブ完全カタログ</h2>
+<p><code>src/pni/_actions/ai_actions.py</code> および <code>src/pni/_workflows/engine.py</code> において、すべての <code>get-action</code> プロンプトは <code>get_expected_input_schema_json()</code> を注入し、すべての <code>push-action</code> 呼び出しは <strong>Pydantic v2 スキーマ構造</strong>と<strong>リポジトリパスの実在性</strong>（<code>_verify_grounded_paths()</code> により、ディスク上および <code>AstFacts.module_inventory</code> に存在しないファイル/モジュールパスを拒否）の両方を検証します。</p>
+<figure class="drawlib-image" style="text-align: center;">
+  <img src="../../images/03_workflows_and_actions/actions_pipeline/primitive_catalog_table.png" alt="actions_pipeline_2" />
+  <figcaption class="drawlib-caption">12個の正規 PrimitiveType アクション完全カタログ: 実行モード、Push 検証スキーマ、および実在検証と副作用</figcaption>
+</figure>
+<details class="drawlib-code-details">
+<summary>Source Code</summary>
+<pre><code class="language-python"><span class="kn">from</span><span class="w"> </span><span class="nn">drawlib.canvas</span><span class="w"> </span><span class="kn">import</span> <span class="n">save</span><span class="p">,</span> <span class="n">setup</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">drawlib.smartarts</span><span class="w"> </span><span class="kn">import</span> <span class="n">Table</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">drawlib.styles</span><span class="w"> </span><span class="kn">import</span> <span class="n">Styles</span>
+
+<span class="n">setup</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="mi">162</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">118</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">150</span><span class="p">)</span>
+
+<span class="n">headers_and_rows</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">[</span><span class="s2">"Primitive"</span><span class="p">,</span> <span class="s2">"Mode"</span><span class="p">,</span> <span class="s2">"Validated Push Schema"</span><span class="p">,</span> <span class="s2">"Grounding &amp; Side Effects"</span><span class="p">],</span>
+    <span class="p">[</span>
+        <span class="s2">"project_inspect"</span><span class="p">,</span>
+        <span class="s2">"Deterministic"</span><span class="p">,</span>
+        <span class="s2">"DeterministicAckInput"</span><span class="p">,</span>
+        <span class="s2">"Parses manifests, lockfiles &amp; governance</span><span class="se">\n</span><span class="s2">-&gt; .pni/cache/&lt;wf&gt;/facts.json"</span><span class="p">,</span>
+    <span class="p">],</span>
+    <span class="p">[</span>
+        <span class="s2">"ast_analyze"</span><span class="p">,</span>
+        <span class="s2">"Deterministic"</span><span class="p">,</span>
+        <span class="s2">"DeterministicAckInput"</span><span class="p">,</span>
+        <span class="s2">"Runs 9 Tree-sitter AST checkers (6 langs)</span><span class="se">\n</span><span class="s2">-&gt; .pni/cache/&lt;wf&gt;/facts.json"</span><span class="p">,</span>
+    <span class="p">],</span>
+    <span class="p">[</span>
+        <span class="s2">"run_check"</span><span class="p">,</span>
+        <span class="s2">"Deterministic"</span><span class="p">,</span>
+        <span class="s2">"DeterministicAckInput"</span><span class="p">,</span>
+        <span class="s2">"Materializes .pni/dockerfiles/, runs</span><span class="se">\n</span><span class="s2">--network=none unit tests &amp; coverage"</span><span class="p">,</span>
+    <span class="p">],</span>
+    <span class="p">[</span>
+        <span class="s2">"security_scan"</span><span class="p">,</span>
+        <span class="s2">"Deterministic"</span><span class="p">,</span>
+        <span class="s2">"DeterministicAckInput"</span><span class="p">,</span>
+        <span class="s2">"Runs socketless Trivy FS + image tar scan</span><span class="se">\n</span><span class="s2">-&gt; security_facts.json &amp; facts.json"</span><span class="p">,</span>
+    <span class="p">],</span>
+    <span class="p">[</span>
+        <span class="s2">"web_pentest"</span><span class="p">,</span>
+        <span class="s2">"Deterministic"</span><span class="p">,</span>
+        <span class="s2">"DeterministicAckInput"</span><span class="p">,</span>
+        <span class="s2">"Boots 127.0.0.1 loopback container &amp; runs</span><span class="se">\n</span><span class="s2">.pni/pentests/&lt;target&gt;/ httpx probes"</span><span class="p">,</span>
+    <span class="p">],</span>
+    <span class="p">[</span>
+        <span class="s2">"migration_analyze"</span><span class="p">,</span>
+        <span class="s2">"Deterministic"</span><span class="p">,</span>
+        <span class="s2">"DeterministicAckInput"</span><span class="p">,</span>
+        <span class="s2">"Computes Waves 1..4, Tarjan SCC cuts,</span><span class="se">\n</span><span class="s2">contracts &amp; DEC-XX -&gt; migration_facts.json"</span><span class="p">,</span>
+    <span class="p">],</span>
+    <span class="p">[</span>
+        <span class="s2">"load_rules"</span><span class="p">,</span>
+        <span class="s2">"AI / Gate"</span><span class="p">,</span>
+        <span class="s2">"DeterministicAckInput"</span><span class="p">,</span>
+        <span class="s2">"Resolves &amp; injects cascaded Markdown</span><span class="se">\n</span><span class="s2">engineering rules into prompt context"</span><span class="p">,</span>
+    <span class="p">],</span>
+    <span class="p">[</span>
+        <span class="s2">"record_architecture"</span><span class="p">,</span>
+        <span class="s2">"AI / Grounded"</span><span class="p">,</span>
+        <span class="s2">"SystemProfile | StructureMap |</span><span class="se">\n</span><span class="s2">ExecutionFlowMap"</span><span class="p">,</span>
+        <span class="s2">"Verifies paths against module_inventory</span><span class="se">\n</span><span class="s2">-&gt; .pni/cache/&lt;wf&gt;/architecture.json"</span><span class="p">,</span>
+    <span class="p">],</span>
+    <span class="p">[</span>
+        <span class="s2">"ai_interpret"</span><span class="p">,</span>
+        <span class="s2">"AI / Grounded"</span><span class="p">,</span>
+        <span class="s2">"InterpretationInput"</span><span class="p">,</span>
+        <span class="s2">"Grounds findings/action_items &amp; runs</span><span class="se">\n</span><span class="s2">normalize_step_rule_checks() per rule"</span><span class="p">,</span>
+    <span class="p">],</span>
+    <span class="p">[</span>
+        <span class="s2">"emit_score"</span><span class="p">,</span>
+        <span class="s2">"AI + Aggregator"</span><span class="p">,</span>
+        <span class="s2">"ScoreResult"</span><span class="p">,</span>
+        <span class="s2">"Runs aggregator.py digest + metric stamp</span><span class="se">\n</span><span class="s2">-&gt; reports/&lt;target&gt;_score.json"</span><span class="p">,</span>
+    <span class="p">],</span>
+    <span class="p">[</span>
+        <span class="s2">"emit_migration_plan"</span><span class="p">,</span>
+        <span class="s2">"AI + Grounded"</span><span class="p">,</span>
+        <span class="s2">"MigrationPlanResult"</span><span class="p">,</span>
+        <span class="s2">"Grounds As-Is paths + attaches MigrationFacts</span><span class="se">\n</span><span class="s2">-&gt; reports/&lt;target&gt;_migration_plan.json"</span><span class="p">,</span>
+    <span class="p">],</span>
+    <span class="p">[</span>
+        <span class="s2">"write_drawlib_report"</span><span class="p">,</span>
+        <span class="s2">"AI + Compiler"</span><span class="p">,</span>
+        <span class="s2">"ReportCompletionInput"</span><span class="p">,</span>
+        <span class="s2">"Emits blueprint.json &amp; verifies non-empty</span><span class="se">\n</span><span class="s2">compiled PDF deliverable on disk"</span><span class="p">,</span>
+    <span class="p">],</span>
+<span class="p">]</span>
+
+<span class="n">tbl</span> <span class="o">=</span> <span class="n">Table</span><span class="p">(</span>
+    <span class="n">cell_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">White</span><span class="p">,</span>
+    <span class="n">text_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">Dark</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">text_size</span><span class="o">=</span><span class="mf">10.0</span><span class="p">),</span>
+    <span class="n">header_cell_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">PrimaryFlat</span><span class="p">,</span>
+    <span class="n">header_text_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">WhiteBold</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">text_size</span><span class="o">=</span><span class="mf">10.5</span><span class="p">),</span>
+    <span class="n">border_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">MutedThin</span><span class="p">,</span>
+    <span class="n">has_header</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="n">tbl</span><span class="o">.</span><span class="n">set_style_cell_evenodd</span><span class="p">(</span>
+    <span class="n">even_color</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">Neutral</span><span class="o">.</span><span class="n">shape_fill_color</span><span class="p">,</span>
+    <span class="n">even_text_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">Dark</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">text_size</span><span class="o">=</span><span class="mf">10.0</span><span class="p">),</span>
+    <span class="n">odd_color</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">White</span><span class="o">.</span><span class="n">shape_fill_color</span><span class="p">,</span>
+    <span class="n">odd_text_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">Dark</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">text_size</span><span class="o">=</span><span class="mf">10.0</span><span class="p">),</span>
+<span class="p">)</span>
+<span class="n">tbl</span><span class="o">.</span><span class="n">set_style_cell</span><span class="p">(</span>
+    <span class="n">background_color</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">PrimaryFlat</span><span class="o">.</span><span class="n">shape_fill_color</span><span class="p">,</span>
+    <span class="n">text_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">WhiteBold</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">text_size</span><span class="o">=</span><span class="mf">10.5</span><span class="p">),</span>
+    <span class="n">rows</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+<span class="p">)</span>
+<span class="n">tbl</span><span class="o">.</span><span class="n">set_style_cell</span><span class="p">(</span>
+    <span class="n">background_color</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">SecondaryNeutral</span><span class="o">.</span><span class="n">shape_fill_color</span><span class="p">,</span>
+    <span class="n">text_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">SecondaryBold</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">text_size</span><span class="o">=</span><span class="mf">10.0</span><span class="p">),</span>
+    <span class="n">rows</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">],</span>
+    <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+<span class="p">)</span>
+<span class="n">tbl</span><span class="o">.</span><span class="n">set_style_cell</span><span class="p">(</span>
+    <span class="n">background_color</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">PrimaryNeutral</span><span class="o">.</span><span class="n">shape_fill_color</span><span class="p">,</span>
+    <span class="n">text_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">PrimaryBold</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">text_size</span><span class="o">=</span><span class="mf">10.0</span><span class="p">),</span>
+    <span class="n">rows</span><span class="o">=</span><span class="p">[</span><span class="mi">7</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">9</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">11</span><span class="p">,</span> <span class="mi">12</span><span class="p">],</span>
+    <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+<span class="p">)</span>
+
+<span class="n">col_widths</span> <span class="o">=</span> <span class="p">[</span><span class="mf">31.0</span><span class="p">,</span> <span class="mf">23.0</span><span class="p">,</span> <span class="mf">39.0</span><span class="p">,</span> <span class="mf">63.0</span><span class="p">]</span>
+<span class="n">row_heights</span> <span class="o">=</span> <span class="p">[</span><span class="mf">8.2</span><span class="p">]</span> <span class="o">+</span> <span class="p">[</span><span class="mf">8.6</span><span class="p">]</span> <span class="o">*</span> <span class="mi">12</span>
+
+<span class="n">tbl</span><span class="o">.</span><span class="n">draw_flexible</span><span class="p">(</span>
+    <span class="n">xy</span><span class="o">=</span><span class="p">(</span><span class="mf">3.0</span><span class="p">,</span> <span class="mf">114.5</span><span class="p">),</span>
+    <span class="n">column_widths</span><span class="o">=</span><span class="n">col_widths</span><span class="p">,</span>
+    <span class="n">row_heights</span><span class="o">=</span><span class="n">row_heights</span><span class="p">,</span>
+    <span class="n">data</span><span class="o">=</span><span class="n">headers_and_rows</span><span class="p">,</span>
+    <span class="n">align</span><span class="o">=</span><span class="s2">"top_left"</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">save</span><span class="p">()</span>
+</code></pre>
+</details>
+<h3>2.1 決定論的自動実行と <code>WorkflowFactsBundle</code> の永続化</h3>
+<p><code>pni workflows get-action</code>（または <code>push-action</code>）が 6 個の決定論的プリミティブ（<code>project_inspect</code>, <code>ast_analyze</code>, <code>run_check</code>, <code>security_scan</code>, <code>web_pentest</code>, <code>migration_analyze</code>）のいずれかに到達すると、<code>_execute_deterministic_step_if_needed()</code> が対応する Python 解析器を <strong>1 回だけ</strong>自動実行します。</p>
+<ul>
+<li><strong>SQLite と JSON への二重永続化</strong>: シリアライズされた解析結果は <code>.pni/cache/workflow_state.db</code> の <code>action_runs.deterministic_output_json</code> に保存されると同時に、<code>.pni/cache/&lt;workflow_id&gt;/facts.json</code>（<code>WorkflowFactsBundle</code>）へ統合されます。</li>
+<li><strong>再取得時のゼロ再計算</strong>: 以降の <code>get-action</code> 呼び出しでは、<code>pni workflows rewind &lt;run_id&gt; &lt;selector&gt;</code> で明示的に巻き戻さない限り、SQLite にキャッシュされた JSON が即座に返されます。</li>
+</ul>
+<h3>2.2 AI 推論プリミティブにおける実在検証ゲートと統合処理</h3>
+<ul>
+<li><strong>3側面分離アーキテクチャ理解 (<code>record_architecture</code> -&gt; <code>architecture.json</code>)</strong>: <code>with: {aspect: purpose_and_stack | layers_and_modules | flows_and_state}</code> でパラメータ化され、コードベース理解を 3 つのスキーマ（<code>SystemProfile</code>, <code>StructureMap</code>, <code>ExecutionFlowMap</code>）に分割します。<code>_validate_and_persist_architecture()</code> は、<code>layers[].paths</code>, <code>modules[].path</code>, <code>entry_points</code>, <code>involved_files</code> のすべてのエントリを <code>AstFacts.module_inventory</code> および実ワークスペースと照合した上で <code>.pni/cache/&lt;workflow_id&gt;/architecture.json</code> に永続化します。</li>
+<li><strong>ルール別準拠判定と根拠付き推論 (<code>ai_interpret</code> -&gt; <code>InterpretationInput</code>)</strong>: <code>0..100</code> の <code>step_score</code>、明示的な <code>RuleCheckResult</code> 判定（<code>pass</code>, <code>warn</code>, <code>fail</code>, <code>not_applicable</code>）、根拠付きの <code>findings</code>、および <code>P0</code>〜<code>P2</code> の <code>action_items</code> を要求します。Push 時に <code>engine.py</code> はすべての <code>file_path</code> と <code>target_files</code> の実在を検証し、<code>normalize_step_rule_checks()</code>（<code>aggregator.py</code>）を実行して当該ステップの全アクティブルールに準拠判定を刻印します。</li>
+<li><strong>決定論的ダイジェストとメトリクス刻印 (<code>emit_score</code> -&gt; <code>&lt;target&gt;_score.json</code>)</strong>: <code>_enrich_score_result()</code> が <code>compile_workflow_digest()</code>（<code>src/pni/_workflows/aggregator.py</code>）を実行し、重複指摘の排除、同一箇所の違反の <code>consolidated_findings</code> への統合、ファイル別 <code>module_hotspots</code>（<code>0.0..1.0</code> のリスク密度）の算出、正規 <code>S</code>〜<code>D</code> <code>grade</code> の導出、<code>RuntimeFacts</code> / <code>SecurityFacts</code> / <code>PentestFacts</code> の結合、およびプログラム計測ファクトによる <code>metrics_snapshot</code> の上書きを行ってから <code>reports/&lt;target&gt;_score.json</code> を書き出します。</li>
+<li><strong>根拠検証付きマイグレーション計画合成 (<code>emit_migration_plan</code> -&gt; <code>&lt;target&gt;_migration_plan.json</code>)</strong>: <code>validate_and_persist_migration_plan()</code>（<code>_migration_engine.py</code>）が <code>MigrationPlanResult</code>（<code>transformation_axes</code>, <code>target_architecture</code>, <code>component_mappings</code>, <code>phases</code>, <code>pr_backlog</code>, <code>decision_log</code>）を検証し、参照された全 As-Is パスの実在を確認した上で決定論的 <code>MigrationFacts</code> を結合して <code>reports/&lt;target&gt;_migration_plan.json</code> を出力します。</li>
+<li><strong>ブループリント連動ビジュアルレポートゲート (<code>write_drawlib_report</code> -&gt; <code>ReportCompletionInput</code>)</strong>: <code>render_drawlib_report_guide()</code> が 7章構成 Drawlib <code>doc</code> レポート（<code>00_cover.md</code> .. <code>06_*.md</code>）用の <code>.pni/cache/&lt;workflow_id&gt;/blueprint.json</code>（または <code>migration_blueprint.json</code>）を事前生成し、<code>_validate_report_completion()</code> が <code>ReportCompletionInput.generated_files</code> に列挙された全成果物がワークスペース内に <code>st_size &gt; 0</code> で実在することを検証します。</li>
+</ul>
+<p>続いて、9 個の Tree-sitter AST チェッカーおよび隔離 Docker/Podman コンテナ実行・Trivy・ライブペネトレーションテストの内部構造については <a href="analyzers_and_pentest.html">決定論的解析器とペネトレーションテスト</a> を参照し、最終グレード算出ロジックについては <a href="../04_scoring_and_reports/scoring_model.html">7軸品質スコアリングモデル</a> を参照してください。</p>
+
+            </main>
+        </div>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Theme toggle
+            const themeBtn = document.getElementById('theme-toggle');
+            if (themeBtn) {
+                themeBtn.addEventListener('click', function() {
+                    const current = document.documentElement.getAttribute('data-theme');
+                    const next = current === 'dark' ? 'light' : 'dark';
+                    document.documentElement.setAttribute('data-theme', next);
+                    localStorage.setItem('drawlib-theme', next);
+                });
+            }
+
+            // Language dropdown outside-click & Escape close
+            const langDropdowns = document.querySelectorAll('.lang-dropdown');
+            if (langDropdowns.length > 0) {
+                document.addEventListener('click', function(e) {
+                    langDropdowns.forEach(function(dd) {
+                        if (dd.hasAttribute('open') && !dd.contains(e.target)) {
+                            dd.removeAttribute('open');
+                        }
+                    });
+                });
+                document.addEventListener('keydown', function(e) {
+                    if (e.key === 'Escape') {
+                        langDropdowns.forEach(function(dd) {
+                            dd.removeAttribute('open');
+                        });
+                    }
+                });
+            }
+
+            // Mobile menu toggle
+            const menuBtn = document.getElementById('menu-toggle');
+            const sidebar = document.querySelector('.sidebar');
+            if (menuBtn && sidebar) {
+                function setMenuOpen(open) {
+                    sidebar.classList.toggle('is-open', open);
+                    menuBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
+                    document.body.classList.toggle('menu-open', open);
+                    if (open) {
+                        const menu = sidebar.querySelector('.sidebar-menu');
+                        if (menu) {
+                            menu.scrollTop = 0;
+                        }
+                    }
+                }
+
+                menuBtn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    const willOpen = !sidebar.classList.contains('is-open');
+                    setMenuOpen(willOpen);
+                });
+
+                // Close menu when clicking outside sidebar
+                document.addEventListener('click', function(e) {
+                    if (sidebar.classList.contains('is-open') && !sidebar.contains(e.target)) {
+                        setMenuOpen(false);
+                    }
+                });
+
+                // Close menu when a navigation link is clicked
+                const navLinks = sidebar.querySelectorAll('.nav-item a');
+                navLinks.forEach(function(link) {
+                    link.addEventListener('click', function() {
+                        setMenuOpen(false);
+                    });
+                });
+
+                // Close on Escape key
+                document.addEventListener('keydown', function(e) {
+                    if (e.key === 'Escape' && sidebar.classList.contains('is-open')) {
+                        setMenuOpen(false);
+                    }
+                });
+
+                // Reset menu state when resized above mobile breakpoint
+                window.addEventListener('resize', function() {
+                    if (window.innerWidth > 768 && sidebar.classList.contains('is-open')) {
+                        setMenuOpen(false);
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>

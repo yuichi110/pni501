@@ -1,0 +1,901 @@
+<!--
+ Copyright (c) 2026 Yuichi Ito (yuichi@yuichi.com)
+
+ This software is licensed under the Apache License, Version 2.0.
+ For more information, please visit: https://github.com/yuichi110/drawlib
+
+ This software is provided "as is", without warranty of any kind,
+ express or implied, including but not limited to the warranties of
+ merchantability, fitness for a particular purpose and noninfringement.
+-->
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Workflows &amp; Pre-Flight Readiness Gates</title>
+    <script>
+        (function() {
+            const saved = localStorage.getItem('drawlib-theme');
+            if (saved === 'dark' || (!saved && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                document.documentElement.setAttribute('data-theme', 'dark');
+            } else {
+                document.documentElement.setAttribute('data-theme', 'light');
+            }
+        })();
+    </script>
+    
+    
+    
+    <link rel="alternate" hreflang="en" href="https://www.pni501.com/en/03_workflows_and_actions/workflows_guide.html">
+    
+    <link rel="alternate" hreflang="ja" href="https://www.pni501.com/ja/03_workflows_and_actions/workflows_guide.html">
+    
+    <link rel="alternate" hreflang="x-default" href="https://www.pni501.com/en/03_workflows_and_actions/workflows_guide.html">
+    
+    
+    
+    <meta name="description" content="Executing a reliable software health audit, live penetration test, or phased modernization plan requires deterministic coordination before state is frozen…">
+    <link rel="canonical" href="https://www.pni501.com/en/03_workflows_and_actions/workflows_guide.html">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="pni501 Documentation">
+    <meta property="og:title" content="Workflows &amp; Pre-Flight Readiness Gates — pni501 Documentation">
+    <meta property="og:description" content="Executing a reliable software health audit, live penetration test, or phased modernization plan requires deterministic coordination before state is frozen…">
+    <meta property="og:url" content="https://www.pni501.com/en/03_workflows_and_actions/workflows_guide.html">
+    <meta property="og:image" content="https://www.pni501.com/_assets/logo.png">
+    <meta property="og:locale" content="en_US">
+    <meta property="og:locale:alternate" content="ja_JP">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Workflows &amp; Pre-Flight Readiness Gates — pni501 Documentation">
+    <meta name="twitter:description" content="Executing a reliable software health audit, live penetration test, or phased modernization plan requires deterministic coordination before state is frozen…">
+    <meta name="twitter:image" content="https://www.pni501.com/_assets/logo.png">
+    
+    
+    <link rel="icon" type="image/png" href="../../_assets/favicon.png">
+    
+    
+    <link rel="stylesheet" href="../style.css">
+    
+    
+</head>
+<body>
+    
+    <div class="doc-layout">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <a href="../index.html" class="sidebar-brand" aria-label="pni501 Documentation">
+                    
+                    <img src="../../_assets/logo.png" alt="pni501 Documentation" class="sidebar-logo sidebar-logo-light">
+                    <img src="../../_assets/logo_dark.png" alt="pni501 Documentation" class="sidebar-logo sidebar-logo-dark">
+                    
+                </a>
+                <div class="sidebar-header-actions">
+                    <button type="button" id="theme-toggle" class="theme-toggle-btn" aria-label="Toggle theme">
+                        <svg class="icon-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+                        <svg class="icon-moon" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+                    </button>
+                    <button type="button" id="menu-toggle" class="menu-toggle-btn" aria-label="Toggle navigation" aria-expanded="false">
+                        <svg class="icon-hamburger" viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+                        <svg class="icon-close" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                    </button>
+                </div>
+            </div>
+            <div class="sidebar-menu">
+                
+                    
+                        
+                        <ul class="nav-list">
+                            
+                            <li class="nav-item ">
+                                <a href="../index.html" >Overview</a>
+                            </li>
+                            
+                        </ul>
+                    
+                        
+                        <div class="sidebar-heading">1. Getting Started</div>
+                        
+                        <ul class="nav-list">
+                            
+                            <li class="nav-item ">
+                                <a href="../01_getting_started/concepts.html" >Background &amp; Core Concepts</a>
+                            </li>
+                            
+                            <li class="nav-item ">
+                                <a href="../01_getting_started/quickstart.html" >Quickstart Guide</a>
+                            </li>
+                            
+                            <li class="nav-item ">
+                                <a href="../01_getting_started/use_cases.html" >Primary Use Cases</a>
+                            </li>
+                            
+                        </ul>
+                    
+                        
+                        <div class="sidebar-heading">2. Architecture</div>
+                        
+                        <ul class="nav-list">
+                            
+                            <li class="nav-item ">
+                                <a href="../02_architecture/domain_architecture.html" >Domain Architecture &amp; Cascade</a>
+                            </li>
+                            
+                            <li class="nav-item ">
+                                <a href="../02_architecture/stateful_engine.html" >Stateful Pull-Push Engine</a>
+                            </li>
+                            
+                        </ul>
+                    
+                        
+                        <div class="sidebar-heading">3. Workflows &amp; Actions</div>
+                        
+                        <ul class="nav-list">
+                            
+                            <li class="nav-item active">
+                                <a href="workflows_guide.html" >Workflows &amp; Pre-Flight Gates</a>
+                            </li>
+                            
+                            <li class="nav-item ">
+                                <a href="actions_pipeline.html" >15 Actions &amp; 12 Primitives</a>
+                            </li>
+                            
+                            <li class="nav-item ">
+                                <a href="analyzers_and_pentest.html" >Analyzers &amp; Live Pentest</a>
+                            </li>
+                            
+                        </ul>
+                    
+                        
+                        <div class="sidebar-heading">4. Scoring &amp; Reports</div>
+                        
+                        <ul class="nav-list">
+                            
+                            <li class="nav-item ">
+                                <a href="../04_scoring_and_reports/scoring_model.html" >7-Axis Scoring Model</a>
+                            </li>
+                            
+                            <li class="nav-item ">
+                                <a href="../04_scoring_and_reports/drawlib_reporter.html" >Drawlib Visual Reporter</a>
+                            </li>
+                            
+                        </ul>
+                    
+                        
+                        <div class="sidebar-heading">5. Languages &amp; Reference</div>
+                        
+                        <ul class="nav-list">
+                            
+                            <li class="nav-item ">
+                                <a href="../05_languages_and_reference/supported_languages.html" >Supported 6 Languages</a>
+                            </li>
+                            
+                            <li class="nav-item ">
+                                <a href="../05_languages_and_reference/rules_and_cli.html" >Rules &amp; CLI Reference</a>
+                            </li>
+                            
+                        </ul>
+                    
+                        
+                        <div class="sidebar-heading">External Links</div>
+                        
+                        <ul class="nav-list">
+                            
+                            <li class="nav-item ">
+                                <a href="https://github.com/yuichi110/pni501" target="_blank" rel="noopener noreferrer">GitHub Repository<svg class="nav-external-icon" viewBox="0 0 24 24" aria-hidden="true"><line x1="7" y1="17" x2="17" y2="7"></line><polyline points="7 7 17 7 17 17"></polyline></svg></a>
+                            </li>
+                            
+                            <li class="nav-item ">
+                                <a href="https://pypi.org/project/pni501/" target="_blank" rel="noopener noreferrer">PyPI Package<svg class="nav-external-icon" viewBox="0 0 24 24" aria-hidden="true"><line x1="7" y1="17" x2="17" y2="7"></line><polyline points="7 7 17 7 17 17"></polyline></svg></a>
+                            </li>
+                            
+                        </ul>
+                    
+                
+            </div>
+        </aside>
+        <div class="content-wrapper">
+            <header class="top-bar">
+                <div class="breadcrumbs">
+                    <span class="crumb">Docs</span>
+                    <span class="crumb-separator">&raquo;</span>
+                    <span class="crumb active">Workflows &amp; Pre-Flight Readiness Gates</span>
+                </div>
+                
+                <div class="lang-switcher">
+                    <details class="lang-dropdown">
+                        <summary class="lang-dropdown-btn" aria-label="Select language">
+                            <svg class="lang-globe-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+                            <span class="lang-current-label">English</span>
+                            <svg class="lang-caret-icon" viewBox="0 0 24 24" aria-hidden="true"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                        </summary>
+                        <div class="lang-dropdown-menu" role="menu">
+                            
+                            <a href="workflows_guide.html" class="lang-option active" lang="en" hreflang="en" aria-current="page">
+                                <span>English</span>
+                                
+                                <svg class="lang-check-icon" viewBox="0 0 24 24" aria-hidden="true"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                                
+                            </a>
+                            
+                            <a href="../../ja/03_workflows_and_actions/workflows_guide.html" class="lang-option" lang="ja" hreflang="ja" >
+                                <span>日本語</span>
+                                
+                            </a>
+                            
+                        </div>
+                    </details>
+                </div>
+                
+            </header>
+            <main class="main-content">
+                <h1>Workflows &amp; Pre-Flight Readiness Gates</h1>
+<p>Executing a reliable software health audit, live penetration test, or phased modernization plan requires deterministic coordination before state is frozen into SQLite. <code>pni501</code> unifies this lifecycle under <code>pni workflows</code>, combining <strong>three complementary operating modes</strong>, <strong>fail-closed pre-flight readiness gates</strong>, and <strong>declarative YAML target inheritance and composite step expansion</strong> across Python, Java, PHP, Go, TypeScript, and JavaScript repositories.</p>
+<figure class="drawlib-image" style="text-align: center;">
+  <img src="../../images/03_workflows_and_actions/workflows_guide/workflow_three_modes.png" alt="workflows_guide_1" />
+  <figcaption class="drawlib-caption">The Three Operating Modes of pni workflows: Stateful Pull-Push, Stateless Ad-Hoc Runner, and Run Monitoring & Inspection</figcaption>
+</figure>
+<details class="drawlib-code-details">
+<summary>Source Code</summary>
+<pre><code class="language-python"><span class="kn">from</span><span class="w"> </span><span class="nn">drawlib.canvas</span><span class="w"> </span><span class="kn">import</span> <span class="n">save</span><span class="p">,</span> <span class="n">setup</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">drawlib.icons</span><span class="w"> </span><span class="kn">import</span> <span class="n">phosphor</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">drawlib.smartarts</span><span class="w"> </span><span class="kn">import</span> <span class="n">CardList</span><span class="p">,</span> <span class="n">Panel</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">drawlib.styles</span><span class="w"> </span><span class="kn">import</span> <span class="n">Styles</span>
+
+<span class="n">setup</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="mi">174</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">84</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">150</span><span class="p">)</span>
+
+<span class="n">p1</span> <span class="o">=</span> <span class="n">Panel</span><span class="p">(</span>
+    <span class="s2">"Mode 1: Stateful Pull-Push"</span><span class="p">,</span>
+    <span class="n">header_variant</span><span class="o">=</span><span class="s2">"filled"</span><span class="p">,</span>
+    <span class="n">header_height</span><span class="o">=</span><span class="mf">10.5</span><span class="p">,</span>
+    <span class="n">style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">Neutral</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">shape_r</span><span class="o">=</span><span class="mf">2.0</span><span class="p">),</span>
+    <span class="n">header_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">PrimaryFlat</span><span class="p">,</span>
+    <span class="n">text_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">WhiteBold</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">text_size</span><span class="o">=</span><span class="mf">11.2</span><span class="p">),</span>
+    <span class="n">icon</span><span class="o">=</span><span class="n">phosphor</span><span class="o">.</span><span class="n">database</span><span class="p">,</span>
+    <span class="n">icon_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">WhiteBold</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">p1</span><span class="o">.</span><span class="n">draw</span><span class="p">(</span><span class="n">xy</span><span class="o">=</span><span class="p">(</span><span class="mf">3.0</span><span class="p">,</span> <span class="mf">3.0</span><span class="p">),</span> <span class="n">width</span><span class="o">=</span><span class="mf">54.0</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mf">78.0</span><span class="p">)</span>
+<span class="n">ix1</span><span class="p">,</span> <span class="n">iw1</span><span class="p">,</span> <span class="n">ih1</span> <span class="o">=</span> <span class="n">p1</span><span class="o">.</span><span class="n">get_content_box</span><span class="p">(</span><span class="n">xy</span><span class="o">=</span><span class="p">(</span><span class="mf">3.0</span><span class="p">,</span> <span class="mf">3.0</span><span class="p">),</span> <span class="n">width</span><span class="o">=</span><span class="mf">54.0</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mf">78.0</span><span class="p">,</span> <span class="n">padding</span><span class="o">=</span><span class="p">(</span><span class="mf">2.5</span><span class="p">,</span> <span class="mf">2.5</span><span class="p">))</span>
+
+<span class="n">c1</span> <span class="o">=</span> <span class="n">CardList</span><span class="p">(</span>
+    <span class="n">style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">WhiteBordered</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">shape_r</span><span class="o">=</span><span class="mf">1.5</span><span class="p">),</span>
+    <span class="n">text_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">DarkBold</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">text_size</span><span class="o">=</span><span class="mf">10.5</span><span class="p">),</span>
+    <span class="n">description_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">Dark</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">text_size</span><span class="o">=</span><span class="mf">10.0</span><span class="p">),</span>
+    <span class="n">badge_shape</span><span class="o">=</span><span class="s2">"rounded_rect"</span><span class="p">,</span>
+    <span class="n">badge_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">PrimaryNeutral</span><span class="p">,</span>
+    <span class="n">badge_text_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">PrimaryBold</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">text_size</span><span class="o">=</span><span class="mf">10.0</span><span class="p">),</span>
+    <span class="n">icon_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">PrimaryBold</span><span class="p">,</span>
+    <span class="n">direction</span><span class="o">=</span><span class="s2">"vertical"</span><span class="p">,</span>
+    <span class="n">spacing</span><span class="o">=</span><span class="mf">2.4</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">c1</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="s2">"start / get / push-action"</span><span class="p">,</span> <span class="s2">"Persists wf-&lt;8hex&gt; &amp; act-01..NN</span><span class="se">\n</span><span class="s2">in .pni/cache/workflow_state.db"</span><span class="p">,</span> <span class="n">icon</span><span class="o">=</span><span class="n">phosphor</span><span class="o">.</span><span class="n">hard_drives</span><span class="p">)</span>
+<span class="n">c1</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="s2">"Grounding &amp; Schema Gates"</span><span class="p">,</span> <span class="s2">"Enforces step order, Pydantic</span><span class="se">\n</span><span class="s2">models &amp; AST path verification"</span><span class="p">,</span> <span class="n">icon</span><span class="o">=</span><span class="n">phosphor</span><span class="o">.</span><span class="n">shield_check</span><span class="p">)</span>
+<span class="n">c1</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="s2">"Official Deliverables"</span><span class="p">,</span> <span class="s2">"Emits *_score.json, *_plan.json</span><span class="se">\n</span><span class="s2">and compiled A4 vector PDF"</span><span class="p">,</span> <span class="n">icon</span><span class="o">=</span><span class="n">phosphor</span><span class="o">.</span><span class="n">file_pdf</span><span class="p">)</span>
+<span class="n">c1</span><span class="o">.</span><span class="n">draw</span><span class="p">(</span><span class="n">xy</span><span class="o">=</span><span class="n">ix1</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="n">iw1</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="n">ih1</span><span class="p">)</span>
+
+<span class="n">p2</span> <span class="o">=</span> <span class="n">Panel</span><span class="p">(</span>
+    <span class="s2">"Mode 2: Ad-Hoc Runner"</span><span class="p">,</span>
+    <span class="n">header_variant</span><span class="o">=</span><span class="s2">"filled"</span><span class="p">,</span>
+    <span class="n">header_height</span><span class="o">=</span><span class="mf">10.5</span><span class="p">,</span>
+    <span class="n">style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">Neutral</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">shape_r</span><span class="o">=</span><span class="mf">2.0</span><span class="p">),</span>
+    <span class="n">header_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">SecondaryNeutral</span><span class="p">,</span>
+    <span class="n">text_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">DarkBold</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">text_size</span><span class="o">=</span><span class="mf">11.2</span><span class="p">),</span>
+    <span class="n">icon</span><span class="o">=</span><span class="n">phosphor</span><span class="o">.</span><span class="n">lightning</span><span class="p">,</span>
+    <span class="n">icon_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">SecondaryBold</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">p2</span><span class="o">.</span><span class="n">draw</span><span class="p">(</span><span class="n">xy</span><span class="o">=</span><span class="p">(</span><span class="mf">60.0</span><span class="p">,</span> <span class="mf">3.0</span><span class="p">),</span> <span class="n">width</span><span class="o">=</span><span class="mf">54.0</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mf">78.0</span><span class="p">)</span>
+<span class="n">ix2</span><span class="p">,</span> <span class="n">iw2</span><span class="p">,</span> <span class="n">ih2</span> <span class="o">=</span> <span class="n">p2</span><span class="o">.</span><span class="n">get_content_box</span><span class="p">(</span><span class="n">xy</span><span class="o">=</span><span class="p">(</span><span class="mf">60.0</span><span class="p">,</span> <span class="mf">3.0</span><span class="p">),</span> <span class="n">width</span><span class="o">=</span><span class="mf">54.0</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mf">78.0</span><span class="p">,</span> <span class="n">padding</span><span class="o">=</span><span class="p">(</span><span class="mf">2.5</span><span class="p">,</span> <span class="mf">2.5</span><span class="p">))</span>
+
+<span class="n">c2</span> <span class="o">=</span> <span class="n">CardList</span><span class="p">(</span>
+    <span class="n">style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">WhiteBordered</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">shape_r</span><span class="o">=</span><span class="mf">1.5</span><span class="p">),</span>
+    <span class="n">text_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">DarkBold</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">text_size</span><span class="o">=</span><span class="mf">10.5</span><span class="p">),</span>
+    <span class="n">description_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">Dark</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">text_size</span><span class="o">=</span><span class="mf">10.0</span><span class="p">),</span>
+    <span class="n">badge_shape</span><span class="o">=</span><span class="s2">"rounded_rect"</span><span class="p">,</span>
+    <span class="n">badge_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">SecondaryNeutral</span><span class="p">,</span>
+    <span class="n">badge_text_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">DarkBold</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">text_size</span><span class="o">=</span><span class="mf">10.0</span><span class="p">),</span>
+    <span class="n">icon_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">SecondaryBold</span><span class="p">,</span>
+    <span class="n">direction</span><span class="o">=</span><span class="s2">"vertical"</span><span class="p">,</span>
+    <span class="n">spacing</span><span class="o">=</span><span class="mf">2.4</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">c2</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="s2">"run-action &lt;wf&gt; &lt;selector&gt;"</span><span class="p">,</span> <span class="s2">"Stateless adhoc.py runner; zero</span><span class="se">\n</span><span class="s2">SQLite reads, writes, or locks"</span><span class="p">,</span> <span class="n">icon</span><span class="o">=</span><span class="n">phosphor</span><span class="o">.</span><span class="n">prohibit</span><span class="p">)</span>
+<span class="n">c2</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="s2">"Lazy In-Memory Facts"</span><span class="p">,</span> <span class="s2">"Computes Project &amp; AST facts</span><span class="se">\n</span><span class="s2">on demand for target selector"</span><span class="p">,</span> <span class="n">icon</span><span class="o">=</span><span class="n">phosphor</span><span class="o">.</span><span class="n">cpu</span><span class="p">)</span>
+<span class="n">c2</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="s2">"Fast Iteration Flags"</span><span class="p">,</span> <span class="s2">"--base-url, --force-pentests &amp;</span><span class="se">\n</span><span class="s2">--fail-on-findings for CI/probes"</span><span class="p">,</span> <span class="n">icon</span><span class="o">=</span><span class="n">phosphor</span><span class="o">.</span><span class="n">terminal_window</span><span class="p">)</span>
+<span class="n">c2</span><span class="o">.</span><span class="n">draw</span><span class="p">(</span><span class="n">xy</span><span class="o">=</span><span class="n">ix2</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="n">iw2</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="n">ih2</span><span class="p">)</span>
+
+<span class="n">p3</span> <span class="o">=</span> <span class="n">Panel</span><span class="p">(</span>
+    <span class="s2">"Mode 3: Monitor &amp; Rewind"</span><span class="p">,</span>
+    <span class="n">header_variant</span><span class="o">=</span><span class="s2">"filled"</span><span class="p">,</span>
+    <span class="n">header_height</span><span class="o">=</span><span class="mf">10.5</span><span class="p">,</span>
+    <span class="n">style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">Neutral</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">shape_r</span><span class="o">=</span><span class="mf">2.0</span><span class="p">),</span>
+    <span class="n">header_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">PrimaryNeutral</span><span class="p">,</span>
+    <span class="n">text_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">PrimaryBold</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">text_size</span><span class="o">=</span><span class="mf">11.2</span><span class="p">),</span>
+    <span class="n">icon</span><span class="o">=</span><span class="n">phosphor</span><span class="o">.</span><span class="n">magnifying_glass</span><span class="p">,</span>
+    <span class="n">icon_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">PrimaryBold</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">p3</span><span class="o">.</span><span class="n">draw</span><span class="p">(</span><span class="n">xy</span><span class="o">=</span><span class="p">(</span><span class="mf">117.0</span><span class="p">,</span> <span class="mf">3.0</span><span class="p">),</span> <span class="n">width</span><span class="o">=</span><span class="mf">54.0</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mf">78.0</span><span class="p">)</span>
+<span class="n">ix3</span><span class="p">,</span> <span class="n">iw3</span><span class="p">,</span> <span class="n">ih3</span> <span class="o">=</span> <span class="n">p3</span><span class="o">.</span><span class="n">get_content_box</span><span class="p">(</span><span class="n">xy</span><span class="o">=</span><span class="p">(</span><span class="mf">117.0</span><span class="p">,</span> <span class="mf">3.0</span><span class="p">),</span> <span class="n">width</span><span class="o">=</span><span class="mf">54.0</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mf">78.0</span><span class="p">,</span> <span class="n">padding</span><span class="o">=</span><span class="p">(</span><span class="mf">2.5</span><span class="p">,</span> <span class="mf">2.5</span><span class="p">))</span>
+
+<span class="n">c3</span> <span class="o">=</span> <span class="n">CardList</span><span class="p">(</span>
+    <span class="n">style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">WhiteBordered</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">shape_r</span><span class="o">=</span><span class="mf">1.5</span><span class="p">),</span>
+    <span class="n">text_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">DarkBold</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">text_size</span><span class="o">=</span><span class="mf">10.5</span><span class="p">),</span>
+    <span class="n">description_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">Dark</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">text_size</span><span class="o">=</span><span class="mf">10.0</span><span class="p">),</span>
+    <span class="n">badge_shape</span><span class="o">=</span><span class="s2">"rounded_rect"</span><span class="p">,</span>
+    <span class="n">badge_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">Neutral</span><span class="p">,</span>
+    <span class="n">badge_text_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">DarkBold</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">text_size</span><span class="o">=</span><span class="mf">10.0</span><span class="p">),</span>
+    <span class="n">icon_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">DarkBold</span><span class="p">,</span>
+    <span class="n">direction</span><span class="o">=</span><span class="s2">"vertical"</span><span class="p">,</span>
+    <span class="n">spacing</span><span class="o">=</span><span class="mf">2.4</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">c3</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="s2">"status [--latest | &lt;run&gt;]"</span><span class="p">,</span> <span class="s2">"Inspect active/completed runs</span><span class="se">\n</span><span class="s2">and done/total step progress"</span><span class="p">,</span> <span class="n">icon</span><span class="o">=</span><span class="n">phosphor</span><span class="o">.</span><span class="n">list_checks</span><span class="p">)</span>
+<span class="n">c3</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="s2">"inspect-action &lt;run&gt; &lt;act&gt;"</span><span class="p">,</span> <span class="s2">"Extract --agent-input or</span><span class="se">\n</span><span class="s2">--deterministic [-o file.json]"</span><span class="p">,</span> <span class="n">icon</span><span class="o">=</span><span class="n">phosphor</span><span class="o">.</span><span class="n">export</span><span class="p">)</span>
+<span class="n">c3</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="s2">"rewind / cancel"</span><span class="p">,</span> <span class="s2">"Rewind to step, re-sync YAML,</span><span class="se">\n</span><span class="s2">or cancel superseded runs"</span><span class="p">,</span> <span class="n">icon</span><span class="o">=</span><span class="n">phosphor</span><span class="o">.</span><span class="n">broom</span><span class="p">)</span>
+<span class="n">c3</span><span class="o">.</span><span class="n">draw</span><span class="p">(</span><span class="n">xy</span><span class="o">=</span><span class="n">ix3</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="n">iw3</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="n">ih3</span><span class="p">)</span>
+
+<span class="n">save</span><span class="p">()</span>
+</code></pre>
+</details>
+<hr />
+<h2>1. The Three Operating Modes of <code>pni workflows</code></h2>
+<p>To support formal end-to-end evaluations, rapid single-step iteration, and non-invasive SQLite inspection without forcing operators or AI agents to write raw <code>sqlite3</code> queries, <code>pni workflows</code> provides three distinct operating modes:</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">Mode</th>
+<th style="text-align:left">Subcommands &amp; Key Flags</th>
+<th style="text-align:left">Touches <code>workflow_state.db</code>?</th>
+<th style="text-align:left">Primary Use Cases</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left"><strong>Mode 1: Full Stateful Pull-Push</strong> (<code>engine.py</code>)</td>
+<td style="text-align:left"><code>start &lt;wf&gt; [--supersede]</code><br><code>get-action &lt;run_id&gt;</code><br><code>push-action &lt;run_id&gt; &lt;act_id&gt; [JSON | -f file.json]</code></td>
+<td style="text-align:left"><strong>Read / Write</strong> (creates <code>wf-&lt;8hex&gt;</code> &amp; <code>act-01..NN</code>, persists outputs &amp; inputs)</td>
+<td style="text-align:left">Official repository audits, <code>based_on</code> chained migration plans, score/plan JSON emission, and A4 PDF report compilation</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>Mode 2: Ad-Hoc Single-Step Runner</strong> (<code>adhoc.py</code>)</td>
+<td style="text-align:left"><code>run-action &lt;wf&gt; &lt;selector&gt;</code><br><code>[--base-url URL]</code><br><code>[--force-pentests]</code><br><code>[--fail-on-findings]</code></td>
+<td style="text-align:left"><strong>None</strong> (100% stateless in-memory <code>WorkflowFactsBundle</code>)</td>
+<td style="text-align:left">Developing <code>.pni/pentests/&lt;target&gt;/</code> HTTP probes, tuning <code>.pni/dockerfiles/</code>, testing a single composite step, or CI gating</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>Mode 3: Monitoring, Rewind &amp; Cleanup</strong> (<code>inspector.py</code>, <code>state_db.py</code>)</td>
+<td style="text-align:left"><code>status [run_or_wf] [--latest] [-w wf] [-s status]</code><br><code>inspect-action &lt;run_or_wf&gt; &lt;action&gt; [--agent-input | --deterministic] [-o path]</code><br><code>rewind &lt;run_or_wf&gt; &lt;action&gt; [--pull]</code><br><code>cancel [&lt;run_id&gt; | --superseded]</code></td>
+<td style="text-align:left"><strong>Read</strong> (<code>status</code>, <code>inspect-action</code>) / <strong>State Update</strong> (<code>rewind</code>, <code>cancel</code>)</td>
+<td style="text-align:left">Checking <code>done/total</code> progress, exporting recorded JSON payloads, rewinding to re-run a modified step, and retiring superseded runs</td>
+</tr>
+</tbody>
+</table>
+<h3>1.1 Stateless Lazy Evaluation in <code>run-action</code></h3>
+<p>When an operator or agent runs <code>pni workflows run-action &lt;workflow_id&gt; &lt;selector&gt;</code>, <code>run_workflow_action_adhoc()</code> loads and normalizes <code>.pni/workflows/&lt;workflow_id&gt;.yaml</code> without creating a SQLite run or enforcing workflow-wide <code>based_on</code> prerequisites:</p>
+<ul>
+<li><strong>On-Demand Prerequisite Synthesis</strong>: If the matched primitive requires upstream metadata—for example, <code>web_pentest</code> or <code>migration_analyze</code> needing <code>ProjectFacts</code> and <code>AstFacts</code>, or <code>run_check</code> / <code>security_scan</code> needing <code>ProjectFacts</code>—the runner computes them lazily in memory and suppresses silent helper outputs from the rendered Markdown.</li>
+<li><strong>Paired AI Guidance Preview</strong>: When <code>&lt;selector&gt;</code> matches a composite <code>uses:</code> step (such as <code>repo_structure_audit</code> or <code>web_penetration_audit</code>), <code>adhoc.py</code> executes the deterministic primitive(s) and renders both the extracted facts and the paired <code>ai_interpret</code> checklist, active engineering rules, and expected JSON Schema in one stdout pass.</li>
+<li><strong>Exit-Code Gating</strong>: Execution or container boot errors (<code>status in {&quot;error&quot;, &quot;timeout&quot;}</code>) always exit with code <code>1</code>; passing <code>--fail-on-findings</code> additionally exits with code <code>1</code> whenever unit test failures, Trivy vulnerabilities/misconfigurations/secrets, or live penetration findings are detected.</li>
+</ul>
+<h3>1.2 Six Standard Workflow Patterns Across 6 Languages</h3>
+<p>Across <strong>Python, Java, PHP, Go, TypeScript, and JavaScript</strong>, <code>pni init</code> scaffolds starter <code>.pni/workflows/*.yaml</code> definitions (<code>full_audit</code> and <code>quick_check</code>) that can be tailored into six canonical workflow patterns:</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">Workflow Pattern</th>
+<th style="text-align:left">Category</th>
+<th style="text-align:left">Included Composite Stages</th>
+<th style="text-align:left">Primary Deliverables</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left"><strong><code>full_audit</code></strong></td>
+<td style="text-align:left"><code>audit</code></td>
+<td style="text-align:left"><code>architecture_analysis</code> + <code>&lt;lang&gt;</code> structure/AST/test + archetype audits + <code>container_runtime_audit</code> + <code>security_vulnerability_audit</code> (+ <code>web_penetration_audit</code>) + <code>emit_score</code> + <code>write_drawlib_report</code></td>
+<td style="text-align:left"><code>reports/&lt;target&gt;_score.json</code> + 7-chapter A4 PDF (<code>reports/&lt;target&gt;.pdf</code>)</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong><code>quick_check</code> / <code>scoring</code></strong></td>
+<td style="text-align:left"><code>audit</code></td>
+<td style="text-align:left">Fast static <code>&lt;lang&gt;</code> structure/AST/test audits + <code>emit_score</code> (omits container/Trivy/PDF steps)</td>
+<td style="text-align:left"><code>reports/&lt;target&gt;_score.json</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><strong><code>security_audit</code></strong></td>
+<td style="text-align:left"><code>audit</code></td>
+<td style="text-align:left"><code>repo_structure_audit</code> + <code>&lt;lang&gt;_ast_audit</code> + <code>supply_chain_audit</code> + <code>security_vulnerability_audit</code> + <code>emit_score</code></td>
+<td style="text-align:left">Security &amp; supply-chain focused <code>*_score.json</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><strong><code>pentest</code></strong></td>
+<td style="text-align:left"><code>audit</code></td>
+<td style="text-align:left"><code>&lt;lang&gt;_ast_audit</code> (endpoint discovery) + <code>web_penetration_audit</code> (<code>127.0.0.1</code> loopback container + <code>httpx</code> suite) + <code>emit_score</code></td>
+<td style="text-align:left"><code>.pni/cache/&lt;wf&gt;/pentest/pentest_facts.json</code> + <code>*_score.json</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><strong><code>migration_plan</code></strong></td>
+<td style="text-align:left"><code>migration</code></td>
+<td style="text-align:left">Requires <code>based_on: &lt;audit_id&gt;</code>; executes <code>migration_proposal</code> (<code>migration_analyze</code> + <code>ai_interpret</code> + <code>emit_migration_plan</code>) + <code>write_migration_report</code></td>
+<td style="text-align:left"><code>reports/&lt;target&gt;_migration_plan.json</code> + Migration A4 PDF</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong><code>report</code></strong></td>
+<td style="text-align:left"><code>audit</code> / <code>migration</code></td>
+<td style="text-align:left">Re-invokes <code>write_drawlib_report</code> or <code>write_migration_report</code> (or via <code>pni workflows rewind &lt;wf&gt; create_report --pull</code>)</td>
+<td style="text-align:left">Refreshed <code>reports_src/&lt;target&gt;_src/</code> + compiled <code>reports/&lt;target&gt;.pdf</code></td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2>2. Fail-Closed Pre-Flight Readiness Workflow</h2>
+<p>Because <code>pni workflows start &lt;id&gt;</code> freezes resolved directory targets, action parameters, and rule bindings into <code>.pni/cache/workflow_state.db</code>, <code>.pni/workflows/&lt;id&gt;.yaml</code> serves as the <strong>Single Source of Truth (SSOT)</strong> for every run. Before starting a stateful workflow session, human operators and AI agents follow a four-step readiness sequence enforced by <code>pni workflows show &lt;id&gt;</code> and <code>start_workflow_run()</code>:</p>
+<figure class="drawlib-image" style="text-align: center;">
+  <img src="../../images/03_workflows_and_actions/workflows_guide/workflow_preflight_flowchart.png" alt="workflows_guide_2" />
+  <figcaption class="drawlib-caption">End-to-End pni workflows Operator & Agent Readiness Flowchart: Setup, Fail-Closed Pre-Flight Gates, and Execution</figcaption>
+</figure>
+<details class="drawlib-code-details">
+<summary>Source Code</summary>
+<pre><code class="language-python"><span class="kn">from</span><span class="w"> </span><span class="nn">drawlib.canvas</span><span class="w"> </span><span class="kn">import</span> <span class="n">save</span><span class="p">,</span> <span class="n">setup</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">drawlib.diagrams.flow</span><span class="w"> </span><span class="kn">import</span> <span class="n">Decision</span><span class="p">,</span> <span class="n">End</span><span class="p">,</span> <span class="n">FlowDiagram</span><span class="p">,</span> <span class="n">Process</span><span class="p">,</span> <span class="n">Start</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">drawlib.styles</span><span class="w"> </span><span class="kn">import</span> <span class="n">Styles</span>
+
+<span class="n">setup</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="mi">176</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">112</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">150</span><span class="p">)</span>
+
+<span class="n">flow</span> <span class="o">=</span> <span class="n">FlowDiagram</span><span class="p">(</span>
+    <span class="n">node_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">WhiteBordered</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span>
+        <span class="n">text_color</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">Dark</span><span class="o">.</span><span class="n">text_color</span><span class="p">,</span> <span class="n">shape_r</span><span class="o">=</span><span class="mf">1.6</span><span class="p">,</span> <span class="n">text_size</span><span class="o">=</span><span class="mf">10.0</span>
+    <span class="p">),</span>
+    <span class="n">edge_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">DarkBold</span><span class="p">,</span>
+    <span class="n">edge_text_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">DarkBold</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">text_size</span><span class="o">=</span><span class="mf">10.0</span><span class="p">),</span>
+    <span class="n">width</span><span class="o">=</span><span class="mf">170.0</span><span class="p">,</span>
+    <span class="n">height</span><span class="o">=</span><span class="mf">106.0</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="n">flow</span><span class="o">.</span><span class="n">add_lane</span><span class="p">(</span><span class="s2">"1. Author &amp; Inspect"</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mf">48.0</span><span class="p">)</span>
+<span class="n">flow</span><span class="o">.</span><span class="n">add_lane</span><span class="p">(</span><span class="s2">"2. Pre-Flight Readiness Gates"</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mf">58.0</span><span class="p">)</span>
+<span class="n">flow</span><span class="o">.</span><span class="n">add_lane</span><span class="p">(</span><span class="s2">"3. Remedies &amp; Deliverables"</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mf">64.0</span><span class="p">)</span>
+
+<span class="n">n_init</span> <span class="o">=</span> <span class="n">flow</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+    <span class="n">Start</span><span class="p">(</span>
+        <span class="s2">"pni init &amp;</span><span class="se">\n</span><span class="s2">Tailor &lt;id&gt;.yaml"</span><span class="p">,</span>
+        <span class="n">width</span><span class="o">=</span><span class="mf">38.0</span><span class="p">,</span>
+        <span class="n">height</span><span class="o">=</span><span class="mf">12.0</span><span class="p">,</span>
+        <span class="n">style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">PrimaryNeutral</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">shape_r</span><span class="o">=</span><span class="mf">6.0</span><span class="p">),</span>
+        <span class="n">text_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">PrimaryBold</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">text_size</span><span class="o">=</span><span class="mf">10.2</span><span class="p">),</span>
+    <span class="p">),</span>
+    <span class="n">xy</span><span class="o">=</span><span class="p">(</span><span class="mf">24.0</span><span class="p">,</span> <span class="mf">86.0</span><span class="p">),</span>
+<span class="p">)</span>
+
+<span class="n">n_show</span> <span class="o">=</span> <span class="n">flow</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+    <span class="n">Process</span><span class="p">(</span>
+        <span class="s2">"pni workflows show &lt;id&gt;</span><span class="se">\n</span><span class="s2">(Expand &amp; Check Gates)"</span><span class="p">,</span>
+        <span class="n">width</span><span class="o">=</span><span class="mf">40.0</span><span class="p">,</span>
+        <span class="n">height</span><span class="o">=</span><span class="mf">13.0</span><span class="p">,</span>
+        <span class="n">style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">Neutral</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">shape_r</span><span class="o">=</span><span class="mf">1.6</span><span class="p">),</span>
+        <span class="n">text_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">DarkBold</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">text_size</span><span class="o">=</span><span class="mf">10.0</span><span class="p">),</span>
+    <span class="p">),</span>
+    <span class="n">xy</span><span class="o">=</span><span class="p">(</span><span class="mf">24.0</span><span class="p">,</span> <span class="mf">62.0</span><span class="p">),</span>
+<span class="p">)</span>
+
+<span class="n">g_pentest</span> <span class="o">=</span> <span class="n">flow</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+    <span class="n">Decision</span><span class="p">(</span>
+        <span class="s2">"Gate 1: web_pentest</span><span class="se">\n</span><span class="s2">Suite Ready?"</span><span class="p">,</span>
+        <span class="n">width</span><span class="o">=</span><span class="mf">42.0</span><span class="p">,</span>
+        <span class="n">height</span><span class="o">=</span><span class="mf">16.0</span><span class="p">,</span>
+        <span class="n">style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">SecondaryNeutral</span><span class="p">,</span>
+        <span class="n">text_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">DarkBold</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">text_size</span><span class="o">=</span><span class="mf">10.0</span><span class="p">),</span>
+    <span class="p">),</span>
+    <span class="n">xy</span><span class="o">=</span><span class="p">(</span><span class="mf">77.0</span><span class="p">,</span> <span class="mf">84.5</span><span class="p">),</span>
+<span class="p">)</span>
+
+<span class="n">r_pentest</span> <span class="o">=</span> <span class="n">flow</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+    <span class="n">Process</span><span class="p">(</span>
+        <span class="s2">"Fail-Closed Block!</span><span class="se">\n</span><span class="s2">pni pentests init -w &lt;id&gt; + Probes</span><span class="se">\n</span><span class="s2">-&gt; run-action &lt;id&gt; web_pentest"</span><span class="p">,</span>
+        <span class="n">width</span><span class="o">=</span><span class="mf">50.0</span><span class="p">,</span>
+        <span class="n">height</span><span class="o">=</span><span class="mf">15.0</span><span class="p">,</span>
+        <span class="n">style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">DangerNeutral</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">shape_r</span><span class="o">=</span><span class="mf">1.6</span><span class="p">),</span>
+        <span class="n">text_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">DangerBold</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">text_size</span><span class="o">=</span><span class="mf">10.0</span><span class="p">),</span>
+    <span class="p">),</span>
+    <span class="n">xy</span><span class="o">=</span><span class="p">(</span><span class="mf">141.0</span><span class="p">,</span> <span class="mf">84.5</span><span class="p">),</span>
+<span class="p">)</span>
+
+<span class="n">g_based</span> <span class="o">=</span> <span class="n">flow</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+    <span class="n">Decision</span><span class="p">(</span>
+        <span class="s2">"Gate 2a: Migration</span><span class="se">\n</span><span class="s2">based_on Done?"</span><span class="p">,</span>
+        <span class="n">width</span><span class="o">=</span><span class="mf">42.0</span><span class="p">,</span>
+        <span class="n">height</span><span class="o">=</span><span class="mf">16.0</span><span class="p">,</span>
+        <span class="n">style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">SecondaryNeutral</span><span class="p">,</span>
+        <span class="n">text_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">DarkBold</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">text_size</span><span class="o">=</span><span class="mf">10.0</span><span class="p">),</span>
+    <span class="p">),</span>
+    <span class="n">xy</span><span class="o">=</span><span class="p">(</span><span class="mf">77.0</span><span class="p">,</span> <span class="mf">59.5</span><span class="p">),</span>
+<span class="p">)</span>
+
+<span class="n">r_based</span> <span class="o">=</span> <span class="n">flow</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+    <span class="n">Process</span><span class="p">(</span>
+        <span class="s2">"Audit Prerequisite Block!</span><span class="se">\n</span><span class="s2">pni workflows start &lt;audit_id&gt;</span><span class="se">\n</span><span class="s2">&amp; Complete Base Audit First"</span><span class="p">,</span>
+        <span class="n">width</span><span class="o">=</span><span class="mf">50.0</span><span class="p">,</span>
+        <span class="n">height</span><span class="o">=</span><span class="mf">14.5</span><span class="p">,</span>
+        <span class="n">style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">DangerNeutral</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">shape_r</span><span class="o">=</span><span class="mf">1.6</span><span class="p">),</span>
+        <span class="n">text_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">DangerBold</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">text_size</span><span class="o">=</span><span class="mf">10.0</span><span class="p">),</span>
+    <span class="p">),</span>
+    <span class="n">xy</span><span class="o">=</span><span class="p">(</span><span class="mf">141.0</span><span class="p">,</span> <span class="mf">59.5</span><span class="p">),</span>
+<span class="p">)</span>
+
+<span class="n">g_brief</span> <span class="o">=</span> <span class="n">flow</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+    <span class="n">Decision</span><span class="p">(</span>
+        <span class="s2">"Gate 2b: Brief &amp;</span><span class="se">\n</span><span class="s2">Guardrails Pinned?"</span><span class="p">,</span>
+        <span class="n">width</span><span class="o">=</span><span class="mf">42.0</span><span class="p">,</span>
+        <span class="n">height</span><span class="o">=</span><span class="mf">16.0</span><span class="p">,</span>
+        <span class="n">style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">SecondaryNeutral</span><span class="p">,</span>
+        <span class="n">text_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">DarkBold</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">text_size</span><span class="o">=</span><span class="mf">10.0</span><span class="p">),</span>
+    <span class="p">),</span>
+    <span class="n">xy</span><span class="o">=</span><span class="p">(</span><span class="mf">77.0</span><span class="p">,</span> <span class="mf">34.5</span><span class="p">),</span>
+<span class="p">)</span>
+
+<span class="n">r_brief</span> <span class="o">=</span> <span class="n">flow</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+    <span class="n">Process</span><span class="p">(</span>
+        <span class="s2">"Ambiguity Hints Found!</span><span class="se">\n</span><span class="s2">Ask User -&gt; Pin brief &amp; non-auto</span><span class="se">\n</span><span class="s2">YAML -&gt; Re-run show &lt;id&gt;"</span><span class="p">,</span>
+        <span class="n">width</span><span class="o">=</span><span class="mf">50.0</span><span class="p">,</span>
+        <span class="n">height</span><span class="o">=</span><span class="mf">15.0</span><span class="p">,</span>
+        <span class="n">style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">WarningNeutral</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">shape_r</span><span class="o">=</span><span class="mf">1.6</span><span class="p">),</span>
+        <span class="n">text_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">DarkBold</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">text_size</span><span class="o">=</span><span class="mf">10.0</span><span class="p">),</span>
+    <span class="p">),</span>
+    <span class="n">xy</span><span class="o">=</span><span class="p">(</span><span class="mf">141.0</span><span class="p">,</span> <span class="mf">34.5</span><span class="p">),</span>
+<span class="p">)</span>
+
+<span class="n">n_start</span> <span class="o">=</span> <span class="n">flow</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+    <span class="n">Process</span><span class="p">(</span>
+        <span class="s2">"pni workflows start &lt;id&gt;</span><span class="se">\n</span><span class="s2">[--supersede] -&gt; wf-&lt;8hex&gt;"</span><span class="p">,</span>
+        <span class="n">width</span><span class="o">=</span><span class="mf">40.0</span><span class="p">,</span>
+        <span class="n">height</span><span class="o">=</span><span class="mf">13.0</span><span class="p">,</span>
+        <span class="n">style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">PrimaryFlat</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">shape_r</span><span class="o">=</span><span class="mf">1.6</span><span class="p">),</span>
+        <span class="n">text_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">WhiteBold</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">text_size</span><span class="o">=</span><span class="mf">10.0</span><span class="p">),</span>
+    <span class="p">),</span>
+    <span class="n">xy</span><span class="o">=</span><span class="p">(</span><span class="mf">24.0</span><span class="p">,</span> <span class="mf">11.5</span><span class="p">),</span>
+<span class="p">)</span>
+
+<span class="n">n_loop</span> <span class="o">=</span> <span class="n">flow</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+    <span class="n">Process</span><span class="p">(</span>
+        <span class="s2">"Stateful Pull-Push Loop</span><span class="se">\n</span><span class="s2">get-action &lt;-&gt; push-action"</span><span class="p">,</span>
+        <span class="n">width</span><span class="o">=</span><span class="mf">42.0</span><span class="p">,</span>
+        <span class="n">height</span><span class="o">=</span><span class="mf">13.0</span><span class="p">,</span>
+        <span class="n">style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">PrimaryNeutral</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">shape_r</span><span class="o">=</span><span class="mf">1.6</span><span class="p">),</span>
+        <span class="n">text_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">PrimaryBold</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">text_size</span><span class="o">=</span><span class="mf">10.0</span><span class="p">),</span>
+    <span class="p">),</span>
+    <span class="n">xy</span><span class="o">=</span><span class="p">(</span><span class="mf">77.0</span><span class="p">,</span> <span class="mf">11.5</span><span class="p">),</span>
+<span class="p">)</span>
+
+<span class="n">n_done</span> <span class="o">=</span> <span class="n">flow</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+    <span class="n">End</span><span class="p">(</span>
+        <span class="s2">"COMPLETED</span><span class="se">\n</span><span class="s2">(JSON + A4 PDF)"</span><span class="p">,</span>
+        <span class="n">width</span><span class="o">=</span><span class="mf">42.0</span><span class="p">,</span>
+        <span class="n">height</span><span class="o">=</span><span class="mf">12.0</span><span class="p">,</span>
+        <span class="n">style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">SuccessNeutral</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">shape_r</span><span class="o">=</span><span class="mf">6.0</span><span class="p">),</span>
+        <span class="n">text_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">SuccessBold</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">text_size</span><span class="o">=</span><span class="mf">10.2</span><span class="p">),</span>
+    <span class="p">),</span>
+    <span class="n">xy</span><span class="o">=</span><span class="p">(</span><span class="mf">141.0</span><span class="p">,</span> <span class="mf">11.5</span><span class="p">),</span>
+<span class="p">)</span>
+
+<span class="n">n_init</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">n_show</span><span class="p">,</span> <span class="n">start_side</span><span class="o">=</span><span class="s2">"bottom"</span><span class="p">,</span> <span class="n">end_side</span><span class="o">=</span><span class="s2">"top"</span><span class="p">)</span>
+<span class="n">n_show</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">g_pentest</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">"Inspect"</span><span class="p">,</span> <span class="n">start_side</span><span class="o">=</span><span class="s2">"right"</span><span class="p">,</span> <span class="n">end_side</span><span class="o">=</span><span class="s2">"left"</span><span class="p">)</span>
+
+<span class="n">g_pentest</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">r_pentest</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">"Missing"</span><span class="p">,</span> <span class="n">start_side</span><span class="o">=</span><span class="s2">"right"</span><span class="p">,</span> <span class="n">end_side</span><span class="o">=</span><span class="s2">"left"</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">DangerBold</span><span class="p">)</span>
+<span class="n">g_pentest</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">g_based</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">"Pass / N/A"</span><span class="p">,</span> <span class="n">start_side</span><span class="o">=</span><span class="s2">"bottom"</span><span class="p">,</span> <span class="n">end_side</span><span class="o">=</span><span class="s2">"top"</span><span class="p">)</span>
+
+<span class="n">g_based</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">r_based</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">"No"</span><span class="p">,</span> <span class="n">start_side</span><span class="o">=</span><span class="s2">"right"</span><span class="p">,</span> <span class="n">end_side</span><span class="o">=</span><span class="s2">"left"</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">DangerBold</span><span class="p">)</span>
+<span class="n">g_based</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">g_brief</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">"Yes / Audit"</span><span class="p">,</span> <span class="n">start_side</span><span class="o">=</span><span class="s2">"bottom"</span><span class="p">,</span> <span class="n">end_side</span><span class="o">=</span><span class="s2">"top"</span><span class="p">)</span>
+
+<span class="n">g_brief</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">r_brief</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">"Hints"</span><span class="p">,</span> <span class="n">start_side</span><span class="o">=</span><span class="s2">"right"</span><span class="p">,</span> <span class="n">end_side</span><span class="o">=</span><span class="s2">"left"</span><span class="p">)</span>
+<span class="n">g_brief</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">n_start</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">"Ready"</span><span class="p">,</span> <span class="n">start_side</span><span class="o">=</span><span class="s2">"left"</span><span class="p">,</span> <span class="n">end_side</span><span class="o">=</span><span class="s2">"top"</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">PrimaryBold</span><span class="p">)</span>
+
+<span class="n">n_start</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">n_loop</span><span class="p">,</span> <span class="n">start_side</span><span class="o">=</span><span class="s2">"right"</span><span class="p">,</span> <span class="n">end_side</span><span class="o">=</span><span class="s2">"left"</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">PrimaryBold</span><span class="p">)</span>
+<span class="n">n_loop</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">n_done</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">"Done"</span><span class="p">,</span> <span class="n">start_side</span><span class="o">=</span><span class="s2">"right"</span><span class="p">,</span> <span class="n">end_side</span><span class="o">=</span><span class="s2">"left"</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">SuccessBold</span><span class="p">)</span>
+
+<span class="n">flow</span><span class="o">.</span><span class="n">draw</span><span class="p">(</span><span class="n">xy</span><span class="o">=</span><span class="p">(</span><span class="mf">3.0</span><span class="p">,</span> <span class="mf">3.0</span><span class="p">))</span>
+<span class="n">save</span><span class="p">()</span>
+</code></pre>
+</details>
+<h3>2.1 Gate 1: Fail-Closed Web Penetration Test Suite Check (<code>web_pentest</code>)</h3>
+<p>Whenever a workflow's normalized steps include <code>web_pentest</code> (typically via <code>uses: web_penetration_audit</code>) and <code>force_regenerate_pentests</code> is <code>false</code>, <code>inspect_pentests_prerequisite()</code> inspects <code>.pni/pentests/&lt;target&gt;/</code>:</p>
+<ul>
+<li><strong>Fail-Closed Enforcement</strong>: If <code>.pni/pentests/&lt;target&gt;/</code> is missing <code>conftest.py</code> or at least one <code>test_*.py</code> probe suite, <code>pni workflows show &lt;id&gt;</code> prints a red blocking panel and <code>pni workflows start &lt;id&gt;</code> raises <code>WorkflowPrerequisiteError</code> immediately—preventing half-baked runs that would stall mid-pipeline.</li>
+<li><strong>Remedy Loop</strong>: Materialize the target's <code>Python + httpx</code> suite with <code>pni pentests init</code>, inspect AST-discovered routes and authentication guards to add target-specific HTTP security probes in <code>.pni/pentests/&lt;target&gt;/test_*.py</code>, and verify statelessly via <code>run-action</code> before starting the stateful workflow:</li>
+</ul>
+<pre><code class="language-bash"><span class="c1"># 1. Materialize baseline + AST-discovered route probes in .pni/pentests/&lt;target&gt;/</span>
+pni<span class="w"> </span>pentests<span class="w"> </span>init<span class="w"> </span>-w<span class="w"> </span>&lt;workflow_id&gt;
+
+<span class="c1"># 2. Customize .pni/pentests/&lt;target&gt;/test_*.py and verify statelessly in Mode 2</span>
+pni<span class="w"> </span>workflows<span class="w"> </span>run-action<span class="w"> </span>&lt;workflow_id&gt;<span class="w"> </span>web_pentest
+
+<span class="c1"># 3. Confirm all pre-flight readiness gates pass before starting Mode 1</span>
+pni<span class="w"> </span>workflows<span class="w"> </span>show<span class="w"> </span>&lt;workflow_id&gt;
+</code></pre>
+<h3>2.2 Gate 2: Migration Prerequisite (<code>based_on</code>) &amp; Guardrail Scrutiny</h3>
+<p>Migration workflows (<code>category: migration</code>) must declare <code>based_on: &lt;audit_id&gt;</code>:</p>
+<ul>
+<li><strong>Gate 2a — SQLite Base Audit Gate (<code>based_on</code>)</strong>: On <code>show</code> and <code>start</code>, <code>inspect_base_audit_status()</code> queries <code>.pni/cache/workflow_state.db</code> for the latest <code>completed</code> run of <code>&lt;audit_id&gt;</code>. If <code>&lt;audit_id&gt;</code> has never run or its latest run is still <code>in_progress</code>, <code>start</code> blocks with an actionable error instructing the agent to start or resume <code>&lt;audit_id&gt;</code> and finish the As-Is audit first.</li>
+<li><strong>Gate 2b — Pre-Execution Brief &amp; Guardrail Scrutiny</strong>: <code>check_migration_preflight_hints()</code> inspects <code>MigrationOptions</code> and the merged <code>brief</code> / <code>brief_file</code> text, surfacing structured <code>PreflightReadinessHint</code> warnings whenever specifications are underspecified:</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">Hint Code</th>
+<th style="text-align:left">Trigger Condition</th>
+<th style="text-align:left">Required Operator / Agent Action Before <code>workflows start</code></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left"><strong><code>MISSING_BRIEF</code></strong></td>
+<td style="text-align:left">Both <code>with.brief</code> and <code>with.brief_file</code> resolve to empty text</td>
+<td style="text-align:left">Cross-check As-Is audit facts, ask the user for target stack, boundaries, and compatibility, and write <code>with.brief: |</code> into YAML</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong><code>BRIEF_TOO_TERSE</code></strong></td>
+<td style="text-align:left">Resolved brief is shorter than <code>40</code> characters</td>
+<td style="text-align:left">Expand brief with concrete runtime/framework versions, DB/Cache backing stores, and explicit Non-Goals</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong><code>VAGUE_BRIEF_TERMS</code></strong></td>
+<td style="text-align:left">Brief contains placeholders such as <code>&quot;to latest&quot;</code>, <code>&quot;TBD&quot;</code>, <code>&quot;TODO&quot;</code>, <code>&quot;undecided&quot;</code>, <code>&quot;最新&quot;</code>, <code>&quot;未定&quot;</code>, or <code>&quot;いい感じ&quot;</code></td>
+<td style="text-align:left">Replace vague placeholders with pinned target versions (e.g., <code>Java 21 LTS + Spring Boot 3.4</code>, <code>PHP 8.3 + Laravel 11</code>, <code>Go 1.23</code>, <code>Node 22 LTS</code>)</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong><code>UNPINNED_STRATEGY</code></strong></td>
+<td style="text-align:left"><code>migration_strategy</code> is left at <code>&quot;auto&quot;</code></td>
+<td style="text-align:left">Confirm rollout model with user and pin <code>&quot;phased_pr&quot;</code>, <code>&quot;strangler_fig&quot;</code>, or <code>&quot;rewrite&quot;</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><strong><code>UNPINNED_CODEMOD_TOOL</code></strong></td>
+<td style="text-align:left"><code>codemod_tool</code> is left at <code>&quot;auto&quot;</code></td>
+<td style="text-align:left">Pin <code>&quot;openrewrite&quot;</code>, <code>&quot;rector&quot;</code>, <code>&quot;ruff&quot;</code>, <code>&quot;gofmt&quot;</code>, <code>&quot;jscodeshift&quot;</code>, or <code>&quot;manual_only&quot;</code> matching the confirmed target stack</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2>3. Workflow YAML Schema, Normalization &amp; Action Selectors</h2>
+<p>Workflow files live in <code>.pni/workflows/&lt;id&gt;.yaml</code> and validate against <code>WorkflowDefinition</code>. During loading and normalization (<code>normalize_workflow_steps()</code>), declarative steps are transformed into flat <code>PrimitiveStep</code> sequences with deterministic parameter interpolation and cross-step output propagation.</p>
+<h3>3.1 Target Inheritance, Composite Expansion &amp; Token Interpolation</h3>
+<ol>
+<li><strong>Category &amp; <code>based_on</code> Invariants (<code>WorkflowDefinition</code>)</strong>:
+<ul>
+<li><code>category: audit</code> (default) cannot declare <code>based_on</code>.</li>
+<li><code>category: migration</code> (and <code>category: progress</code>) <strong>must</strong> declare <code>based_on: &lt;workflow_id&gt;</code> referencing an upstream workflow YAML (self-references and circular chains raise <code>WorkflowPrerequisiteError</code>).</li>
+<li><code>_merge_inherited_targets()</code> copies <code>root</code>, <code>source</code>, <code>tests</code>, <code>docs</code>, and <code>exclude</code> from the upstream workflow automatically while preserving any explicit child field overrides.</li>
+</ul>
+</li>
+<li><strong>Composite Expansion (<code>expand_composite_action</code>)</strong>:
+<ul>
+<li>Steps declaring <code>uses: &lt;composite_id&gt;</code> resolve <code>&lt;composite_id&gt;.yaml</code> through the three-layer cascade (<code>.pni/actions/</code> &gt; built-in <code>&lt;lang&gt;/</code> &gt; built-in <code>common/</code>).</li>
+<li>Each expanded primitive receives deterministic ID <code>{step_id}__{idx}_{primitive_type}</code> (for example, <code>repo_and_deps__1_project_inspect</code> and <code>repo_and_deps__2_ai_interpret</code>), deduplicated merged <code>rules</code>, merged <code>with</code> parameters (<code>step.with</code> overrides composite defaults), and <code>source_action = &lt;composite_id&gt;</code>.</li>
+<li>Steps declaring <code>action: &lt;primitive_type&gt;</code> map 1-to-1 to a single <code>PrimitiveStep</code> with <code>id = step.id</code> and <code>source_action = None</code>.</li>
+</ul>
+</li>
+<li><strong>Placeholder Interpolation &amp; Downstream Path Propagation</strong>:
+<ul>
+<li><code>_finalize_primitive_params()</code> injects workspace target context (<code>workflow_id</code>, <code>workflow_category</code>, <code>target_root</code>, <code>source_targets</code>, <code>test_targets</code>, <code>doc_targets</code>, <code>facts_path</code>) alongside canonical defaults (<code>src_dir: &quot;reports_src&quot;</code>, <code>output_dir: &quot;reports&quot;</code>, <code>target: &quot;{workflow_id}&quot;</code>, <code>score_path: &quot;{output_dir}/{target}_score.json&quot;</code>), then interpolates <code>{workflow_id}</code>, <code>{target}</code>, <code>{output_dir}</code>, and <code>{src_dir}</code> across all string parameters.</li>
+<li><code>_propagate_emitted_score()</code> forwards the resolved <code>score_path</code> from <code>emit_score</code> (or <code>plan_path</code> from <code>emit_migration_plan</code>) into subsequent <code>write_drawlib_report</code> steps automatically unless overridden explicitly on the report step.</li>
+</ul>
+</li>
+</ol>
+<h3>3.2 Example A: Full Service Audit Workflow (<code>category: audit</code>)</h3>
+<pre><code class="language-yaml"><span class="nt">id</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">order_api_audit</span>
+<span class="nt">category</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">audit</span>
+<span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Order API Health, Security &amp; Penetration Audit</span>
+<span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Static AST/supply-chain audit, 3-aspect architecture comprehension, container/Trivy checks, and live HTTP pentest.</span>
+
+<span class="nt">targets</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">root</span><span class="p">:</span><span class="w"> </span><span class="s">"services/order_api"</span>
+<span class="w">  </span><span class="nt">source</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">"order_app"</span><span class="p p-Indicator">]</span>
+<span class="w">  </span><span class="nt">tests</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">"tests"</span><span class="p p-Indicator">]</span>
+<span class="w">  </span><span class="nt">docs</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">"README.md"</span><span class="p p-Indicator">]</span>
+
+<span class="nt">steps</span><span class="p">:</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">id</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">arch_recording</span>
+<span class="w">    </span><span class="nt">uses</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">architecture_analysis</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">id</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">repo_and_deps</span>
+<span class="w">    </span><span class="nt">uses</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">repo_structure_audit</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">id</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ast_and_quality</span>
+<span class="w">    </span><span class="nt">uses</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">python_ast_audit</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">id</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">test_suite</span>
+<span class="w">    </span><span class="nt">uses</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">python_test_audit</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">id</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">service_readiness</span>
+<span class="w">    </span><span class="nt">uses</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">service_readiness_audit</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">id</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">runtime_verification</span>
+<span class="w">    </span><span class="nt">uses</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">container_runtime_audit</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">id</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">security_audit</span>
+<span class="w">    </span><span class="nt">uses</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">security_vulnerability_audit</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">id</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">web_pentest</span>
+<span class="w">    </span><span class="nt">uses</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">web_penetration_audit</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">id</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">output_score</span>
+<span class="w">    </span><span class="nt">uses</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">emit_score</span>
+<span class="w">    </span><span class="nt">with</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">output_dir</span><span class="p">:</span><span class="w"> </span><span class="s">"reports/python"</span>
+<span class="w">      </span><span class="nt">target</span><span class="p">:</span><span class="w"> </span><span class="s">"order_api"</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">id</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">create_report</span>
+<span class="w">    </span><span class="nt">uses</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">write_drawlib_report</span>
+<span class="w">    </span><span class="nt">with</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">src_dir</span><span class="p">:</span><span class="w"> </span><span class="s">"reports_src/python"</span>
+<span class="w">      </span><span class="nt">output_dir</span><span class="p">:</span><span class="w"> </span><span class="s">"reports/python"</span>
+<span class="w">      </span><span class="nt">target</span><span class="p">:</span><span class="w"> </span><span class="s">"order_api"</span>
+<span class="w">      </span><span class="nt">lang</span><span class="p">:</span><span class="w"> </span><span class="s">"en"</span>
+<span class="w">      </span><span class="nt">style</span><span class="p">:</span><span class="w"> </span><span class="s">"google"</span>
+</code></pre>
+<h3>3.3 Example B: Chained Migration Workflow (<code>category: migration</code>)</h3>
+<pre><code class="language-yaml"><span class="nt">id</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">order_api_migration</span>
+<span class="nt">category</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">migration</span>
+<span class="nt">based_on</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">order_api_audit</span><span class="w">          </span><span class="c1"># Inherits targets &amp; requires COMPLETED run in workflow_state.db</span>
+<span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Phased Migration Plan - Legacy Flask Order API -&gt; Python 3.12 + FastAPI</span>
+
+<span class="nt">steps</span><span class="p">:</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">id</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">migration_intelligence_and_plan</span>
+<span class="w">    </span><span class="nt">uses</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">migration_proposal</span>
+<span class="w">    </span><span class="nt">with</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">output_dir</span><span class="p">:</span><span class="w"> </span><span class="s">"reports/python"</span>
+<span class="w">      </span><span class="nt">target</span><span class="p">:</span><span class="w"> </span><span class="s">"order_api_migration"</span>
+<span class="w">      </span><span class="nt">migration_strategy</span><span class="p">:</span><span class="w"> </span><span class="s">"phased_pr"</span><span class="w">     </span><span class="c1"># Pinned (non-"auto"): phased_pr | strangler_fig | rewrite</span>
+<span class="w">      </span><span class="nt">api_compatibility</span><span class="p">:</span><span class="w"> </span><span class="s">"strict"</span><span class="w">         </span><span class="c1"># Pinned: strict | versioned_v2 | flexible</span>
+<span class="w">      </span><span class="nt">bug_handling_policy</span><span class="p">:</span><span class="w"> </span><span class="s">"ask_human"</span><span class="w">    </span><span class="c1"># Pinned: ask_human | preserve_behavior | fix_in_phase3</span>
+<span class="w">      </span><span class="nt">codemod_tool</span><span class="p">:</span><span class="w"> </span><span class="s">"ruff"</span><span class="w">                </span><span class="c1"># Pinned: openrewrite | rector | ruff | manual_only</span>
+<span class="w">      </span><span class="nt">brief</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">|</span>
+<span class="w">        </span><span class="no">Target Stack &amp; Infrastructure (Confirmed):</span>
+<span class="w">          </span><span class="no">- Runtime &amp; Web: Python 3.12 + FastAPI + Pydantic v2 DTOs (replace Flask untyped request.json)</span>
+<span class="w">          </span><span class="no">- Persistence &amp; State: PostgreSQL 16 via SQLAlchemy 2.0 + Redis 7 TTL cache (eliminate module globals)</span>
+<span class="w">        </span><span class="no">Architecture &amp; Compatibility Guardrails:</span>
+<span class="w">          </span><span class="no">- Clean Architecture rings (`domain` / `usecase` / `port` / `adapter`) with zero framework imports in `domain`.</span>
+<span class="w">          </span><span class="no">- Strict external HTTP route and JSON key backward compatibility; isolate Hyrum's Law quirks in DEC-XX log.</span>
+<span class="w">        </span><span class="no">Confirmed Non-Goals:</span>
+<span class="w">          </span><span class="no">- Do not split into separate microservices during this migration.</span>
+
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">id</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">compile_migration_report</span>
+<span class="w">    </span><span class="nt">uses</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">write_migration_report</span>
+<span class="w">    </span><span class="nt">with</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">src_dir</span><span class="p">:</span><span class="w"> </span><span class="s">"reports_src/python"</span>
+<span class="w">      </span><span class="nt">output_dir</span><span class="p">:</span><span class="w"> </span><span class="s">"reports/python"</span>
+<span class="w">      </span><span class="nt">target</span><span class="p">:</span><span class="w"> </span><span class="s">"order_api_migration"</span>
+<span class="w">      </span><span class="nt">lang</span><span class="p">:</span><span class="w"> </span><span class="s">"en"</span>
+<span class="w">      </span><span class="nt">style</span><span class="p">:</span><span class="w"> </span><span class="s">"google"</span>
+</code></pre>
+<h3>3.4 Action Selector Priority Rules (<code>run-action</code> &amp; <code>inspect-action</code>)</h3>
+<p>Both <code>pni workflows run-action &lt;wf&gt; &lt;selector&gt;</code> and <code>pni workflows inspect-action &lt;run_or_wf&gt; &lt;selector&gt;</code> (as well as <code>pni workflows rewind &lt;run_or_wf&gt; &lt;selector&gt;</code>) accept flexible human- and agent-friendly selectors resolved in strict priority order:</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:center">Priority</th>
+<th style="text-align:left">Selector Form</th>
+<th style="text-align:left">Example</th>
+<th style="text-align:left"><code>run-action</code> Match (<code>PrimitiveStep</code>)</th>
+<th style="text-align:left"><code>inspect-action</code> / <code>rewind</code> Match (<code>ActionRunRecord</code>)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center"><strong>1</strong></td>
+<td style="text-align:left"><strong>Step Index / <code>act-XX</code></strong></td>
+<td style="text-align:left"><code>act-07</code> or <code>7</code></td>
+<td style="text-align:left">1-based index into normalized <code>primitives</code></td>
+<td style="text-align:left">Exact <code>seq == 7</code> (or exact <code>action_id == &quot;act-07&quot;</code>)</td>
+</tr>
+<tr>
+<td style="text-align:center"><strong>2</strong></td>
+<td style="text-align:left"><strong>Expanded Primitive ID</strong></td>
+<td style="text-align:left"><code>web_pentest__1_web_pentest</code></td>
+<td style="text-align:left">Exact <code>prim.id == selector</code></td>
+<td style="text-align:left">Stored as <code>act-XX</code> in SQLite; matched via index or step name</td>
+</tr>
+<tr>
+<td style="text-align:center"><strong>3</strong></td>
+<td style="text-align:left"><strong>Workflow Step ID</strong></td>
+<td style="text-align:left"><code>web_pentest</code> or <code>repo_and_deps</code></td>
+<td style="text-align:left">All primitives whose <code>prim.id</code> prefix before <code>__</code> equals <code>selector</code></td>
+<td style="text-align:left">Matched when <code>name</code> or <code>source_action</code> equals <code>selector</code></td>
+</tr>
+<tr>
+<td style="text-align:center"><strong>4</strong></td>
+<td style="text-align:left"><strong>Composite <code>uses</code> ID</strong></td>
+<td style="text-align:left"><code>web_penetration_audit</code></td>
+<td style="text-align:left">All primitives with <code>source_action</code> (or leaf after <code>/</code>) matching <code>selector</code></td>
+<td style="text-align:left">All recorded actions with <code>source_action</code> (or leaf) matching <code>selector</code></td>
+</tr>
+<tr>
+<td style="text-align:center"><strong>5</strong></td>
+<td style="text-align:left"><strong>Primitive Type</strong></td>
+<td style="text-align:left"><code>ast_analyze</code> or <code>emit_score</code></td>
+<td style="text-align:left">All primitives where <code>prim.type.value == selector</code></td>
+<td style="text-align:left">All recorded actions where <code>primitive_type.value == selector</code></td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p><strong>Multi-Step Narrowing in <code>inspect-action</code></strong>: When a composite selector such as <code>web_penetration_audit</code> matches both a deterministic step (<code>act-15: web_pentest</code>) and its paired AI step (<code>act-16: ai_interpret</code>), passing <code>--deterministic</code> automatically narrows the result to steps carrying <code>deterministic_output_json</code>, whereas passing <code>--agent-input</code> narrows the result to steps carrying substantive <code>agent_input_json</code>.</p>
+</blockquote>
+<p>Next, explore the <a href="actions_pipeline.html">15 Actions &amp; 12 Primitives</a> catalog to see how composite YAML building blocks expand into deterministic and AI-grounded execution steps, or dive into <a href="analyzers_and_pentest.html">Analyzers &amp; Live Pentest</a> and the <a href="../02_architecture/stateful_engine.html">Stateful Pull-Push Engine</a>.</p>
+
+            </main>
+        </div>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Theme toggle
+            const themeBtn = document.getElementById('theme-toggle');
+            if (themeBtn) {
+                themeBtn.addEventListener('click', function() {
+                    const current = document.documentElement.getAttribute('data-theme');
+                    const next = current === 'dark' ? 'light' : 'dark';
+                    document.documentElement.setAttribute('data-theme', next);
+                    localStorage.setItem('drawlib-theme', next);
+                });
+            }
+
+            // Language dropdown outside-click & Escape close
+            const langDropdowns = document.querySelectorAll('.lang-dropdown');
+            if (langDropdowns.length > 0) {
+                document.addEventListener('click', function(e) {
+                    langDropdowns.forEach(function(dd) {
+                        if (dd.hasAttribute('open') && !dd.contains(e.target)) {
+                            dd.removeAttribute('open');
+                        }
+                    });
+                });
+                document.addEventListener('keydown', function(e) {
+                    if (e.key === 'Escape') {
+                        langDropdowns.forEach(function(dd) {
+                            dd.removeAttribute('open');
+                        });
+                    }
+                });
+            }
+
+            // Mobile menu toggle
+            const menuBtn = document.getElementById('menu-toggle');
+            const sidebar = document.querySelector('.sidebar');
+            if (menuBtn && sidebar) {
+                function setMenuOpen(open) {
+                    sidebar.classList.toggle('is-open', open);
+                    menuBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
+                    document.body.classList.toggle('menu-open', open);
+                    if (open) {
+                        const menu = sidebar.querySelector('.sidebar-menu');
+                        if (menu) {
+                            menu.scrollTop = 0;
+                        }
+                    }
+                }
+
+                menuBtn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    const willOpen = !sidebar.classList.contains('is-open');
+                    setMenuOpen(willOpen);
+                });
+
+                // Close menu when clicking outside sidebar
+                document.addEventListener('click', function(e) {
+                    if (sidebar.classList.contains('is-open') && !sidebar.contains(e.target)) {
+                        setMenuOpen(false);
+                    }
+                });
+
+                // Close menu when a navigation link is clicked
+                const navLinks = sidebar.querySelectorAll('.nav-item a');
+                navLinks.forEach(function(link) {
+                    link.addEventListener('click', function() {
+                        setMenuOpen(false);
+                    });
+                });
+
+                // Close on Escape key
+                document.addEventListener('keydown', function(e) {
+                    if (e.key === 'Escape' && sidebar.classList.contains('is-open')) {
+                        setMenuOpen(false);
+                    }
+                });
+
+                // Reset menu state when resized above mobile breakpoint
+                window.addEventListener('resize', function() {
+                    if (window.innerWidth > 768 && sidebar.classList.contains('is-open')) {
+                        setMenuOpen(false);
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>

@@ -55,15 +55,14 @@ pni workflows start full_audit
 
 ---
 
-## Documentation (`docs_src/`)
+## Documentation (`docs_src/` & `docs/`)
 
-Comprehensive architectural and mechanism documentation for `pni501` is maintained as a **Drawlib `doc` project** inside [`docs_src/`](docs_src/README.md):
+Official bilingual (`en` / `ja`) architectural and user documentation for `pni501` is maintained as a **Drawlib `site` project** inside [`docs_src/`](docs_src/README.md) and compiled into [`docs/`](docs/) for GitHub Pages (**[https://www.pni501.com](https://www.pni501.com)**):
 
-- **Source of Truth**: `docs_src/doc_src/en/` (`00_cover.md` – `06_scoring_and_drawlib_reporter.md`, configured via `docs_src/doc_src/drawlib.toml`)
-- **Compiled HTML**: `docs_src/doc_html/index.html` (`docs_src/doc_html/en/index.html`)
-- **Printable A4 Vector PDF**: `docs_src/doc.pdf`
-- **GitHub-Flavored Markdown**: `docs_src/doc_markdown/`
-- **Rebuild Command**: `./docs_src/doc_src/build.sh` (or `uv run pni report build doc --src-dir docs_src --output-dir docs_src`)
+- **Source of Truth**: `docs_src/en/` and `docs_src/ja/` (configured via `docs_src/drawlib.toml`)
+- **Compiled Website (GitHub Pages)**: `docs/index.html` (`docs/en/`, `docs/ja/`, `docs/sitemap.xml`, `docs/llms.txt`)
+- **Rebuild & Link Check**: `./docs_src/build.sh && uv run drawlib serve docs/ --check`
+- **Local Preview Server**: `./docs_src/serve.sh`
 
 ---
 

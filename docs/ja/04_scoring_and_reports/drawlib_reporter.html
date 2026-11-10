@@ -1,0 +1,806 @@
+<!--
+ Copyright (c) 2026 Yuichi Ito (yuichi@yuichi.com)
+
+ This software is licensed under the Apache License, Version 2.0.
+ For more information, please visit: https://github.com/yuichi110/drawlib
+
+ This software is provided "as is", without warranty of any kind,
+ express or implied, including but not limited to the warranties of
+ merchantability, fitness for a particular purpose and noninfringement.
+-->
+<!DOCTYPE html>
+<html lang="ja" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Drawlib ビジュアルレポーターと7章ブループリント</title>
+    <script>
+        (function() {
+            const saved = localStorage.getItem('drawlib-theme');
+            if (saved === 'dark' || (!saved && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                document.documentElement.setAttribute('data-theme', 'dark');
+            } else {
+                document.documentElement.setAttribute('data-theme', 'light');
+            }
+        })();
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+    
+    
+    <link rel="alternate" hreflang="en" href="https://www.pni501.com/en/04_scoring_and_reports/drawlib_reporter.html">
+    
+    <link rel="alternate" hreflang="ja" href="https://www.pni501.com/ja/04_scoring_and_reports/drawlib_reporter.html">
+    
+    <link rel="alternate" hreflang="x-default" href="https://www.pni501.com/en/04_scoring_and_reports/drawlib_reporter.html">
+    
+    
+    
+    <meta name="description" content="LLM にテーブルのソートやドキュメント構成の考案をゼロから任せるのではなく、pni501 はすべての診断メトリクスを決定論的にエンリッチ・重複排除・事前ソートしてキャッシュ済みの 7 章構成 ReportBlueprint（blueprint.py および…">
+    <link rel="canonical" href="https://www.pni501.com/ja/04_scoring_and_reports/drawlib_reporter.html">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="pni501 ドキュメント">
+    <meta property="og:title" content="Drawlib ビジュアルレポーターと7章ブループリント — pni501 ドキュメント">
+    <meta property="og:description" content="LLM にテーブルのソートやドキュメント構成の考案をゼロから任せるのではなく、pni501 はすべての診断メトリクスを決定論的にエンリッチ・重複排除・事前ソートしてキャッシュ済みの 7 章構成 ReportBlueprint（blueprint.py および…">
+    <meta property="og:url" content="https://www.pni501.com/ja/04_scoring_and_reports/drawlib_reporter.html">
+    <meta property="og:image" content="https://www.pni501.com/_assets/logo.png">
+    <meta property="og:locale" content="ja_JP">
+    <meta property="og:locale:alternate" content="en_US">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Drawlib ビジュアルレポーターと7章ブループリント — pni501 ドキュメント">
+    <meta name="twitter:description" content="LLM にテーブルのソートやドキュメント構成の考案をゼロから任せるのではなく、pni501 はすべての診断メトリクスを決定論的にエンリッチ・重複排除・事前ソートしてキャッシュ済みの 7 章構成 ReportBlueprint（blueprint.py および…">
+    <meta name="twitter:image" content="https://www.pni501.com/_assets/logo.png">
+    
+    
+    <link rel="icon" type="image/png" href="../../_assets/favicon.png">
+    
+    
+    <link rel="stylesheet" href="../style.css">
+    
+    
+</head>
+<body>
+    
+    <div class="doc-layout">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <a href="../index.html" class="sidebar-brand" aria-label="pni501 ドキュメント">
+                    
+                    <img src="../../_assets/logo.png" alt="pni501 ドキュメント" class="sidebar-logo sidebar-logo-light">
+                    <img src="../../_assets/logo_dark.png" alt="pni501 ドキュメント" class="sidebar-logo sidebar-logo-dark">
+                    
+                </a>
+                <div class="sidebar-header-actions">
+                    <button type="button" id="theme-toggle" class="theme-toggle-btn" aria-label="Toggle theme">
+                        <svg class="icon-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+                        <svg class="icon-moon" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+                    </button>
+                    <button type="button" id="menu-toggle" class="menu-toggle-btn" aria-label="Toggle navigation" aria-expanded="false">
+                        <svg class="icon-hamburger" viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+                        <svg class="icon-close" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                    </button>
+                </div>
+            </div>
+            <div class="sidebar-menu">
+                
+                    
+                        
+                        <ul class="nav-list">
+                            
+                            <li class="nav-item ">
+                                <a href="../index.html" >概要 (Overview)</a>
+                            </li>
+                            
+                        </ul>
+                    
+                        
+                        <div class="sidebar-heading">1. はじめに (Getting Started)</div>
+                        
+                        <ul class="nav-list">
+                            
+                            <li class="nav-item ">
+                                <a href="../01_getting_started/concepts.html" >背景とコアコンセプト</a>
+                            </li>
+                            
+                            <li class="nav-item ">
+                                <a href="../01_getting_started/quickstart.html" >クイックスタートガイド</a>
+                            </li>
+                            
+                            <li class="nav-item ">
+                                <a href="../01_getting_started/use_cases.html" >3つの主要ユースケース</a>
+                            </li>
+                            
+                        </ul>
+                    
+                        
+                        <div class="sidebar-heading">2. アーキテクチャ (Architecture)</div>
+                        
+                        <ul class="nav-list">
+                            
+                            <li class="nav-item ">
+                                <a href="../02_architecture/domain_architecture.html" >ドメイン構造と3層カスケード</a>
+                            </li>
+                            
+                            <li class="nav-item ">
+                                <a href="../02_architecture/stateful_engine.html" >ステートフル Pull-Push エンジン</a>
+                            </li>
+                            
+                        </ul>
+                    
+                        
+                        <div class="sidebar-heading">3. ワークフローとアクション</div>
+                        
+                        <ul class="nav-list">
+                            
+                            <li class="nav-item ">
+                                <a href="../03_workflows_and_actions/workflows_guide.html" >ワークフローと Pre-Flight ゲート</a>
+                            </li>
+                            
+                            <li class="nav-item ">
+                                <a href="../03_workflows_and_actions/actions_pipeline.html" >15 アクションと 12 プリミティブ</a>
+                            </li>
+                            
+                            <li class="nav-item ">
+                                <a href="../03_workflows_and_actions/analyzers_and_pentest.html" >決定論的解析器とペネトレーションテスト</a>
+                            </li>
+                            
+                        </ul>
+                    
+                        
+                        <div class="sidebar-heading">4. スコアリングとレポート</div>
+                        
+                        <ul class="nav-list">
+                            
+                            <li class="nav-item ">
+                                <a href="scoring_model.html" >7軸品質スコアリングモデル</a>
+                            </li>
+                            
+                            <li class="nav-item active">
+                                <a href="drawlib_reporter.html" >Drawlib ビジュアルレポーター</a>
+                            </li>
+                            
+                        </ul>
+                    
+                        
+                        <div class="sidebar-heading">5. 対応言語とリファレンス</div>
+                        
+                        <ul class="nav-list">
+                            
+                            <li class="nav-item ">
+                                <a href="../05_languages_and_reference/supported_languages.html" >対応 6 言語マトリクス</a>
+                            </li>
+                            
+                            <li class="nav-item ">
+                                <a href="../05_languages_and_reference/rules_and_cli.html" >ルール拡張と CLI リファレンス</a>
+                            </li>
+                            
+                        </ul>
+                    
+                        
+                        <div class="sidebar-heading">外部リンク (External Links)</div>
+                        
+                        <ul class="nav-list">
+                            
+                            <li class="nav-item ">
+                                <a href="https://github.com/yuichi110/pni501" target="_blank" rel="noopener noreferrer">GitHub リポジトリ<svg class="nav-external-icon" viewBox="0 0 24 24" aria-hidden="true"><line x1="7" y1="17" x2="17" y2="7"></line><polyline points="7 7 17 7 17 17"></polyline></svg></a>
+                            </li>
+                            
+                            <li class="nav-item ">
+                                <a href="https://pypi.org/project/pni501/" target="_blank" rel="noopener noreferrer">PyPI パッケージ<svg class="nav-external-icon" viewBox="0 0 24 24" aria-hidden="true"><line x1="7" y1="17" x2="17" y2="7"></line><polyline points="7 7 17 7 17 17"></polyline></svg></a>
+                            </li>
+                            
+                        </ul>
+                    
+                
+            </div>
+        </aside>
+        <div class="content-wrapper">
+            <header class="top-bar">
+                <div class="breadcrumbs">
+                    <span class="crumb">Docs</span>
+                    <span class="crumb-separator">&raquo;</span>
+                    <span class="crumb active">Drawlib ビジュアルレポーターと7章ブループリント</span>
+                </div>
+                
+                <div class="lang-switcher">
+                    <details class="lang-dropdown">
+                        <summary class="lang-dropdown-btn" aria-label="Select language">
+                            <svg class="lang-globe-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+                            <span class="lang-current-label">日本語</span>
+                            <svg class="lang-caret-icon" viewBox="0 0 24 24" aria-hidden="true"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                        </summary>
+                        <div class="lang-dropdown-menu" role="menu">
+                            
+                            <a href="../../en/04_scoring_and_reports/drawlib_reporter.html" class="lang-option" lang="en" hreflang="en" >
+                                <span>English</span>
+                                
+                            </a>
+                            
+                            <a href="drawlib_reporter.html" class="lang-option active" lang="ja" hreflang="ja" aria-current="page">
+                                <span>日本語</span>
+                                
+                                <svg class="lang-check-icon" viewBox="0 0 24 24" aria-hidden="true"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                                
+                            </a>
+                            
+                        </div>
+                    </details>
+                </div>
+                
+            </header>
+            <main class="main-content">
+                <h1>Drawlib ビジュアルレポーターと7章ブループリント</h1>
+<p>LLM にテーブルのソートやドキュメント構成の考案をゼロから任せるのではなく、<code>pni501</code> はすべての診断メトリクスを決定論的にエンリッチ・重複排除・事前ソートしてキャッシュ済みの 7 章構成 <code>ReportBlueprint</code>（<code>blueprint.py</code> および <code>migration_blueprint.py</code>）へ変換したうえで、<code>compiler.py</code> から <code>drawlib</code> を通じてベクター A4 PDF（<code>reports/&lt;target&gt;.pdf</code>）およびマルチフォーマット成果物をコンパイルします。</p>
+<figure class="drawlib-image" style="text-align: center;">
+  <img src="../../images/04_scoring_and_reports/drawlib_reporter/reporter_compilation_pipeline.png" alt="drawlib_reporter_1" />
+  <figcaption class="drawlib-caption">健全性監査トラックとマイグレーション実行計画トラックを統合するブループリント駆動 Drawlib レポートパイプライン</figcaption>
+</figure>
+<details class="drawlib-code-details">
+<summary>Source Code</summary>
+<pre><code class="language-python"><span class="kn">from</span><span class="w"> </span><span class="nn">drawlib.canvas</span><span class="w"> </span><span class="kn">import</span> <span class="n">save</span><span class="p">,</span> <span class="n">setup</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">drawlib.diagrams.architecture</span><span class="w"> </span><span class="kn">import</span> <span class="n">ArchitectureDiagram</span><span class="p">,</span> <span class="n">Node</span><span class="p">,</span> <span class="n">NodeGroup</span><span class="p">,</span> <span class="n">PhosphorIcon</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">drawlib.styles</span><span class="w"> </span><span class="kn">import</span> <span class="n">Styles</span>
+
+<span class="n">setup</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="mi">162</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">78</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">150</span><span class="p">)</span>
+
+<span class="n">diag</span> <span class="o">=</span> <span class="n">ArchitectureDiagram</span><span class="p">(</span>
+    <span class="n">node_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">PrimaryBold</span><span class="p">,</span>
+    <span class="n">node_text_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">DarkBold</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">text_size</span><span class="o">=</span><span class="mf">10.2</span><span class="p">),</span>
+    <span class="n">edge_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">DarkBold</span><span class="p">,</span>
+    <span class="n">edge_text_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">DarkBold</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">text_size</span><span class="o">=</span><span class="mf">10.0</span><span class="p">),</span>
+    <span class="n">node_card_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">WhiteBordered</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">shape_r</span><span class="o">=</span><span class="mf">1.5</span><span class="p">),</span>
+<span class="p">)</span>
+
+<span class="n">g_inputs</span> <span class="o">=</span> <span class="n">diag</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+    <span class="n">NodeGroup</span><span class="p">(</span>
+        <span class="n">title</span><span class="o">=</span><span class="s2">"1. Enriched Inputs"</span><span class="p">,</span>
+        <span class="n">width</span><span class="o">=</span><span class="mf">34.5</span><span class="p">,</span>
+        <span class="n">height</span><span class="o">=</span><span class="mf">70.0</span><span class="p">,</span>
+        <span class="n">style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">Neutral</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">shape_r</span><span class="o">=</span><span class="mf">2.0</span><span class="p">),</span>
+        <span class="n">text_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">DarkBold</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">text_size</span><span class="o">=</span><span class="mf">10.8</span><span class="p">,</span> <span class="n">halign</span><span class="o">=</span><span class="s2">"left"</span><span class="p">,</span> <span class="n">valign</span><span class="o">=</span><span class="s2">"top"</span><span class="p">),</span>
+    <span class="p">),</span>
+    <span class="n">xy</span><span class="o">=</span><span class="p">(</span><span class="mf">3.0</span><span class="p">,</span> <span class="mf">4.0</span><span class="p">),</span>
+<span class="p">)</span>
+<span class="n">n_score</span> <span class="o">=</span> <span class="n">g_inputs</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+    <span class="n">Node</span><span class="p">(</span>
+        <span class="s2">"ScoreResult + agg</span><span class="se">\n</span><span class="s2">(*_score.json)"</span><span class="p">,</span>
+        <span class="n">width</span><span class="o">=</span><span class="mf">30.0</span><span class="p">,</span>
+        <span class="n">height</span><span class="o">=</span><span class="mf">16.0</span><span class="p">,</span>
+        <span class="n">icon</span><span class="o">=</span><span class="n">PhosphorIcon</span><span class="o">.</span><span class="n">MEDAL</span><span class="p">,</span>
+        <span class="n">icon_size</span><span class="o">=</span><span class="mf">5.4</span><span class="p">,</span>
+        <span class="n">card_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">PrimaryNeutral</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">shape_r</span><span class="o">=</span><span class="mf">1.5</span><span class="p">),</span>
+    <span class="p">),</span>
+    <span class="n">xy</span><span class="o">=</span><span class="p">(</span><span class="mf">17.25</span><span class="p">,</span> <span class="mf">51.5</span><span class="p">),</span>
+<span class="p">)</span>
+<span class="n">n_plan</span> <span class="o">=</span> <span class="n">g_inputs</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+    <span class="n">Node</span><span class="p">(</span>
+        <span class="s2">"MigrationPlanResult</span><span class="se">\n</span><span class="s2">(*_migration_plan.json)"</span><span class="p">,</span>
+        <span class="n">width</span><span class="o">=</span><span class="mf">30.0</span><span class="p">,</span>
+        <span class="n">height</span><span class="o">=</span><span class="mf">16.0</span><span class="p">,</span>
+        <span class="n">icon</span><span class="o">=</span><span class="n">PhosphorIcon</span><span class="o">.</span><span class="n">GIT_PULL_REQUEST</span><span class="p">,</span>
+        <span class="n">icon_size</span><span class="o">=</span><span class="mf">5.4</span><span class="p">,</span>
+    <span class="p">),</span>
+    <span class="n">xy</span><span class="o">=</span><span class="p">(</span><span class="mf">17.25</span><span class="p">,</span> <span class="mf">31.5</span><span class="p">),</span>
+<span class="p">)</span>
+<span class="n">n_cache</span> <span class="o">=</span> <span class="n">g_inputs</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+    <span class="n">Node</span><span class="p">(</span>
+        <span class="s2">"facts.json +</span><span class="se">\n</span><span class="s2">architecture.json"</span><span class="p">,</span>
+        <span class="n">width</span><span class="o">=</span><span class="mf">30.0</span><span class="p">,</span>
+        <span class="n">height</span><span class="o">=</span><span class="mf">16.0</span><span class="p">,</span>
+        <span class="n">icon</span><span class="o">=</span><span class="n">PhosphorIcon</span><span class="o">.</span><span class="n">DATABASE</span><span class="p">,</span>
+        <span class="n">icon_size</span><span class="o">=</span><span class="mf">5.4</span><span class="p">,</span>
+        <span class="n">style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">SecondaryBold</span><span class="p">,</span>
+        <span class="n">card_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">SecondaryNeutral</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">shape_r</span><span class="o">=</span><span class="mf">1.5</span><span class="p">),</span>
+    <span class="p">),</span>
+    <span class="n">xy</span><span class="o">=</span><span class="p">(</span><span class="mf">17.25</span><span class="p">,</span> <span class="mf">11.5</span><span class="p">),</span>
+<span class="p">)</span>
+
+<span class="n">g_bp</span> <span class="o">=</span> <span class="n">diag</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+    <span class="n">NodeGroup</span><span class="p">(</span>
+        <span class="n">title</span><span class="o">=</span><span class="s2">"2. Blueprint Synthesis"</span><span class="p">,</span>
+        <span class="n">width</span><span class="o">=</span><span class="mf">34.5</span><span class="p">,</span>
+        <span class="n">height</span><span class="o">=</span><span class="mf">70.0</span><span class="p">,</span>
+        <span class="n">style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">Neutral</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">shape_r</span><span class="o">=</span><span class="mf">2.0</span><span class="p">),</span>
+        <span class="n">text_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">DarkBold</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">text_size</span><span class="o">=</span><span class="mf">10.8</span><span class="p">,</span> <span class="n">halign</span><span class="o">=</span><span class="s2">"left"</span><span class="p">,</span> <span class="n">valign</span><span class="o">=</span><span class="s2">"top"</span><span class="p">),</span>
+    <span class="p">),</span>
+    <span class="n">xy</span><span class="o">=</span><span class="p">(</span><span class="mf">43.5</span><span class="p">,</span> <span class="mf">4.0</span><span class="p">),</span>
+<span class="p">)</span>
+<span class="n">n_bp_eng</span> <span class="o">=</span> <span class="n">g_bp</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+    <span class="n">Node</span><span class="p">(</span>
+        <span class="s2">"blueprint.py /</span><span class="se">\n</span><span class="s2">migration_blueprint.py"</span><span class="p">,</span>
+        <span class="n">width</span><span class="o">=</span><span class="mf">30.0</span><span class="p">,</span>
+        <span class="n">height</span><span class="o">=</span><span class="mf">18.5</span><span class="p">,</span>
+        <span class="n">icon</span><span class="o">=</span><span class="n">PhosphorIcon</span><span class="o">.</span><span class="n">SLIDERS_HORIZONTAL</span><span class="p">,</span>
+        <span class="n">icon_size</span><span class="o">=</span><span class="mf">5.6</span><span class="p">,</span>
+        <span class="n">style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">WhiteBold</span><span class="p">,</span>
+        <span class="n">text_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">WhiteBold</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">text_size</span><span class="o">=</span><span class="mf">10.0</span><span class="p">),</span>
+        <span class="n">card_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">PrimaryFlat</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">shape_r</span><span class="o">=</span><span class="mf">1.5</span><span class="p">),</span>
+    <span class="p">),</span>
+    <span class="n">xy</span><span class="o">=</span><span class="p">(</span><span class="mf">17.25</span><span class="p">,</span> <span class="mf">48.0</span><span class="p">),</span>
+<span class="p">)</span>
+<span class="n">n_bp_json</span> <span class="o">=</span> <span class="n">g_bp</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+    <span class="n">Node</span><span class="p">(</span>
+        <span class="s2">"Blueprint JSON Cache</span><span class="se">\n</span><span class="s2">(00_cover + 01..06)"</span><span class="p">,</span>
+        <span class="n">width</span><span class="o">=</span><span class="mf">30.0</span><span class="p">,</span>
+        <span class="n">height</span><span class="o">=</span><span class="mf">18.5</span><span class="p">,</span>
+        <span class="n">icon</span><span class="o">=</span><span class="n">PhosphorIcon</span><span class="o">.</span><span class="n">LIST_NUMBERS</span><span class="p">,</span>
+        <span class="n">icon_size</span><span class="o">=</span><span class="mf">5.6</span><span class="p">,</span>
+        <span class="n">card_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">PrimaryNeutral</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">shape_r</span><span class="o">=</span><span class="mf">1.5</span><span class="p">),</span>
+    <span class="p">),</span>
+    <span class="n">xy</span><span class="o">=</span><span class="p">(</span><span class="mf">17.25</span><span class="p">,</span> <span class="mf">16.0</span><span class="p">),</span>
+<span class="p">)</span>
+
+<span class="n">g_author</span> <span class="o">=</span> <span class="n">diag</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+    <span class="n">NodeGroup</span><span class="p">(</span>
+        <span class="n">title</span><span class="o">=</span><span class="s2">"3. AI Authoring &amp; QA"</span><span class="p">,</span>
+        <span class="n">width</span><span class="o">=</span><span class="mf">34.5</span><span class="p">,</span>
+        <span class="n">height</span><span class="o">=</span><span class="mf">70.0</span><span class="p">,</span>
+        <span class="n">style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">Neutral</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">shape_r</span><span class="o">=</span><span class="mf">2.0</span><span class="p">),</span>
+        <span class="n">text_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">DarkBold</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">text_size</span><span class="o">=</span><span class="mf">10.8</span><span class="p">,</span> <span class="n">halign</span><span class="o">=</span><span class="s2">"left"</span><span class="p">,</span> <span class="n">valign</span><span class="o">=</span><span class="s2">"top"</span><span class="p">),</span>
+    <span class="p">),</span>
+    <span class="n">xy</span><span class="o">=</span><span class="p">(</span><span class="mf">84.0</span><span class="p">,</span> <span class="mf">4.0</span><span class="p">),</span>
+<span class="p">)</span>
+<span class="n">n_src</span> <span class="o">=</span> <span class="n">g_author</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+    <span class="n">Node</span><span class="p">(</span>
+        <span class="s2">"reports_src/</span><span class="se">\n</span><span class="s2">&lt;target&gt;_src/00..06.md"</span><span class="p">,</span>
+        <span class="n">width</span><span class="o">=</span><span class="mf">30.0</span><span class="p">,</span>
+        <span class="n">height</span><span class="o">=</span><span class="mf">18.5</span><span class="p">,</span>
+        <span class="n">icon</span><span class="o">=</span><span class="n">PhosphorIcon</span><span class="o">.</span><span class="n">FILE_CODE</span><span class="p">,</span>
+        <span class="n">icon_size</span><span class="o">=</span><span class="mf">5.6</span><span class="p">,</span>
+    <span class="p">),</span>
+    <span class="n">xy</span><span class="o">=</span><span class="p">(</span><span class="mf">17.25</span><span class="p">,</span> <span class="mf">48.0</span><span class="p">),</span>
+<span class="p">)</span>
+<span class="n">n_qa</span> <span class="o">=</span> <span class="n">g_author</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+    <span class="n">Node</span><span class="p">(</span>
+        <span class="s2">"drawlib rules show</span><span class="se">\n</span><span class="s2">+ show -g Grid Check"</span><span class="p">,</span>
+        <span class="n">width</span><span class="o">=</span><span class="mf">30.0</span><span class="p">,</span>
+        <span class="n">height</span><span class="o">=</span><span class="mf">18.5</span><span class="p">,</span>
+        <span class="n">icon</span><span class="o">=</span><span class="n">PhosphorIcon</span><span class="o">.</span><span class="n">MAGNIFYING_GLASS</span><span class="p">,</span>
+        <span class="n">icon_size</span><span class="o">=</span><span class="mf">5.6</span><span class="p">,</span>
+        <span class="n">style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">SecondaryBold</span><span class="p">,</span>
+        <span class="n">card_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">SecondaryNeutral</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">shape_r</span><span class="o">=</span><span class="mf">1.5</span><span class="p">),</span>
+    <span class="p">),</span>
+    <span class="n">xy</span><span class="o">=</span><span class="p">(</span><span class="mf">17.25</span><span class="p">,</span> <span class="mf">16.0</span><span class="p">),</span>
+<span class="p">)</span>
+
+<span class="n">g_compile</span> <span class="o">=</span> <span class="n">diag</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+    <span class="n">NodeGroup</span><span class="p">(</span>
+        <span class="n">title</span><span class="o">=</span><span class="s2">"4. compiler.py Build"</span><span class="p">,</span>
+        <span class="n">width</span><span class="o">=</span><span class="mf">34.5</span><span class="p">,</span>
+        <span class="n">height</span><span class="o">=</span><span class="mf">70.0</span><span class="p">,</span>
+        <span class="n">style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">Neutral</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">shape_r</span><span class="o">=</span><span class="mf">2.0</span><span class="p">),</span>
+        <span class="n">text_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">DarkBold</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">text_size</span><span class="o">=</span><span class="mf">10.8</span><span class="p">,</span> <span class="n">halign</span><span class="o">=</span><span class="s2">"left"</span><span class="p">,</span> <span class="n">valign</span><span class="o">=</span><span class="s2">"top"</span><span class="p">),</span>
+    <span class="p">),</span>
+    <span class="n">xy</span><span class="o">=</span><span class="p">(</span><span class="mf">124.5</span><span class="p">,</span> <span class="mf">4.0</span><span class="p">),</span>
+<span class="p">)</span>
+<span class="n">n_comp</span> <span class="o">=</span> <span class="n">g_compile</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+    <span class="n">Node</span><span class="p">(</span>
+        <span class="s2">"pni report build</span><span class="se">\n</span><span class="s2">(lint + drawlib.tools)"</span><span class="p">,</span>
+        <span class="n">width</span><span class="o">=</span><span class="mf">30.0</span><span class="p">,</span>
+        <span class="n">height</span><span class="o">=</span><span class="mf">16.0</span><span class="p">,</span>
+        <span class="n">icon</span><span class="o">=</span><span class="n">PhosphorIcon</span><span class="o">.</span><span class="n">GEAR_SIX</span><span class="p">,</span>
+        <span class="n">icon_size</span><span class="o">=</span><span class="mf">5.4</span><span class="p">,</span>
+        <span class="n">style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">WhiteBold</span><span class="p">,</span>
+        <span class="n">text_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">WhiteBold</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">text_size</span><span class="o">=</span><span class="mf">10.0</span><span class="p">),</span>
+        <span class="n">card_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">PrimaryFlat</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">shape_r</span><span class="o">=</span><span class="mf">1.5</span><span class="p">),</span>
+    <span class="p">),</span>
+    <span class="n">xy</span><span class="o">=</span><span class="p">(</span><span class="mf">17.25</span><span class="p">,</span> <span class="mf">51.5</span><span class="p">),</span>
+<span class="p">)</span>
+<span class="n">n_pdf</span> <span class="o">=</span> <span class="n">g_compile</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+    <span class="n">Node</span><span class="p">(</span>
+        <span class="s2">"reports/&lt;target&gt;.pdf</span><span class="se">\n</span><span class="s2">(A4 Vector + ToC)"</span><span class="p">,</span>
+        <span class="n">width</span><span class="o">=</span><span class="mf">30.0</span><span class="p">,</span>
+        <span class="n">height</span><span class="o">=</span><span class="mf">16.0</span><span class="p">,</span>
+        <span class="n">icon</span><span class="o">=</span><span class="n">PhosphorIcon</span><span class="o">.</span><span class="n">FILE_PDF</span><span class="p">,</span>
+        <span class="n">icon_size</span><span class="o">=</span><span class="mf">5.4</span><span class="p">,</span>
+        <span class="n">style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">SuccessBold</span><span class="p">,</span>
+        <span class="n">card_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">SuccessNeutral</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">shape_r</span><span class="o">=</span><span class="mf">1.5</span><span class="p">),</span>
+    <span class="p">),</span>
+    <span class="n">xy</span><span class="o">=</span><span class="p">(</span><span class="mf">17.25</span><span class="p">,</span> <span class="mf">31.5</span><span class="p">),</span>
+<span class="p">)</span>
+<span class="n">n_opt</span> <span class="o">=</span> <span class="n">g_compile</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+    <span class="n">Node</span><span class="p">(</span>
+        <span class="s2">"HTML / MD / PNG</span><span class="se">\n</span><span class="s2">(scan_broken_links)"</span><span class="p">,</span>
+        <span class="n">width</span><span class="o">=</span><span class="mf">30.0</span><span class="p">,</span>
+        <span class="n">height</span><span class="o">=</span><span class="mf">16.0</span><span class="p">,</span>
+        <span class="n">icon</span><span class="o">=</span><span class="n">PhosphorIcon</span><span class="o">.</span><span class="n">BROWSER</span><span class="p">,</span>
+        <span class="n">icon_size</span><span class="o">=</span><span class="mf">5.4</span><span class="p">,</span>
+    <span class="p">),</span>
+    <span class="n">xy</span><span class="o">=</span><span class="p">(</span><span class="mf">17.25</span><span class="p">,</span> <span class="mf">11.5</span><span class="p">),</span>
+<span class="p">)</span>
+
+<span class="n">diag</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">n_bp_eng</span><span class="p">,</span> <span class="n">n_bp_json</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">"7 chapters"</span><span class="p">,</span> <span class="n">routing</span><span class="o">=</span><span class="s2">"orthogonal"</span><span class="p">)</span>
+<span class="n">diag</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">n_qa</span><span class="p">,</span> <span class="n">n_src</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">"self-heal"</span><span class="p">,</span> <span class="n">arrow</span><span class="o">=</span><span class="s2">"&lt;-&gt;"</span><span class="p">,</span> <span class="n">routing</span><span class="o">=</span><span class="s2">"orthogonal"</span><span class="p">)</span>
+<span class="n">diag</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">n_comp</span><span class="p">,</span> <span class="n">n_pdf</span><span class="p">,</span> <span class="n">routing</span><span class="o">=</span><span class="s2">"orthogonal"</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">SuccessBold</span><span class="p">)</span>
+<span class="n">diag</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">n_pdf</span><span class="p">,</span> <span class="n">n_opt</span><span class="p">,</span> <span class="n">routing</span><span class="o">=</span><span class="s2">"orthogonal"</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">MutedBold</span><span class="p">)</span>
+
+<span class="n">diag</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">g_inputs</span><span class="p">,</span> <span class="n">g_bp</span><span class="p">,</span> <span class="n">routing</span><span class="o">=</span><span class="s2">"orthogonal"</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">PrimaryBold</span><span class="p">)</span>
+<span class="n">diag</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">g_bp</span><span class="p">,</span> <span class="n">g_author</span><span class="p">,</span> <span class="n">routing</span><span class="o">=</span><span class="s2">"orthogonal"</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">PrimaryBold</span><span class="p">)</span>
+<span class="n">diag</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">g_author</span><span class="p">,</span> <span class="n">g_compile</span><span class="p">,</span> <span class="n">routing</span><span class="o">=</span><span class="s2">"orthogonal"</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">PrimaryBold</span><span class="p">)</span>
+
+<span class="n">diag</span><span class="o">.</span><span class="n">draw</span><span class="p">(</span><span class="n">xy</span><span class="o">=</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">))</span>
+<span class="n">save</span><span class="p">()</span>
+</code></pre>
+</details>
+<hr />
+<h2>1. なぜブループリント駆動の Illustration-as-Code なのか？</h2>
+<p>エグゼクティブ向け監査レポートや多段階マイグレーション仕様書を生成する際、ガイドなしの LLM ドキュメント生成では、ファインディングの抜け漏れ、テーブル順序の不整合、壊れやすいチャート描画コードが頻発します。<code>pni501</code> は <strong>決定論的なブループリント合成</strong> と <strong>ビジュアル Markdown オーサリング</strong> を分離することで、これらの失敗モードを排除します。</p>
+<ul>
+<li><strong>事前計算された章別ペイロード（<code>blueprint.json</code> / <code>migration_blueprint.json</code>）</strong>: <code>write_drawlib_report</code> および <code>write_migration_report</code> ステップにおいて、<code>src/pni/_reporter/blueprint.py</code> と <code>src/pni/_reporter/migration_blueprint.py</code> がエンリッチ済みの <code>ScoreResult</code> または <code>MigrationPlanResult</code> を 7 章構成の <code>ReportBlueprint</code> へ変換し、事前ソート済みテーブル、チャート系列、KPI カード値、および章ごとの推奨 Drawlib コンポーネントを提供します。</li>
+<li><strong>Git バージョン管理された <code>doc</code> アーキタイプ（<code>reports_src/&lt;target&gt;_src/</code>）</strong>: すべてのレポートは自己完結した Drawlib <code>doc</code> プロジェクト（<code>drawlib.toml</code>、<code>styles.py</code>、<code>utils.py</code>、および <code>&lt;lang&gt;/00_cover.md .. 06_*.md</code>）としてスキャフォールドされ、散文解説と宣言的 Python ダイアグラムをリポジトリとともに Git 管理できます。</li>
+<li><strong>自動プリフライトリンティングとマルチモーダル・グリッド検証</strong>: <code>drawlib.tools.build_pdf()</code> を呼び出す前に、<code>compiler.py</code> が <code>lint_drawlib_chapters()</code> を実行して複数系列チャートの凡例漏れや UML ヒートマップの等高線衝突を検出し、さらにエージェントが <code>-g</code> 座標グリッド画像を視覚検査してテキスト切れをゼロに抑えます。</li>
+</ul>
+<hr />
+<h2>2. 2系統の7章構成 ReportBlueprint アーキテクチャ</h2>
+<p>健全性監査ワークフロー（<code>category: audit</code>）とモダナイゼーションワークフロー（<code>category: migration</code>）はいずれも、英語（<code>en</code>）または日本語（<code>ja</code>）にローカライズされた同一の <strong>7ファイル線形 <code>doc</code> レイアウト（<code>00_cover.md</code> + <code>01..06.md</code>）</strong> に標準化されています。Drawlib は <code>00_cover.md</code> の直後にハイパーリンク付き目次（Table of Contents）を自動挿入します。</p>
+<figure class="drawlib-image" style="text-align: center;">
+  <img src="../../images/04_scoring_and_reports/drawlib_reporter/blueprint_chapter_comparison.png" alt="drawlib_reporter_2" />
+  <figcaption class="drawlib-caption">健全性監査レポートとマイグレーション実行計画の7章構成 ReportBlueprint アーキテクチャ比較</figcaption>
+</figure>
+<details class="drawlib-code-details">
+<summary>Source Code</summary>
+<pre><code class="language-python"><span class="kn">from</span><span class="w"> </span><span class="nn">drawlib.canvas</span><span class="w"> </span><span class="kn">import</span> <span class="n">save</span><span class="p">,</span> <span class="n">setup</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">drawlib.icons</span><span class="w"> </span><span class="kn">import</span> <span class="n">phosphor</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">drawlib.smartarts</span><span class="w"> </span><span class="kn">import</span> <span class="n">CardList</span><span class="p">,</span> <span class="n">Panel</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">drawlib.styles</span><span class="w"> </span><span class="kn">import</span> <span class="n">Styles</span>
+
+<span class="n">setup</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="mi">170</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">112</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">150</span><span class="p">)</span>
+
+<span class="n">audit_panel</span> <span class="o">=</span> <span class="n">Panel</span><span class="p">(</span>
+    <span class="s2">"Health Audit Blueprint (blueprint.py)"</span><span class="p">,</span>
+    <span class="n">header_variant</span><span class="o">=</span><span class="s2">"filled"</span><span class="p">,</span>
+    <span class="n">header_height</span><span class="o">=</span><span class="mf">8.5</span><span class="p">,</span>
+    <span class="n">style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">Neutral</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">shape_r</span><span class="o">=</span><span class="mf">2.0</span><span class="p">),</span>
+    <span class="n">header_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">PrimaryFlat</span><span class="p">,</span>
+    <span class="n">text_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">WhiteBold</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">text_size</span><span class="o">=</span><span class="mf">11.2</span><span class="p">),</span>
+<span class="p">)</span>
+<span class="n">audit_panel</span><span class="o">.</span><span class="n">draw</span><span class="p">(</span><span class="n">xy</span><span class="o">=</span><span class="p">(</span><span class="mf">3.0</span><span class="p">,</span> <span class="mf">3.0</span><span class="p">),</span> <span class="n">width</span><span class="o">=</span><span class="mf">79.5</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mf">106.0</span><span class="p">)</span>
+
+<span class="n">audit_cards</span> <span class="o">=</span> <span class="n">CardList</span><span class="p">(</span>
+    <span class="n">style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">WhiteBordered</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">shape_r</span><span class="o">=</span><span class="mf">1.4</span><span class="p">),</span>
+    <span class="n">text_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">DarkBold</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">text_size</span><span class="o">=</span><span class="mf">10.2</span><span class="p">),</span>
+    <span class="n">description_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">Dark</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">text_size</span><span class="o">=</span><span class="mf">10.0</span><span class="p">),</span>
+    <span class="n">badge_shape</span><span class="o">=</span><span class="s2">"rounded_rect"</span><span class="p">,</span>
+    <span class="n">badge_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">PrimaryNeutral</span><span class="p">,</span>
+    <span class="n">badge_text_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">PrimaryBold</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">text_size</span><span class="o">=</span><span class="mf">10.0</span><span class="p">),</span>
+    <span class="n">icon_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">PrimaryBold</span><span class="p">,</span>
+    <span class="n">direction</span><span class="o">=</span><span class="s2">"vertical"</span><span class="p">,</span>
+    <span class="n">spacing</span><span class="o">=</span><span class="mf">2.0</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">audit_cards</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+    <span class="s2">"00_cover.md — Diagnostic Cover"</span><span class="p">,</span>
+    <span class="s2">"Panel + KpiCards (Score/Grade, Rules) -&gt; Auto ToC"</span><span class="p">,</span>
+    <span class="n">badge_text</span><span class="o">=</span><span class="s2">"00"</span><span class="p">,</span>
+    <span class="n">icon</span><span class="o">=</span><span class="n">phosphor</span><span class="o">.</span><span class="n">medal</span><span class="p">,</span>
+    <span class="n">badge_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">PrimaryFlat</span><span class="p">,</span>
+    <span class="n">badge_text_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">WhiteBold</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">text_size</span><span class="o">=</span><span class="mf">10.0</span><span class="p">),</span>
+    <span class="n">icon_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">WhiteBold</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">audit_cards</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+    <span class="s2">"01_executive_summary.md"</span><span class="p">,</span>
+    <span class="s2">"7-Axis RadarChart + KpiCards + Strengths/Top Risks"</span><span class="p">,</span>
+    <span class="n">badge_text</span><span class="o">=</span><span class="s2">"01"</span><span class="p">,</span>
+    <span class="n">icon</span><span class="o">=</span><span class="n">phosphor</span><span class="o">.</span><span class="n">chart_polar</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">audit_cards</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+    <span class="s2">"02_architecture_and_structure.md"</span><span class="p">,</span>
+    <span class="s2">"TreeNode/Table + ClassDiagram &amp; HeatmapOverlay"</span><span class="p">,</span>
+    <span class="n">badge_text</span><span class="o">=</span><span class="s2">"02"</span><span class="p">,</span>
+    <span class="n">icon</span><span class="o">=</span><span class="n">phosphor</span><span class="o">.</span><span class="n">tree_structure</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">audit_cards</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+    <span class="s2">"03_remediation_roadmap.md"</span><span class="p">,</span>
+    <span class="s2">"Phased P0 -&gt; P1 -&gt; P2 Roadmap + Traceability Table"</span><span class="p">,</span>
+    <span class="n">badge_text</span><span class="o">=</span><span class="s2">"03"</span><span class="p">,</span>
+    <span class="n">icon</span><span class="o">=</span><span class="n">phosphor</span><span class="o">.</span><span class="n">git_commit</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">audit_cards</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+    <span class="s2">"04_standards_and_findings.md"</span><span class="p">,</span>
+    <span class="s2">"Weakest-First BarChart + Consolidated Findings Table"</span><span class="p">,</span>
+    <span class="n">badge_text</span><span class="o">=</span><span class="s2">"04"</span><span class="p">,</span>
+    <span class="n">icon</span><span class="o">=</span><span class="n">phosphor</span><span class="o">.</span><span class="n">list_checks</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">audit_cards</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+    <span class="s2">"05_code_and_runtime_analysis.md"</span><span class="p">,</span>
+    <span class="s2">"Module HeatmapChart + Runtime/Coverage Bars"</span><span class="p">,</span>
+    <span class="n">badge_text</span><span class="o">=</span><span class="s2">"05"</span><span class="p">,</span>
+    <span class="n">icon</span><span class="o">=</span><span class="n">phosphor</span><span class="o">.</span><span class="n">cpu</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">audit_cards</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+    <span class="s2">"06_security_and_supply_chain.md"</span><span class="p">,</span>
+    <span class="s2">"App/OS CVE Table + CWE Sinks &amp; API Auth Surface"</span><span class="p">,</span>
+    <span class="n">badge_text</span><span class="o">=</span><span class="s2">"06"</span><span class="p">,</span>
+    <span class="n">icon</span><span class="o">=</span><span class="n">phosphor</span><span class="o">.</span><span class="n">shield_check</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">audit_cards</span><span class="o">.</span><span class="n">draw</span><span class="p">(</span><span class="n">xy</span><span class="o">=</span><span class="p">(</span><span class="mf">5.5</span><span class="p">,</span> <span class="mf">5.5</span><span class="p">),</span> <span class="n">width</span><span class="o">=</span><span class="mf">74.5</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mf">92.5</span><span class="p">)</span>
+
+<span class="n">mig_panel</span> <span class="o">=</span> <span class="n">Panel</span><span class="p">(</span>
+    <span class="s2">"Migration Plan Blueprint (migration_blueprint.py)"</span><span class="p">,</span>
+    <span class="n">header_variant</span><span class="o">=</span><span class="s2">"filled"</span><span class="p">,</span>
+    <span class="n">header_height</span><span class="o">=</span><span class="mf">8.5</span><span class="p">,</span>
+    <span class="n">style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">PrimaryNeutral</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">shape_r</span><span class="o">=</span><span class="mf">2.0</span><span class="p">),</span>
+    <span class="n">header_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">SecondaryFlat</span><span class="p">,</span>
+    <span class="n">text_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">WhiteBold</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">text_size</span><span class="o">=</span><span class="mf">11.2</span><span class="p">),</span>
+<span class="p">)</span>
+<span class="n">mig_panel</span><span class="o">.</span><span class="n">draw</span><span class="p">(</span><span class="n">xy</span><span class="o">=</span><span class="p">(</span><span class="mf">87.5</span><span class="p">,</span> <span class="mf">3.0</span><span class="p">),</span> <span class="n">width</span><span class="o">=</span><span class="mf">79.5</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mf">106.0</span><span class="p">)</span>
+
+<span class="n">mig_cards</span> <span class="o">=</span> <span class="n">CardList</span><span class="p">(</span>
+    <span class="n">style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">WhiteBordered</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">shape_r</span><span class="o">=</span><span class="mf">1.4</span><span class="p">),</span>
+    <span class="n">text_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">DarkBold</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">text_size</span><span class="o">=</span><span class="mf">10.2</span><span class="p">),</span>
+    <span class="n">description_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">Dark</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">text_size</span><span class="o">=</span><span class="mf">10.0</span><span class="p">),</span>
+    <span class="n">badge_shape</span><span class="o">=</span><span class="s2">"rounded_rect"</span><span class="p">,</span>
+    <span class="n">badge_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">SecondaryNeutral</span><span class="p">,</span>
+    <span class="n">badge_text_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">SecondaryBold</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">text_size</span><span class="o">=</span><span class="mf">10.0</span><span class="p">),</span>
+    <span class="n">icon_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">SecondaryBold</span><span class="p">,</span>
+    <span class="n">direction</span><span class="o">=</span><span class="s2">"vertical"</span><span class="p">,</span>
+    <span class="n">spacing</span><span class="o">=</span><span class="mf">2.0</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">mig_cards</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+    <span class="s2">"00_cover.md — Migration Cover"</span><span class="p">,</span>
+    <span class="s2">"Panel + KpiCards (Mode, Strategy, PRs) -&gt; Auto ToC"</span><span class="p">,</span>
+    <span class="n">badge_text</span><span class="o">=</span><span class="s2">"00"</span><span class="p">,</span>
+    <span class="n">icon</span><span class="o">=</span><span class="n">phosphor</span><span class="o">.</span><span class="n">compass</span><span class="p">,</span>
+    <span class="n">badge_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">SecondaryFlat</span><span class="p">,</span>
+    <span class="n">badge_text_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">WhiteBold</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">text_size</span><span class="o">=</span><span class="mf">10.0</span><span class="p">),</span>
+    <span class="n">icon_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">WhiteBold</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">mig_cards</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+    <span class="s2">"01_migration_strategy_summary.md"</span><span class="p">,</span>
+    <span class="s2">"Assumptions/Non-Goals + As-Is-&gt;To-Be Gap Table"</span><span class="p">,</span>
+    <span class="n">badge_text</span><span class="o">=</span><span class="s2">"01"</span><span class="p">,</span>
+    <span class="n">icon</span><span class="o">=</span><span class="n">phosphor</span><span class="o">.</span><span class="n">arrows_left_right</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">mig_cards</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+    <span class="s2">"02_architecture_waves_and_contracts.md"</span><span class="p">,</span>
+    <span class="s2">"Port/Adapter ClassDiagram + Wave 1..4 Roadmap"</span><span class="p">,</span>
+    <span class="n">badge_text</span><span class="o">=</span><span class="s2">"02"</span><span class="p">,</span>
+    <span class="n">icon</span><span class="o">=</span><span class="n">phosphor</span><span class="o">.</span><span class="n">graph</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">mig_cards</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+    <span class="s2">"03_spec_vs_bug_decision_log.md"</span><span class="p">,</span>
+    <span class="s2">"Hyrum's Law Decision Matrix + Sign-Off Workflow"</span><span class="p">,</span>
+    <span class="n">badge_text</span><span class="o">=</span><span class="s2">"03"</span><span class="p">,</span>
+    <span class="n">icon</span><span class="o">=</span><span class="n">phosphor</span><span class="o">.</span><span class="n">scales</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">mig_cards</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+    <span class="s2">"04_five_phase_gate_roadmap.md"</span><span class="p">,</span>
+    <span class="s2">"Phase 0..4 Gated Timeline + Exit/Rollback Matrix"</span><span class="p">,</span>
+    <span class="n">badge_text</span><span class="o">=</span><span class="s2">"04"</span><span class="p">,</span>
+    <span class="n">icon</span><span class="o">=</span><span class="n">phosphor</span><span class="o">.</span><span class="n">flag_checkered</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">mig_cards</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+    <span class="s2">"05_codemod_and_refactoring_design.md"</span><span class="p">,</span>
+    <span class="s2">"Codemod vs Manual Chart + Touchpoint-&gt;Port Table"</span><span class="p">,</span>
+    <span class="n">badge_text</span><span class="o">=</span><span class="s2">"05"</span><span class="p">,</span>
+    <span class="n">icon</span><span class="o">=</span><span class="n">phosphor</span><span class="o">.</span><span class="n">wrench</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">mig_cards</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+    <span class="s2">"06_pr_wbs_and_verification_gates.md"</span><span class="p">,</span>
+    <span class="s2">"Topological PR-01..NN WBS Table + Gate Summary"</span><span class="p">,</span>
+    <span class="n">badge_text</span><span class="o">=</span><span class="s2">"06"</span><span class="p">,</span>
+    <span class="n">icon</span><span class="o">=</span><span class="n">phosphor</span><span class="o">.</span><span class="n">git_pull_request</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">mig_cards</span><span class="o">.</span><span class="n">draw</span><span class="p">(</span><span class="n">xy</span><span class="o">=</span><span class="p">(</span><span class="mf">90.0</span><span class="p">,</span> <span class="mf">5.5</span><span class="p">),</span> <span class="n">width</span><span class="o">=</span><span class="mf">74.5</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mf">92.5</span><span class="p">)</span>
+
+<span class="n">save</span><span class="p">()</span>
+</code></pre>
+</details>
+<h3>2.1 健全性監査 7章ブループリント（blueprint.py）</h3>
+<p><code>src/pni/_reporter/blueprint.py</code> は、<code>ScoreResult</code>、<code>WorkflowFactsBundle</code>、および <code>ArchitectureRecord</code> を以下の 7 章へマッピングします。</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">章ファイル</th>
+<th style="text-align:left">主なブループリントデータスライス</th>
+<th style="text-align:left">標準 Drawlib ビジュアルコンポーネント</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left"><strong><code>00_cover.md</code></strong></td>
+<td style="text-align:left"><code>overall_score</code>、<code>grade</code>、<code>workflow_id</code>、<code>evaluated_at</code>、ルール準拠サマリ、ファインディング件数</td>
+<td style="text-align:left">フルブリード表紙 <code>Panel</code> + <code>KpiCards</code>（直後に PDF/HTML 目次を自動生成）</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong><code>01_executive_summary.md</code></strong></td>
+<td style="text-align:left"><code>category_scores</code>（<code>7</code> 軸）、<code>category_rationales</code>、<code>strengths</code>、主要 Critical/High リスク、<code>opt_outs</code></td>
+<td style="text-align:left">7軸 <code>RadarChart</code> + <code>KpiCards</code> + <code>CardList</code> / サマリテーブル</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong><code>02_architecture_and_structure.md</code></strong></td>
+<td style="text-align:left"><code>architecture_record</code>（<code>layers_and_modules</code>、<code>flows_and_state</code>）、<code>internal_import_graph</code>、<code>module_hotspots</code></td>
+<td style="text-align:left"><code>TreeNode</code> / <code>Table</code> + UML <code>ClassDiagram</code> と <code>HeatmapOverlay(show_contour_lines=False)</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><strong><code>03_remediation_roadmap.md</code></strong></td>
+<td style="text-align:left"><code>action_plan</code>（<code>P0 -&gt; P1 -&gt; P2</code> 改善アクション、対象ファイル、工数、関連ルール ID）</td>
+<td style="text-align:left">フェーズ別 <code>Roadmap</code> / <code>ChevronProcess</code> + 改善トレーサビリティ <code>Table</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><strong><code>04_standards_and_findings.md</code></strong></td>
+<td style="text-align:left"><code>audit_dimensions</code>（弱点順）、<code>rule_compliance</code>、<code>consolidated_findings</code>（ファイル・行番号統合）</td>
+<td style="text-align:left">弱点順の水平 <code>BarChart</code> + 位置統合ファインディング <code>Table</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><strong><code>05_code_and_runtime_analysis.md</code></strong></td>
+<td style="text-align:left"><code>modules</code>（<code>loc</code>、複雑度、型注釈、docstring、<code>risk_score</code>）、<code>runtime_facts</code>（テスト、カバレッジ、スモーク）</td>
+<td style="text-align:left">モジュール品質 <code>HeatmapChart</code> + 複数系列ランタイム・カバレッジ <code>BarChart</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><strong><code>06_security_and_supply_chain.md</code></strong></td>
+<td style="text-align:left"><code>security_facts</code>（Trivy アプリ/OS CVE、秘密情報、IaC）、<code>dangerous_sinks</code>、<code>api_endpoints</code>、<code>pentest_facts</code></td>
+<td style="text-align:left">アプリ/OS CVE・CWE シンク内訳 + 動的 HTTP ペネトレーションテスト判定 <code>Table</code></td>
+</tr>
+</tbody>
+</table>
+<h3>2.2 マイグレーション実行計画 7章ブループリント（migration_blueprint.py）</h3>
+<p>完了した健全性監査実行を起点とするモダナイゼーションワークフロー（<code>based_on</code> 指定）では、<code>src/pni/_reporter/migration_blueprint.py</code> が <code>MigrationPlanResult</code> と <code>MigrationFacts</code> を並列の 7 章構成実行ブループリントへ合成します。</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">章ファイル</th>
+<th style="text-align:left">主なブループリントデータスライス</th>
+<th style="text-align:left">標準 Drawlib ビジュアルコンポーネント</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left"><strong><code>00_cover.md</code></strong></td>
+<td style="text-align:left"><code>transformation_mode</code>、<code>migration_strategy</code>、<code>api_compatibility</code>、<code>bug_handling_policy</code>、PR・フェーズ数</td>
+<td style="text-align:left">フルブリード移行計画表紙 <code>Panel</code> + <code>KpiCards</code>（直後に目次を自動生成）</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong><code>01_migration_strategy_summary.md</code></strong></td>
+<td style="text-align:left"><code>confirmed_assumptions</code>、<code>non_goals</code>、<code>target_axes</code>（<code>As-Is -&gt; To-Be</code> スタック・リスク軸）</td>
+<td style="text-align:left">移行戦略 <code>CardList</code> + <code>As-Is -&gt; To-Be</code> ギャップ変換マトリクス <code>Table</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><strong><code>02_architecture_waves_and_contracts.md</code></strong></td>
+<td style="text-align:left"><code>target_architecture</code>（<code>target_layers</code>、<code>component_mappings</code>）、<code>refactoring_waves</code>、<code>cycle_cuts</code>、<code>implicit_contracts</code></td>
+<td style="text-align:left">To-Be Port/Adapter <code>ClassDiagram</code> / <code>ArchitectureDiagram</code> + Wave <code>1..4</code> 依存トポロジ</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong><code>03_spec_vs_bug_decision_log.md</code></strong></td>
+<td style="text-align:left"><code>decision_log</code>（<code>DEC-01..NN</code>）、<code>spec_vs_bug_candidates</code>（PO 承認を要する Hyrum の法則の挙動）</td>
+<td style="text-align:left">意思決定ワークフロー図 + <code>DEC-01..NN</code> サインオフマトリクス <code>Table</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><strong><code>04_five_phase_gate_roadmap.md</code></strong></td>
+<td style="text-align:left"><code>phase_gates</code>（<code>Phase 0</code> 特性テストから <code>Phase 4</code> カットオーバーまでの完了条件・ロールバック手順）</td>
+<td style="text-align:left">5フェーズゲート付き <code>Roadmap</code> / <code>GanttChart</code> + 完了・ロールバック基準 <code>Table</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><strong><code>05_codemod_and_refactoring_design.md</code></strong></td>
+<td style="text-align:left"><code>mechanical_codemods</code>、<code>manual_blockers</code>、<code>boundary_touchpoints</code>（<code>db</code>、<code>http</code>、<code>cache</code>、<code>auth</code> ポート）</td>
+<td style="text-align:left">自動 Codemod 対 手動リファクタリング <code>BarChart</code> + 境界タッチポイント変換 <code>Table</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><strong><code>06_pr_wbs_and_verification_gates.md</code></strong></td>
+<td style="text-align:left"><code>pr_wbs</code>（<code>PR-01..NN</code> トポロジカル順 PR チケット、<code>depends_on_prs</code>、<code>verification_cmd</code>）</td>
+<td style="text-align:left">PR 依存 DAG / フェーズ内訳 + <code>PR-01..NN</code> 作業分解構成（WBS）<code>Table</code></td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2>3. 非破壊スキャフォールディング・プリフライトリンター・グリッドQA</h2>
+<p><code>src/pni/_reporter/compiler.py</code> と <code>src/pni/_reporter/drawlib_guide.py</code> は、スキャフォールディング、章オーサリング、およびマルチフォーマットビルドにわたって決定論的な品質ゲートを強制します。</p>
+<h3>3.1 非破壊 pni report init とオンデマンドルール参照</h3>
+<p>前半の AST 解析やルール解釈ステップでシステムプロンプトが肥大化するのを防ぐため、エージェントは <code>reports_src/&lt;target&gt;_src/&lt;lang&gt;/*.md</code> を執筆する直前に Drawlib ルールをオンデマンドで読み込み、<code>-g</code> 座標グリッドで各図を検証したうえで最終的な A4 ベクター PDF をコンパイルします。</p>
+<pre><code class="language-bash"><span class="c1"># 1. Non-destructively scaffold reports_src/&lt;target&gt;_src/ (preserves existing *.md chapters)</span>
+pni<span class="w"> </span>report<span class="w"> </span>init<span class="w"> </span>&lt;target&gt;<span class="w"> </span>--src-dir<span class="w"> </span>reports_src<span class="w"> </span>--lang<span class="w"> </span>en<span class="w"> </span>--style<span class="w"> </span>google
+
+<span class="c1"># 2. Query Drawlib API &amp; component rules on-demand (never guess constructor arguments)</span>
+uv<span class="w"> </span>run<span class="w"> </span>drawlib<span class="w"> </span>rules<span class="w"> </span>show<span class="w"> </span>overview
+uv<span class="w"> </span>run<span class="w"> </span>drawlib<span class="w"> </span>rules<span class="w"> </span>show<span class="w"> </span>project-doc
+uv<span class="w"> </span>run<span class="w"> </span>drawlib<span class="w"> </span>rules<span class="w"> </span>show<span class="w"> </span>api
+
+<span class="c1"># 3. Stage 2 visual grid verification (-g) before full PDF compilation</span>
+uv<span class="w"> </span>run<span class="w"> </span>drawlib<span class="w"> </span>show<span class="w"> </span>reports_src/&lt;target&gt;_src/en/01_executive_summary.md<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-s<span class="w"> </span>reports_src/&lt;target&gt;_src/styles.py<span class="w"> </span>-u<span class="w"> </span>reports_src/&lt;target&gt;_src/utils.py<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-g<span class="w"> </span>-o<span class="w"> </span>.drawlib/scratch/exec_summary_grid.png
+
+<span class="c1"># 4. Run preflight linter and compile reports/&lt;target&gt;.pdf (default A4 vector PDF + ToC)</span>
+pni<span class="w"> </span>report<span class="w"> </span>build<span class="w"> </span>&lt;target&gt;<span class="w"> </span>--src-dir<span class="w"> </span>reports_src<span class="w"> </span>--output-dir<span class="w"> </span>reports
+</code></pre>
+<h3>3.2 プリフライトビジュアルリンター（lint_drawlib_chapters）とリンク検証</h3>
+<p><code>drawlib.tools</code> を呼び出す前に、<code>compiler.py</code> は 4 つの自動検証ガードレールを実行します。</p>
+<ul>
+<li><strong>非破壊的な再スキャフォールディング（<code>scaffold_report_project</code>）</strong>: 初回作成時、<code>pni report init</code> はスターターサンプル（<code>00_cover.md</code>、<code>01_overview.md</code>、<code>02_design.md</code>）を削除します。既存レポートディレクトリに対して再実行された場合は、<code>--force</code> で <code>drawlib.toml</code>、<code>styles.py</code>、<code>utils.py</code> を更新する際にも執筆済みの <code>&lt;lang&gt;/*.md</code> 章ファイルをすべて無傷で保持し、再監査時の <code>git diff</code> をクリーンに保ちます。</li>
+<li><strong>複数系列チャートの凡例チェック</strong>: <code>lint_drawlib_chapters()</code> がすべての <code>```drawlib</code> フェンスを走査し、<code>.add_series(...)</code> を 2 回以上呼び出す <code>BarChart</code> または <code>LineChart</code> が <code>.draw_legend(...)</code> を呼び出していることを検証します。</li>
+<li><strong>UML ClassDiagram + HeatmapOverlay の等高線衝突ガード</strong>: <code>ClassDiagram</code> と <code>HeatmapOverlay(..., show_contour_lines=True)</code> の併用に対してプリフライト警告（<code>strict_preflight=True</code> 時は <code>ValueError</code>）を発行します。<code>show_contour_lines=False</code> を指定することで、メソッドシグネチャに等高線が重なるのを防ぎつつ高リスククラスを滑らかなサーマルグラデーションで強調できます。</li>
+<li><strong>出力ファイル正規化とリンク切れスキャン（<code>_verify_links</code>）</strong>: <code>pni report build</code> は <code>&lt;target&gt;_&lt;default_lang&gt;.pdf</code> を <code>reports/&lt;target&gt;.pdf</code>（<code>page_break=True</code>、<code>generate_index=True</code>）へ正規化します。また <code>-f html</code> 指定時には <code>_verify_links()</code> が <code>drawlib.tools.scan_broken_links()</code> を実行し、リンク切れや画像アセット欠損があればフェイルクローズ（<code>strict_links=True</code>）で検出します。</li>
+</ul>
+<p>上流の JSON スキーマや決定論的ホットスポット計算式の詳細は <a href="scoring_model.html">7軸品質スコアリングモデル</a> を、<code>pni report</code> の全 CLI オプションについては <a href="../05_languages_and_reference/rules_and_cli.html">ルール拡張と CLI リファレンス</a> を参照してください。</p>
+
+            </main>
+        </div>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Theme toggle
+            const themeBtn = document.getElementById('theme-toggle');
+            if (themeBtn) {
+                themeBtn.addEventListener('click', function() {
+                    const current = document.documentElement.getAttribute('data-theme');
+                    const next = current === 'dark' ? 'light' : 'dark';
+                    document.documentElement.setAttribute('data-theme', next);
+                    localStorage.setItem('drawlib-theme', next);
+                });
+            }
+
+            // Language dropdown outside-click & Escape close
+            const langDropdowns = document.querySelectorAll('.lang-dropdown');
+            if (langDropdowns.length > 0) {
+                document.addEventListener('click', function(e) {
+                    langDropdowns.forEach(function(dd) {
+                        if (dd.hasAttribute('open') && !dd.contains(e.target)) {
+                            dd.removeAttribute('open');
+                        }
+                    });
+                });
+                document.addEventListener('keydown', function(e) {
+                    if (e.key === 'Escape') {
+                        langDropdowns.forEach(function(dd) {
+                            dd.removeAttribute('open');
+                        });
+                    }
+                });
+            }
+
+            // Mobile menu toggle
+            const menuBtn = document.getElementById('menu-toggle');
+            const sidebar = document.querySelector('.sidebar');
+            if (menuBtn && sidebar) {
+                function setMenuOpen(open) {
+                    sidebar.classList.toggle('is-open', open);
+                    menuBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
+                    document.body.classList.toggle('menu-open', open);
+                    if (open) {
+                        const menu = sidebar.querySelector('.sidebar-menu');
+                        if (menu) {
+                            menu.scrollTop = 0;
+                        }
+                    }
+                }
+
+                menuBtn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    const willOpen = !sidebar.classList.contains('is-open');
+                    setMenuOpen(willOpen);
+                });
+
+                // Close menu when clicking outside sidebar
+                document.addEventListener('click', function(e) {
+                    if (sidebar.classList.contains('is-open') && !sidebar.contains(e.target)) {
+                        setMenuOpen(false);
+                    }
+                });
+
+                // Close menu when a navigation link is clicked
+                const navLinks = sidebar.querySelectorAll('.nav-item a');
+                navLinks.forEach(function(link) {
+                    link.addEventListener('click', function() {
+                        setMenuOpen(false);
+                    });
+                });
+
+                // Close on Escape key
+                document.addEventListener('keydown', function(e) {
+                    if (e.key === 'Escape' && sidebar.classList.contains('is-open')) {
+                        setMenuOpen(false);
+                    }
+                });
+
+                // Reset menu state when resized above mobile breakpoint
+                window.addEventListener('resize', function() {
+                    if (window.innerWidth > 768 && sidebar.classList.contains('is-open')) {
+                        setMenuOpen(false);
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>

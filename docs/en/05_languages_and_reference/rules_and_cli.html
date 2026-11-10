@@ -1,0 +1,1075 @@
+<!--
+ Copyright (c) 2026 Yuichi Ito (yuichi@yuichi.com)
+
+ This software is licensed under the Apache License, Version 2.0.
+ For more information, please visit: https://github.com/yuichi110/drawlib
+
+ This software is provided "as is", without warranty of any kind,
+ express or implied, including but not limited to the warranties of
+ merchantability, fitness for a particular purpose and noninfringement.
+-->
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rules Customization &amp; CLI Reference</title>
+    <script>
+        (function() {
+            const saved = localStorage.getItem('drawlib-theme');
+            if (saved === 'dark' || (!saved && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                document.documentElement.setAttribute('data-theme', 'dark');
+            } else {
+                document.documentElement.setAttribute('data-theme', 'light');
+            }
+        })();
+    </script>
+    
+    
+    
+    <link rel="alternate" hreflang="en" href="https://www.pni501.com/en/05_languages_and_reference/rules_and_cli.html">
+    
+    <link rel="alternate" hreflang="ja" href="https://www.pni501.com/ja/05_languages_and_reference/rules_and_cli.html">
+    
+    <link rel="alternate" hreflang="x-default" href="https://www.pni501.com/en/05_languages_and_reference/rules_and_cli.html">
+    
+    
+    
+    <meta name="description" content="pni501 (v0.1.3) ships 52 built-in Markdown rule files across common/ (16 universal standards and orchestration guides) and / (36 language and framework…">
+    <link rel="canonical" href="https://www.pni501.com/en/05_languages_and_reference/rules_and_cli.html">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="pni501 Documentation">
+    <meta property="og:title" content="Rules Customization &amp; CLI Reference — pni501 Documentation">
+    <meta property="og:description" content="pni501 (v0.1.3) ships 52 built-in Markdown rule files across common/ (16 universal standards and orchestration guides) and / (36 language and framework…">
+    <meta property="og:url" content="https://www.pni501.com/en/05_languages_and_reference/rules_and_cli.html">
+    <meta property="og:image" content="https://www.pni501.com/_assets/logo.png">
+    <meta property="og:locale" content="en_US">
+    <meta property="og:locale:alternate" content="ja_JP">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Rules Customization &amp; CLI Reference — pni501 Documentation">
+    <meta name="twitter:description" content="pni501 (v0.1.3) ships 52 built-in Markdown rule files across common/ (16 universal standards and orchestration guides) and / (36 language and framework…">
+    <meta name="twitter:image" content="https://www.pni501.com/_assets/logo.png">
+    
+    
+    <link rel="icon" type="image/png" href="../../_assets/favicon.png">
+    
+    
+    <link rel="stylesheet" href="../style.css">
+    
+    
+</head>
+<body>
+    
+    <div class="doc-layout">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <a href="../index.html" class="sidebar-brand" aria-label="pni501 Documentation">
+                    
+                    <img src="../../_assets/logo.png" alt="pni501 Documentation" class="sidebar-logo sidebar-logo-light">
+                    <img src="../../_assets/logo_dark.png" alt="pni501 Documentation" class="sidebar-logo sidebar-logo-dark">
+                    
+                </a>
+                <div class="sidebar-header-actions">
+                    <button type="button" id="theme-toggle" class="theme-toggle-btn" aria-label="Toggle theme">
+                        <svg class="icon-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+                        <svg class="icon-moon" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+                    </button>
+                    <button type="button" id="menu-toggle" class="menu-toggle-btn" aria-label="Toggle navigation" aria-expanded="false">
+                        <svg class="icon-hamburger" viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+                        <svg class="icon-close" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                    </button>
+                </div>
+            </div>
+            <div class="sidebar-menu">
+                
+                    
+                        
+                        <ul class="nav-list">
+                            
+                            <li class="nav-item ">
+                                <a href="../index.html" >Overview</a>
+                            </li>
+                            
+                        </ul>
+                    
+                        
+                        <div class="sidebar-heading">1. Getting Started</div>
+                        
+                        <ul class="nav-list">
+                            
+                            <li class="nav-item ">
+                                <a href="../01_getting_started/concepts.html" >Background &amp; Core Concepts</a>
+                            </li>
+                            
+                            <li class="nav-item ">
+                                <a href="../01_getting_started/quickstart.html" >Quickstart Guide</a>
+                            </li>
+                            
+                            <li class="nav-item ">
+                                <a href="../01_getting_started/use_cases.html" >Primary Use Cases</a>
+                            </li>
+                            
+                        </ul>
+                    
+                        
+                        <div class="sidebar-heading">2. Architecture</div>
+                        
+                        <ul class="nav-list">
+                            
+                            <li class="nav-item ">
+                                <a href="../02_architecture/domain_architecture.html" >Domain Architecture &amp; Cascade</a>
+                            </li>
+                            
+                            <li class="nav-item ">
+                                <a href="../02_architecture/stateful_engine.html" >Stateful Pull-Push Engine</a>
+                            </li>
+                            
+                        </ul>
+                    
+                        
+                        <div class="sidebar-heading">3. Workflows &amp; Actions</div>
+                        
+                        <ul class="nav-list">
+                            
+                            <li class="nav-item ">
+                                <a href="../03_workflows_and_actions/workflows_guide.html" >Workflows &amp; Pre-Flight Gates</a>
+                            </li>
+                            
+                            <li class="nav-item ">
+                                <a href="../03_workflows_and_actions/actions_pipeline.html" >15 Actions &amp; 12 Primitives</a>
+                            </li>
+                            
+                            <li class="nav-item ">
+                                <a href="../03_workflows_and_actions/analyzers_and_pentest.html" >Analyzers &amp; Live Pentest</a>
+                            </li>
+                            
+                        </ul>
+                    
+                        
+                        <div class="sidebar-heading">4. Scoring &amp; Reports</div>
+                        
+                        <ul class="nav-list">
+                            
+                            <li class="nav-item ">
+                                <a href="../04_scoring_and_reports/scoring_model.html" >7-Axis Scoring Model</a>
+                            </li>
+                            
+                            <li class="nav-item ">
+                                <a href="../04_scoring_and_reports/drawlib_reporter.html" >Drawlib Visual Reporter</a>
+                            </li>
+                            
+                        </ul>
+                    
+                        
+                        <div class="sidebar-heading">5. Languages &amp; Reference</div>
+                        
+                        <ul class="nav-list">
+                            
+                            <li class="nav-item ">
+                                <a href="supported_languages.html" >Supported 6 Languages</a>
+                            </li>
+                            
+                            <li class="nav-item active">
+                                <a href="rules_and_cli.html" >Rules &amp; CLI Reference</a>
+                            </li>
+                            
+                        </ul>
+                    
+                        
+                        <div class="sidebar-heading">External Links</div>
+                        
+                        <ul class="nav-list">
+                            
+                            <li class="nav-item ">
+                                <a href="https://github.com/yuichi110/pni501" target="_blank" rel="noopener noreferrer">GitHub Repository<svg class="nav-external-icon" viewBox="0 0 24 24" aria-hidden="true"><line x1="7" y1="17" x2="17" y2="7"></line><polyline points="7 7 17 7 17 17"></polyline></svg></a>
+                            </li>
+                            
+                            <li class="nav-item ">
+                                <a href="https://pypi.org/project/pni501/" target="_blank" rel="noopener noreferrer">PyPI Package<svg class="nav-external-icon" viewBox="0 0 24 24" aria-hidden="true"><line x1="7" y1="17" x2="17" y2="7"></line><polyline points="7 7 17 7 17 17"></polyline></svg></a>
+                            </li>
+                            
+                        </ul>
+                    
+                
+            </div>
+        </aside>
+        <div class="content-wrapper">
+            <header class="top-bar">
+                <div class="breadcrumbs">
+                    <span class="crumb">Docs</span>
+                    <span class="crumb-separator">&raquo;</span>
+                    <span class="crumb active">Rules Customization &amp; CLI Reference</span>
+                </div>
+                
+                <div class="lang-switcher">
+                    <details class="lang-dropdown">
+                        <summary class="lang-dropdown-btn" aria-label="Select language">
+                            <svg class="lang-globe-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+                            <span class="lang-current-label">English</span>
+                            <svg class="lang-caret-icon" viewBox="0 0 24 24" aria-hidden="true"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                        </summary>
+                        <div class="lang-dropdown-menu" role="menu">
+                            
+                            <a href="rules_and_cli.html" class="lang-option active" lang="en" hreflang="en" aria-current="page">
+                                <span>English</span>
+                                
+                                <svg class="lang-check-icon" viewBox="0 0 24 24" aria-hidden="true"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                                
+                            </a>
+                            
+                            <a href="../../ja/05_languages_and_reference/rules_and_cli.html" class="lang-option" lang="ja" hreflang="ja" >
+                                <span>日本語</span>
+                                
+                            </a>
+                            
+                        </div>
+                    </details>
+                </div>
+                
+            </header>
+            <main class="main-content">
+                <h1>Rules Customization &amp; CLI Reference</h1>
+<p><code>pni501</code> (<code>v0.1.3</code>) ships <strong>52 built-in Markdown rule files</strong> across <code>common/*</code> (<code>16</code> universal standards and orchestration guides) and <code>&lt;lang&gt;/*</code> (<code>36</code> language and framework standards across 6 languages), resolves workspace customizations through a deterministic <code>.pni/</code> override cascade, and exposes every lifecycle operation via the unified <code>pni</code> CLI.</p>
+<figure class="drawlib-image" style="text-align: center;">
+  <img src="../../images/05_languages_and_reference/rules_and_cli/rules_taxonomy_and_override.png" alt="rules_and_cli_1" />
+  <figcaption class="drawlib-caption">Orthogonal Rule Taxonomy (common/* + <lang>/*) and .pni/ Local Override Cascade</figcaption>
+</figure>
+<details class="drawlib-code-details">
+<summary>Source Code</summary>
+<pre><code class="language-python"><span class="kn">from</span><span class="w"> </span><span class="nn">drawlib.canvas</span><span class="w"> </span><span class="kn">import</span> <span class="n">save</span><span class="p">,</span> <span class="n">setup</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">drawlib.icons</span><span class="w"> </span><span class="kn">import</span> <span class="n">phosphor</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">drawlib.smartarts</span><span class="w"> </span><span class="kn">import</span> <span class="n">CardList</span><span class="p">,</span> <span class="n">Panel</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">drawlib.styles</span><span class="w"> </span><span class="kn">import</span> <span class="n">Styles</span>
+
+<span class="n">setup</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="mi">184</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">86</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">150</span><span class="p">)</span>
+
+<span class="n">tax_panel</span> <span class="o">=</span> <span class="n">Panel</span><span class="p">(</span>
+    <span class="s2">"1. Built-in Rule Taxonomy (52 Markdown Files)"</span><span class="p">,</span>
+    <span class="n">header_variant</span><span class="o">=</span><span class="s2">"filled"</span><span class="p">,</span>
+    <span class="n">header_height</span><span class="o">=</span><span class="mf">8.5</span><span class="p">,</span>
+    <span class="n">style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">Neutral</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">shape_r</span><span class="o">=</span><span class="mf">2.0</span><span class="p">),</span>
+    <span class="n">header_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">PrimaryFlat</span><span class="p">,</span>
+    <span class="n">text_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">WhiteBold</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">text_size</span><span class="o">=</span><span class="mf">11.2</span><span class="p">),</span>
+<span class="p">)</span>
+<span class="n">tax_panel</span><span class="o">.</span><span class="n">draw</span><span class="p">(</span><span class="n">xy</span><span class="o">=</span><span class="p">(</span><span class="mf">4.0</span><span class="p">,</span> <span class="mf">4.0</span><span class="p">),</span> <span class="n">width</span><span class="o">=</span><span class="mf">85.5</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mf">78.0</span><span class="p">)</span>
+
+<span class="n">tax_cards</span> <span class="o">=</span> <span class="n">CardList</span><span class="p">(</span>
+    <span class="n">style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">WhiteBordered</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">shape_r</span><span class="o">=</span><span class="mf">1.5</span><span class="p">),</span>
+    <span class="n">text_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">DarkBold</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">text_size</span><span class="o">=</span><span class="mf">10.8</span><span class="p">),</span>
+    <span class="n">description_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">Dark</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">text_size</span><span class="o">=</span><span class="mf">10.0</span><span class="p">),</span>
+    <span class="n">badge_shape</span><span class="o">=</span><span class="s2">"rounded_rect"</span><span class="p">,</span>
+    <span class="n">badge_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">PrimaryNeutral</span><span class="p">,</span>
+    <span class="n">badge_text_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">PrimaryBold</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">text_size</span><span class="o">=</span><span class="mf">10.0</span><span class="p">),</span>
+    <span class="n">icon_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">PrimaryBold</span><span class="p">,</span>
+    <span class="n">direction</span><span class="o">=</span><span class="s2">"vertical"</span><span class="p">,</span>
+    <span class="n">spacing</span><span class="o">=</span><span class="mf">2.8</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">tax_cards</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+    <span class="s2">"Universal Standards &amp; Guides (common/*)"</span><span class="p">,</span>
+    <span class="s2">"12 evaluation rules (Arch, SIG, OpenSSF, OWASP,</span><span class="se">\n</span><span class="s2">"</span>
+    <span class="s2">"12-Factor, SRE, CLI, Library) + 4 meta-guides</span><span class="se">\n</span><span class="s2">"</span>
+    <span class="s2">"(agent_instruction, workflow/migration/progress)"</span><span class="p">,</span>
+    <span class="n">badge_text</span><span class="o">=</span><span class="s2">"16"</span><span class="p">,</span>
+    <span class="n">icon</span><span class="o">=</span><span class="n">phosphor</span><span class="o">.</span><span class="n">globe</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">tax_cards</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+    <span class="s2">"6-Language Core Standards (&lt;lang&gt;/*)"</span><span class="p">,</span>
+    <span class="s2">"code_quality, typing, dependencies, testing,</span><span class="se">\n</span><span class="s2">"</span>
+    <span class="s2">"modern_stack, workflow_guide across python,</span><span class="se">\n</span><span class="s2">"</span>
+    <span class="s2">"java, php, go, typescript, and javascript"</span><span class="p">,</span>
+    <span class="n">badge_text</span><span class="o">=</span><span class="s2">"32"</span><span class="p">,</span>
+    <span class="n">icon</span><span class="o">=</span><span class="n">phosphor</span><span class="o">.</span><span class="n">code</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">tax_cards</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+    <span class="s2">"Framework Rules (&lt;lang&gt;/frameworks/*)"</span><span class="p">,</span>
+    <span class="s2">"python/frameworks/fastapi, java/frameworks/</span><span class="se">\n</span><span class="s2">"</span>
+    <span class="s2">"spring_boot, php/frameworks/laravel, and</span><span class="se">\n</span><span class="s2">"</span>
+    <span class="s2">"php/frameworks/wordpress"</span><span class="p">,</span>
+    <span class="n">badge_text</span><span class="o">=</span><span class="s2">"4"</span><span class="p">,</span>
+    <span class="n">icon</span><span class="o">=</span><span class="n">phosphor</span><span class="o">.</span><span class="n">stack</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">tax_cards</span><span class="o">.</span><span class="n">draw</span><span class="p">(</span><span class="n">xy</span><span class="o">=</span><span class="p">(</span><span class="mf">6.5</span><span class="p">,</span> <span class="mf">6.5</span><span class="p">),</span> <span class="n">width</span><span class="o">=</span><span class="mf">80.5</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mf">64.5</span><span class="p">)</span>
+
+<span class="n">cas_panel</span> <span class="o">=</span> <span class="n">Panel</span><span class="p">(</span>
+    <span class="s2">"2. Local .pni/ Override &amp; Waiver Cascade"</span><span class="p">,</span>
+    <span class="n">header_variant</span><span class="o">=</span><span class="s2">"filled"</span><span class="p">,</span>
+    <span class="n">header_height</span><span class="o">=</span><span class="mf">8.5</span><span class="p">,</span>
+    <span class="n">style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">PrimaryNeutral</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">shape_r</span><span class="o">=</span><span class="mf">2.0</span><span class="p">),</span>
+    <span class="n">header_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">SecondaryFlat</span><span class="p">,</span>
+    <span class="n">text_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">WhiteBold</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">text_size</span><span class="o">=</span><span class="mf">11.2</span><span class="p">),</span>
+<span class="p">)</span>
+<span class="n">cas_panel</span><span class="o">.</span><span class="n">draw</span><span class="p">(</span><span class="n">xy</span><span class="o">=</span><span class="p">(</span><span class="mf">94.5</span><span class="p">,</span> <span class="mf">4.0</span><span class="p">),</span> <span class="n">width</span><span class="o">=</span><span class="mf">85.5</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mf">78.0</span><span class="p">)</span>
+
+<span class="n">cas_cards</span> <span class="o">=</span> <span class="n">CardList</span><span class="p">(</span>
+    <span class="n">style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">WhiteBordered</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">shape_r</span><span class="o">=</span><span class="mf">1.5</span><span class="p">),</span>
+    <span class="n">text_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">DarkBold</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">text_size</span><span class="o">=</span><span class="mf">10.8</span><span class="p">),</span>
+    <span class="n">description_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">Dark</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">text_size</span><span class="o">=</span><span class="mf">10.0</span><span class="p">),</span>
+    <span class="n">badge_shape</span><span class="o">=</span><span class="s2">"rounded_rect"</span><span class="p">,</span>
+    <span class="n">badge_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">SecondaryNeutral</span><span class="p">,</span>
+    <span class="n">badge_text_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">SecondaryBold</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">text_size</span><span class="o">=</span><span class="mf">10.0</span><span class="p">),</span>
+    <span class="n">icon_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">SecondaryBold</span><span class="p">,</span>
+    <span class="n">direction</span><span class="o">=</span><span class="s2">"vertical"</span><span class="p">,</span>
+    <span class="n">spacing</span><span class="o">=</span><span class="mf">2.8</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">cas_cards</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+    <span class="s2">"Priority 1: Local .pni/ Workspace Files"</span><span class="p">,</span>
+    <span class="s2">".pni/rules/&lt;scope&gt;/&lt;name&gt;.md, .pni/actions/*.yaml,</span><span class="se">\n</span><span class="s2">"</span>
+    <span class="s2">".pni/dockerfiles/, and .pni/instructions.md</span><span class="se">\n</span><span class="s2">"</span>
+    <span class="s2">"automatically shadow built-in package defaults"</span><span class="p">,</span>
+    <span class="n">badge_text</span><span class="o">=</span><span class="s2">"P1"</span><span class="p">,</span>
+    <span class="n">icon</span><span class="o">=</span><span class="n">phosphor</span><span class="o">.</span><span class="n">folder_open</span><span class="p">,</span>
+    <span class="n">badge_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">PrimaryFlat</span><span class="p">,</span>
+    <span class="n">badge_text_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">WhiteBold</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">text_size</span><span class="o">=</span><span class="mf">10.0</span><span class="p">),</span>
+    <span class="n">icon_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">WhiteBold</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">cas_cards</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+    <span class="s2">"Priority 2: Active Language Scope (&lt;lang&gt;/*)"</span><span class="p">,</span>
+    <span class="s2">"Short names (e.g. 'pni rules show testing' or</span><span class="se">\n</span><span class="s2">"</span>
+    <span class="s2">"'repo_structure_audit') resolve to the active</span><span class="se">\n</span><span class="s2">"</span>
+    <span class="s2">"language before falling back to common/*"</span><span class="p">,</span>
+    <span class="n">badge_text</span><span class="o">=</span><span class="s2">"P2"</span><span class="p">,</span>
+    <span class="n">icon</span><span class="o">=</span><span class="n">phosphor</span><span class="o">.</span><span class="n">magnifying_glass</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">cas_cards</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+    <span class="s2">"Priority 3: Built-in common/* &amp; [[opt_out]]"</span><span class="p">,</span>
+    <span class="s2">"Canonical src/pni/_rules/ fallback paired with</span><span class="se">\n</span><span class="s2">"</span>
+    <span class="s2">"declarative .pni/pni.toml [[opt_out]] waivers</span><span class="se">\n</span><span class="s2">"</span>
+    <span class="s2">"(requires scoped paths + reason &gt;= 10 chars)"</span><span class="p">,</span>
+    <span class="n">badge_text</span><span class="o">=</span><span class="s2">"P3"</span><span class="p">,</span>
+    <span class="n">icon</span><span class="o">=</span><span class="n">phosphor</span><span class="o">.</span><span class="n">shield_check</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">cas_cards</span><span class="o">.</span><span class="n">draw</span><span class="p">(</span><span class="n">xy</span><span class="o">=</span><span class="p">(</span><span class="mf">97.0</span><span class="p">,</span> <span class="mf">6.5</span><span class="p">),</span> <span class="n">width</span><span class="o">=</span><span class="mf">80.5</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mf">64.5</span><span class="p">)</span>
+
+<span class="n">save</span><span class="p">()</span>
+</code></pre>
+</details>
+<hr />
+<h2>1. Orthogonal Rule Taxonomy (52 Built-in Files)</h2>
+<p>Every rule in <code>pni501</code> is stored as clean, human- and LLM-readable Markdown under <code>src/pni/_rules/</code> and paired with deterministic static, runtime, or security signals so AI evaluations never rely on ungrounded impressions.</p>
+<h3>1.1 Universal Standards &amp; Meta-Guides (<code>common/*</code> — 16 Files)</h3>
+<p>The <code>common/</code> scope contains <strong>12 universal engineering evaluation rules</strong> (spanning all repositories plus <code>Service / API</code>, <code>CLI Tool</code>, and <code>Library / SDK</code> archetypes) and <strong>4 orchestration meta-guides</strong>:</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">Rule Identifier</th>
+<th style="text-align:left">Anchor Standard</th>
+<th style="text-align:left">Target Archetype</th>
+<th style="text-align:left">Deterministic Grounding Signals (<code>ProjectFacts</code> / <code>AstFacts</code> / <code>RuntimeFacts</code>)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left"><code>common/architecture</code></td>
+<td style="text-align:left">Clean / Layered Arch</td>
+<td style="text-align:left">All Projects</td>
+<td style="text-align:left"><code>circular_dependencies</code>, <code>internal_import_graph</code>, <code>boundary_violations</code>, <code>ArchitectureRecord</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>common/maintainability</code></td>
+<td style="text-align:left">SIG / ISO 25010</td>
+<td style="text-align:left">All Projects</td>
+<td style="text-align:left"><code>complex_functions</code> (<code>McCabe &gt; 7</code>, <code>cognitive &gt; 15</code>), <code>LOC &lt;= 50</code>, <code>params &lt;= 6</code>, <code>global_state_usages</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>common/supply_chain</code></td>
+<td style="text-align:left">OpenSSF Scorecard</td>
+<td style="text-align:left">All Projects</td>
+<td style="text-align:left"><code>lockfiles_found</code>, <code>unpinned_dependencies</code>, <code>ci_supply_chain_issues</code>, <code>has_license</code>, <code>has_security_md</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>common/security</code></td>
+<td style="text-align:left">OWASP ASVS Baseline</td>
+<td style="text-align:left">All Projects</td>
+<td style="text-align:left"><code>committed_secret_files</code>, <code>hardcoded_secrets</code>, <code>bug_risk_idioms</code>, <code>dangerous_sinks</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>common/security_vulnerability</code></td>
+<td style="text-align:left">Trivy + CWE Sinks</td>
+<td style="text-align:left">All Projects</td>
+<td style="text-align:left"><code>SecurityScanFacts</code> (App/OS CVEs, IaC misconfigs, redacted secrets) + AST <code>dangerous_sinks</code> &amp; <code>api_endpoints</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>common/runtime_verification</code></td>
+<td style="text-align:left">Heretic Container QA</td>
+<td style="text-align:left">All Projects</td>
+<td style="text-align:left"><code>RuntimeFacts</code> (Dockerfile build, offline <code>--network=none</code> test pass rate, line/branch coverage, Stage 3 smoke probe)</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>common/git_workflow</code></td>
+<td style="text-align:left">Conventional Repo</td>
+<td style="text-align:left">All Projects</td>
+<td style="text-align:left"><code>has_gitignore</code>, committed caches/artifacts (<code>__pycache__</code>, <code>node_modules</code>, <code>.venv</code>), workspace hygiene</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>common/documentation</code></td>
+<td style="text-align:left">Std Readme &amp; Diataxis</td>
+<td style="text-align:left">All Projects</td>
+<td style="text-align:left"><code>readme_headings</code>, <code>readme_line_count</code>, <code>docs_inventory</code>, <code>docstring_coverage_pct</code>, <code>docstring_issues</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>common/twelve_factor</code></td>
+<td style="text-align:left">12 / 15-Factor App</td>
+<td style="text-align:left">Service / API</td>
+<td style="text-align:left"><code>scattered_env_access</code> outside config modules, <code>runtime_types</code>, stateless worker readiness</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>common/production_readiness</code></td>
+<td style="text-align:left">Google SRE PRR</td>
+<td style="text-align:left">Service / API</td>
+<td style="text-align:left"><code>missing_io_timeouts</code>, <code>unstructured_logging</code>, health/readiness endpoints, container non-root hygiene</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>common/cli_guidelines</code></td>
+<td style="text-align:left">clig.dev Guidelines</td>
+<td style="text-align:left">CLI Tool</td>
+<td style="text-align:left">CLI entrypoints, <code>--help</code>/<code>--version</code>/<code>--json</code> support, <code>stdout</code> vs <code>stderr</code> separation, non-zero exit codes</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>common/library_guidelines</code></td>
+<td style="text-align:left">Public SDK Hygiene</td>
+<td style="text-align:left">Library / SDK</td>
+<td style="text-align:left">Explicit public exports (<code>__all__</code>), <code>py.typed</code> / <code>.d.ts</code> markers, import-time purity, zero <code>sys.exit()</code> in library code</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>common/agent_instruction</code></td>
+<td style="text-align:left">PNI Agent Protocol</td>
+<td style="text-align:left">Meta-Guide</td>
+<td style="text-align:left">Top-level deterministic pull-push execution loop &amp; zero-hallucination protocol (<code>pni instructions</code>)</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>common/workflow_guide</code></td>
+<td style="text-align:left">PNI Authoring Spec</td>
+<td style="text-align:left">Meta-Guide</td>
+<td style="text-align:left">Guide for inspecting repository layout and authoring <code>.pni/workflows/*.yaml</code> &amp; <code>.pni/actions/*.yaml</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>common/migration_planning</code></td>
+<td style="text-align:left">Modernization Spec</td>
+<td style="text-align:left">Meta-Guide</td>
+<td style="text-align:left">Pre-flight user clarification checklist, <code>based_on</code> audit inheritance, and 5-phase gated migration planning</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>common/progress_tracking</code></td>
+<td style="text-align:left">Schedule &amp; Git Gov</td>
+<td style="text-align:left">Meta-Guide</td>
+<td style="text-align:left">Guide for <code>.pni/progress/&lt;target&gt;.yaml</code> milestones, task DAG validation, and Git branch/commit governance</td>
+</tr>
+</tbody>
+</table>
+<h3>1.2 Language &amp; Framework Rule Catalog (<code>&lt;lang&gt;/*</code> — 36 Files)</h3>
+<p>Each of the 6 supported languages provides core evaluation rules (<code>code_quality</code>, <code>typing</code>, <code>dependencies</code>, <code>testing</code>), an ecosystem <code>workflow_guide</code>, and optional <code>modern_stack</code> or <code>frameworks/*</code> rules:</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">Language Scope</th>
+<th style="text-align:left">Count</th>
+<th style="text-align:left">Built-in Rule Identifiers</th>
+<th style="text-align:left">Key Ecosystem &amp; Framework Checkpoints</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left"><strong>Python (<code>python/*</code>)</strong></td>
+<td style="text-align:left"><code>7</code></td>
+<td style="text-align:left"><code>code_quality</code>, <code>typing</code>, <code>dependencies</code>, <code>modern_stack</code>, <code>testing</code>, <code>frameworks/fastapi</code>, <code>workflow_guide</code></td>
+<td style="text-align:left">PEP 621 <code>pyproject.toml</code> + <code>uv.lock</code>, 100% public type hints, Google docstrings, Python 3.11+ <code>pathlib</code> / <code>X | Y</code>, <code>pytest</code> mirror layout, FastAPI <code>lifespan</code> &amp; <code>Depends()</code> DI</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>Java (<code>java/*</code>)</strong></td>
+<td style="text-align:left"><code>6</code></td>
+<td style="text-align:left"><code>code_quality</code>, <code>typing</code>, <code>dependencies</code>, <code>testing</code>, <code>frameworks/spring_boot</code>, <code>workflow_guide</code></td>
+<td style="text-align:left">Maven/Gradle wrapper &amp; lockfiles, generics safety (zero raw types), Javadoc <code>@param</code> sync, Java 21 <code>record</code>/<code>sealed</code> idioms, JUnit 5 <code>@Test</code>, Spring Boot constructor DI &amp; <code>@ConfigurationProperties</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>PHP (<code>php/*</code>)</strong></td>
+<td style="text-align:left"><code>8</code></td>
+<td style="text-align:left"><code>code_quality</code>, <code>typing</code>, <code>dependencies</code>, <code>modern_stack</code>, <code>testing</code>, <code>frameworks/laravel</code>, <code>frameworks/wordpress</code>, <code>workflow_guide</code></td>
+<td style="text-align:left"><code>declare(strict_types=1)</code>, PSR-12 / PSR-4 autoloading, zero <code>$_GET</code>/<code>$GLOBALS</code> coupling, PHP 8.2+ <code>readonly</code>/<code>enum</code>, PHPUnit/Pest + <code>pcov</code>, Laravel FormRequest/Eloquent safety, WordPress <code>$wpdb-&gt;prepare</code> &amp; nonces</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>Go (<code>go/*</code>)</strong></td>
+<td style="text-align:left"><code>5</code></td>
+<td style="text-align:left"><code>code_quality</code>, <code>typing</code>, <code>dependencies</code>, <code>testing</code>, <code>workflow_guide</code></td>
+<td style="text-align:left"><code>gofmt</code>/<code>go vet</code>, GoDoc comments on exported symbols, explicit <code>if err != nil</code> (<code>%w</code> wrapping, zero <code>_ = err</code>), narrow consumer-side interfaces (avoid <code>any</code>/<code>unsafe.Pointer</code>), table-driven <code>t.Run</code> tests</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>TypeScript (<code>typescript/*</code>)</strong></td>
+<td style="text-align:left"><code>5</code></td>
+<td style="text-align:left"><code>code_quality</code>, <code>typing</code>, <code>dependencies</code>, <code>testing</code>, <code>workflow_guide</code></td>
+<td style="text-align:left"><code>tsconfig.json</code> <code>&quot;strict&quot;: true</code> (<code>noImplicitAny</code>, <code>strictNullChecks</code>), zero <code>: any</code> / <code>as any</code> (<code>unknown</code> + Zod narrowing), TSDoc comments, handled Promises, Vitest/Jest coverage</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>JavaScript (<code>javascript/*</code>)</strong></td>
+<td style="text-align:left"><code>5</code></td>
+<td style="text-align:left"><code>code_quality</code>, <code>typing</code>, <code>dependencies</code>, <code>testing</code>, <code>workflow_guide</code></td>
+<td style="text-align:left">ES Modules (<code>import</code>/<code>export</code>), JSDoc <code>@param {Type}</code> &amp; <code>@returns {Type}</code> contracts, <code>checkJs</code> / <code>// @ts-check</code>, <code>const</code>/<code>let</code> &amp; strict <code>===</code>, Vitest/Jest/Node test suites</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2>2. The <code>.pni/</code> Local Override Cascade &amp; <code>pni.toml</code> Waivers</h2>
+<p>Running <code>pni init</code> initializes the <code>.pni/</code> workspace directory. PNI resolves rules, composite actions, instructions, and container harnesses through a non-destructive override cascade so teams can tailor thresholds or container images without forking <code>pni501</code>:</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">Workspace Path</th>
+<th style="text-align:left">Cascade Resolution Behavior</th>
+<th style="text-align:left">Purpose &amp; Customization Pattern</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left"><code>.pni/pni.toml</code></td>
+<td style="text-align:left">Workspace root (or nearest ancestor <code>.pni/pni.toml</code>)</td>
+<td style="text-align:left">Configures <code>[project]</code>, default <code>[targets]</code>, <code>[scan]</code> exclusions, <code>[report]</code> defaults, and <code>[[opt_out]]</code> waivers.</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>.pni/rules/&lt;scope&gt;/&lt;name&gt;.md</code></td>
+<td style="text-align:left"><code>.pni/rules/</code> $\to$ built-in <code>&lt;active_lang&gt;/</code> $\to$ built-in <code>common/</code></td>
+<td style="text-align:left">Edit any copied <code>.md</code> rule in <code>.pni/rules/</code> to customize thresholds (shown as <code>Local (.pni)</code> in <code>pni rules list</code>). Meta-guides (<code>agent_instruction</code>, <code>workflow_guide</code>) always resolve from built-in package files.</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>.pni/actions/*.yaml</code></td>
+<td style="text-align:left"><code>.pni/actions/</code> $\to$ built-in <code>&lt;active_lang&gt;/</code> $\to$ built-in <code>common/</code></td>
+<td style="text-align:left">Customize composite action step rules, parameters, or prompts per project.</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>.pni/workflows/*.yaml</code></td>
+<td style="text-align:left">Project-defined in <code>.pni/workflows/</code></td>
+<td style="text-align:left">Declares <code>audit</code>, <code>migration</code> (<code>based_on</code>), and <code>progress</code> workflows.</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>.pni/dockerfiles/</code></td>
+<td style="text-align:left"><code>explicit_dockerfile</code> $\to$ <code>.pni/dockerfiles/_templates/&lt;lang&gt;/&lt;tool&gt;.dockerfile</code> $\to$ built-in <code>src/pni/_dockerfiles/</code></td>
+<td style="text-align:left">Materializes target-scoped harness Dockerfiles (<code>.pni/dockerfiles/&lt;target&gt;/Dockerfile</code> + <code>.dockerignore</code>) for offline test/smoke execution.</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>.pni/pentests/&lt;target&gt;/</code></td>
+<td style="text-align:left">Scaffolded via <code>pni pentests init -w &lt;workflow_id&gt;</code></td>
+<td style="text-align:left">Holds explicit <code>Python + httpx</code> dynamic penetration test probes (<code>conftest.py</code>, <code>test_*.py</code>).</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>.pni/progress/&lt;target&gt;.yaml</code></td>
+<td style="text-align:left">Scaffolded via <code>pni progress init</code> &amp; verified via <code>pni progress validate</code></td>
+<td style="text-align:left">Defines project milestones, task dependency DAG (<code>depends_on</code>), and <code>git_policy</code> governance rules.</td>
+</tr>
+</tbody>
+</table>
+<p>To suppress intentional design trade-offs (such as a sandboxed CLI subprocess call or a dev-only Dockerfile stage) without weakening global rules, declare scoped <code>[[opt_out]]</code> entries in <code>.pni/pni.toml</code> with an explicit engineering <code>reason</code> (<code>&gt;= 10</code> non-whitespace characters):</p>
+<pre><code class="language-toml"><span class="k">[project]</span>
+<span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"order-dispatch"</span>
+<span class="n">language_version</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"3.12"</span>
+<span class="n">archetypes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="s2">"web_api"</span><span class="p">]</span>
+
+<span class="k">[targets]</span>
+<span class="n">root</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"."</span>
+<span class="n">source</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="s2">"src"</span><span class="p">]</span>
+<span class="n">tests</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="s2">"tests"</span><span class="p">]</span>
+<span class="n">docs</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="s2">"README.md"</span><span class="p">]</span>
+<span class="n">exclude</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="s2">"src/generated/**"</span><span class="p">]</span>
+
+<span class="k">[scan]</span>
+<span class="n">respect_gitignore</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span>
+<span class="n">include_gitignored</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="s2">"uv.lock"</span><span class="p">,</span><span class="w"> </span><span class="s2">"composer.lock"</span><span class="p">]</span>
+
+<span class="k">[report]</span>
+<span class="n">src_dir</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"reports_src"</span>
+<span class="n">output_dir</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"reports"</span>
+<span class="n">formats</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="s2">"pdf"</span><span class="p">]</span>
+<span class="n">lang</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"en"</span>
+<span class="n">style</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"google"</span>
+
+<span class="k">[[opt_out]]</span>
+<span class="n">id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"CWE-78"</span>
+<span class="n">scope</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="s2">"src/cli/sandbox_runner.py"</span><span class="p">]</span>
+<span class="n">reason</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"Command arguments are validated against an allowlist and executed with shell=False."</span>
+</code></pre>
+<hr />
+<h2>3. Complete <code>pni</code> CLI Reference</h2>
+<p>The <code>pni</code> CLI (<code>src/pni/cli.py</code>) organizes all workspace initialization, rule discovery, stateful workflow orchestration, live penetration testing, progress governance, Drawlib report compilation, and Pydantic schema validation commands into a cohesive command hierarchy.</p>
+<figure class="drawlib-image" style="text-align: center;">
+  <img src="../../images/05_languages_and_reference/rules_and_cli/cli_command_tree.png" alt="rules_and_cli_2" />
+  <figcaption class="drawlib-caption">The pni CLI Command Hierarchy and Workspace Artifact Mapping</figcaption>
+</figure>
+<details class="drawlib-code-details">
+<summary>Source Code</summary>
+<pre><code class="language-python"><span class="kn">from</span><span class="w"> </span><span class="nn">drawlib.canvas</span><span class="w"> </span><span class="kn">import</span> <span class="n">save</span><span class="p">,</span> <span class="n">setup</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">drawlib.smartarts</span><span class="w"> </span><span class="kn">import</span> <span class="n">MindMapNode</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">drawlib.styles</span><span class="w"> </span><span class="kn">import</span> <span class="n">Styles</span>
+
+<span class="n">setup</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="mi">204</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">90</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">150</span><span class="p">)</span>
+
+<span class="n">txt_root</span> <span class="o">=</span> <span class="n">Styles</span><span class="o">.</span><span class="n">WhiteBold</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">text_size</span><span class="o">=</span><span class="mf">11.0</span><span class="p">)</span>
+<span class="n">txt_group</span> <span class="o">=</span> <span class="n">Styles</span><span class="o">.</span><span class="n">DarkBold</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">text_size</span><span class="o">=</span><span class="mf">10.0</span><span class="p">)</span>
+<span class="n">txt_leaf</span> <span class="o">=</span> <span class="n">Styles</span><span class="o">.</span><span class="n">Dark</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">text_size</span><span class="o">=</span><span class="mf">9.8</span><span class="p">)</span>
+
+<span class="n">root</span> <span class="o">=</span> <span class="n">MindMapNode</span><span class="p">(</span>
+    <span class="s2">"pni CLI</span><span class="se">\n</span><span class="s2">(pni501 v0.1.3)"</span><span class="p">,</span>
+    <span class="n">shape</span><span class="o">=</span><span class="s2">"rectangle"</span><span class="p">,</span>
+    <span class="n">width</span><span class="o">=</span><span class="mf">26.0</span><span class="p">,</span>
+    <span class="n">height</span><span class="o">=</span><span class="mf">13.0</span><span class="p">,</span>
+    <span class="n">style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">PrimaryFlat</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">shape_r</span><span class="o">=</span><span class="mf">2.0</span><span class="p">),</span>
+    <span class="n">text_style</span><span class="o">=</span><span class="n">txt_root</span><span class="p">,</span>
+    <span class="n">line_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">DarkBold</span><span class="p">,</span>
+    <span class="n">line_length</span><span class="o">=</span><span class="mf">6.0</span><span class="p">,</span>
+    <span class="n">horizontal_margin</span><span class="o">=</span><span class="mf">3.0</span><span class="p">,</span>
+    <span class="n">vertical_margin</span><span class="o">=</span><span class="mf">2.4</span><span class="p">,</span>
+    <span class="n">children</span><span class="o">=</span><span class="p">[</span>
+        <span class="n">MindMapNode</span><span class="p">(</span>
+            <span class="s2">"Workspace &amp; Rules"</span><span class="p">,</span>
+            <span class="n">branch</span><span class="o">=</span><span class="s2">"left"</span><span class="p">,</span>
+            <span class="n">shape</span><span class="o">=</span><span class="s2">"rectangle"</span><span class="p">,</span>
+            <span class="n">width</span><span class="o">=</span><span class="mf">31.0</span><span class="p">,</span>
+            <span class="n">height</span><span class="o">=</span><span class="mf">8.0</span><span class="p">,</span>
+            <span class="n">style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">PrimaryNeutral</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">shape_r</span><span class="o">=</span><span class="mf">1.5</span><span class="p">),</span>
+            <span class="n">text_style</span><span class="o">=</span><span class="n">txt_group</span><span class="p">,</span>
+            <span class="n">children</span><span class="o">=</span><span class="p">[</span>
+                <span class="n">MindMapNode</span><span class="p">(</span>
+                    <span class="s2">"pni init [--lang] [--force]"</span><span class="p">,</span>
+                    <span class="n">shape</span><span class="o">=</span><span class="s2">"rectangle"</span><span class="p">,</span>
+                    <span class="n">width</span><span class="o">=</span><span class="mf">36.0</span><span class="p">,</span>
+                    <span class="n">height</span><span class="o">=</span><span class="mf">6.2</span><span class="p">,</span>
+                    <span class="n">style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">Neutral</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">shape_r</span><span class="o">=</span><span class="mf">1.2</span><span class="p">),</span>
+                    <span class="n">text_style</span><span class="o">=</span><span class="n">txt_leaf</span><span class="p">,</span>
+                <span class="p">),</span>
+                <span class="n">MindMapNode</span><span class="p">(</span>
+                    <span class="s2">"pni rules list [--all]"</span><span class="p">,</span>
+                    <span class="n">shape</span><span class="o">=</span><span class="s2">"rectangle"</span><span class="p">,</span>
+                    <span class="n">width</span><span class="o">=</span><span class="mf">36.0</span><span class="p">,</span>
+                    <span class="n">height</span><span class="o">=</span><span class="mf">6.2</span><span class="p">,</span>
+                    <span class="n">style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">Neutral</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">shape_r</span><span class="o">=</span><span class="mf">1.2</span><span class="p">),</span>
+                    <span class="n">text_style</span><span class="o">=</span><span class="n">txt_leaf</span><span class="p">,</span>
+                <span class="p">),</span>
+                <span class="n">MindMapNode</span><span class="p">(</span>
+                    <span class="s2">"pni rules show &lt;id&gt; [-p]"</span><span class="p">,</span>
+                    <span class="n">shape</span><span class="o">=</span><span class="s2">"rectangle"</span><span class="p">,</span>
+                    <span class="n">width</span><span class="o">=</span><span class="mf">36.0</span><span class="p">,</span>
+                    <span class="n">height</span><span class="o">=</span><span class="mf">6.2</span><span class="p">,</span>
+                    <span class="n">style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">Neutral</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">shape_r</span><span class="o">=</span><span class="mf">1.2</span><span class="p">),</span>
+                    <span class="n">text_style</span><span class="o">=</span><span class="n">txt_leaf</span><span class="p">,</span>
+                <span class="p">),</span>
+                <span class="n">MindMapNode</span><span class="p">(</span>
+                    <span class="s2">"pni instructions | version"</span><span class="p">,</span>
+                    <span class="n">shape</span><span class="o">=</span><span class="s2">"rectangle"</span><span class="p">,</span>
+                    <span class="n">width</span><span class="o">=</span><span class="mf">36.0</span><span class="p">,</span>
+                    <span class="n">height</span><span class="o">=</span><span class="mf">6.2</span><span class="p">,</span>
+                    <span class="n">style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">Neutral</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">shape_r</span><span class="o">=</span><span class="mf">1.2</span><span class="p">),</span>
+                    <span class="n">text_style</span><span class="o">=</span><span class="n">txt_leaf</span><span class="p">,</span>
+                <span class="p">),</span>
+            <span class="p">],</span>
+        <span class="p">),</span>
+        <span class="n">MindMapNode</span><span class="p">(</span>
+            <span class="s2">"Cascaded .pni/ Assets"</span><span class="p">,</span>
+            <span class="n">branch</span><span class="o">=</span><span class="s2">"left"</span><span class="p">,</span>
+            <span class="n">shape</span><span class="o">=</span><span class="s2">"rectangle"</span><span class="p">,</span>
+            <span class="n">width</span><span class="o">=</span><span class="mf">31.0</span><span class="p">,</span>
+            <span class="n">height</span><span class="o">=</span><span class="mf">8.0</span><span class="p">,</span>
+            <span class="n">style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">SecondaryNeutral</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">shape_r</span><span class="o">=</span><span class="mf">1.5</span><span class="p">),</span>
+            <span class="n">text_style</span><span class="o">=</span><span class="n">txt_group</span><span class="p">,</span>
+            <span class="n">children</span><span class="o">=</span><span class="p">[</span>
+                <span class="n">MindMapNode</span><span class="p">(</span>
+                    <span class="s2">"actions (.pni/actions/)"</span><span class="p">,</span>
+                    <span class="n">shape</span><span class="o">=</span><span class="s2">"rectangle"</span><span class="p">,</span>
+                    <span class="n">width</span><span class="o">=</span><span class="mf">36.0</span><span class="p">,</span>
+                    <span class="n">height</span><span class="o">=</span><span class="mf">6.2</span><span class="p">,</span>
+                    <span class="n">style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">Neutral</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">shape_r</span><span class="o">=</span><span class="mf">1.2</span><span class="p">),</span>
+                    <span class="n">text_style</span><span class="o">=</span><span class="n">txt_leaf</span><span class="p">,</span>
+                <span class="p">),</span>
+                <span class="n">MindMapNode</span><span class="p">(</span>
+                    <span class="s2">"dockerfiles (.pni/)"</span><span class="p">,</span>
+                    <span class="n">shape</span><span class="o">=</span><span class="s2">"rectangle"</span><span class="p">,</span>
+                    <span class="n">width</span><span class="o">=</span><span class="mf">36.0</span><span class="p">,</span>
+                    <span class="n">height</span><span class="o">=</span><span class="mf">6.2</span><span class="p">,</span>
+                    <span class="n">style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">Neutral</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">shape_r</span><span class="o">=</span><span class="mf">1.2</span><span class="p">),</span>
+                    <span class="n">text_style</span><span class="o">=</span><span class="n">txt_leaf</span><span class="p">,</span>
+                <span class="p">),</span>
+                <span class="n">MindMapNode</span><span class="p">(</span>
+                    <span class="s2">"validate-score | plan"</span><span class="p">,</span>
+                    <span class="n">shape</span><span class="o">=</span><span class="s2">"rectangle"</span><span class="p">,</span>
+                    <span class="n">width</span><span class="o">=</span><span class="mf">36.0</span><span class="p">,</span>
+                    <span class="n">height</span><span class="o">=</span><span class="mf">6.2</span><span class="p">,</span>
+                    <span class="n">style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">Neutral</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">shape_r</span><span class="o">=</span><span class="mf">1.2</span><span class="p">),</span>
+                    <span class="n">text_style</span><span class="o">=</span><span class="n">txt_leaf</span><span class="p">,</span>
+                <span class="p">),</span>
+            <span class="p">],</span>
+        <span class="p">),</span>
+        <span class="n">MindMapNode</span><span class="p">(</span>
+            <span class="s2">"pni workflows"</span><span class="p">,</span>
+            <span class="n">branch</span><span class="o">=</span><span class="s2">"right"</span><span class="p">,</span>
+            <span class="n">shape</span><span class="o">=</span><span class="s2">"rectangle"</span><span class="p">,</span>
+            <span class="n">width</span><span class="o">=</span><span class="mf">31.0</span><span class="p">,</span>
+            <span class="n">height</span><span class="o">=</span><span class="mf">8.0</span><span class="p">,</span>
+            <span class="n">style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">PrimaryNeutral</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">shape_r</span><span class="o">=</span><span class="mf">1.5</span><span class="p">),</span>
+            <span class="n">text_style</span><span class="o">=</span><span class="n">txt_group</span><span class="p">,</span>
+            <span class="n">children</span><span class="o">=</span><span class="p">[</span>
+                <span class="n">MindMapNode</span><span class="p">(</span>
+                    <span class="s2">"list [-c] | show &lt;wf_id&gt;"</span><span class="p">,</span>
+                    <span class="n">shape</span><span class="o">=</span><span class="s2">"rectangle"</span><span class="p">,</span>
+                    <span class="n">width</span><span class="o">=</span><span class="mf">36.0</span><span class="p">,</span>
+                    <span class="n">height</span><span class="o">=</span><span class="mf">6.2</span><span class="p">,</span>
+                    <span class="n">style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">Neutral</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">shape_r</span><span class="o">=</span><span class="mf">1.2</span><span class="p">),</span>
+                    <span class="n">text_style</span><span class="o">=</span><span class="n">txt_leaf</span><span class="p">,</span>
+                <span class="p">),</span>
+                <span class="n">MindMapNode</span><span class="p">(</span>
+                    <span class="s2">"start &lt;wf_id&gt; [--supersede]"</span><span class="p">,</span>
+                    <span class="n">shape</span><span class="o">=</span><span class="s2">"rectangle"</span><span class="p">,</span>
+                    <span class="n">width</span><span class="o">=</span><span class="mf">36.0</span><span class="p">,</span>
+                    <span class="n">height</span><span class="o">=</span><span class="mf">6.2</span><span class="p">,</span>
+                    <span class="n">style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">Neutral</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">shape_r</span><span class="o">=</span><span class="mf">1.2</span><span class="p">),</span>
+                    <span class="n">text_style</span><span class="o">=</span><span class="n">txt_leaf</span><span class="p">,</span>
+                <span class="p">),</span>
+                <span class="n">MindMapNode</span><span class="p">(</span>
+                    <span class="s2">"get-action | push-action"</span><span class="p">,</span>
+                    <span class="n">shape</span><span class="o">=</span><span class="s2">"rectangle"</span><span class="p">,</span>
+                    <span class="n">width</span><span class="o">=</span><span class="mf">36.0</span><span class="p">,</span>
+                    <span class="n">height</span><span class="o">=</span><span class="mf">6.2</span><span class="p">,</span>
+                    <span class="n">style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">Neutral</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">shape_r</span><span class="o">=</span><span class="mf">1.2</span><span class="p">),</span>
+                    <span class="n">text_style</span><span class="o">=</span><span class="n">txt_leaf</span><span class="p">,</span>
+                <span class="p">),</span>
+                <span class="n">MindMapNode</span><span class="p">(</span>
+                    <span class="s2">"run-action &lt;wf_id&gt; &lt;step&gt;"</span><span class="p">,</span>
+                    <span class="n">shape</span><span class="o">=</span><span class="s2">"rectangle"</span><span class="p">,</span>
+                    <span class="n">width</span><span class="o">=</span><span class="mf">36.0</span><span class="p">,</span>
+                    <span class="n">height</span><span class="o">=</span><span class="mf">6.2</span><span class="p">,</span>
+                    <span class="n">style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">Neutral</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">shape_r</span><span class="o">=</span><span class="mf">1.2</span><span class="p">),</span>
+                    <span class="n">text_style</span><span class="o">=</span><span class="n">txt_leaf</span><span class="p">,</span>
+                <span class="p">),</span>
+                <span class="n">MindMapNode</span><span class="p">(</span>
+                    <span class="s2">"status | inspect | rewind"</span><span class="p">,</span>
+                    <span class="n">shape</span><span class="o">=</span><span class="s2">"rectangle"</span><span class="p">,</span>
+                    <span class="n">width</span><span class="o">=</span><span class="mf">36.0</span><span class="p">,</span>
+                    <span class="n">height</span><span class="o">=</span><span class="mf">6.2</span><span class="p">,</span>
+                    <span class="n">style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">Neutral</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">shape_r</span><span class="o">=</span><span class="mf">1.2</span><span class="p">),</span>
+                    <span class="n">text_style</span><span class="o">=</span><span class="n">txt_leaf</span><span class="p">,</span>
+                <span class="p">),</span>
+            <span class="p">],</span>
+        <span class="p">),</span>
+        <span class="n">MindMapNode</span><span class="p">(</span>
+            <span class="s2">"Report &amp; Governance"</span><span class="p">,</span>
+            <span class="n">branch</span><span class="o">=</span><span class="s2">"right"</span><span class="p">,</span>
+            <span class="n">shape</span><span class="o">=</span><span class="s2">"rectangle"</span><span class="p">,</span>
+            <span class="n">width</span><span class="o">=</span><span class="mf">31.0</span><span class="p">,</span>
+            <span class="n">height</span><span class="o">=</span><span class="mf">8.0</span><span class="p">,</span>
+            <span class="n">style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">SecondaryNeutral</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">shape_r</span><span class="o">=</span><span class="mf">1.5</span><span class="p">),</span>
+            <span class="n">text_style</span><span class="o">=</span><span class="n">txt_group</span><span class="p">,</span>
+            <span class="n">children</span><span class="o">=</span><span class="p">[</span>
+                <span class="n">MindMapNode</span><span class="p">(</span>
+                    <span class="s2">"pni report init | build"</span><span class="p">,</span>
+                    <span class="n">shape</span><span class="o">=</span><span class="s2">"rectangle"</span><span class="p">,</span>
+                    <span class="n">width</span><span class="o">=</span><span class="mf">36.0</span><span class="p">,</span>
+                    <span class="n">height</span><span class="o">=</span><span class="mf">6.2</span><span class="p">,</span>
+                    <span class="n">style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">Neutral</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">shape_r</span><span class="o">=</span><span class="mf">1.2</span><span class="p">),</span>
+                    <span class="n">text_style</span><span class="o">=</span><span class="n">txt_leaf</span><span class="p">,</span>
+                <span class="p">),</span>
+                <span class="n">MindMapNode</span><span class="p">(</span>
+                    <span class="s2">"pni pentests init | run"</span><span class="p">,</span>
+                    <span class="n">shape</span><span class="o">=</span><span class="s2">"rectangle"</span><span class="p">,</span>
+                    <span class="n">width</span><span class="o">=</span><span class="mf">36.0</span><span class="p">,</span>
+                    <span class="n">height</span><span class="o">=</span><span class="mf">6.2</span><span class="p">,</span>
+                    <span class="n">style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">Neutral</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">shape_r</span><span class="o">=</span><span class="mf">1.2</span><span class="p">),</span>
+                    <span class="n">text_style</span><span class="o">=</span><span class="n">txt_leaf</span><span class="p">,</span>
+                <span class="p">),</span>
+                <span class="n">MindMapNode</span><span class="p">(</span>
+                    <span class="s2">"pni progress init | validate"</span><span class="p">,</span>
+                    <span class="n">shape</span><span class="o">=</span><span class="s2">"rectangle"</span><span class="p">,</span>
+                    <span class="n">width</span><span class="o">=</span><span class="mf">36.0</span><span class="p">,</span>
+                    <span class="n">height</span><span class="o">=</span><span class="mf">6.2</span><span class="p">,</span>
+                    <span class="n">style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">Neutral</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">shape_r</span><span class="o">=</span><span class="mf">1.2</span><span class="p">),</span>
+                    <span class="n">text_style</span><span class="o">=</span><span class="n">txt_leaf</span><span class="p">,</span>
+                <span class="p">),</span>
+            <span class="p">],</span>
+        <span class="p">),</span>
+    <span class="p">],</span>
+<span class="p">)</span>
+
+<span class="n">root</span><span class="o">.</span><span class="n">draw</span><span class="p">(</span><span class="n">xy</span><span class="o">=</span><span class="p">(</span><span class="mf">102.0</span><span class="p">,</span> <span class="mf">45.0</span><span class="p">))</span>
+<span class="n">save</span><span class="p">()</span>
+</code></pre>
+</details>
+<h3>3.1 Workspace Bootstrap, Rules &amp; Validation Commands</h3>
+<p>Use top-level commands and <code>pni rules</code> to initialize <code>.pni/</code>, inspect engineering standards, bootstrap AI coding agents, and validate emitted JSON artifacts:</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">Command</th>
+<th style="text-align:left">Arguments &amp; Key Options</th>
+<th style="text-align:left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left"><code>pni init</code></td>
+<td style="text-align:left"><code>[--lang/-l &lt;lang&gt;] [--force/-f]</code></td>
+<td style="text-align:left">Auto-detect project language (<code>python</code>, <code>java</code>, <code>php</code>, <code>go</code>, <code>typescript</code>, <code>javascript</code>) and scaffold <code>.pni/</code> (<code>pni.toml</code>, <code>rules/</code>, <code>actions/</code>, <code>workflows/</code>, <code>instructions.md</code>, and <code>cache/.gitignore</code>).</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>pni instructions</code></td>
+<td style="text-align:left"><em>(alias: <code>pni instruction</code>)</em></td>
+<td style="text-align:left">Print the AI agent bootstrap and stateful pull-push execution loop guide in Markdown to <code>stdout</code>.</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>pni rules list</code></td>
+<td style="text-align:left"><code>[--all/-a]</code></td>
+<td style="text-align:left">List active rules for <code>common</code> + detected <code>&lt;lang&gt;</code> (or all 52 rules across all 6 languages with <code>--all</code>), showing <code>Builtin</code> vs <code>Local (.pni)</code> source status.</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>pni rules show</code></td>
+<td style="text-align:left"><code>&lt;name&gt; [--pretty/-p]</code></td>
+<td style="text-align:left">Output a rule or workflow guide (<code>common/workflow_guide</code>, <code>python/testing</code>, or short name <code>testing</code>) in raw Markdown or a styled Rich panel (<code>--pretty</code>).</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>pni validate-score</code></td>
+<td style="text-align:left"><code>[score_path]</code></td>
+<td style="text-align:left">Validate a <code>reports/&lt;target&gt;_score.json</code> file against the Pydantic <code>ScoreResult</code> schema.</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>pni validate-migration-plan</code></td>
+<td style="text-align:left"><code>[plan_path]</code></td>
+<td style="text-align:left">Validate a <code>reports/&lt;target&gt;_migration_plan.json</code> file against the Pydantic <code>MigrationPlanResult</code> schema.</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>pni validate-progress</code></td>
+<td style="text-align:left"><code>[progress_path]</code></td>
+<td style="text-align:left">Validate a <code>reports/&lt;target&gt;_progress.json</code> file against the Pydantic <code>ProgressResult</code> schema.</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>pni version</code></td>
+<td style="text-align:left"><em>(none)</em></td>
+<td style="text-align:left">Print the installed <code>pni501</code> package name and version string.</td>
+</tr>
+</tbody>
+</table>
+<pre><code class="language-bash"><span class="c1"># Initialize .pni/ workspace and inspect active + language-specific rules</span>
+pni<span class="w"> </span>init
+pni<span class="w"> </span>rules<span class="w"> </span>list<span class="w"> </span>--all
+pni<span class="w"> </span>rules<span class="w"> </span>show<span class="w"> </span>common/workflow_guide
+pni<span class="w"> </span>rules<span class="w"> </span>show<span class="w"> </span>python/testing<span class="w"> </span>--pretty
+
+<span class="c1"># Validate emitted JSON deliverables in CI</span>
+pni<span class="w"> </span>validate-score<span class="w"> </span>reports/full_audit_score.json
+pni<span class="w"> </span>validate-migration-plan<span class="w"> </span>reports/migration_plan.json
+pni<span class="w"> </span>validate-progress<span class="w"> </span>reports/project_progress.json
+</code></pre>
+<h3>3.2 Stateful Workflow Execution &amp; Debugging Commands (<code>pni workflows</code>)</h3>
+<p><code>pni workflows</code> manages the SQLite state machine (<code>.pni/cache/workflow_state.db</code>) as well as zero-setup ad-hoc step execution (<code>run-action</code>) and non-destructive step rewinding (<code>rewind</code>):</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">Command</th>
+<th style="text-align:left">Arguments &amp; Key Options</th>
+<th style="text-align:left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left"><code>pni workflows list</code></td>
+<td style="text-align:left"><code>[--category/-c audit|migration|progress]</code></td>
+<td style="text-align:left">List workflows in <code>.pni/workflows/</code> with category, <code>based_on</code> prerequisite link, step count, source targets, and outputs.</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>pni workflows show</code></td>
+<td style="text-align:left"><code>&lt;workflow_id&gt;</code></td>
+<td style="text-align:left">Expand composite actions into normalized primitive steps (<code>1..N</code>) and run preflight readiness checks for pentests, migrations, and progress plans.</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>pni workflows start</code></td>
+<td style="text-align:left"><code>&lt;workflow_id&gt; [--supersede]</code></td>
+<td style="text-align:left">Start a stateful workflow run (<code>wf-...</code>) in <code>.pni/cache/workflow_state.db</code> (<code>--supersede</code> cancels older unfinished runs of <code>&lt;workflow_id&gt;</code>).</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>pni workflows get-action</code></td>
+<td style="text-align:left"><code>&lt;run_id&gt;</code></td>
+<td style="text-align:left">Automatically execute pending deterministic analyzers (<code>project_inspect</code>, <code>ast_analyze</code>, <code>run_check</code>, <code>security_scan</code>, <code>web_pentest</code>, <code>migration_analyze</code>, <code>progress_analyze</code>) and emit the next <code>act-XX</code> prompt &amp; JSON schema.</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>pni workflows push-action</code></td>
+<td style="text-align:left"><code>&lt;run_id&gt; &lt;action_id&gt; [json] [--file/-f &lt;path&gt;]</code></td>
+<td style="text-align:left">Validate agent JSON output against Pydantic schemas and repository file paths, persist to SQLite, and advance to the next step.</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>pni workflows run-action</code></td>
+<td style="text-align:left"><code>&lt;workflow_id&gt; &lt;action&gt; [--base-url &lt;url&gt;] [--force-pentests] [--fail-on-findings]</code></td>
+<td style="text-align:left">Execute a single step or analyzer inside <code>&lt;workflow_id&gt;</code> directly with zero prior SQLite run setup (ideal for debugging Dockerfiles, pentests, or CI gates).</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>pni workflows status</code></td>
+<td style="text-align:left"><code>[run_or_wf] [-w &lt;wf&gt;] [-s &lt;status&gt;] [--latest] [-n &lt;limit&gt;] [--json]</code></td>
+<td style="text-align:left">Inspect run history or action-by-action step progress (<code>done/total</code>, current step) from SQLite without raw <code>sqlite3</code> queries.</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>pni workflows inspect-action</code></td>
+<td style="text-align:left"><code>&lt;run_or_wf&gt; &lt;action&gt; [--agent-input | --deterministic] [--json] [-o &lt;path&gt;]</code></td>
+<td style="text-align:left">Export recorded deterministic analyzer JSON facts or submitted agent JSON inputs from SQLite.</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>pni workflows rewind</code></td>
+<td style="text-align:left"><code>&lt;run_or_wf&gt; &lt;action&gt; [--pull/-p]</code> <em>(alias: <code>retry-action</code>)</em></td>
+<td style="text-align:left">Rewind a run back to <code>&lt;action&gt;</code>, re-sync <code>.pni/workflows/&lt;id&gt;.yaml</code> parameters, and clear downstream step outputs for clean re-execution.</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>pni workflows cancel</code></td>
+<td style="text-align:left"><code>&lt;run_id&gt; | --superseded [-w &lt;wf&gt;]</code></td>
+<td style="text-align:left">Cancel an abandoned <code>in_progress</code> workflow run or clean up superseded runs in SQLite.</td>
+</tr>
+</tbody>
+</table>
+<pre><code class="language-bash"><span class="c1"># Inspect workflow pipeline and execute the stateful Pull-Push loop</span>
+pni<span class="w"> </span>workflows<span class="w"> </span>show<span class="w"> </span>full_audit
+pni<span class="w"> </span>workflows<span class="w"> </span>start<span class="w"> </span>full_audit<span class="w"> </span>--supersede
+pni<span class="w"> </span>workflows<span class="w"> </span>get-action<span class="w"> </span>wf-1a2b3c4d
+pni<span class="w"> </span>workflows<span class="w"> </span>push-action<span class="w"> </span>wf-1a2b3c4d<span class="w"> </span>act-02<span class="w"> </span>--file<span class="w"> </span>payload.json
+
+<span class="c1"># Debug a single step ad-hoc or rewind an existing run to re-run runtime verification</span>
+pni<span class="w"> </span>workflows<span class="w"> </span>run-action<span class="w"> </span>full_audit<span class="w"> </span>runtime_verification
+pni<span class="w"> </span>workflows<span class="w"> </span>status<span class="w"> </span>wf-1a2b3c4d
+pni<span class="w"> </span>workflows<span class="w"> </span>inspect-action<span class="w"> </span>full_audit<span class="w"> </span>emit_score<span class="w"> </span>--agent-input<span class="w"> </span>-o<span class="w"> </span>last_score.json
+pni<span class="w"> </span>workflows<span class="w"> </span>rewind<span class="w"> </span>wf-1a2b3c4d<span class="w"> </span>runtime_verification<span class="w"> </span>--pull
+</code></pre>
+<h3>3.3 Visual Reports, Penetration Tests &amp; Progress Governance Commands</h3>
+<p>Dedicated subcommand groups manage Drawlib report compilation (<code>pni report</code>), live loopback HTTP penetration test suites (<code>pni pentests</code>), and schedule/Git governance manifests (<code>pni progress</code>):</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">Command</th>
+<th style="text-align:left">Arguments &amp; Key Options</th>
+<th style="text-align:left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left"><code>pni report init</code></td>
+<td style="text-align:left"><code>[target] [--src-dir reports_src] [-l en|ja] [-s google|default|monochrome] [--keep-samples] [-f]</code></td>
+<td style="text-align:left">Non-destructively scaffold or refresh <code>reports_src/&lt;target&gt;_src/</code> (<code>drawlib.toml</code>, <code>styles.py</code>, <code>&lt;lang&gt;/</code>) while preserving existing authored <code>*.md</code> chapters.</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>pni report build</code></td>
+<td style="text-align:left"><code>[target] [--src-dir reports_src] [-o reports] [-f pdf|html|markdown|images] [--toc/--no-toc] [--no-cache]</code></td>
+<td style="text-align:left">Run <code>lint_drawlib_chapters</code> preflight checks, compile <code>reports/&lt;target&gt;.pdf</code> (default A4 vector PDF with ToC), and verify zero broken links when <code>-f html</code> is enabled.</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>pni pentests init</code></td>
+<td style="text-align:left"><code>[-w &lt;wf&gt;] [-t &lt;root&gt;] [-s &lt;src&gt;] [-l &lt;lang&gt;] [--force/-f]</code></td>
+<td style="text-align:left">Discover API endpoints from AST facts and materialize explicit <code>Python + httpx</code> DAST suites (<code>conftest.py</code>, <code>test_*.py</code>) in <code>.pni/pentests/&lt;target&gt;/</code>.</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>pni pentests run</code></td>
+<td style="text-align:left"><code>[-w &lt;wf&gt;] [-t &lt;root&gt;] [-s &lt;src&gt;] [--base-url &lt;url&gt;] [--container-engine auto|docker|podman] [-f]</code></td>
+<td style="text-align:left">Boot an isolated loopback container (or target <code>--base-url</code>) and execute <code>.pni/pentests/&lt;target&gt;/</code> to verify exploitability (<code>PentestFacts</code>).</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>pni progress init</code></td>
+<td style="text-align:left"><code>[target] [-w &lt;wf&gt;] [--force/-f]</code></td>
+<td style="text-align:left">Scaffold a starter <code>.pni/progress/&lt;target&gt;.yaml</code> manifest with milestones, tasks, and <code>git_policy</code>.</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>pni progress validate</code></td>
+<td style="text-align:left"><code>[target_or_path]</code></td>
+<td style="text-align:left">Validate <code>.pni/progress/&lt;target&gt;.yaml</code> schema, ISO-8601 dates, <code>git_policy</code>, and acyclic <code>depends_on</code> task DAG before starting a progress workflow.</td>
+</tr>
+</tbody>
+</table>
+<pre><code class="language-bash"><span class="c1"># Scaffold and compile a 7-chapter Drawlib visual PDF report</span>
+pni<span class="w"> </span>report<span class="w"> </span>init<span class="w"> </span>full_audit<span class="w"> </span>--src-dir<span class="w"> </span>reports_src<span class="w"> </span>--lang<span class="w"> </span>en<span class="w"> </span>--style<span class="w"> </span>google
+pni<span class="w"> </span>report<span class="w"> </span>build<span class="w"> </span>full_audit<span class="w"> </span>--src-dir<span class="w"> </span>reports_src<span class="w"> </span>--output-dir<span class="w"> </span>reports
+
+<span class="c1"># Materialize and execute live HTTP penetration tests for a web service workflow</span>
+pni<span class="w"> </span>pentests<span class="w"> </span>init<span class="w"> </span>-w<span class="w"> </span>full_audit
+pni<span class="w"> </span>pentests<span class="w"> </span>run<span class="w"> </span>-w<span class="w"> </span>full_audit
+
+<span class="c1"># Initialize and validate a project progress &amp; Git governance plan</span>
+pni<span class="w"> </span>progress<span class="w"> </span>init<span class="w"> </span>project_progress<span class="w"> </span>-w<span class="w"> </span>full_audit
+pni<span class="w"> </span>progress<span class="w"> </span>validate<span class="w"> </span>project_progress
+</code></pre>
+<p>For end-to-end walkthroughs of these commands in action, see the <a href="../01_getting_started/quickstart.html">Quickstart Guide</a>, <a href="../03_workflows_and_actions/workflows_guide.html">Workflows &amp; Pre-Flight Gates</a>, and <a href="../04_scoring_and_reports/drawlib_reporter.html">Drawlib Visual Reporter</a>.</p>
+
+            </main>
+        </div>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Theme toggle
+            const themeBtn = document.getElementById('theme-toggle');
+            if (themeBtn) {
+                themeBtn.addEventListener('click', function() {
+                    const current = document.documentElement.getAttribute('data-theme');
+                    const next = current === 'dark' ? 'light' : 'dark';
+                    document.documentElement.setAttribute('data-theme', next);
+                    localStorage.setItem('drawlib-theme', next);
+                });
+            }
+
+            // Language dropdown outside-click & Escape close
+            const langDropdowns = document.querySelectorAll('.lang-dropdown');
+            if (langDropdowns.length > 0) {
+                document.addEventListener('click', function(e) {
+                    langDropdowns.forEach(function(dd) {
+                        if (dd.hasAttribute('open') && !dd.contains(e.target)) {
+                            dd.removeAttribute('open');
+                        }
+                    });
+                });
+                document.addEventListener('keydown', function(e) {
+                    if (e.key === 'Escape') {
+                        langDropdowns.forEach(function(dd) {
+                            dd.removeAttribute('open');
+                        });
+                    }
+                });
+            }
+
+            // Mobile menu toggle
+            const menuBtn = document.getElementById('menu-toggle');
+            const sidebar = document.querySelector('.sidebar');
+            if (menuBtn && sidebar) {
+                function setMenuOpen(open) {
+                    sidebar.classList.toggle('is-open', open);
+                    menuBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
+                    document.body.classList.toggle('menu-open', open);
+                    if (open) {
+                        const menu = sidebar.querySelector('.sidebar-menu');
+                        if (menu) {
+                            menu.scrollTop = 0;
+                        }
+                    }
+                }
+
+                menuBtn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    const willOpen = !sidebar.classList.contains('is-open');
+                    setMenuOpen(willOpen);
+                });
+
+                // Close menu when clicking outside sidebar
+                document.addEventListener('click', function(e) {
+                    if (sidebar.classList.contains('is-open') && !sidebar.contains(e.target)) {
+                        setMenuOpen(false);
+                    }
+                });
+
+                // Close menu when a navigation link is clicked
+                const navLinks = sidebar.querySelectorAll('.nav-item a');
+                navLinks.forEach(function(link) {
+                    link.addEventListener('click', function() {
+                        setMenuOpen(false);
+                    });
+                });
+
+                // Close on Escape key
+                document.addEventListener('keydown', function(e) {
+                    if (e.key === 'Escape' && sidebar.classList.contains('is-open')) {
+                        setMenuOpen(false);
+                    }
+                });
+
+                // Reset menu state when resized above mobile breakpoint
+                window.addEventListener('resize', function() {
+                    if (window.innerWidth > 768 && sidebar.classList.contains('is-open')) {
+                        setMenuOpen(false);
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>

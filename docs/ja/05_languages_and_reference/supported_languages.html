@@ -1,0 +1,809 @@
+<!--
+ Copyright (c) 2026 Yuichi Ito (yuichi@yuichi.com)
+
+ This software is licensed under the Apache License, Version 2.0.
+ For more information, please visit: https://github.com/yuichi110/drawlib
+
+ This software is provided "as is", without warranty of any kind,
+ express or implied, including but not limited to the warranties of
+ merchantability, fitness for a particular purpose and noninfringement.
+-->
+<!DOCTYPE html>
+<html lang="ja" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>対応 6 言語マトリクス</title>
+    <script>
+        (function() {
+            const saved = localStorage.getItem('drawlib-theme');
+            if (saved === 'dark' || (!saved && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                document.documentElement.setAttribute('data-theme', 'dark');
+            } else {
+                document.documentElement.setAttribute('data-theme', 'light');
+            }
+        })();
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+    
+    
+    <link rel="alternate" hreflang="en" href="https://www.pni501.com/en/05_languages_and_reference/supported_languages.html">
+    
+    <link rel="alternate" hreflang="ja" href="https://www.pni501.com/ja/05_languages_and_reference/supported_languages.html">
+    
+    <link rel="alternate" hreflang="x-default" href="https://www.pni501.com/en/05_languages_and_reference/supported_languages.html">
+    
+    
+    
+    <meta name="description" content="pni501 (v0.1.3) は、Python・Java・PHP・Go・TypeScript・JavaScript の主要 6 言語に対して、決定論的な静的解析（ProjectFacts および単一パス Tree-sitter…">
+    <link rel="canonical" href="https://www.pni501.com/ja/05_languages_and_reference/supported_languages.html">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="pni501 ドキュメント">
+    <meta property="og:title" content="対応 6 言語マトリクス — pni501 ドキュメント">
+    <meta property="og:description" content="pni501 (v0.1.3) は、Python・Java・PHP・Go・TypeScript・JavaScript の主要 6 言語に対して、決定論的な静的解析（ProjectFacts および単一パス Tree-sitter…">
+    <meta property="og:url" content="https://www.pni501.com/ja/05_languages_and_reference/supported_languages.html">
+    <meta property="og:image" content="https://www.pni501.com/_assets/logo.png">
+    <meta property="og:locale" content="ja_JP">
+    <meta property="og:locale:alternate" content="en_US">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="対応 6 言語マトリクス — pni501 ドキュメント">
+    <meta name="twitter:description" content="pni501 (v0.1.3) は、Python・Java・PHP・Go・TypeScript・JavaScript の主要 6 言語に対して、決定論的な静的解析（ProjectFacts および単一パス Tree-sitter…">
+    <meta name="twitter:image" content="https://www.pni501.com/_assets/logo.png">
+    
+    
+    <link rel="icon" type="image/png" href="../../_assets/favicon.png">
+    
+    
+    <link rel="stylesheet" href="../style.css">
+    
+    
+</head>
+<body>
+    
+    <div class="doc-layout">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <a href="../index.html" class="sidebar-brand" aria-label="pni501 ドキュメント">
+                    
+                    <img src="../../_assets/logo.png" alt="pni501 ドキュメント" class="sidebar-logo sidebar-logo-light">
+                    <img src="../../_assets/logo_dark.png" alt="pni501 ドキュメント" class="sidebar-logo sidebar-logo-dark">
+                    
+                </a>
+                <div class="sidebar-header-actions">
+                    <button type="button" id="theme-toggle" class="theme-toggle-btn" aria-label="Toggle theme">
+                        <svg class="icon-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+                        <svg class="icon-moon" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+                    </button>
+                    <button type="button" id="menu-toggle" class="menu-toggle-btn" aria-label="Toggle navigation" aria-expanded="false">
+                        <svg class="icon-hamburger" viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+                        <svg class="icon-close" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                    </button>
+                </div>
+            </div>
+            <div class="sidebar-menu">
+                
+                    
+                        
+                        <ul class="nav-list">
+                            
+                            <li class="nav-item ">
+                                <a href="../index.html" >概要 (Overview)</a>
+                            </li>
+                            
+                        </ul>
+                    
+                        
+                        <div class="sidebar-heading">1. はじめに (Getting Started)</div>
+                        
+                        <ul class="nav-list">
+                            
+                            <li class="nav-item ">
+                                <a href="../01_getting_started/concepts.html" >背景とコアコンセプト</a>
+                            </li>
+                            
+                            <li class="nav-item ">
+                                <a href="../01_getting_started/quickstart.html" >クイックスタートガイド</a>
+                            </li>
+                            
+                            <li class="nav-item ">
+                                <a href="../01_getting_started/use_cases.html" >3つの主要ユースケース</a>
+                            </li>
+                            
+                        </ul>
+                    
+                        
+                        <div class="sidebar-heading">2. アーキテクチャ (Architecture)</div>
+                        
+                        <ul class="nav-list">
+                            
+                            <li class="nav-item ">
+                                <a href="../02_architecture/domain_architecture.html" >ドメイン構造と3層カスケード</a>
+                            </li>
+                            
+                            <li class="nav-item ">
+                                <a href="../02_architecture/stateful_engine.html" >ステートフル Pull-Push エンジン</a>
+                            </li>
+                            
+                        </ul>
+                    
+                        
+                        <div class="sidebar-heading">3. ワークフローとアクション</div>
+                        
+                        <ul class="nav-list">
+                            
+                            <li class="nav-item ">
+                                <a href="../03_workflows_and_actions/workflows_guide.html" >ワークフローと Pre-Flight ゲート</a>
+                            </li>
+                            
+                            <li class="nav-item ">
+                                <a href="../03_workflows_and_actions/actions_pipeline.html" >15 アクションと 12 プリミティブ</a>
+                            </li>
+                            
+                            <li class="nav-item ">
+                                <a href="../03_workflows_and_actions/analyzers_and_pentest.html" >決定論的解析器とペネトレーションテスト</a>
+                            </li>
+                            
+                        </ul>
+                    
+                        
+                        <div class="sidebar-heading">4. スコアリングとレポート</div>
+                        
+                        <ul class="nav-list">
+                            
+                            <li class="nav-item ">
+                                <a href="../04_scoring_and_reports/scoring_model.html" >7軸品質スコアリングモデル</a>
+                            </li>
+                            
+                            <li class="nav-item ">
+                                <a href="../04_scoring_and_reports/drawlib_reporter.html" >Drawlib ビジュアルレポーター</a>
+                            </li>
+                            
+                        </ul>
+                    
+                        
+                        <div class="sidebar-heading">5. 対応言語とリファレンス</div>
+                        
+                        <ul class="nav-list">
+                            
+                            <li class="nav-item active">
+                                <a href="supported_languages.html" >対応 6 言語マトリクス</a>
+                            </li>
+                            
+                            <li class="nav-item ">
+                                <a href="rules_and_cli.html" >ルール拡張と CLI リファレンス</a>
+                            </li>
+                            
+                        </ul>
+                    
+                        
+                        <div class="sidebar-heading">外部リンク (External Links)</div>
+                        
+                        <ul class="nav-list">
+                            
+                            <li class="nav-item ">
+                                <a href="https://github.com/yuichi110/pni501" target="_blank" rel="noopener noreferrer">GitHub リポジトリ<svg class="nav-external-icon" viewBox="0 0 24 24" aria-hidden="true"><line x1="7" y1="17" x2="17" y2="7"></line><polyline points="7 7 17 7 17 17"></polyline></svg></a>
+                            </li>
+                            
+                            <li class="nav-item ">
+                                <a href="https://pypi.org/project/pni501/" target="_blank" rel="noopener noreferrer">PyPI パッケージ<svg class="nav-external-icon" viewBox="0 0 24 24" aria-hidden="true"><line x1="7" y1="17" x2="17" y2="7"></line><polyline points="7 7 17 7 17 17"></polyline></svg></a>
+                            </li>
+                            
+                        </ul>
+                    
+                
+            </div>
+        </aside>
+        <div class="content-wrapper">
+            <header class="top-bar">
+                <div class="breadcrumbs">
+                    <span class="crumb">Docs</span>
+                    <span class="crumb-separator">&raquo;</span>
+                    <span class="crumb active">対応 6 言語マトリクス</span>
+                </div>
+                
+                <div class="lang-switcher">
+                    <details class="lang-dropdown">
+                        <summary class="lang-dropdown-btn" aria-label="Select language">
+                            <svg class="lang-globe-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+                            <span class="lang-current-label">日本語</span>
+                            <svg class="lang-caret-icon" viewBox="0 0 24 24" aria-hidden="true"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                        </summary>
+                        <div class="lang-dropdown-menu" role="menu">
+                            
+                            <a href="../../en/05_languages_and_reference/supported_languages.html" class="lang-option" lang="en" hreflang="en" >
+                                <span>English</span>
+                                
+                            </a>
+                            
+                            <a href="supported_languages.html" class="lang-option active" lang="ja" hreflang="ja" aria-current="page">
+                                <span>日本語</span>
+                                
+                                <svg class="lang-check-icon" viewBox="0 0 24 24" aria-hidden="true"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                                
+                            </a>
+                            
+                        </div>
+                    </details>
+                </div>
+                
+            </header>
+            <main class="main-content">
+                <h1>対応 6 言語マトリクス</h1>
+<p><code>pni501</code> (<code>v0.1.3</code>) は、<strong>Python・Java・PHP・Go・TypeScript・JavaScript の主要 6 言語</strong>に対して、決定論的な静的解析（<code>ProjectFacts</code> および単一パス Tree-sitter <code>AstFacts</code>）、言語別エンジニアリングルール、隔離コンテナテスト・カバレッジハーネス（<code>.pni/dockerfiles/</code>）、および Trivy セキュリティスキャンを一貫したアーキテクチャで提供します。</p>
+<figure class="drawlib-image" style="text-align: center;">
+  <img src="../../images/05_languages_and_reference/supported_languages/six_languages_matrix_hero.png" alt="supported_languages_1" />
+  <figcaption class="drawlib-caption">対応 6 言語マトリクス：マニフェスト・Tree-sitter AST パーサー・テスト/カバレッジツールチェーン・コンテナハーネス</figcaption>
+</figure>
+<details class="drawlib-code-details">
+<summary>Source Code</summary>
+<pre><code class="language-python"><span class="kn">from</span><span class="w"> </span><span class="nn">drawlib.canvas</span><span class="w"> </span><span class="kn">import</span> <span class="n">save</span><span class="p">,</span> <span class="n">setup</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">drawlib.icons</span><span class="w"> </span><span class="kn">import</span> <span class="n">code</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">drawlib.smartarts</span><span class="w"> </span><span class="kn">import</span> <span class="n">CardList</span><span class="p">,</span> <span class="n">Panel</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">drawlib.styles</span><span class="w"> </span><span class="kn">import</span> <span class="n">Styles</span>
+
+<span class="n">setup</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="mi">184</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">86</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">150</span><span class="p">)</span>
+
+<span class="n">left_panel</span> <span class="o">=</span> <span class="n">Panel</span><span class="p">(</span>
+    <span class="s2">"1. Backend &amp; Enterprise (Python / Java / PHP)"</span><span class="p">,</span>
+    <span class="n">header_variant</span><span class="o">=</span><span class="s2">"filled"</span><span class="p">,</span>
+    <span class="n">header_height</span><span class="o">=</span><span class="mf">8.5</span><span class="p">,</span>
+    <span class="n">style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">Neutral</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">shape_r</span><span class="o">=</span><span class="mf">2.0</span><span class="p">),</span>
+    <span class="n">header_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">PrimaryFlat</span><span class="p">,</span>
+    <span class="n">text_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">WhiteBold</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">text_size</span><span class="o">=</span><span class="mf">11.2</span><span class="p">),</span>
+<span class="p">)</span>
+<span class="n">left_panel</span><span class="o">.</span><span class="n">draw</span><span class="p">(</span><span class="n">xy</span><span class="o">=</span><span class="p">(</span><span class="mf">4.0</span><span class="p">,</span> <span class="mf">4.0</span><span class="p">),</span> <span class="n">width</span><span class="o">=</span><span class="mf">85.5</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mf">78.0</span><span class="p">)</span>
+
+<span class="n">left_cards</span> <span class="o">=</span> <span class="n">CardList</span><span class="p">(</span>
+    <span class="n">style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">WhiteBordered</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">shape_r</span><span class="o">=</span><span class="mf">1.5</span><span class="p">),</span>
+    <span class="n">text_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">DarkBold</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">text_size</span><span class="o">=</span><span class="mf">10.8</span><span class="p">),</span>
+    <span class="n">description_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">Dark</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">text_size</span><span class="o">=</span><span class="mf">10.0</span><span class="p">),</span>
+    <span class="n">badge_shape</span><span class="o">=</span><span class="s2">"rounded_rect"</span><span class="p">,</span>
+    <span class="n">badge_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">PrimaryNeutral</span><span class="p">,</span>
+    <span class="n">badge_text_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">PrimaryBold</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">text_size</span><span class="o">=</span><span class="mf">10.0</span><span class="p">),</span>
+    <span class="n">icon_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">PrimaryBold</span><span class="p">,</span>
+    <span class="n">direction</span><span class="o">=</span><span class="s2">"vertical"</span><span class="p">,</span>
+    <span class="n">spacing</span><span class="o">=</span><span class="mf">2.8</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">left_cards</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+    <span class="s2">"Python (python — 3.11 / 3.12 / 3.13)"</span><span class="p">,</span>
+    <span class="s2">"Manifest: pyproject.toml, uv.lock, poetry.lock</span><span class="se">\n</span><span class="s2">"</span>
+    <span class="s2">"AST/Rules: stdlib ast + ast-grep | 7 rules</span><span class="se">\n</span><span class="s2">"</span>
+    <span class="s2">"Harness: uv/poetry/pip -&gt; pytest + coverage"</span><span class="p">,</span>
+    <span class="n">badge_text</span><span class="o">=</span><span class="s2">"PY"</span><span class="p">,</span>
+    <span class="n">icon</span><span class="o">=</span><span class="n">code</span><span class="o">.</span><span class="n">python</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">left_cards</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+    <span class="s2">"Java (java — JDK 8 / 11 / 17 / 21 LTS)"</span><span class="p">,</span>
+    <span class="s2">"Manifest: pom.xml, build.gradle(.kts)</span><span class="se">\n</span><span class="s2">"</span>
+    <span class="s2">"AST/Rules: ast-grep (java) | 6 rules (Spring)</span><span class="se">\n</span><span class="s2">"</span>
+    <span class="s2">"Harness: maven/gradle -&gt; JUnit 5 + JaCoCo"</span><span class="p">,</span>
+    <span class="n">badge_text</span><span class="o">=</span><span class="s2">"JV"</span><span class="p">,</span>
+    <span class="n">icon</span><span class="o">=</span><span class="n">code</span><span class="o">.</span><span class="n">java</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">left_cards</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+    <span class="s2">"PHP (php — 8.1..8.4 &amp; Raw PHP)"</span><span class="p">,</span>
+    <span class="s2">"Manifest: composer.json, artisan, wp-config</span><span class="se">\n</span><span class="s2">"</span>
+    <span class="s2">"AST/Rules: ast-grep (php) | 8 rules (Laravel/WP)</span><span class="se">\n</span><span class="s2">"</span>
+    <span class="s2">"Harness: composer/raw -&gt; php -l + PHPUnit/PCOV"</span><span class="p">,</span>
+    <span class="n">badge_text</span><span class="o">=</span><span class="s2">"PHP"</span><span class="p">,</span>
+    <span class="n">icon</span><span class="o">=</span><span class="n">code</span><span class="o">.</span><span class="n">php</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">left_cards</span><span class="o">.</span><span class="n">draw</span><span class="p">(</span><span class="n">xy</span><span class="o">=</span><span class="p">(</span><span class="mf">6.5</span><span class="p">,</span> <span class="mf">6.5</span><span class="p">),</span> <span class="n">width</span><span class="o">=</span><span class="mf">80.5</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mf">64.5</span><span class="p">)</span>
+
+<span class="n">right_panel</span> <span class="o">=</span> <span class="n">Panel</span><span class="p">(</span>
+    <span class="s2">"2. Cloud-Native &amp; Web (Go / TypeScript / JS)"</span><span class="p">,</span>
+    <span class="n">header_variant</span><span class="o">=</span><span class="s2">"filled"</span><span class="p">,</span>
+    <span class="n">header_height</span><span class="o">=</span><span class="mf">8.5</span><span class="p">,</span>
+    <span class="n">style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">PrimaryNeutral</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">shape_r</span><span class="o">=</span><span class="mf">2.0</span><span class="p">),</span>
+    <span class="n">header_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">SecondaryFlat</span><span class="p">,</span>
+    <span class="n">text_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">WhiteBold</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">text_size</span><span class="o">=</span><span class="mf">11.2</span><span class="p">),</span>
+<span class="p">)</span>
+<span class="n">right_panel</span><span class="o">.</span><span class="n">draw</span><span class="p">(</span><span class="n">xy</span><span class="o">=</span><span class="p">(</span><span class="mf">94.5</span><span class="p">,</span> <span class="mf">4.0</span><span class="p">),</span> <span class="n">width</span><span class="o">=</span><span class="mf">85.5</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mf">78.0</span><span class="p">)</span>
+
+<span class="n">right_cards</span> <span class="o">=</span> <span class="n">CardList</span><span class="p">(</span>
+    <span class="n">style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">WhiteBordered</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">shape_r</span><span class="o">=</span><span class="mf">1.5</span><span class="p">),</span>
+    <span class="n">text_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">DarkBold</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">text_size</span><span class="o">=</span><span class="mf">10.8</span><span class="p">),</span>
+    <span class="n">description_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">Dark</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">text_size</span><span class="o">=</span><span class="mf">10.0</span><span class="p">),</span>
+    <span class="n">badge_shape</span><span class="o">=</span><span class="s2">"rounded_rect"</span><span class="p">,</span>
+    <span class="n">badge_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">SecondaryNeutral</span><span class="p">,</span>
+    <span class="n">badge_text_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">SecondaryBold</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">text_size</span><span class="o">=</span><span class="mf">10.0</span><span class="p">),</span>
+    <span class="n">icon_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">SecondaryBold</span><span class="p">,</span>
+    <span class="n">direction</span><span class="o">=</span><span class="s2">"vertical"</span><span class="p">,</span>
+    <span class="n">spacing</span><span class="o">=</span><span class="mf">2.8</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">right_cards</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+    <span class="s2">"Go (go — 1.21 / 1.22 / 1.23 / 1.24)"</span><span class="p">,</span>
+    <span class="s2">"Manifest: go.mod, go.sum (*_test.go split)</span><span class="se">\n</span><span class="s2">"</span>
+    <span class="s2">"AST/Rules: ast-grep (go) | 5 rules (GoDoc/err)</span><span class="se">\n</span><span class="s2">"</span>
+    <span class="s2">"Harness: go.dockerfile -&gt; go vet + coverprofile"</span><span class="p">,</span>
+    <span class="n">badge_text</span><span class="o">=</span><span class="s2">"GO"</span><span class="p">,</span>
+    <span class="n">icon</span><span class="o">=</span><span class="n">code</span><span class="o">.</span><span class="n">go</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">right_cards</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+    <span class="s2">"TypeScript (typescript — Node 18 / 20 / 22)"</span><span class="p">,</span>
+    <span class="s2">"Manifest: package.json + tsconfig.json</span><span class="se">\n</span><span class="s2">"</span>
+    <span class="s2">"AST/Rules: ast-grep (ts/tsx) | 5 rules (strict)</span><span class="se">\n</span><span class="s2">"</span>
+    <span class="s2">"Harness: node.dockerfile -&gt; Vitest/Jest + tsc"</span><span class="p">,</span>
+    <span class="n">badge_text</span><span class="o">=</span><span class="s2">"TS"</span><span class="p">,</span>
+    <span class="n">icon</span><span class="o">=</span><span class="n">code</span><span class="o">.</span><span class="n">typescript</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">right_cards</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+    <span class="s2">"JavaScript (javascript — Node 18 / 20 / 22)"</span><span class="p">,</span>
+    <span class="s2">"Manifest: package.json + jsconfig.json</span><span class="se">\n</span><span class="s2">"</span>
+    <span class="s2">"AST/Rules: ast-grep (tsx) | 5 rules (JSDoc)</span><span class="se">\n</span><span class="s2">"</span>
+    <span class="s2">"Harness: node.dockerfile -&gt; Vitest + node --check"</span><span class="p">,</span>
+    <span class="n">badge_text</span><span class="o">=</span><span class="s2">"JS"</span><span class="p">,</span>
+    <span class="n">icon</span><span class="o">=</span><span class="n">code</span><span class="o">.</span><span class="n">javascript</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">right_cards</span><span class="o">.</span><span class="n">draw</span><span class="p">(</span><span class="n">xy</span><span class="o">=</span><span class="p">(</span><span class="mf">97.0</span><span class="p">,</span> <span class="mf">6.5</span><span class="p">),</span> <span class="n">width</span><span class="o">=</span><span class="mf">80.5</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mf">64.5</span><span class="p">)</span>
+
+<span class="n">save</span><span class="p">()</span>
+</code></pre>
+</details>
+<hr />
+<h2>1. 6 言語のエンドツーエンド機能マトリクス</h2>
+<p>すべての対応言語は共通の <code>LanguageAnalyzerSuite</code> プロトコル（<code>src/pni/_actions/ast_analyze/runner.py</code>）および 4 ステージのコンテナ実行検証エンジン（<code>src/pni/_actions/runtime_check/runner.py</code>）に統合されており、言語ランタイムの違いを問わず正規化された <code>ProjectFacts</code>・<code>AstFacts</code>・<code>RuntimeFacts</code>・<code>SecurityScanFacts</code> スキーマを出力します。</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">評価軸・機能</th>
+<th style="text-align:left">Python (<code>python</code>)</th>
+<th style="text-align:left">Java (<code>java</code>)</th>
+<th style="text-align:left">PHP (<code>php</code>)</th>
+<th style="text-align:left">Go (<code>go</code>)</th>
+<th style="text-align:left">TypeScript (<code>typescript</code>)</th>
+<th style="text-align:left">JavaScript (<code>javascript</code>)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left"><strong>マニフェスト / ロックファイル</strong></td>
+<td style="text-align:left"><code>pyproject.toml</code>, <code>setup.py</code>, <code>requirements.txt</code>, <code>uv.lock</code>, <code>poetry.lock</code></td>
+<td style="text-align:left"><code>pom.xml</code>, <code>build.gradle(.kts)</code>, <code>settings.gradle(.kts)</code>, <code>gradle.lockfile</code></td>
+<td style="text-align:left"><code>composer.json</code>, <code>composer.lock</code>, <code>artisan</code>, <code>wp-config.php</code>, 素の <code>*.php</code></td>
+<td style="text-align:left"><code>go.mod</code>, <code>go.sum</code>, <code>go.work</code></td>
+<td style="text-align:left"><code>package.json</code>, <code>tsconfig.json</code>, <code>pnpm-lock.yaml</code>, <code>package-lock.json</code>, <code>yarn.lock</code></td>
+<td style="text-align:left"><code>package.json</code>, <code>jsconfig.json</code>, <code>pnpm-lock.yaml</code>, <code>package-lock.json</code>, <code>yarn.lock</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>対象ソース拡張子</strong></td>
+<td style="text-align:left"><code>.py</code></td>
+<td style="text-align:left"><code>.java</code></td>
+<td style="text-align:left"><code>.php</code>, <code>.phtml</code></td>
+<td style="text-align:left"><code>.go</code> (<code>*_test.go</code> を自動分離)</td>
+<td style="text-align:left"><code>.ts</code>, <code>.tsx</code> (<code>.d.ts</code> 除外・<code>*.test.ts</code> 自動分離)</td>
+<td style="text-align:left"><code>.js</code>, <code>.jsx</code>, <code>.mjs</code>, <code>.cjs</code> (<code>*.test.js</code> 自動分離)</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>AST パーサーエンジン</strong></td>
+<td style="text-align:left">Python 標準 <code>ast</code> + <code>ast-grep-py</code> (<code>python</code>)</td>
+<td style="text-align:left"><code>ast-grep-py</code> (<code>java</code>)</td>
+<td style="text-align:left"><code>ast-grep-py</code> (<code>php</code> + 混在 HTML プリプロセッサ)</td>
+<td style="text-align:left"><code>ast-grep-py</code> (<code>go</code>)</td>
+<td style="text-align:left"><code>ast-grep-py</code> (<code>typescript</code> / <code>tsx</code>)</td>
+<td style="text-align:left"><code>ast-grep-py</code> (<code>tsx</code>)</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>言語別複合アクション</strong></td>
+<td style="text-align:left"><code>python_ast_audit</code>, <code>python_test_audit</code></td>
+<td style="text-align:left"><code>java_ast_audit</code>, <code>java_test_audit</code></td>
+<td style="text-align:left"><code>php_ast_audit</code>, <code>php_test_audit</code></td>
+<td style="text-align:left"><code>go_ast_audit</code>, <code>go_test_audit</code></td>
+<td style="text-align:left"><code>typescript_ast_audit</code>, <code>typescript_test_audit</code></td>
+<td style="text-align:left"><code>javascript_ast_audit</code>, <code>javascript_test_audit</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>組み込みルール数</strong></td>
+<td style="text-align:left"><code>7</code> ファイル (<code>code_quality</code>, <code>typing</code>, <code>dependencies</code>, <code>modern_stack</code>, <code>testing</code>, <code>frameworks/fastapi</code>, <code>workflow_guide</code>)</td>
+<td style="text-align:left"><code>6</code> ファイル (<code>code_quality</code>, <code>typing</code>, <code>dependencies</code>, <code>testing</code>, <code>frameworks/spring_boot</code>, <code>workflow_guide</code>)</td>
+<td style="text-align:left"><code>8</code> ファイル (<code>code_quality</code>, <code>typing</code>, <code>dependencies</code>, <code>modern_stack</code>, <code>testing</code>, <code>frameworks/laravel</code>, <code>frameworks/wordpress</code>, <code>workflow_guide</code>)</td>
+<td style="text-align:left"><code>5</code> ファイル (<code>code_quality</code>, <code>typing</code>, <code>dependencies</code>, <code>testing</code>, <code>workflow_guide</code>)</td>
+<td style="text-align:left"><code>5</code> ファイル (<code>code_quality</code>, <code>typing</code>, <code>dependencies</code>, <code>testing</code>, <code>workflow_guide</code>)</td>
+<td style="text-align:left"><code>5</code> ファイル (<code>code_quality</code>, <code>typing</code>, <code>dependencies</code>, <code>testing</code>, <code>workflow_guide</code>)</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>コンテナテンプレート</strong></td>
+<td style="text-align:left"><code>python/uv.dockerfile</code>, <code>poetry.dockerfile</code>, <code>pip.dockerfile</code> (<code>3.11</code>–<code>3.13</code>)</td>
+<td style="text-align:left"><code>java/maven.dockerfile</code>, <code>gradle.dockerfile</code> (Temurin <code>8</code>/<code>11</code>/<code>17</code>/<code>21</code>)</td>
+<td style="text-align:left"><code>php/composer.dockerfile</code>, <code>raw.dockerfile</code> (PHP CLI <code>8.1</code>–<code>8.4</code>)</td>
+<td style="text-align:left"><code>go/go.dockerfile</code> (Golang Bookworm <code>1.21</code>–<code>1.24</code>)</td>
+<td style="text-align:left"><code>typescript/node.dockerfile</code> (Node Bookworm <code>18</code>/<code>20</code>/<code>22</code>)</td>
+<td style="text-align:left"><code>javascript/node.dockerfile</code> (Node Bookworm <code>18</code>/<code>20</code>/<code>22</code>)</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>オフラインテスト &amp; カバレッジ</strong></td>
+<td style="text-align:left"><code>pytest --junitxml=/out/junit.xml --cov --cov-report=json:/out/coverage.json</code></td>
+<td style="text-align:left"><code>mvn test</code> / <code>gradle test</code> + JaCoCo XML (<code>/out/jacoco.xml</code>)</td>
+<td style="text-align:left"><code>php -l</code> 構文ゲート + <code>phpunit</code> + PCOV Clover (<code>/out/clover.xml</code>)</td>
+<td style="text-align:left"><code>go vet ./...</code> + <code>go test -v -coverprofile=/out/coverage.out ./...</code></td>
+<td style="text-align:left"><code>vitest run</code> / <code>jest --coverage</code> (<code>coverage-summary.json</code>) または <code>tsc --noEmit</code></td>
+<td style="text-align:left"><code>vitest run</code> / <code>jest --coverage</code> / <code>npm test</code> / <code>node --test</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>Stage 3 スモークプローブ</strong></td>
+<td style="text-align:left">ASGI/WSGI <code>TestClient</code> 疎通・CLI <code>--help</code>・<code>importlib.import_module</code></td>
+<td style="text-align:left">Spring Boot TCP <code>:18080</code> 起動確認・<code>main --help</code>・<code>target/classes</code> 検証</td>
+<td style="text-align:left"><code>php -S</code> HTTP ルート疎通・<code>php artisan --version</code>・PSR-4 オートロード・WP プラグインフック検証</td>
+<td style="text-align:left"><code>go build ./...</code> モジュール全体のコンパイル・リンク検証</td>
+<td style="text-align:left"><code>tsc --noEmit</code> 型チェックまたは Node ランタイム検証</td>
+<td style="text-align:left"><code>node --check</code> による <code>.js</code>/<code>.mjs</code>/<code>.cjs</code> 構文チェック</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2>2. 決定論的な言語自動検出とサンドボックス実行パイプライン</h2>
+<p><code>pni init</code> や <code>pni rules list</code>、またはワークフローステップを実行すると、<code>src/pni/_rules/manager.py</code> の <code>detect_active_language()</code> が以下の優先順位でリポジトリの主要言語を決定論的に自動判定します。</p>
+<ol>
+<li><strong>主要ビルドマニフェストの検査</strong>: ルートディレクトリのマニフェストを厳密な優先順で検査します。
+<ul>
+<li><strong>Python</strong>: <code>pyproject.toml</code>, <code>setup.py</code>, <code>requirements.txt</code></li>
+<li><strong>Java</strong>: <code>pom.xml</code>, <code>build.gradle</code>, <code>build.gradle.kts</code>, <code>settings.gradle</code>, <code>settings.gradle.kts</code></li>
+<li><strong>PHP</strong>: <code>composer.json</code>, <code>wp-config.php</code>, <code>wp-config-sample.php</code>, <code>artisan</code>, <code>phpunit.xml</code>, <code>phpunit.xml.dist</code></li>
+<li><strong>Go</strong>: <code>go.mod</code>, <code>go.work</code></li>
+</ul>
+</li>
+<li><strong>Node.js プロジェクトにおける TypeScript / JavaScript 判別 (<code>_detect_node_language</code>)</strong>:
+<ul>
+<li><code>tsconfig.json</code> または <code>tsconfig.base.json</code> が存在する場合、あるいは <code>package.json</code> の <code>dependencies</code> / <code>devDependencies</code> に <code>&quot;typescript&quot;</code> が含まれる場合は即座に <code>typescript</code> と判定します。</li>
+<li><code>jsconfig.json</code> が存在する場合は <code>javascript</code> を返し、それ以外は <code>src/</code>・<code>app/</code>・<code>lib/</code>・<code>packages/</code>・<code>pages/</code>・<code>components/</code> 配下の <code>.ts</code>/<code>.tsx</code>（<code>.d.ts</code> を除く）と <code>.js</code>/<code>.jsx</code>/<code>.mjs</code>/<code>.cjs</code> の有無を比較します。</li>
+</ul>
+</li>
+<li><strong>ソースツリー拡張子フォールバック</strong>: 標準ディレクトリ（<code>src/main/java</code>・<code>cmd/</code>・<code>internal/</code>・<code>pkg/</code>・<code>app/</code>・<code>public/</code>・<code>includes/</code>）のソース拡張子を走査し、該当がない場合はデフォルトの <code>python</code> にフォールバックします。</li>
+</ol>
+<figure class="drawlib-image" style="text-align: center;">
+  <img src="../../images/05_languages_and_reference/supported_languages/language_detection_and_toolchains.png" alt="supported_languages_2" />
+  <figcaption class="drawlib-caption">決定論的な言語自動検出・単一パス AST チェッカー群・オフラインコンテナツールチェーンの連携</figcaption>
+</figure>
+<details class="drawlib-code-details">
+<summary>Source Code</summary>
+<pre><code class="language-python"><span class="kn">from</span><span class="w"> </span><span class="nn">drawlib.canvas</span><span class="w"> </span><span class="kn">import</span> <span class="n">save</span><span class="p">,</span> <span class="n">setup</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">drawlib.diagrams.architecture</span><span class="w"> </span><span class="kn">import</span> <span class="n">ArchitectureDiagram</span><span class="p">,</span> <span class="n">Node</span><span class="p">,</span> <span class="n">NodeGroup</span><span class="p">,</span> <span class="n">PhosphorIcon</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">drawlib.styles</span><span class="w"> </span><span class="kn">import</span> <span class="n">Styles</span>
+
+<span class="n">setup</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="mi">168</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">84</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">150</span><span class="p">)</span>
+
+<span class="n">diag</span> <span class="o">=</span> <span class="n">ArchitectureDiagram</span><span class="p">(</span>
+    <span class="n">node_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">PrimaryBold</span><span class="p">,</span>
+    <span class="n">node_text_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">DarkBold</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">text_size</span><span class="o">=</span><span class="mf">10.0</span><span class="p">),</span>
+    <span class="n">edge_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">DarkBold</span><span class="p">,</span>
+    <span class="n">edge_text_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">DarkBold</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">text_size</span><span class="o">=</span><span class="mf">9.8</span><span class="p">),</span>
+    <span class="n">node_card_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">WhiteBordered</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">shape_r</span><span class="o">=</span><span class="mf">1.5</span><span class="p">),</span>
+<span class="p">)</span>
+
+<span class="n">g_detect</span> <span class="o">=</span> <span class="n">diag</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+    <span class="n">NodeGroup</span><span class="p">(</span>
+        <span class="n">title</span><span class="o">=</span><span class="s2">"1. Auto-Detection &amp; Inspect"</span><span class="p">,</span>
+        <span class="n">width</span><span class="o">=</span><span class="mf">48.0</span><span class="p">,</span>
+        <span class="n">height</span><span class="o">=</span><span class="mf">74.0</span><span class="p">,</span>
+        <span class="n">style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">Neutral</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">shape_r</span><span class="o">=</span><span class="mf">2.0</span><span class="p">),</span>
+        <span class="n">text_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">DarkBold</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">text_size</span><span class="o">=</span><span class="mf">10.5</span><span class="p">,</span> <span class="n">halign</span><span class="o">=</span><span class="s2">"left"</span><span class="p">,</span> <span class="n">valign</span><span class="o">=</span><span class="s2">"top"</span><span class="p">),</span>
+    <span class="p">),</span>
+    <span class="n">xy</span><span class="o">=</span><span class="p">(</span><span class="mf">4.0</span><span class="p">,</span> <span class="mf">5.0</span><span class="p">),</span>
+<span class="p">)</span>
+<span class="n">n_manifest</span> <span class="o">=</span> <span class="n">g_detect</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+    <span class="n">Node</span><span class="p">(</span>
+        <span class="s2">"detect_active_language()</span><span class="se">\n</span><span class="s2">Manifests &amp; tsconfig/jsconfig"</span><span class="p">,</span>
+        <span class="n">width</span><span class="o">=</span><span class="mf">42.0</span><span class="p">,</span>
+        <span class="n">height</span><span class="o">=</span><span class="mf">15.5</span><span class="p">,</span>
+        <span class="n">icon</span><span class="o">=</span><span class="n">PhosphorIcon</span><span class="o">.</span><span class="n">MAGNIFYING_GLASS</span><span class="p">,</span>
+        <span class="n">icon_size</span><span class="o">=</span><span class="mf">5.2</span><span class="p">,</span>
+        <span class="n">card_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">PrimaryNeutral</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">shape_r</span><span class="o">=</span><span class="mf">1.5</span><span class="p">),</span>
+    <span class="p">),</span>
+    <span class="n">xy</span><span class="o">=</span><span class="p">(</span><span class="mf">24.0</span><span class="p">,</span> <span class="mf">54.0</span><span class="p">),</span>
+<span class="p">)</span>
+<span class="n">n_inspect</span> <span class="o">=</span> <span class="n">g_detect</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+    <span class="n">Node</span><span class="p">(</span>
+        <span class="s2">"project_inspect (ProjectFacts)</span><span class="se">\n</span><span class="s2">Build Tool, Lockfiles &amp; Runtime"</span><span class="p">,</span>
+        <span class="n">width</span><span class="o">=</span><span class="mf">42.0</span><span class="p">,</span>
+        <span class="n">height</span><span class="o">=</span><span class="mf">15.5</span><span class="p">,</span>
+        <span class="n">icon</span><span class="o">=</span><span class="n">PhosphorIcon</span><span class="o">.</span><span class="n">PACKAGE</span><span class="p">,</span>
+        <span class="n">icon_size</span><span class="o">=</span><span class="mf">5.2</span><span class="p">,</span>
+    <span class="p">),</span>
+    <span class="n">xy</span><span class="o">=</span><span class="p">(</span><span class="mf">24.0</span><span class="p">,</span> <span class="mf">32.0</span><span class="p">),</span>
+<span class="p">)</span>
+<span class="n">n_pni_toml</span> <span class="o">=</span> <span class="n">g_detect</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+    <span class="n">Node</span><span class="p">(</span>
+        <span class="s2">".pni/pni.toml Overrides</span><span class="se">\n</span><span class="s2">Targets, Excludes &amp; [[opt_out]]"</span><span class="p">,</span>
+        <span class="n">width</span><span class="o">=</span><span class="mf">42.0</span><span class="p">,</span>
+        <span class="n">height</span><span class="o">=</span><span class="mf">15.5</span><span class="p">,</span>
+        <span class="n">icon</span><span class="o">=</span><span class="n">PhosphorIcon</span><span class="o">.</span><span class="n">SLIDERS_HORIZONTAL</span><span class="p">,</span>
+        <span class="n">icon_size</span><span class="o">=</span><span class="mf">5.2</span><span class="p">,</span>
+        <span class="n">style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">SecondaryBold</span><span class="p">,</span>
+        <span class="n">card_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">SecondaryNeutral</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">shape_r</span><span class="o">=</span><span class="mf">1.5</span><span class="p">),</span>
+    <span class="p">),</span>
+    <span class="n">xy</span><span class="o">=</span><span class="p">(</span><span class="mf">24.0</span><span class="p">,</span> <span class="mf">10.0</span><span class="p">),</span>
+<span class="p">)</span>
+
+<span class="n">g_ast</span> <span class="o">=</span> <span class="n">diag</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+    <span class="n">NodeGroup</span><span class="p">(</span>
+        <span class="n">title</span><span class="o">=</span><span class="s2">"2. Parse-Once AST Suite"</span><span class="p">,</span>
+        <span class="n">width</span><span class="o">=</span><span class="mf">52.0</span><span class="p">,</span>
+        <span class="n">height</span><span class="o">=</span><span class="mf">74.0</span><span class="p">,</span>
+        <span class="n">style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">Neutral</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">shape_r</span><span class="o">=</span><span class="mf">2.0</span><span class="p">),</span>
+        <span class="n">text_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">DarkBold</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">text_size</span><span class="o">=</span><span class="mf">10.5</span><span class="p">,</span> <span class="n">halign</span><span class="o">=</span><span class="s2">"left"</span><span class="p">,</span> <span class="n">valign</span><span class="o">=</span><span class="s2">"top"</span><span class="p">),</span>
+    <span class="p">),</span>
+    <span class="n">xy</span><span class="o">=</span><span class="p">(</span><span class="mf">58.0</span><span class="p">,</span> <span class="mf">5.0</span><span class="p">),</span>
+<span class="p">)</span>
+<span class="n">n_suite</span> <span class="o">=</span> <span class="n">g_ast</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+    <span class="n">Node</span><span class="p">(</span>
+        <span class="s2">"LanguageAnalyzerSuite</span><span class="se">\n</span><span class="s2">Single-Pass SgRoot Tree-sitter"</span><span class="p">,</span>
+        <span class="n">width</span><span class="o">=</span><span class="mf">46.0</span><span class="p">,</span>
+        <span class="n">height</span><span class="o">=</span><span class="mf">15.5</span><span class="p">,</span>
+        <span class="n">icon</span><span class="o">=</span><span class="n">PhosphorIcon</span><span class="o">.</span><span class="n">TREE_STRUCTURE</span><span class="p">,</span>
+        <span class="n">icon_size</span><span class="o">=</span><span class="mf">5.2</span><span class="p">,</span>
+        <span class="n">style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">WhiteBold</span><span class="p">,</span>
+        <span class="n">text_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">WhiteBold</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">text_size</span><span class="o">=</span><span class="mf">10.0</span><span class="p">),</span>
+        <span class="n">card_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">PrimaryFlat</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">shape_r</span><span class="o">=</span><span class="mf">1.5</span><span class="p">),</span>
+    <span class="p">),</span>
+    <span class="n">xy</span><span class="o">=</span><span class="p">(</span><span class="mf">26.0</span><span class="p">,</span> <span class="mf">54.0</span><span class="p">),</span>
+<span class="p">)</span>
+<span class="n">n_checkers</span> <span class="o">=</span> <span class="n">g_ast</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+    <span class="n">Node</span><span class="p">(</span>
+        <span class="s2">"9 Specialized Checkers</span><span class="se">\n</span><span class="s2">Imports, Typing, Docs, Quality, Test"</span><span class="p">,</span>
+        <span class="n">width</span><span class="o">=</span><span class="mf">46.0</span><span class="p">,</span>
+        <span class="n">height</span><span class="o">=</span><span class="mf">15.5</span><span class="p">,</span>
+        <span class="n">icon</span><span class="o">=</span><span class="n">PhosphorIcon</span><span class="o">.</span><span class="n">LIST_CHECKS</span><span class="p">,</span>
+        <span class="n">icon_size</span><span class="o">=</span><span class="mf">5.2</span><span class="p">,</span>
+        <span class="n">card_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">PrimaryNeutral</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">shape_r</span><span class="o">=</span><span class="mf">1.5</span><span class="p">),</span>
+    <span class="p">),</span>
+    <span class="n">xy</span><span class="o">=</span><span class="p">(</span><span class="mf">26.0</span><span class="p">,</span> <span class="mf">32.0</span><span class="p">),</span>
+<span class="p">)</span>
+<span class="n">n_sec_ast</span> <span class="o">=</span> <span class="n">g_ast</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+    <span class="n">Node</span><span class="p">(</span>
+        <span class="s2">"Framework &amp; CWE Sinks</span><span class="se">\n</span><span class="s2">dangerous_sinks + api_endpoints"</span><span class="p">,</span>
+        <span class="n">width</span><span class="o">=</span><span class="mf">46.0</span><span class="p">,</span>
+        <span class="n">height</span><span class="o">=</span><span class="mf">15.5</span><span class="p">,</span>
+        <span class="n">icon</span><span class="o">=</span><span class="n">PhosphorIcon</span><span class="o">.</span><span class="n">SHIELD_WARNING</span><span class="p">,</span>
+        <span class="n">icon_size</span><span class="o">=</span><span class="mf">5.2</span><span class="p">,</span>
+    <span class="p">),</span>
+    <span class="n">xy</span><span class="o">=</span><span class="p">(</span><span class="mf">26.0</span><span class="p">,</span> <span class="mf">10.0</span><span class="p">),</span>
+<span class="p">)</span>
+
+<span class="n">g_runtime</span> <span class="o">=</span> <span class="n">diag</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+    <span class="n">NodeGroup</span><span class="p">(</span>
+        <span class="n">title</span><span class="o">=</span><span class="s2">"3. Container Harness &amp; Scan"</span><span class="p">,</span>
+        <span class="n">width</span><span class="o">=</span><span class="mf">48.0</span><span class="p">,</span>
+        <span class="n">height</span><span class="o">=</span><span class="mf">74.0</span><span class="p">,</span>
+        <span class="n">style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">Neutral</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">shape_r</span><span class="o">=</span><span class="mf">2.0</span><span class="p">),</span>
+        <span class="n">text_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">DarkBold</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">text_size</span><span class="o">=</span><span class="mf">10.5</span><span class="p">,</span> <span class="n">halign</span><span class="o">=</span><span class="s2">"left"</span><span class="p">,</span> <span class="n">valign</span><span class="o">=</span><span class="s2">"top"</span><span class="p">),</span>
+    <span class="p">),</span>
+    <span class="n">xy</span><span class="o">=</span><span class="p">(</span><span class="mf">116.0</span><span class="p">,</span> <span class="mf">5.0</span><span class="p">),</span>
+<span class="p">)</span>
+<span class="n">n_select</span> <span class="o">=</span> <span class="n">g_runtime</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+    <span class="n">Node</span><span class="p">(</span>
+        <span class="s2">"select_harness_tool()</span><span class="se">\n</span><span class="s2">10 Built-in .dockerfile Templates"</span><span class="p">,</span>
+        <span class="n">width</span><span class="o">=</span><span class="mf">42.0</span><span class="p">,</span>
+        <span class="n">height</span><span class="o">=</span><span class="mf">15.5</span><span class="p">,</span>
+        <span class="n">icon</span><span class="o">=</span><span class="n">PhosphorIcon</span><span class="o">.</span><span class="n">CUBE</span><span class="p">,</span>
+        <span class="n">icon_size</span><span class="o">=</span><span class="mf">5.2</span><span class="p">,</span>
+        <span class="n">style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">SecondaryBold</span><span class="p">,</span>
+        <span class="n">card_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">SecondaryNeutral</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">shape_r</span><span class="o">=</span><span class="mf">1.5</span><span class="p">),</span>
+    <span class="p">),</span>
+    <span class="n">xy</span><span class="o">=</span><span class="p">(</span><span class="mf">24.0</span><span class="p">,</span> <span class="mf">54.0</span><span class="p">),</span>
+<span class="p">)</span>
+<span class="n">n_offline</span> <span class="o">=</span> <span class="n">g_runtime</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+    <span class="n">Node</span><span class="p">(</span>
+        <span class="s2">"Offline Test, Coverage &amp; Smoke</span><span class="se">\n</span><span class="s2">--network=none -&gt; /out/* XML/JSON"</span><span class="p">,</span>
+        <span class="n">width</span><span class="o">=</span><span class="mf">42.0</span><span class="p">,</span>
+        <span class="n">height</span><span class="o">=</span><span class="mf">15.5</span><span class="p">,</span>
+        <span class="n">icon</span><span class="o">=</span><span class="n">PhosphorIcon</span><span class="o">.</span><span class="n">TERMINAL_WINDOW</span><span class="p">,</span>
+        <span class="n">icon_size</span><span class="o">=</span><span class="mf">5.2</span><span class="p">,</span>
+        <span class="n">style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">WhiteBold</span><span class="p">,</span>
+        <span class="n">text_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">WhiteBold</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">text_size</span><span class="o">=</span><span class="mf">10.0</span><span class="p">),</span>
+        <span class="n">card_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">PrimaryFlat</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">shape_r</span><span class="o">=</span><span class="mf">1.5</span><span class="p">),</span>
+    <span class="p">),</span>
+    <span class="n">xy</span><span class="o">=</span><span class="p">(</span><span class="mf">24.0</span><span class="p">,</span> <span class="mf">32.0</span><span class="p">),</span>
+<span class="p">)</span>
+<span class="n">n_trivy</span> <span class="o">=</span> <span class="n">g_runtime</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+    <span class="n">Node</span><span class="p">(</span>
+        <span class="s2">"Trivy FS + Image Scan</span><span class="se">\n</span><span class="s2">App Lockfiles + OS Packages"</span><span class="p">,</span>
+        <span class="n">width</span><span class="o">=</span><span class="mf">42.0</span><span class="p">,</span>
+        <span class="n">height</span><span class="o">=</span><span class="mf">15.5</span><span class="p">,</span>
+        <span class="n">icon</span><span class="o">=</span><span class="n">PhosphorIcon</span><span class="o">.</span><span class="n">SHIELD_CHECK</span><span class="p">,</span>
+        <span class="n">icon_size</span><span class="o">=</span><span class="mf">5.2</span><span class="p">,</span>
+        <span class="n">card_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">PrimaryNeutral</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">shape_r</span><span class="o">=</span><span class="mf">1.5</span><span class="p">),</span>
+    <span class="p">),</span>
+    <span class="n">xy</span><span class="o">=</span><span class="p">(</span><span class="mf">24.0</span><span class="p">,</span> <span class="mf">10.0</span><span class="p">),</span>
+<span class="p">)</span>
+
+<span class="n">diag</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">n_manifest</span><span class="p">,</span> <span class="n">n_inspect</span><span class="p">,</span> <span class="n">routing</span><span class="o">=</span><span class="s2">"orthogonal"</span><span class="p">)</span>
+<span class="n">diag</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">n_pni_toml</span><span class="p">,</span> <span class="n">n_inspect</span><span class="p">,</span> <span class="n">routing</span><span class="o">=</span><span class="s2">"orthogonal"</span><span class="p">)</span>
+<span class="n">diag</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">n_suite</span><span class="p">,</span> <span class="n">n_checkers</span><span class="p">,</span> <span class="n">routing</span><span class="o">=</span><span class="s2">"orthogonal"</span><span class="p">)</span>
+<span class="n">diag</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">n_checkers</span><span class="p">,</span> <span class="n">n_sec_ast</span><span class="p">,</span> <span class="n">routing</span><span class="o">=</span><span class="s2">"orthogonal"</span><span class="p">)</span>
+<span class="n">diag</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">n_select</span><span class="p">,</span> <span class="n">n_offline</span><span class="p">,</span> <span class="n">routing</span><span class="o">=</span><span class="s2">"orthogonal"</span><span class="p">)</span>
+<span class="n">diag</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">n_offline</span><span class="p">,</span> <span class="n">n_trivy</span><span class="p">,</span> <span class="n">routing</span><span class="o">=</span><span class="s2">"orthogonal"</span><span class="p">)</span>
+
+<span class="n">diag</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">g_detect</span><span class="p">,</span> <span class="n">g_ast</span><span class="p">,</span> <span class="n">routing</span><span class="o">=</span><span class="s2">"orthogonal"</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">PrimaryBold</span><span class="p">)</span>
+<span class="n">diag</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">g_ast</span><span class="p">,</span> <span class="n">g_runtime</span><span class="p">,</span> <span class="n">routing</span><span class="o">=</span><span class="s2">"orthogonal"</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">PrimaryBold</span><span class="p">)</span>
+
+<span class="n">diag</span><span class="o">.</span><span class="n">draw</span><span class="p">(</span><span class="n">xy</span><span class="o">=</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">))</span>
+<span class="n">save</span><span class="p">()</span>
+</code></pre>
+</details>
+<h3>2.1 Python &amp; Java エコシステム</h3>
+<p><strong>Python</strong>（<code>pyproject.toml</code>, <code>uv</code>, <code>Poetry</code>, <code>pip</code>）および <strong>Java</strong>（<code>Maven</code>, <code>Gradle</code>）では、自動生成コード（<code>target/</code>, <code>build/</code>, Alembic の <code>migrations/versions/</code> 等）がプロダクション AST 指標に混入しないよう、<code>.pni/workflows/full_audit.yaml</code> の <code>targets</code> を明示的に指定します。</p>
+<pre><code class="language-yaml"><span class="c1"># Python PEP 621 src/ layout (or source: ["app"] for FastAPI services)</span>
+<span class="nt">targets</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">root</span><span class="p">:</span><span class="w"> </span><span class="s">"."</span>
+<span class="w">  </span><span class="nt">source</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">"src"</span><span class="p p-Indicator">]</span>
+<span class="w">  </span><span class="nt">tests</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">"tests"</span><span class="p p-Indicator">]</span>
+<span class="w">  </span><span class="nt">docs</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">"README.md"</span><span class="p p-Indicator">]</span>
+
+<span class="c1"># Java Maven / Gradle standard layout</span>
+<span class="nt">targets</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">root</span><span class="p">:</span><span class="w"> </span><span class="s">"."</span>
+<span class="w">  </span><span class="nt">source</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">"src/main/java"</span><span class="p p-Indicator">]</span>
+<span class="w">  </span><span class="nt">tests</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">"src/test/java"</span><span class="p p-Indicator">]</span>
+<span class="w">  </span><span class="nt">docs</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">"README.md"</span><span class="p p-Indicator">]</span>
+</code></pre>
+<h3>2.2 PHP &amp; Go エコシステム</h3>
+<p><strong>PHP</strong> はモダンな Composer / PSR-4 アプリケーション（Laravel, Symfony）だけでなく、Composer を使わないレガシーな素の PHP（<code>raw.dockerfile</code>）や WordPress プラグインにも対応しています。<strong>Go</strong>（<code>go.mod</code>）では、<code>source</code> と <code>tests</code> に同じディレクトリを指定しても、プロダクションコード（<code>*.go</code>）と同居するテストファイル（<code>*_test.go</code>）が自動的に分離されます。</p>
+<pre><code class="language-yaml"><span class="c1"># PHP Laravel layout (use source: ["."] for legacy raw PHP or WordPress plugins)</span>
+<span class="nt">targets</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">root</span><span class="p">:</span><span class="w"> </span><span class="s">"."</span>
+<span class="w">  </span><span class="nt">source</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">"app"</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">"src"</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">"routes"</span><span class="p p-Indicator">]</span>
+<span class="w">  </span><span class="nt">tests</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">"tests"</span><span class="p p-Indicator">]</span>
+<span class="w">  </span><span class="nt">docs</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">"README.md"</span><span class="p p-Indicator">]</span>
+
+<span class="c1"># Go module layout (co-located *_test.go files are separated automatically)</span>
+<span class="nt">targets</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">root</span><span class="p">:</span><span class="w"> </span><span class="s">"."</span>
+<span class="w">  </span><span class="nt">source</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">"cmd"</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">"internal"</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">"pkg"</span><span class="p p-Indicator">]</span>
+<span class="w">  </span><span class="nt">tests</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">"cmd"</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">"internal"</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">"pkg"</span><span class="p p-Indicator">]</span>
+<span class="w">  </span><span class="nt">docs</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">"README.md"</span><span class="p p-Indicator">]</span>
+</code></pre>
+<h3>2.3 TypeScript &amp; JavaScript エコシステム</h3>
+<p><strong>TypeScript</strong> および <strong>JavaScript</strong> リポジトリでは、<code>LanguageAnalyzerSuite</code> が型宣言ファイル（<code>*.d.ts</code>）を本番 AST スコア対象から自動除外し、さらに <code>src/</code> 内に同居する <code>*.test.ts(x)</code>・<code>*.spec.ts(x)</code>・<code>*.test.js(x)</code>・<code>*.spec.js(x)</code> および <code>__tests__/</code> 配下のファイルをテスト解析器へ自動振り分けします。</p>
+<pre><code class="language-yaml"><span class="c1"># TypeScript / JavaScript layout (supports dedicated tests/ or co-located src/**/*.test.ts)</span>
+<span class="nt">targets</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">root</span><span class="p">:</span><span class="w"> </span><span class="s">"."</span>
+<span class="w">  </span><span class="nt">source</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">"src"</span><span class="p p-Indicator">]</span>
+<span class="w">  </span><span class="nt">tests</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">"tests"</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">"src"</span><span class="p p-Indicator">]</span>
+<span class="w">  </span><span class="nt">docs</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">"README.md"</span><span class="p p-Indicator">]</span>
+</code></pre>
+<hr />
+<h2>3. 言語別 AST チェッカーと CWE セキュリティシンク抽出</h2>
+<p>各言語の <code>LanguageAnalyzerSuite</code> はソースファイルを <strong>1 回だけ</strong> Tree-sitter CST（<code>SgRoot</code>）にパースし、9 つの専門チェッカー（<code>imports</code>, <code>typing</code>, <code>docs</code>, <code>quality</code>, <code>dependencies</code>, <code>testing</code>, <code>framework</code>, <code>operational</code>, <code>security</code>）を一括実行します。</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">言語</th>
+<th style="text-align:left">型安全性・契約シグナル (<code>typing</code>)</th>
+<th style="text-align:left">コード品質・運用シグナル (<code>quality</code> / <code>operational</code>)</th>
+<th style="text-align:left">フレームワーク規約・CWE 危険シンク (<code>dangerous_sinks</code>)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left"><strong>Python</strong></td>
+<td style="text-align:left">公開関数・メソッドの引数/戻り値型ヒント率、<code>Any</code> / 無制限 <code>type: ignore</code>、<code>py.typed</code> マーカー</td>
+<td style="text-align:left"><code>isort</code> 順、Google/NumPy/Sphinx docstring と <code>Args:</code> 整合性、McCabe (<code>&gt;7</code>)・認知的複雑度 (<code>&gt;15</code>)、ミュータブルデフォルト引数、裸の <code>except:</code>、<code>timeout=</code> 欠落</td>
+<td style="text-align:left">FastAPI <code>on_event</code>・<code>response_model</code> 欠落・<code>async def</code> 内の同期 I/O、<code>eval</code>/<code>exec</code> (<code>CWE-94</code>)、<code>subprocess(..., shell=True)</code> (<code>CWE-78</code>)、<code>pickle</code>/<code>yaml.load</code> (<code>CWE-502</code>)、SQL 文字列補間 (<code>CWE-89</code>)</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>Java</strong></td>
+<td style="text-align:left">ジェネリクス型安全率、生型（<code>List</code> 等の <code>&lt;T&gt;</code> 欠落）、スコープなしの <code>@SuppressWarnings</code></td>
+<td style="text-align:left">ワイルドカード <code>import .*</code>、Javadoc 率と <code>@param</code> 整合性、可変 <code>public static</code> フィールド、空の <code>catch</code>、サービス内の <code>System.out.println</code></td>
+<td style="text-align:left">Spring Boot <code>@Autowired</code> フィールド注入、非 public <code>@Transactional</code>、<code>javax.*</code> 残存、<code>Runtime.exec</code> (<code>CWE-78</code>)、<code>ObjectInputStream.readObject</code> (<code>CWE-502</code>)、文字列連結 JDBC/JPQL (<code>CWE-89</code>)</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>PHP</strong></td>
+<td style="text-align:left"><code>declare(strict_types=1)</code> 宣言率、引数・戻り値・プロパティ型ヒント率、無制限 <code>@phpstan-ignore</code></td>
+<td style="text-align:left">PSR-4 名前空間 vs <code>include</code>/<code>require_once</code>、HTML/PHP 混在スパゲッティ、<code>$_GET</code>/<code>$_POST</code>/<code>$GLOBALS</code> 直参照、<code>@</code> エラー抑制、<code>die()</code>/<code>exit()</code>、マジックハッシュ <code>==</code></td>
+<td style="text-align:left">Laravel <code>config/</code> 外の <code>env()</code>・<code>$guarded = []</code>・生 <code>DB::raw()</code>、WordPress 未エスケープ SQLi/XSS・CSRF nonce 欠落、<code>eval</code>/<code>shell_exec</code>/<code>unserialize</code> (<code>CWE-94</code>/<code>78</code>/<code>502</code>)</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>Go</strong></td>
+<td style="text-align:left">具体型・ジェネリクス vs 非型付け <code>any</code> / <code>interface{}</code>、<code>unsafe.Pointer</code> 使用、裸の <code>//nolint</code></td>
+<td style="text-align:left"><code>gofmt</code>/import グループ順、ドット import (<code>import .</code>)、エクスポートシンボルの GoDoc 率、エラー握り潰し (<code>_ = err</code>)、非 <code>main</code> での <code>panic()</code>、ループ内 <code>defer</code></td>
+<td style="text-align:left">Gin/Echo/Fiber/Chi/net-http ルート抽出 (<code>api_endpoints</code>)、<code>exec.Command(&quot;sh&quot;, &quot;-c&quot;, ...)</code> (<code>CWE-78</code>)、<code>db.Query(fmt.Sprintf(...))</code> (<code>CWE-89</code>)、<code>Timeout</code> 未設定 HTTP クライアント</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>TypeScript</strong></td>
+<td style="text-align:left"><code>tsconfig.json</code> <code>&quot;strict&quot;: true</code>、明示的な公開関数型、<code>: any</code> / <code>as any</code>、<code>@ts-ignore</code> vs <code>@ts-expect-error</code></td>
+<td style="text-align:left">ES Module import 衛生、TSDoc (<code>/** ... */</code>) 率、未処理 Promise、空の <code>catch {}</code>、<code>var</code> 宣言、<code>==</code> 緩い等価比較、本番コードの <code>console.log</code></td>
+<td style="text-align:left">Express/Fastify/NestJS/Hono/Next.js ルート抽出、<code>dangerouslySetInnerHTML</code> / <code>innerHTML</code> (<code>CWE-79</code>)、<code>eval</code> / <code>new Function</code> (<code>CWE-94</code>)、<code>child_process.exec</code> (<code>CWE-78</code>)、SQL テンプレート文字列 (<code>CWE-89</code>)</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>JavaScript</strong></td>
+<td style="text-align:left">JSDoc <code>@param {Type}</code>・<code>@returns {Type}</code> 契約カバー率、<code>checkJs</code> / <code>// @ts-check</code>、非型付け <code>@param {*}</code></td>
+<td style="text-align:left">ES Module <code>import</code>/<code>export</code> vs CommonJS <code>require()</code>、<code>const</code>/<code>let</code> vs <code>var</code>、厳密等価 <code>===</code>、Promise <code>.catch()</code> 処理、認知的複雑度</td>
+<td style="text-align:left">Express/Fastify/Hono ルート抽出、DOM XSS (<code>innerHTML</code>, <code>document.write</code>, <code>CWE-79</code>)、<code>eval()</code> (<code>CWE-94</code>)、<code>child_process.exec</code> (<code>CWE-78</code>)、プレースホルダなしの生 SQL (<code>CWE-89</code>)</td>
+</tr>
+</tbody>
+</table>
+<p>全 52 個の組み込みルールファイル一覧や <code>.pni/</code> ローカルオーバーライドカスケード、<code>pni</code> CLI コマンドの詳細については <a href="rules_and_cli.html">ルール拡張と CLI リファレンス</a> を、コンテナ実行およびライブ HTTP ペネトレーションテストの詳細は <a href="../03_workflows_and_actions/analyzers_and_pentest.html">決定論的解析器とペネトレーションテスト</a> を参照してください。</p>
+
+            </main>
+        </div>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Theme toggle
+            const themeBtn = document.getElementById('theme-toggle');
+            if (themeBtn) {
+                themeBtn.addEventListener('click', function() {
+                    const current = document.documentElement.getAttribute('data-theme');
+                    const next = current === 'dark' ? 'light' : 'dark';
+                    document.documentElement.setAttribute('data-theme', next);
+                    localStorage.setItem('drawlib-theme', next);
+                });
+            }
+
+            // Language dropdown outside-click & Escape close
+            const langDropdowns = document.querySelectorAll('.lang-dropdown');
+            if (langDropdowns.length > 0) {
+                document.addEventListener('click', function(e) {
+                    langDropdowns.forEach(function(dd) {
+                        if (dd.hasAttribute('open') && !dd.contains(e.target)) {
+                            dd.removeAttribute('open');
+                        }
+                    });
+                });
+                document.addEventListener('keydown', function(e) {
+                    if (e.key === 'Escape') {
+                        langDropdowns.forEach(function(dd) {
+                            dd.removeAttribute('open');
+                        });
+                    }
+                });
+            }
+
+            // Mobile menu toggle
+            const menuBtn = document.getElementById('menu-toggle');
+            const sidebar = document.querySelector('.sidebar');
+            if (menuBtn && sidebar) {
+                function setMenuOpen(open) {
+                    sidebar.classList.toggle('is-open', open);
+                    menuBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
+                    document.body.classList.toggle('menu-open', open);
+                    if (open) {
+                        const menu = sidebar.querySelector('.sidebar-menu');
+                        if (menu) {
+                            menu.scrollTop = 0;
+                        }
+                    }
+                }
+
+                menuBtn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    const willOpen = !sidebar.classList.contains('is-open');
+                    setMenuOpen(willOpen);
+                });
+
+                // Close menu when clicking outside sidebar
+                document.addEventListener('click', function(e) {
+                    if (sidebar.classList.contains('is-open') && !sidebar.contains(e.target)) {
+                        setMenuOpen(false);
+                    }
+                });
+
+                // Close menu when a navigation link is clicked
+                const navLinks = sidebar.querySelectorAll('.nav-item a');
+                navLinks.forEach(function(link) {
+                    link.addEventListener('click', function() {
+                        setMenuOpen(false);
+                    });
+                });
+
+                // Close on Escape key
+                document.addEventListener('keydown', function(e) {
+                    if (e.key === 'Escape' && sidebar.classList.contains('is-open')) {
+                        setMenuOpen(false);
+                    }
+                });
+
+                // Reset menu state when resized above mobile breakpoint
+                window.addEventListener('resize', function() {
+                    if (window.innerWidth > 768 && sidebar.classList.contains('is-open')) {
+                        setMenuOpen(false);
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>

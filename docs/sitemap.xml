@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
+  <url>
+    <loc>https://www.pni501.com/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.pni501.com/en/" />
+    <xhtml:link rel="alternate" hreflang="ja" href="https://www.pni501.com/ja/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.pni501.com/" />
+  </url>
+  <url>
+    <loc>https://www.pni501.com/en/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.pni501.com/en/" />
+    <xhtml:link rel="alternate" hreflang="ja" href="https://www.pni501.com/ja/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.pni501.com/" />
+  </url>
+  <url>
+    <loc>https://www.pni501.com/en/01_getting_started/concepts.html</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.pni501.com/en/01_getting_started/concepts.html" />
+    <xhtml:link rel="alternate" hreflang="ja" href="https://www.pni501.com/ja/01_getting_started/concepts.html" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.pni501.com/en/01_getting_started/concepts.html" />
+  </url>
+  <url>
+    <loc>https://www.pni501.com/en/01_getting_started/quickstart.html</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.pni501.com/en/01_getting_started/quickstart.html" />
+    <xhtml:link rel="alternate" hreflang="ja" href="https://www.pni501.com/ja/01_getting_started/quickstart.html" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.pni501.com/en/01_getting_started/quickstart.html" />
+  </url>
+  <url>
+    <loc>https://www.pni501.com/en/01_getting_started/use_cases.html</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.pni501.com/en/01_getting_started/use_cases.html" />
+    <xhtml:link rel="alternate" hreflang="ja" href="https://www.pni501.com/ja/01_getting_started/use_cases.html" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.pni501.com/en/01_getting_started/use_cases.html" />
+  </url>
+  <url>
+    <loc>https://www.pni501.com/en/02_architecture/domain_architecture.html</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.pni501.com/en/02_architecture/domain_architecture.html" />
+    <xhtml:link rel="alternate" hreflang="ja" href="https://www.pni501.com/ja/02_architecture/domain_architecture.html" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.pni501.com/en/02_architecture/domain_architecture.html" />
+  </url>
+  <url>
+    <loc>https://www.pni501.com/en/02_architecture/stateful_engine.html</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.pni501.com/en/02_architecture/stateful_engine.html" />
+    <xhtml:link rel="alternate" hreflang="ja" href="https://www.pni501.com/ja/02_architecture/stateful_engine.html" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.pni501.com/en/02_architecture/stateful_engine.html" />
+  </url>
+  <url>
+    <loc>https://www.pni501.com/en/03_workflows_and_actions/actions_pipeline.html</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.pni501.com/en/03_workflows_and_actions/actions_pipeline.html" />
+    <xhtml:link rel="alternate" hreflang="ja" href="https://www.pni501.com/ja/03_workflows_and_actions/actions_pipeline.html" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.pni501.com/en/03_workflows_and_actions/actions_pipeline.html" />
+  </url>
+  <url>
+    <loc>https://www.pni501.com/en/03_workflows_and_actions/analyzers_and_pentest.html</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.pni501.com/en/03_workflows_and_actions/analyzers_and_pentest.html" />
+    <xhtml:link rel="alternate" hreflang="ja" href="https://www.pni501.com/ja/03_workflows_and_actions/analyzers_and_pentest.html" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.pni501.com/en/03_workflows_and_actions/analyzers_and_pentest.html" />
+  </url>
+  <url>
+    <loc>https://www.pni501.com/en/03_workflows_and_actions/workflows_guide.html</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.pni501.com/en/03_workflows_and_actions/workflows_guide.html" />
+    <xhtml:link rel="alternate" hreflang="ja" href="https://www.pni501.com/ja/03_workflows_and_actions/workflows_guide.html" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.pni501.com/en/03_workflows_and_actions/workflows_guide.html" />
+  </url>
+  <url>
+    <loc>https://www.pni501.com/en/04_scoring_and_reports/drawlib_reporter.html</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.pni501.com/en/04_scoring_and_reports/drawlib_reporter.html" />
+    <xhtml:link rel="alternate" hreflang="ja" href="https://www.pni501.com/ja/04_scoring_and_reports/drawlib_reporter.html" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.pni501.com/en/04_scoring_and_reports/drawlib_reporter.html" />
+  </url>
+  <url>
+    <loc>https://www.pni501.com/en/04_scoring_and_reports/scoring_model.html</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.pni501.com/en/04_scoring_and_reports/scoring_model.html" />
+    <xhtml:link rel="alternate" hreflang="ja" href="https://www.pni501.com/ja/04_scoring_and_reports/scoring_model.html" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.pni501.com/en/04_scoring_and_reports/scoring_model.html" />
+  </url>
+  <url>
+    <loc>https://www.pni501.com/en/05_languages_and_reference/rules_and_cli.html</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.pni501.com/en/05_languages_and_reference/rules_and_cli.html" />
+    <xhtml:link rel="alternate" hreflang="ja" href="https://www.pni501.com/ja/05_languages_and_reference/rules_and_cli.html" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.pni501.com/en/05_languages_and_reference/rules_and_cli.html" />
+  </url>
+  <url>
+    <loc>https://www.pni501.com/en/05_languages_and_reference/supported_languages.html</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.pni501.com/en/05_languages_and_reference/supported_languages.html" />
+    <xhtml:link rel="alternate" hreflang="ja" href="https://www.pni501.com/ja/05_languages_and_reference/supported_languages.html" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.pni501.com/en/05_languages_and_reference/supported_languages.html" />
+  </url>
+  <url>
+    <loc>https://www.pni501.com/ja/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.pni501.com/en/" />
+    <xhtml:link rel="alternate" hreflang="ja" href="https://www.pni501.com/ja/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.pni501.com/" />
+  </url>
+  <url>
+    <loc>https://www.pni501.com/ja/01_getting_started/concepts.html</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.pni501.com/en/01_getting_started/concepts.html" />
+    <xhtml:link rel="alternate" hreflang="ja" href="https://www.pni501.com/ja/01_getting_started/concepts.html" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.pni501.com/en/01_getting_started/concepts.html" />
+  </url>
+  <url>
+    <loc>https://www.pni501.com/ja/01_getting_started/quickstart.html</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.pni501.com/en/01_getting_started/quickstart.html" />
+    <xhtml:link rel="alternate" hreflang="ja" href="https://www.pni501.com/ja/01_getting_started/quickstart.html" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.pni501.com/en/01_getting_started/quickstart.html" />
+  </url>
+  <url>
+    <loc>https://www.pni501.com/ja/01_getting_started/use_cases.html</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.pni501.com/en/01_getting_started/use_cases.html" />
+    <xhtml:link rel="alternate" hreflang="ja" href="https://www.pni501.com/ja/01_getting_started/use_cases.html" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.pni501.com/en/01_getting_started/use_cases.html" />
+  </url>
+  <url>
+    <loc>https://www.pni501.com/ja/02_architecture/domain_architecture.html</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.pni501.com/en/02_architecture/domain_architecture.html" />
+    <xhtml:link rel="alternate" hreflang="ja" href="https://www.pni501.com/ja/02_architecture/domain_architecture.html" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.pni501.com/en/02_architecture/domain_architecture.html" />
+  </url>
+  <url>
+    <loc>https://www.pni501.com/ja/02_architecture/stateful_engine.html</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.pni501.com/en/02_architecture/stateful_engine.html" />
+    <xhtml:link rel="alternate" hreflang="ja" href="https://www.pni501.com/ja/02_architecture/stateful_engine.html" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.pni501.com/en/02_architecture/stateful_engine.html" />
+  </url>
+  <url>
+    <loc>https://www.pni501.com/ja/03_workflows_and_actions/actions_pipeline.html</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.pni501.com/en/03_workflows_and_actions/actions_pipeline.html" />
+    <xhtml:link rel="alternate" hreflang="ja" href="https://www.pni501.com/ja/03_workflows_and_actions/actions_pipeline.html" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.pni501.com/en/03_workflows_and_actions/actions_pipeline.html" />
+  </url>
+  <url>
+    <loc>https://www.pni501.com/ja/03_workflows_and_actions/analyzers_and_pentest.html</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.pni501.com/en/03_workflows_and_actions/analyzers_and_pentest.html" />
+    <xhtml:link rel="alternate" hreflang="ja" href="https://www.pni501.com/ja/03_workflows_and_actions/analyzers_and_pentest.html" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.pni501.com/en/03_workflows_and_actions/analyzers_and_pentest.html" />
+  </url>
+  <url>
+    <loc>https://www.pni501.com/ja/03_workflows_and_actions/workflows_guide.html</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.pni501.com/en/03_workflows_and_actions/workflows_guide.html" />
+    <xhtml:link rel="alternate" hreflang="ja" href="https://www.pni501.com/ja/03_workflows_and_actions/workflows_guide.html" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.pni501.com/en/03_workflows_and_actions/workflows_guide.html" />
+  </url>
+  <url>
+    <loc>https://www.pni501.com/ja/04_scoring_and_reports/drawlib_reporter.html</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.pni501.com/en/04_scoring_and_reports/drawlib_reporter.html" />
+    <xhtml:link rel="alternate" hreflang="ja" href="https://www.pni501.com/ja/04_scoring_and_reports/drawlib_reporter.html" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.pni501.com/en/04_scoring_and_reports/drawlib_reporter.html" />
+  </url>
+  <url>
+    <loc>https://www.pni501.com/ja/04_scoring_and_reports/scoring_model.html</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.pni501.com/en/04_scoring_and_reports/scoring_model.html" />
+    <xhtml:link rel="alternate" hreflang="ja" href="https://www.pni501.com/ja/04_scoring_and_reports/scoring_model.html" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.pni501.com/en/04_scoring_and_reports/scoring_model.html" />
+  </url>
+  <url>
+    <loc>https://www.pni501.com/ja/05_languages_and_reference/rules_and_cli.html</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.pni501.com/en/05_languages_and_reference/rules_and_cli.html" />
+    <xhtml:link rel="alternate" hreflang="ja" href="https://www.pni501.com/ja/05_languages_and_reference/rules_and_cli.html" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.pni501.com/en/05_languages_and_reference/rules_and_cli.html" />
+  </url>
+  <url>
+    <loc>https://www.pni501.com/ja/05_languages_and_reference/supported_languages.html</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.pni501.com/en/05_languages_and_reference/supported_languages.html" />
+    <xhtml:link rel="alternate" hreflang="ja" href="https://www.pni501.com/ja/05_languages_and_reference/supported_languages.html" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.pni501.com/en/05_languages_and_reference/supported_languages.html" />
+  </url>
+</urlset>

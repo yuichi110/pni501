@@ -1,0 +1,573 @@
+<!--
+ Copyright (c) 2026 Yuichi Ito (yuichi@yuichi.com)
+
+ This software is licensed under the Apache License, Version 2.0.
+ For more information, please visit: https://github.com/yuichi110/drawlib
+
+ This software is provided "as is", without warranty of any kind,
+ express or implied, including but not limited to the warranties of
+ merchantability, fitness for a particular purpose and noninfringement.
+-->
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>pni501 (Project Nemesis Index) — Official Documentation</title>
+    <script>
+        (function() {
+            const saved = localStorage.getItem('drawlib-theme');
+            if (saved === 'dark' || (!saved && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                document.documentElement.setAttribute('data-theme', 'dark');
+            } else {
+                document.documentElement.setAttribute('data-theme', 'light');
+            }
+        })();
+    </script>
+    
+    
+    
+    <link rel="alternate" hreflang="en" href="https://www.pni501.com/en/">
+    
+    <link rel="alternate" hreflang="ja" href="https://www.pni501.com/ja/">
+    
+    <link rel="alternate" hreflang="x-default" href="https://www.pni501.com/">
+    
+    
+    
+    <meta name="description" content="Official documentation for pni501 (Project Nemesis Index) — Deterministic + AI Software Health Auditing, Security Pentesting, and Migration Planning.">
+    <link rel="canonical" href="https://www.pni501.com/">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="pni501 Documentation">
+    <meta property="og:title" content="pni501 (Project Nemesis Index) — Official Documentation — pni501 Documentation">
+    <meta property="og:description" content="Official documentation for pni501 (Project Nemesis Index) — Deterministic + AI Software Health Auditing, Security Pentesting, and Migration Planning.">
+    <meta property="og:url" content="https://www.pni501.com/">
+    <meta property="og:image" content="https://www.pni501.com/_assets/logo.png">
+    <meta property="og:locale" content="en_US">
+    <meta property="og:locale:alternate" content="ja_JP">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="pni501 (Project Nemesis Index) — Official Documentation — pni501 Documentation">
+    <meta name="twitter:description" content="Official documentation for pni501 (Project Nemesis Index) — Deterministic + AI Software Health Auditing, Security Pentesting, and Migration Planning.">
+    <meta name="twitter:image" content="https://www.pni501.com/_assets/logo.png">
+    
+    
+    <link rel="icon" type="image/png" href="_assets/favicon.png">
+    
+    
+    <link rel="stylesheet" href="en/style.css">
+    
+    
+</head>
+<body>
+    
+    <div class="doc-layout">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <a href="index.html" class="sidebar-brand" aria-label="pni501 Documentation">
+                    
+                    <img src="_assets/logo.png" alt="pni501 Documentation" class="sidebar-logo sidebar-logo-light">
+                    <img src="_assets/logo_dark.png" alt="pni501 Documentation" class="sidebar-logo sidebar-logo-dark">
+                    
+                </a>
+                <div class="sidebar-header-actions">
+                    <button type="button" id="theme-toggle" class="theme-toggle-btn" aria-label="Toggle theme">
+                        <svg class="icon-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+                        <svg class="icon-moon" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+                    </button>
+                    <button type="button" id="menu-toggle" class="menu-toggle-btn" aria-label="Toggle navigation" aria-expanded="false">
+                        <svg class="icon-hamburger" viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+                        <svg class="icon-close" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                    </button>
+                </div>
+            </div>
+            <div class="sidebar-menu">
+                
+                    
+                        
+                        <ul class="nav-list">
+                            
+                            <li class="nav-item active">
+                                <a href="en/index.html" >Overview</a>
+                            </li>
+                            
+                        </ul>
+                    
+                        
+                        <div class="sidebar-heading">1. Getting Started</div>
+                        
+                        <ul class="nav-list">
+                            
+                            <li class="nav-item ">
+                                <a href="en/01_getting_started/concepts.html" >Background &amp; Core Concepts</a>
+                            </li>
+                            
+                            <li class="nav-item ">
+                                <a href="en/01_getting_started/quickstart.html" >Quickstart Guide</a>
+                            </li>
+                            
+                            <li class="nav-item ">
+                                <a href="en/01_getting_started/use_cases.html" >Primary Use Cases</a>
+                            </li>
+                            
+                        </ul>
+                    
+                        
+                        <div class="sidebar-heading">2. Architecture</div>
+                        
+                        <ul class="nav-list">
+                            
+                            <li class="nav-item ">
+                                <a href="en/02_architecture/domain_architecture.html" >Domain Architecture &amp; Cascade</a>
+                            </li>
+                            
+                            <li class="nav-item ">
+                                <a href="en/02_architecture/stateful_engine.html" >Stateful Pull-Push Engine</a>
+                            </li>
+                            
+                        </ul>
+                    
+                        
+                        <div class="sidebar-heading">3. Workflows &amp; Actions</div>
+                        
+                        <ul class="nav-list">
+                            
+                            <li class="nav-item ">
+                                <a href="en/03_workflows_and_actions/workflows_guide.html" >Workflows &amp; Pre-Flight Gates</a>
+                            </li>
+                            
+                            <li class="nav-item ">
+                                <a href="en/03_workflows_and_actions/actions_pipeline.html" >15 Actions &amp; 12 Primitives</a>
+                            </li>
+                            
+                            <li class="nav-item ">
+                                <a href="en/03_workflows_and_actions/analyzers_and_pentest.html" >Analyzers &amp; Live Pentest</a>
+                            </li>
+                            
+                        </ul>
+                    
+                        
+                        <div class="sidebar-heading">4. Scoring &amp; Reports</div>
+                        
+                        <ul class="nav-list">
+                            
+                            <li class="nav-item ">
+                                <a href="en/04_scoring_and_reports/scoring_model.html" >7-Axis Scoring Model</a>
+                            </li>
+                            
+                            <li class="nav-item ">
+                                <a href="en/04_scoring_and_reports/drawlib_reporter.html" >Drawlib Visual Reporter</a>
+                            </li>
+                            
+                        </ul>
+                    
+                        
+                        <div class="sidebar-heading">5. Languages &amp; Reference</div>
+                        
+                        <ul class="nav-list">
+                            
+                            <li class="nav-item ">
+                                <a href="en/05_languages_and_reference/supported_languages.html" >Supported 6 Languages</a>
+                            </li>
+                            
+                            <li class="nav-item ">
+                                <a href="en/05_languages_and_reference/rules_and_cli.html" >Rules &amp; CLI Reference</a>
+                            </li>
+                            
+                        </ul>
+                    
+                        
+                        <div class="sidebar-heading">External Links</div>
+                        
+                        <ul class="nav-list">
+                            
+                            <li class="nav-item ">
+                                <a href="https://github.com/yuichi110/pni501" target="_blank" rel="noopener noreferrer">GitHub Repository<svg class="nav-external-icon" viewBox="0 0 24 24" aria-hidden="true"><line x1="7" y1="17" x2="17" y2="7"></line><polyline points="7 7 17 7 17 17"></polyline></svg></a>
+                            </li>
+                            
+                            <li class="nav-item ">
+                                <a href="https://pypi.org/project/pni501/" target="_blank" rel="noopener noreferrer">PyPI Package<svg class="nav-external-icon" viewBox="0 0 24 24" aria-hidden="true"><line x1="7" y1="17" x2="17" y2="7"></line><polyline points="7 7 17 7 17 17"></polyline></svg></a>
+                            </li>
+                            
+                        </ul>
+                    
+                
+            </div>
+        </aside>
+        <div class="content-wrapper">
+            <header class="top-bar">
+                <div class="breadcrumbs">
+                    <span class="crumb">Docs</span>
+                    <span class="crumb-separator">&raquo;</span>
+                    <span class="crumb active">pni501 (Project Nemesis Index) — Official Documentation</span>
+                </div>
+                
+                <div class="lang-switcher">
+                    <details class="lang-dropdown">
+                        <summary class="lang-dropdown-btn" aria-label="Select language">
+                            <svg class="lang-globe-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+                            <span class="lang-current-label">English</span>
+                            <svg class="lang-caret-icon" viewBox="0 0 24 24" aria-hidden="true"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                        </summary>
+                        <div class="lang-dropdown-menu" role="menu">
+                            
+                            <a href="en/index.html" class="lang-option active" lang="en" hreflang="en" aria-current="page">
+                                <span>English</span>
+                                
+                                <svg class="lang-check-icon" viewBox="0 0 24 24" aria-hidden="true"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                                
+                            </a>
+                            
+                            <a href="ja/index.html" class="lang-option" lang="ja" hreflang="ja" >
+                                <span>日本語</span>
+                                
+                            </a>
+                            
+                        </div>
+                    </details>
+                </div>
+                
+            </header>
+            <main class="main-content">
+                <h1>pni501 (Project Nemesis Index) — Official Documentation</h1>
+<p><strong>Project Nemesis Index (<code>pni501</code> <code>v0.1.3</code>)</strong> is an AI-native software health auditing, security penetration testing, and migration planning framework for <strong>Python</strong>, <strong>Java</strong>, <strong>PHP</strong>, <strong>Go</strong>, <strong>TypeScript</strong>, and <strong>JavaScript</strong> repositories. By combining deterministic static and container analyzers with a SQLite-backed stateful Pull-Push workflow engine and Drawlib visual reporting, <code>pni501</code> eliminates LLM metric and path hallucinations while delivering reproducible 7-axis health scores, topological migration plans, and publication-grade A4 PDF reports.</p>
+<figure class="drawlib-image" style="text-align: center;">
+  <img src="images/index/pni_overview_pillars.png" alt="index_1" />
+  <figcaption class="drawlib-caption">Core Architectural Pillars & Polyglot Capabilities of pni501 (v0.1.3)</figcaption>
+</figure>
+<details class="drawlib-code-details">
+<summary>Source Code</summary>
+<pre><code class="language-python"><span class="kn">from</span><span class="w"> </span><span class="nn">drawlib.canvas</span><span class="w"> </span><span class="kn">import</span> <span class="n">save</span><span class="p">,</span> <span class="n">setup</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">drawlib.icons</span><span class="w"> </span><span class="kn">import</span> <span class="n">phosphor</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">drawlib.smartarts</span><span class="w"> </span><span class="kn">import</span> <span class="n">KpiCards</span><span class="p">,</span> <span class="n">Panel</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">drawlib.styles</span><span class="w"> </span><span class="kn">import</span> <span class="n">Styles</span>
+
+<span class="n">setup</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="mi">156</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">90</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">150</span><span class="p">)</span>
+
+<span class="n">outer</span> <span class="o">=</span> <span class="n">Panel</span><span class="p">(</span>
+    <span class="s2">"Project Nemesis Index (pni501 v0.1.3) — Four Foundational Pillars"</span><span class="p">,</span>
+    <span class="n">header_variant</span><span class="o">=</span><span class="s2">"filled"</span><span class="p">,</span>
+    <span class="n">style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">PrimaryNeutral</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">shape_r</span><span class="o">=</span><span class="mf">2.0</span><span class="p">),</span>
+    <span class="n">header_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">PrimaryFlat</span><span class="p">,</span>
+    <span class="n">text_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">WhiteBold</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">text_size</span><span class="o">=</span><span class="mf">12.5</span><span class="p">),</span>
+<span class="p">)</span>
+<span class="n">outer</span><span class="o">.</span><span class="n">draw</span><span class="p">(</span><span class="n">xy</span><span class="o">=</span><span class="p">(</span><span class="mf">3.0</span><span class="p">,</span> <span class="mf">24.0</span><span class="p">),</span> <span class="n">width</span><span class="o">=</span><span class="mf">150.0</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mf">63.0</span><span class="p">)</span>
+
+<span class="n">cards</span> <span class="o">=</span> <span class="n">KpiCards</span><span class="p">(</span>
+    <span class="n">style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">Neutral</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">shape_r</span><span class="o">=</span><span class="mf">1.8</span><span class="p">),</span>
+    <span class="n">metric_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">PrimaryBold</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">text_size</span><span class="o">=</span><span class="mf">13.5</span><span class="p">),</span>
+    <span class="n">text_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">DarkBold</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">text_size</span><span class="o">=</span><span class="mf">10.8</span><span class="p">),</span>
+    <span class="n">description_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">Dark</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">text_size</span><span class="o">=</span><span class="mf">10.0</span><span class="p">),</span>
+    <span class="n">accent_position</span><span class="o">=</span><span class="s2">"left_pill"</span><span class="p">,</span>
+    <span class="n">accent_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">PrimaryFlat</span><span class="p">,</span>
+    <span class="n">icon_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">PrimaryBold</span><span class="p">,</span>
+    <span class="n">spacing</span><span class="o">=</span><span class="mf">3.5</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">cards</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+    <span class="s2">"P1"</span><span class="p">,</span>
+    <span class="s2">"Cascading Rules (_rules)"</span><span class="p">,</span>
+    <span class="s2">"52 built-in rules + .pni/ overrides</span><span class="se">\n</span><span class="s2">Py, Java, PHP, Go, TS &amp; JS"</span><span class="p">,</span>
+    <span class="n">icon</span><span class="o">=</span><span class="n">phosphor</span><span class="o">.</span><span class="n">book_open_text</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">cards</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+    <span class="s2">"P2"</span><span class="p">,</span>
+    <span class="s2">"Zero-Guess Analyzers (_actions)"</span><span class="p">,</span>
+    <span class="s2">"15 composite actions: AST, Docker,</span><span class="se">\n</span><span class="s2">Trivy CVE/secrets, pentest &amp; DAG"</span><span class="p">,</span>
+    <span class="n">accent_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">SecondaryFlat</span><span class="p">,</span>
+    <span class="n">metric_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">SecondaryBold</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">text_size</span><span class="o">=</span><span class="mf">13.5</span><span class="p">),</span>
+    <span class="n">icon_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">SecondaryBold</span><span class="p">,</span>
+    <span class="n">icon</span><span class="o">=</span><span class="n">phosphor</span><span class="o">.</span><span class="n">cpu</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">cards</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+    <span class="s2">"P3"</span><span class="p">,</span>
+    <span class="s2">"Stateful Engine (_workflows)"</span><span class="p">,</span>
+    <span class="s2">"6 workflow templates, SQLite Pull-Push,</span><span class="se">\n</span><span class="s2">preflight gates &amp; based_on chaining"</span><span class="p">,</span>
+    <span class="n">icon</span><span class="o">=</span><span class="n">phosphor</span><span class="o">.</span><span class="n">database</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">cards</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+    <span class="s2">"P4"</span><span class="p">,</span>
+    <span class="s2">"Blueprint Reporter (_reporter)"</span><span class="p">,</span>
+    <span class="s2">"7-axis ScoreResult, MigrationPlan</span><span class="se">\n</span><span class="s2">&amp; 7-chapter A4 PDF / HTML reports"</span><span class="p">,</span>
+    <span class="n">accent_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">SuccessFlat</span><span class="p">,</span>
+    <span class="n">metric_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">SuccessBold</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">text_size</span><span class="o">=</span><span class="mf">13.5</span><span class="p">),</span>
+    <span class="n">icon_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">SuccessBold</span><span class="p">,</span>
+    <span class="n">icon</span><span class="o">=</span><span class="n">phosphor</span><span class="o">.</span><span class="n">chart_polar</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">cards</span><span class="o">.</span><span class="n">draw</span><span class="p">(</span><span class="n">xy</span><span class="o">=</span><span class="p">(</span><span class="mf">6.5</span><span class="p">,</span> <span class="mf">27.0</span><span class="p">),</span> <span class="n">width</span><span class="o">=</span><span class="mf">143.0</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mf">49.5</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+
+<span class="n">kpis</span> <span class="o">=</span> <span class="n">KpiCards</span><span class="p">(</span>
+    <span class="n">style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">Neutral</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">shape_r</span><span class="o">=</span><span class="mf">1.6</span><span class="p">),</span>
+    <span class="n">metric_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">PrimaryBold</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">text_size</span><span class="o">=</span><span class="mf">13.0</span><span class="p">),</span>
+    <span class="n">text_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">DarkBold</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">text_size</span><span class="o">=</span><span class="mf">10.2</span><span class="p">),</span>
+    <span class="n">accent_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">PrimaryFlat</span><span class="p">,</span>
+    <span class="n">accent_position</span><span class="o">=</span><span class="s2">"top_bar"</span><span class="p">,</span>
+    <span class="n">metric_layout</span><span class="o">=</span><span class="s2">"top_stack"</span><span class="p">,</span>
+    <span class="n">spacing</span><span class="o">=</span><span class="mf">3.0</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">kpis</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="s2">"6 Languages"</span><span class="p">,</span> <span class="s2">"Py / Java / PHP / Go / TS / JS"</span><span class="p">)</span>
+<span class="n">kpis</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="s2">"15 Actions"</span><span class="p">,</span> <span class="s2">"Reusable Audit &amp; Plan Steps"</span><span class="p">)</span>
+<span class="n">kpis</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="s2">"6 Workflows"</span><span class="p">,</span> <span class="s2">"Audit, Quick &amp; Chained Runs"</span><span class="p">)</span>
+<span class="n">kpis</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="s2">"7 Quality Axes"</span><span class="p">,</span> <span class="s2">"0–100 Score &amp; S–D Grades"</span><span class="p">)</span>
+<span class="n">kpis</span><span class="o">.</span><span class="n">draw</span><span class="p">(</span><span class="n">xy</span><span class="o">=</span><span class="p">(</span><span class="mf">3.0</span><span class="p">,</span> <span class="mf">3.0</span><span class="p">),</span> <span class="n">width</span><span class="o">=</span><span class="mf">150.0</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mf">18.0</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+<span class="n">save</span><span class="p">()</span>
+</code></pre>
+</details>
+<h2>1. Executive Overview: Hybrid Deterministic + AI Engineering Engine</h2>
+<p>Purely prompt-driven LLM code reviews suffer from non-deterministic counting errors, invented file paths, skipped audit categories, and blindness to container runtime behavior, dependency CVEs, and live HTTP attack surfaces. Conversely, purely static linters cannot evaluate domain boundary cohesion, aspect-separated system architecture, or phased modernization trade-offs.</p>
+<p><code>pni501</code> (<code>v0.1.3</code>) bridges both worlds across <strong>6 languages</strong> (<code>Python</code>, <code>Java</code>, <code>PHP</code>, <code>Go</code>, <code>TypeScript</code>, and <code>JavaScript</code>) by orchestrating <strong>52 cascading engineering rules</strong>, <strong>15 composite actions</strong>, and <strong>6 stateful workflow templates</strong> in a unified pipeline:</p>
+<ul>
+<li><strong>Programmatic Multi-Modal Fact Extraction</strong>: <code>pni</code> executes deterministic analyzers—<code>project_inspect</code>, polyglot <code>ast_analyze</code> (Python <code>ast</code> and <code>ast-grep-py</code> across Java, PHP, Go, TypeScript, and JavaScript), isolated Docker <code>run_check</code> (offline unit tests, coverage, and HTTP boot probes), socketless Trivy <code>security_scan</code> (CVEs, IaC misconfigurations, and leaked secrets), loopback <code>pytest</code> + <code>httpx</code> <code>web_pentest</code>, topological <code>migration_analyze</code>, and Git <code>progress_analyze</code>—persisting exact telemetry into <code>.pni/cache/&lt;workflow_id&gt;/facts.json</code> and <code>.pni/cache/workflow_state.db</code>.</li>
+<li><strong>Schema-Enforced AI Reasoning &amp; Visual Reporting</strong>: Guided step-by-step via SQLite (<code>workflow_state.db</code>), the Code AI Agent loads scoped rules (<code>load_rules</code>), records path-verified 3-aspect architecture (<code>record_architecture</code> -&gt; <code>architecture.json</code>), evaluates rule compliance (<code>ai_interpret</code>), emits a 7-axis <code>ScoreResult</code> (<code>reports/&lt;target&gt;_score.json</code>), optionally chains <code>based_on</code> migration (<code>reports/&lt;target&gt;_migration_plan.json</code>) or progress (<code>reports/&lt;target&gt;_progress.json</code>) workflows, and compiles a <strong>Drawlib visual report</strong> (<code>reports/&lt;target&gt;.pdf</code> and HTML).</li>
+</ul>
+<figure class="drawlib-image" style="text-align: center;">
+  <img src="images/index/pni_end_to_end_pipeline.png" alt="index_2" />
+  <figcaption class="drawlib-caption">End-to-End Execution Pipeline: From Deterministic Facts to 7-Axis Score, Chained Migration Plan & Drawlib A4 PDF</figcaption>
+</figure>
+<details class="drawlib-code-details">
+<summary>Source Code</summary>
+<pre><code class="language-python"><span class="kn">from</span><span class="w"> </span><span class="nn">drawlib.canvas</span><span class="w"> </span><span class="kn">import</span> <span class="n">save</span><span class="p">,</span> <span class="n">setup</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">drawlib.icons</span><span class="w"> </span><span class="kn">import</span> <span class="n">phosphor</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">drawlib.smartarts</span><span class="w"> </span><span class="kn">import</span> <span class="n">CardList</span><span class="p">,</span> <span class="n">ChevronProcess</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">drawlib.styles</span><span class="w"> </span><span class="kn">import</span> <span class="n">Styles</span>
+
+<span class="n">setup</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="mi">156</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">70</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">150</span><span class="p">)</span>
+
+<span class="n">pipeline</span> <span class="o">=</span> <span class="n">ChevronProcess</span><span class="p">(</span>
+    <span class="n">style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">PrimaryNeutral</span><span class="p">,</span>
+    <span class="n">text_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">DarkBold</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">text_size</span><span class="o">=</span><span class="mf">10.5</span><span class="p">),</span>
+    <span class="n">description_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">Dark</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">text_size</span><span class="o">=</span><span class="mf">10.0</span><span class="p">),</span>
+    <span class="n">corner_angle</span><span class="o">=</span><span class="mf">65.0</span><span class="p">,</span>
+    <span class="n">spacing</span><span class="o">=</span><span class="mf">1.5</span><span class="p">,</span>
+    <span class="n">flat_left_end</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">pipeline</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+    <span class="s2">"1. Static &amp; Runtime</span><span class="se">\n</span><span class="s2">Facts"</span><span class="p">,</span>
+    <span class="n">description</span><span class="o">=</span><span class="s2">"AST + Docker +</span><span class="se">\n</span><span class="s2">Trivy + Pentest"</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">pipeline</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+    <span class="s2">"2. Grounded AI</span><span class="se">\n</span><span class="s2">Audit"</span><span class="p">,</span>
+    <span class="n">description</span><span class="o">=</span><span class="s2">"3-Aspect Arch +</span><span class="se">\n</span><span class="s2">Scoped Rules"</span><span class="p">,</span>
+    <span class="n">style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">Neutral</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">pipeline</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+    <span class="s2">"3. 7-Axis Score"</span><span class="p">,</span>
+    <span class="n">description</span><span class="o">=</span><span class="s2">"Validated</span><span class="se">\n</span><span class="s2">&lt;target&gt;_score.json"</span><span class="p">,</span>
+    <span class="n">style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">PrimaryFlat</span><span class="p">,</span>
+    <span class="n">text_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">WhiteBold</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">text_size</span><span class="o">=</span><span class="mf">10.5</span><span class="p">),</span>
+    <span class="n">description_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">White</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">text_size</span><span class="o">=</span><span class="mf">10.0</span><span class="p">),</span>
+<span class="p">)</span>
+<span class="n">pipeline</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+    <span class="s2">"4. Migration Plan</span><span class="se">\n</span><span class="s2">(Optional)"</span><span class="p">,</span>
+    <span class="n">description</span><span class="o">=</span><span class="s2">"based_on -&gt;</span><span class="se">\n</span><span class="s2">*_migration_plan.json"</span><span class="p">,</span>
+    <span class="n">style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">SecondaryNeutral</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">pipeline</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+    <span class="s2">"5. 7-Chapter</span><span class="se">\n</span><span class="s2">Drawlib PDF"</span><span class="p">,</span>
+    <span class="n">description</span><span class="o">=</span><span class="s2">"Vector A4</span><span class="se">\n</span><span class="s2">reports/&lt;target&gt;.pdf"</span><span class="p">,</span>
+    <span class="n">style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">SuccessFlat</span><span class="p">,</span>
+    <span class="n">text_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">WhiteBold</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">text_size</span><span class="o">=</span><span class="mf">10.5</span><span class="p">),</span>
+    <span class="n">description_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">White</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">text_size</span><span class="o">=</span><span class="mf">10.0</span><span class="p">),</span>
+<span class="p">)</span>
+<span class="n">pipeline</span><span class="o">.</span><span class="n">draw</span><span class="p">(</span><span class="n">xy</span><span class="o">=</span><span class="p">(</span><span class="mf">3.0</span><span class="p">,</span> <span class="mf">43.0</span><span class="p">),</span> <span class="n">width</span><span class="o">=</span><span class="mf">150.0</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mf">23.0</span><span class="p">)</span>
+
+<span class="n">artifacts</span> <span class="o">=</span> <span class="n">CardList</span><span class="p">(</span>
+    <span class="n">style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">Neutral</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">shape_r</span><span class="o">=</span><span class="mf">1.6</span><span class="p">),</span>
+    <span class="n">text_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">DarkBold</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">text_size</span><span class="o">=</span><span class="mf">10.5</span><span class="p">),</span>
+    <span class="n">description_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">Dark</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">text_size</span><span class="o">=</span><span class="mf">10.0</span><span class="p">),</span>
+    <span class="n">badge_shape</span><span class="o">=</span><span class="s2">"circle"</span><span class="p">,</span>
+    <span class="n">badge_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">PrimaryFlat</span><span class="p">,</span>
+    <span class="n">badge_text_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">WhiteBold</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">text_size</span><span class="o">=</span><span class="mf">10.0</span><span class="p">),</span>
+    <span class="n">icon_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">WhiteBold</span><span class="p">,</span>
+    <span class="n">direction</span><span class="o">=</span><span class="s2">"horizontal"</span><span class="p">,</span>
+    <span class="n">show_arrows</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">arrow_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">DarkBold</span><span class="p">,</span>
+    <span class="n">spacing</span><span class="o">=</span><span class="mf">3.0</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">artifacts</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+    <span class="s2">"facts.json"</span><span class="p">,</span>
+    <span class="s2">".pni/cache/&lt;wf&gt;/facts.json</span><span class="se">\n</span><span class="s2">AST, Docker, Trivy &amp; pentest"</span><span class="p">,</span>
+    <span class="n">icon</span><span class="o">=</span><span class="n">phosphor</span><span class="o">.</span><span class="n">file_magnifying_glass</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">artifacts</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+    <span class="s2">"workflow_state.db"</span><span class="p">,</span>
+    <span class="s2">".pni/cache/workflow_state.db</span><span class="se">\n</span><span class="s2">Pull-Push state &amp; arch JSON"</span><span class="p">,</span>
+    <span class="n">icon</span><span class="o">=</span><span class="n">phosphor</span><span class="o">.</span><span class="n">database</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">artifacts</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+    <span class="s2">"Score &amp; Plan JSON"</span><span class="p">,</span>
+    <span class="s2">"reports/&lt;target&gt;_score.json</span><span class="se">\n</span><span class="s2">&amp; *_migration_plan.json"</span><span class="p">,</span>
+    <span class="n">icon</span><span class="o">=</span><span class="n">phosphor</span><span class="o">.</span><span class="n">medal</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">artifacts</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+    <span class="s2">"Visual PDF Report"</span><span class="p">,</span>
+    <span class="s2">"reports/&lt;target&gt;.pdf</span><span class="se">\n</span><span class="s2">Vector A4 PDF &amp; HTML"</span><span class="p">,</span>
+    <span class="n">badge_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">SuccessFlat</span><span class="p">,</span>
+    <span class="n">icon</span><span class="o">=</span><span class="n">phosphor</span><span class="o">.</span><span class="n">file_pdf</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">artifacts</span><span class="o">.</span><span class="n">draw</span><span class="p">(</span><span class="n">xy</span><span class="o">=</span><span class="p">(</span><span class="mf">3.0</span><span class="p">,</span> <span class="mf">4.0</span><span class="p">),</span> <span class="n">width</span><span class="o">=</span><span class="mf">150.0</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mf">34.0</span><span class="p">)</span>
+<span class="n">save</span><span class="p">()</span>
+</code></pre>
+</details>
+<h2>2. Key Capabilities at a Glance</h2>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">Capability Area</th>
+<th style="text-align:left">Built-In Assets (<code>v0.1.3</code>)</th>
+<th style="text-align:left">Primary Output / Guarantee</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left"><strong>Supported Languages</strong></td>
+<td style="text-align:left"><strong>6 languages</strong>: <code>Python</code>, <code>Java</code>, <code>PHP</code>, <code>Go</code>, <code>TypeScript</code>, <code>JavaScript</code></td>
+<td style="text-align:left">Auto-detected from repository manifests &amp; source files (<code>detect_active_language</code>)</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>Cascading Engineering Rules</strong></td>
+<td style="text-align:left"><strong>52 built-in rules</strong> (<code>common/</code> + 6 language scopes) + <code>.pni/rules/</code> overrides</td>
+<td style="text-align:left">Enforces OWASP ASVS, OpenSSF Scorecard, 12-Factor, SRE PRR, CLI &amp; library standards</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>Composite Actions &amp; Primitives</strong></td>
+<td style="text-align:left"><strong>15 composite actions</strong> per language scope expanding into <strong>12+ canonical primitives</strong></td>
+<td style="text-align:left">Combines zero-guess deterministic analyzers with schema-validated AI interpretation</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>Stateful Workflow Engine</strong></td>
+<td style="text-align:left"><strong>6 language workflow sets</strong> (<code>full_audit</code>, <code>quick_check</code>) + <code>migration</code> &amp; <code>progress</code></td>
+<td style="text-align:left">SQLite Pull-Push state machine (<code>workflow_state.db</code>) with fail-closed pre-flight gates</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>7-Axis Quality Scoring</strong></td>
+<td style="text-align:left"><code>architecture</code>, <code>code_quality</code>, <code>typing</code>, <code>testing</code>, <code>dependencies</code>, <code>security</code>, <code>documentation</code></td>
+<td style="text-align:left">Deterministic <code>0–100</code> axis &amp; overall scores, <code>S</code>–<code>D</code> grades, and <code>P0</code>–<code>P2</code> action items</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>Drawlib Visual Reporting</strong></td>
+<td style="text-align:left">Blueprint-driven 7-chapter Audit &amp; Migration PDFs + 5-chapter Progress PDFs</td>
+<td style="text-align:left">High-density vector charts (<code>RadarChart</code>, <code>HeatmapChart</code>, <code>Roadmap</code>) via <code>pni report build</code></td>
+</tr>
+</tbody>
+</table>
+<h2>3. Quick Installation &amp; First Audit</h2>
+<p>Install <code>pni501</code> via <code>pip</code> or <code>uv</code>, initialize <code>.pni/</code> in your repository, and launch a stateful workflow:</p>
+<pre><code class="language-bash"><span class="c1"># Install pni501 from PyPI</span>
+pip<span class="w"> </span>install<span class="w"> </span>pni501
+<span class="c1"># Or with uv:</span>
+uv<span class="w"> </span>add<span class="w"> </span>pni501
+
+<span class="c1"># Initialize .pni/ configuration, rules, actions, and workflows</span>
+pni<span class="w"> </span>init
+pni<span class="w"> </span>workflows<span class="w"> </span>list
+pni<span class="w"> </span>workflows<span class="w"> </span>show<span class="w"> </span>full_audit
+
+<span class="c1"># Start the stateful Pull-Push workflow engine</span>
+pni<span class="w"> </span>workflows<span class="w"> </span>start<span class="w"> </span>full_audit
+</code></pre>
+<h2>4. Documentation Roadmap</h2>
+<p>Explore the complete <code>pni501</code> documentation by section:</p>
+<h3>4.1 Getting Started</h3>
+<ul>
+<li><a href="en/01_getting_started/concepts.html">Background &amp; Core Concepts</a> — Why ad-hoc AI prompting fails on real-world repositories and how PNI's four pillars guarantee zero-hallucination audits.</li>
+<li><a href="en/01_getting_started/quickstart.html">Quickstart Guide</a> — Step-by-step installation, <code>.pni/</code> initialization, pre-flight readiness checks, and executing the <code>get-action</code> / <code>push-action</code> loop.</li>
+<li><a href="en/01_getting_started/use_cases.html">Primary Use Cases</a> — Continuous sprint health monitoring, black-box legacy auditing, and prerequisite-gated migration planning.</li>
+</ul>
+<h3>4.2 Architecture, Workflows, Scoring &amp; Reference</h3>
+<ul>
+<li><a href="en/02_architecture/domain_architecture.html">Domain Architecture &amp; Cascade</a> and <a href="en/02_architecture/stateful_engine.html">Stateful Pull-Push Engine</a> — Internal package design and SQLite state transitions.</li>
+<li><a href="en/03_workflows_and_actions/workflows_guide.html">Workflows &amp; Pre-Flight Gates</a>, <a href="en/03_workflows_and_actions/actions_pipeline.html">15 Actions &amp; 12 Primitives</a>, and <a href="en/03_workflows_and_actions/analyzers_and_pentest.html">Analyzers &amp; Live Pentest</a> — Deep dive into YAML workflows and deterministic analyzers.</li>
+<li><a href="en/04_scoring_and_reports/scoring_model.html">7-Axis Scoring Model</a> and <a href="en/04_scoring_and_reports/drawlib_reporter.html">Drawlib Visual Reporter</a> — Quantitative grading formulas and 7-chapter PDF report blueprints.</li>
+<li><a href="en/05_languages_and_reference/supported_languages.html">Supported 6 Languages</a> and <a href="en/05_languages_and_reference/rules_and_cli.html">Rules &amp; CLI Reference</a> — Polyglot analyzer matrix and complete CLI command reference.</li>
+</ul>
+
+            </main>
+        </div>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Theme toggle
+            const themeBtn = document.getElementById('theme-toggle');
+            if (themeBtn) {
+                themeBtn.addEventListener('click', function() {
+                    const current = document.documentElement.getAttribute('data-theme');
+                    const next = current === 'dark' ? 'light' : 'dark';
+                    document.documentElement.setAttribute('data-theme', next);
+                    localStorage.setItem('drawlib-theme', next);
+                });
+            }
+
+            // Language dropdown outside-click & Escape close
+            const langDropdowns = document.querySelectorAll('.lang-dropdown');
+            if (langDropdowns.length > 0) {
+                document.addEventListener('click', function(e) {
+                    langDropdowns.forEach(function(dd) {
+                        if (dd.hasAttribute('open') && !dd.contains(e.target)) {
+                            dd.removeAttribute('open');
+                        }
+                    });
+                });
+                document.addEventListener('keydown', function(e) {
+                    if (e.key === 'Escape') {
+                        langDropdowns.forEach(function(dd) {
+                            dd.removeAttribute('open');
+                        });
+                    }
+                });
+            }
+
+            // Mobile menu toggle
+            const menuBtn = document.getElementById('menu-toggle');
+            const sidebar = document.querySelector('.sidebar');
+            if (menuBtn && sidebar) {
+                function setMenuOpen(open) {
+                    sidebar.classList.toggle('is-open', open);
+                    menuBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
+                    document.body.classList.toggle('menu-open', open);
+                    if (open) {
+                        const menu = sidebar.querySelector('.sidebar-menu');
+                        if (menu) {
+                            menu.scrollTop = 0;
+                        }
+                    }
+                }
+
+                menuBtn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    const willOpen = !sidebar.classList.contains('is-open');
+                    setMenuOpen(willOpen);
+                });
+
+                // Close menu when clicking outside sidebar
+                document.addEventListener('click', function(e) {
+                    if (sidebar.classList.contains('is-open') && !sidebar.contains(e.target)) {
+                        setMenuOpen(false);
+                    }
+                });
+
+                // Close menu when a navigation link is clicked
+                const navLinks = sidebar.querySelectorAll('.nav-item a');
+                navLinks.forEach(function(link) {
+                    link.addEventListener('click', function() {
+                        setMenuOpen(false);
+                    });
+                });
+
+                // Close on Escape key
+                document.addEventListener('keydown', function(e) {
+                    if (e.key === 'Escape' && sidebar.classList.contains('is-open')) {
+                        setMenuOpen(false);
+                    }
+                });
+
+                // Reset menu state when resized above mobile breakpoint
+                window.addEventListener('resize', function() {
+                    if (window.innerWidth > 768 && sidebar.classList.contains('is-open')) {
+                        setMenuOpen(false);
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>

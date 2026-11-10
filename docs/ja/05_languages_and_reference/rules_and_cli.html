@@ -1,0 +1,1077 @@
+<!--
+ Copyright (c) 2026 Yuichi Ito (yuichi@yuichi.com)
+
+ This software is licensed under the Apache License, Version 2.0.
+ For more information, please visit: https://github.com/yuichi110/drawlib
+
+ This software is provided "as is", without warranty of any kind,
+ express or implied, including but not limited to the warranties of
+ merchantability, fitness for a particular purpose and noninfringement.
+-->
+<!DOCTYPE html>
+<html lang="ja" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ルール拡張と CLI リファレンス</title>
+    <script>
+        (function() {
+            const saved = localStorage.getItem('drawlib-theme');
+            if (saved === 'dark' || (!saved && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                document.documentElement.setAttribute('data-theme', 'dark');
+            } else {
+                document.documentElement.setAttribute('data-theme', 'light');
+            }
+        })();
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+    
+    
+    <link rel="alternate" hreflang="en" href="https://www.pni501.com/en/05_languages_and_reference/rules_and_cli.html">
+    
+    <link rel="alternate" hreflang="ja" href="https://www.pni501.com/ja/05_languages_and_reference/rules_and_cli.html">
+    
+    <link rel="alternate" hreflang="x-default" href="https://www.pni501.com/en/05_languages_and_reference/rules_and_cli.html">
+    
+    
+    
+    <meta name="description" content="pni501 (v0.1.3) は、common/（16 個の普遍的エンジニアリング規約とオーケストレーションガイド）および /（6 言語・36 個の言語/フレームワーク規約）からなる 全 52 個の組み込み Markdown ルールファイルを同梱しており、決定論的な .pni/…">
+    <link rel="canonical" href="https://www.pni501.com/ja/05_languages_and_reference/rules_and_cli.html">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="pni501 ドキュメント">
+    <meta property="og:title" content="ルール拡張と CLI リファレンス — pni501 ドキュメント">
+    <meta property="og:description" content="pni501 (v0.1.3) は、common/（16 個の普遍的エンジニアリング規約とオーケストレーションガイド）および /（6 言語・36 個の言語/フレームワーク規約）からなる 全 52 個の組み込み Markdown ルールファイルを同梱しており、決定論的な .pni/…">
+    <meta property="og:url" content="https://www.pni501.com/ja/05_languages_and_reference/rules_and_cli.html">
+    <meta property="og:image" content="https://www.pni501.com/_assets/logo.png">
+    <meta property="og:locale" content="ja_JP">
+    <meta property="og:locale:alternate" content="en_US">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="ルール拡張と CLI リファレンス — pni501 ドキュメント">
+    <meta name="twitter:description" content="pni501 (v0.1.3) は、common/（16 個の普遍的エンジニアリング規約とオーケストレーションガイド）および /（6 言語・36 個の言語/フレームワーク規約）からなる 全 52 個の組み込み Markdown ルールファイルを同梱しており、決定論的な .pni/…">
+    <meta name="twitter:image" content="https://www.pni501.com/_assets/logo.png">
+    
+    
+    <link rel="icon" type="image/png" href="../../_assets/favicon.png">
+    
+    
+    <link rel="stylesheet" href="../style.css">
+    
+    
+</head>
+<body>
+    
+    <div class="doc-layout">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <a href="../index.html" class="sidebar-brand" aria-label="pni501 ドキュメント">
+                    
+                    <img src="../../_assets/logo.png" alt="pni501 ドキュメント" class="sidebar-logo sidebar-logo-light">
+                    <img src="../../_assets/logo_dark.png" alt="pni501 ドキュメント" class="sidebar-logo sidebar-logo-dark">
+                    
+                </a>
+                <div class="sidebar-header-actions">
+                    <button type="button" id="theme-toggle" class="theme-toggle-btn" aria-label="Toggle theme">
+                        <svg class="icon-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+                        <svg class="icon-moon" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+                    </button>
+                    <button type="button" id="menu-toggle" class="menu-toggle-btn" aria-label="Toggle navigation" aria-expanded="false">
+                        <svg class="icon-hamburger" viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+                        <svg class="icon-close" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                    </button>
+                </div>
+            </div>
+            <div class="sidebar-menu">
+                
+                    
+                        
+                        <ul class="nav-list">
+                            
+                            <li class="nav-item ">
+                                <a href="../index.html" >概要 (Overview)</a>
+                            </li>
+                            
+                        </ul>
+                    
+                        
+                        <div class="sidebar-heading">1. はじめに (Getting Started)</div>
+                        
+                        <ul class="nav-list">
+                            
+                            <li class="nav-item ">
+                                <a href="../01_getting_started/concepts.html" >背景とコアコンセプト</a>
+                            </li>
+                            
+                            <li class="nav-item ">
+                                <a href="../01_getting_started/quickstart.html" >クイックスタートガイド</a>
+                            </li>
+                            
+                            <li class="nav-item ">
+                                <a href="../01_getting_started/use_cases.html" >3つの主要ユースケース</a>
+                            </li>
+                            
+                        </ul>
+                    
+                        
+                        <div class="sidebar-heading">2. アーキテクチャ (Architecture)</div>
+                        
+                        <ul class="nav-list">
+                            
+                            <li class="nav-item ">
+                                <a href="../02_architecture/domain_architecture.html" >ドメイン構造と3層カスケード</a>
+                            </li>
+                            
+                            <li class="nav-item ">
+                                <a href="../02_architecture/stateful_engine.html" >ステートフル Pull-Push エンジン</a>
+                            </li>
+                            
+                        </ul>
+                    
+                        
+                        <div class="sidebar-heading">3. ワークフローとアクション</div>
+                        
+                        <ul class="nav-list">
+                            
+                            <li class="nav-item ">
+                                <a href="../03_workflows_and_actions/workflows_guide.html" >ワークフローと Pre-Flight ゲート</a>
+                            </li>
+                            
+                            <li class="nav-item ">
+                                <a href="../03_workflows_and_actions/actions_pipeline.html" >15 アクションと 12 プリミティブ</a>
+                            </li>
+                            
+                            <li class="nav-item ">
+                                <a href="../03_workflows_and_actions/analyzers_and_pentest.html" >決定論的解析器とペネトレーションテスト</a>
+                            </li>
+                            
+                        </ul>
+                    
+                        
+                        <div class="sidebar-heading">4. スコアリングとレポート</div>
+                        
+                        <ul class="nav-list">
+                            
+                            <li class="nav-item ">
+                                <a href="../04_scoring_and_reports/scoring_model.html" >7軸品質スコアリングモデル</a>
+                            </li>
+                            
+                            <li class="nav-item ">
+                                <a href="../04_scoring_and_reports/drawlib_reporter.html" >Drawlib ビジュアルレポーター</a>
+                            </li>
+                            
+                        </ul>
+                    
+                        
+                        <div class="sidebar-heading">5. 対応言語とリファレンス</div>
+                        
+                        <ul class="nav-list">
+                            
+                            <li class="nav-item ">
+                                <a href="supported_languages.html" >対応 6 言語マトリクス</a>
+                            </li>
+                            
+                            <li class="nav-item active">
+                                <a href="rules_and_cli.html" >ルール拡張と CLI リファレンス</a>
+                            </li>
+                            
+                        </ul>
+                    
+                        
+                        <div class="sidebar-heading">外部リンク (External Links)</div>
+                        
+                        <ul class="nav-list">
+                            
+                            <li class="nav-item ">
+                                <a href="https://github.com/yuichi110/pni501" target="_blank" rel="noopener noreferrer">GitHub リポジトリ<svg class="nav-external-icon" viewBox="0 0 24 24" aria-hidden="true"><line x1="7" y1="17" x2="17" y2="7"></line><polyline points="7 7 17 7 17 17"></polyline></svg></a>
+                            </li>
+                            
+                            <li class="nav-item ">
+                                <a href="https://pypi.org/project/pni501/" target="_blank" rel="noopener noreferrer">PyPI パッケージ<svg class="nav-external-icon" viewBox="0 0 24 24" aria-hidden="true"><line x1="7" y1="17" x2="17" y2="7"></line><polyline points="7 7 17 7 17 17"></polyline></svg></a>
+                            </li>
+                            
+                        </ul>
+                    
+                
+            </div>
+        </aside>
+        <div class="content-wrapper">
+            <header class="top-bar">
+                <div class="breadcrumbs">
+                    <span class="crumb">Docs</span>
+                    <span class="crumb-separator">&raquo;</span>
+                    <span class="crumb active">ルール拡張と CLI リファレンス</span>
+                </div>
+                
+                <div class="lang-switcher">
+                    <details class="lang-dropdown">
+                        <summary class="lang-dropdown-btn" aria-label="Select language">
+                            <svg class="lang-globe-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+                            <span class="lang-current-label">日本語</span>
+                            <svg class="lang-caret-icon" viewBox="0 0 24 24" aria-hidden="true"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                        </summary>
+                        <div class="lang-dropdown-menu" role="menu">
+                            
+                            <a href="../../en/05_languages_and_reference/rules_and_cli.html" class="lang-option" lang="en" hreflang="en" >
+                                <span>English</span>
+                                
+                            </a>
+                            
+                            <a href="rules_and_cli.html" class="lang-option active" lang="ja" hreflang="ja" aria-current="page">
+                                <span>日本語</span>
+                                
+                                <svg class="lang-check-icon" viewBox="0 0 24 24" aria-hidden="true"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                                
+                            </a>
+                            
+                        </div>
+                    </details>
+                </div>
+                
+            </header>
+            <main class="main-content">
+                <h1>ルール拡張と CLI リファレンス</h1>
+<p><code>pni501</code> (<code>v0.1.3</code>) は、<code>common/*</code>（16 個の普遍的エンジニアリング規約とオーケストレーションガイド）および <code>&lt;lang&gt;/*</code>（6 言語・36 個の言語/フレームワーク規約）からなる <strong>全 52 個の組み込み Markdown ルールファイル</strong>を同梱しており、決定論的な <code>.pni/</code> ローカルオーバーライドカスケードと統合 <code>pni</code> CLI によってあらゆるプロジェクトの要件に柔軟に適応します。</p>
+<figure class="drawlib-image" style="text-align: center;">
+  <img src="../../images/05_languages_and_reference/rules_and_cli/rules_taxonomy_and_override.png" alt="rules_and_cli_1" />
+  <figcaption class="drawlib-caption">直交ルール体系（common/* + <lang>/*）と .pni/ ローカルオーバーライドカスケード</figcaption>
+</figure>
+<details class="drawlib-code-details">
+<summary>Source Code</summary>
+<pre><code class="language-python"><span class="kn">from</span><span class="w"> </span><span class="nn">drawlib.canvas</span><span class="w"> </span><span class="kn">import</span> <span class="n">save</span><span class="p">,</span> <span class="n">setup</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">drawlib.icons</span><span class="w"> </span><span class="kn">import</span> <span class="n">phosphor</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">drawlib.smartarts</span><span class="w"> </span><span class="kn">import</span> <span class="n">CardList</span><span class="p">,</span> <span class="n">Panel</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">drawlib.styles</span><span class="w"> </span><span class="kn">import</span> <span class="n">Styles</span>
+
+<span class="n">setup</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="mi">184</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">86</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">150</span><span class="p">)</span>
+
+<span class="n">tax_panel</span> <span class="o">=</span> <span class="n">Panel</span><span class="p">(</span>
+    <span class="s2">"1. Built-in Rule Taxonomy (52 Markdown Files)"</span><span class="p">,</span>
+    <span class="n">header_variant</span><span class="o">=</span><span class="s2">"filled"</span><span class="p">,</span>
+    <span class="n">header_height</span><span class="o">=</span><span class="mf">8.5</span><span class="p">,</span>
+    <span class="n">style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">Neutral</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">shape_r</span><span class="o">=</span><span class="mf">2.0</span><span class="p">),</span>
+    <span class="n">header_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">PrimaryFlat</span><span class="p">,</span>
+    <span class="n">text_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">WhiteBold</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">text_size</span><span class="o">=</span><span class="mf">11.2</span><span class="p">),</span>
+<span class="p">)</span>
+<span class="n">tax_panel</span><span class="o">.</span><span class="n">draw</span><span class="p">(</span><span class="n">xy</span><span class="o">=</span><span class="p">(</span><span class="mf">4.0</span><span class="p">,</span> <span class="mf">4.0</span><span class="p">),</span> <span class="n">width</span><span class="o">=</span><span class="mf">85.5</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mf">78.0</span><span class="p">)</span>
+
+<span class="n">tax_cards</span> <span class="o">=</span> <span class="n">CardList</span><span class="p">(</span>
+    <span class="n">style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">WhiteBordered</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">shape_r</span><span class="o">=</span><span class="mf">1.5</span><span class="p">),</span>
+    <span class="n">text_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">DarkBold</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">text_size</span><span class="o">=</span><span class="mf">10.8</span><span class="p">),</span>
+    <span class="n">description_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">Dark</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">text_size</span><span class="o">=</span><span class="mf">10.0</span><span class="p">),</span>
+    <span class="n">badge_shape</span><span class="o">=</span><span class="s2">"rounded_rect"</span><span class="p">,</span>
+    <span class="n">badge_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">PrimaryNeutral</span><span class="p">,</span>
+    <span class="n">badge_text_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">PrimaryBold</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">text_size</span><span class="o">=</span><span class="mf">10.0</span><span class="p">),</span>
+    <span class="n">icon_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">PrimaryBold</span><span class="p">,</span>
+    <span class="n">direction</span><span class="o">=</span><span class="s2">"vertical"</span><span class="p">,</span>
+    <span class="n">spacing</span><span class="o">=</span><span class="mf">2.8</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">tax_cards</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+    <span class="s2">"Universal Standards &amp; Guides (common/*)"</span><span class="p">,</span>
+    <span class="s2">"12 evaluation rules (Arch, SIG, OpenSSF, OWASP,</span><span class="se">\n</span><span class="s2">"</span>
+    <span class="s2">"12-Factor, SRE, CLI, Library) + 4 meta-guides</span><span class="se">\n</span><span class="s2">"</span>
+    <span class="s2">"(agent_instruction, workflow/migration/progress)"</span><span class="p">,</span>
+    <span class="n">badge_text</span><span class="o">=</span><span class="s2">"16"</span><span class="p">,</span>
+    <span class="n">icon</span><span class="o">=</span><span class="n">phosphor</span><span class="o">.</span><span class="n">globe</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">tax_cards</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+    <span class="s2">"6-Language Core Standards (&lt;lang&gt;/*)"</span><span class="p">,</span>
+    <span class="s2">"code_quality, typing, dependencies, testing,</span><span class="se">\n</span><span class="s2">"</span>
+    <span class="s2">"modern_stack, workflow_guide across python,</span><span class="se">\n</span><span class="s2">"</span>
+    <span class="s2">"java, php, go, typescript, and javascript"</span><span class="p">,</span>
+    <span class="n">badge_text</span><span class="o">=</span><span class="s2">"32"</span><span class="p">,</span>
+    <span class="n">icon</span><span class="o">=</span><span class="n">phosphor</span><span class="o">.</span><span class="n">code</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">tax_cards</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+    <span class="s2">"Framework Rules (&lt;lang&gt;/frameworks/*)"</span><span class="p">,</span>
+    <span class="s2">"python/frameworks/fastapi, java/frameworks/</span><span class="se">\n</span><span class="s2">"</span>
+    <span class="s2">"spring_boot, php/frameworks/laravel, and</span><span class="se">\n</span><span class="s2">"</span>
+    <span class="s2">"php/frameworks/wordpress"</span><span class="p">,</span>
+    <span class="n">badge_text</span><span class="o">=</span><span class="s2">"4"</span><span class="p">,</span>
+    <span class="n">icon</span><span class="o">=</span><span class="n">phosphor</span><span class="o">.</span><span class="n">stack</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">tax_cards</span><span class="o">.</span><span class="n">draw</span><span class="p">(</span><span class="n">xy</span><span class="o">=</span><span class="p">(</span><span class="mf">6.5</span><span class="p">,</span> <span class="mf">6.5</span><span class="p">),</span> <span class="n">width</span><span class="o">=</span><span class="mf">80.5</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mf">64.5</span><span class="p">)</span>
+
+<span class="n">cas_panel</span> <span class="o">=</span> <span class="n">Panel</span><span class="p">(</span>
+    <span class="s2">"2. Local .pni/ Override &amp; Waiver Cascade"</span><span class="p">,</span>
+    <span class="n">header_variant</span><span class="o">=</span><span class="s2">"filled"</span><span class="p">,</span>
+    <span class="n">header_height</span><span class="o">=</span><span class="mf">8.5</span><span class="p">,</span>
+    <span class="n">style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">PrimaryNeutral</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">shape_r</span><span class="o">=</span><span class="mf">2.0</span><span class="p">),</span>
+    <span class="n">header_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">SecondaryFlat</span><span class="p">,</span>
+    <span class="n">text_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">WhiteBold</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">text_size</span><span class="o">=</span><span class="mf">11.2</span><span class="p">),</span>
+<span class="p">)</span>
+<span class="n">cas_panel</span><span class="o">.</span><span class="n">draw</span><span class="p">(</span><span class="n">xy</span><span class="o">=</span><span class="p">(</span><span class="mf">94.5</span><span class="p">,</span> <span class="mf">4.0</span><span class="p">),</span> <span class="n">width</span><span class="o">=</span><span class="mf">85.5</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mf">78.0</span><span class="p">)</span>
+
+<span class="n">cas_cards</span> <span class="o">=</span> <span class="n">CardList</span><span class="p">(</span>
+    <span class="n">style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">WhiteBordered</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">shape_r</span><span class="o">=</span><span class="mf">1.5</span><span class="p">),</span>
+    <span class="n">text_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">DarkBold</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">text_size</span><span class="o">=</span><span class="mf">10.8</span><span class="p">),</span>
+    <span class="n">description_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">Dark</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">text_size</span><span class="o">=</span><span class="mf">10.0</span><span class="p">),</span>
+    <span class="n">badge_shape</span><span class="o">=</span><span class="s2">"rounded_rect"</span><span class="p">,</span>
+    <span class="n">badge_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">SecondaryNeutral</span><span class="p">,</span>
+    <span class="n">badge_text_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">SecondaryBold</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">text_size</span><span class="o">=</span><span class="mf">10.0</span><span class="p">),</span>
+    <span class="n">icon_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">SecondaryBold</span><span class="p">,</span>
+    <span class="n">direction</span><span class="o">=</span><span class="s2">"vertical"</span><span class="p">,</span>
+    <span class="n">spacing</span><span class="o">=</span><span class="mf">2.8</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">cas_cards</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+    <span class="s2">"Priority 1: Local .pni/ Workspace Files"</span><span class="p">,</span>
+    <span class="s2">".pni/rules/&lt;scope&gt;/&lt;name&gt;.md, .pni/actions/*.yaml,</span><span class="se">\n</span><span class="s2">"</span>
+    <span class="s2">".pni/dockerfiles/, and .pni/instructions.md</span><span class="se">\n</span><span class="s2">"</span>
+    <span class="s2">"automatically shadow built-in package defaults"</span><span class="p">,</span>
+    <span class="n">badge_text</span><span class="o">=</span><span class="s2">"P1"</span><span class="p">,</span>
+    <span class="n">icon</span><span class="o">=</span><span class="n">phosphor</span><span class="o">.</span><span class="n">folder_open</span><span class="p">,</span>
+    <span class="n">badge_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">PrimaryFlat</span><span class="p">,</span>
+    <span class="n">badge_text_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">WhiteBold</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">text_size</span><span class="o">=</span><span class="mf">10.0</span><span class="p">),</span>
+    <span class="n">icon_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">WhiteBold</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">cas_cards</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+    <span class="s2">"Priority 2: Active Language Scope (&lt;lang&gt;/*)"</span><span class="p">,</span>
+    <span class="s2">"Short names (e.g. 'pni rules show testing' or</span><span class="se">\n</span><span class="s2">"</span>
+    <span class="s2">"'repo_structure_audit') resolve to the active</span><span class="se">\n</span><span class="s2">"</span>
+    <span class="s2">"language before falling back to common/*"</span><span class="p">,</span>
+    <span class="n">badge_text</span><span class="o">=</span><span class="s2">"P2"</span><span class="p">,</span>
+    <span class="n">icon</span><span class="o">=</span><span class="n">phosphor</span><span class="o">.</span><span class="n">magnifying_glass</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">cas_cards</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+    <span class="s2">"Priority 3: Built-in common/* &amp; [[opt_out]]"</span><span class="p">,</span>
+    <span class="s2">"Canonical src/pni/_rules/ fallback paired with</span><span class="se">\n</span><span class="s2">"</span>
+    <span class="s2">"declarative .pni/pni.toml [[opt_out]] waivers</span><span class="se">\n</span><span class="s2">"</span>
+    <span class="s2">"(requires scoped paths + reason &gt;= 10 chars)"</span><span class="p">,</span>
+    <span class="n">badge_text</span><span class="o">=</span><span class="s2">"P3"</span><span class="p">,</span>
+    <span class="n">icon</span><span class="o">=</span><span class="n">phosphor</span><span class="o">.</span><span class="n">shield_check</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">cas_cards</span><span class="o">.</span><span class="n">draw</span><span class="p">(</span><span class="n">xy</span><span class="o">=</span><span class="p">(</span><span class="mf">97.0</span><span class="p">,</span> <span class="mf">6.5</span><span class="p">),</span> <span class="n">width</span><span class="o">=</span><span class="mf">80.5</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mf">64.5</span><span class="p">)</span>
+
+<span class="n">save</span><span class="p">()</span>
+</code></pre>
+</details>
+<hr />
+<h2>1. 直交ルール体系（全 52 組み込みファイル）</h2>
+<p><code>pni501</code> のすべてのルールは、<code>src/pni/_rules/</code> 配下に人間と LLM の双方が読みやすい Markdown として格納されており、AI が主観的な推測に頼ることなく評価できるよう、決定論的な静的解析・コンテナ実行・セキュリティスキャンの各シグナルと対になっています。</p>
+<h3>1.1 普遍的エンジニアリング規約とメタガイド (<code>common/*</code> — 16 ファイル)</h3>
+<p><code>common/</code> スコープには、全プロジェクト共通およびアーキタイプ別（<code>Service / API</code>・<code>CLI Tool</code>・<code>Library / SDK</code>）の <strong>12 個の評価ルール</strong>と、エージェントおよびワークフロー設計用の <strong>4 個のメタガイド</strong>が含まれます。</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">ルール識別子</th>
+<th style="text-align:left">準拠する業界標準・仕様</th>
+<th style="text-align:left">対象アーキタイプ</th>
+<th style="text-align:left">決定論的グラウンディング指標 (<code>ProjectFacts</code> / <code>AstFacts</code> / <code>RuntimeFacts</code>)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left"><code>common/architecture</code></td>
+<td style="text-align:left">Clean / Layered Arch</td>
+<td style="text-align:left">全プロジェクト</td>
+<td style="text-align:left"><code>circular_dependencies</code>, <code>internal_import_graph</code>, <code>boundary_violations</code>, <code>ArchitectureRecord</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>common/maintainability</code></td>
+<td style="text-align:left">SIG / ISO 25010</td>
+<td style="text-align:left">全プロジェクト</td>
+<td style="text-align:left"><code>complex_functions</code> (<code>McCabe &gt; 7</code>, <code>cognitive &gt; 15</code>), <code>LOC &lt;= 50</code>, <code>params &lt;= 6</code>, <code>global_state_usages</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>common/supply_chain</code></td>
+<td style="text-align:left">OpenSSF Scorecard</td>
+<td style="text-align:left">全プロジェクト</td>
+<td style="text-align:left"><code>lockfiles_found</code>, <code>unpinned_dependencies</code>, <code>ci_supply_chain_issues</code>, <code>has_license</code>, <code>has_security_md</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>common/security</code></td>
+<td style="text-align:left">OWASP ASVS Baseline</td>
+<td style="text-align:left">全プロジェクト</td>
+<td style="text-align:left"><code>committed_secret_files</code>, <code>hardcoded_secrets</code>, <code>bug_risk_idioms</code>, <code>dangerous_sinks</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>common/security_vulnerability</code></td>
+<td style="text-align:left">Trivy + CWE Sinks</td>
+<td style="text-align:left">全プロジェクト</td>
+<td style="text-align:left"><code>SecurityScanFacts</code> (App/OS CVE・IaC 設定ミス・秘匿情報) + AST <code>dangerous_sinks</code> &amp; <code>api_endpoints</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>common/runtime_verification</code></td>
+<td style="text-align:left">隔離コンテナ実行検証</td>
+<td style="text-align:left">全プロジェクト</td>
+<td style="text-align:left"><code>RuntimeFacts</code> (Dockerfile ビルド・<code>--network=none</code> テスト通過率・行/分岐カバレッジ・Stage 3 スモークプローブ)</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>common/git_workflow</code></td>
+<td style="text-align:left">Conventional Repo</td>
+<td style="text-align:left">全プロジェクト</td>
+<td style="text-align:left"><code>has_gitignore</code>、コミットされたキャッシュ・ビルド成果物（<code>__pycache__</code>, <code>node_modules</code>, <code>.venv</code>）、リポジトリ衛生</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>common/documentation</code></td>
+<td style="text-align:left">Std Readme &amp; Diataxis</td>
+<td style="text-align:left">全プロジェクト</td>
+<td style="text-align:left"><code>readme_headings</code>, <code>readme_line_count</code>, <code>docs_inventory</code>, <code>docstring_coverage_pct</code>, <code>docstring_issues</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>common/twelve_factor</code></td>
+<td style="text-align:left">12 / 15-Factor App</td>
+<td style="text-align:left">Service / API</td>
+<td style="text-align:left">設定モジュール外の <code>scattered_env_access</code>、<code>runtime_types</code>、ステートレスワーカー設計</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>common/production_readiness</code></td>
+<td style="text-align:left">Google SRE PRR</td>
+<td style="text-align:left">Service / API</td>
+<td style="text-align:left"><code>missing_io_timeouts</code>、<code>unstructured_logging</code>、ヘルスチェックエンドポイント、非 root コンテナ設定</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>common/cli_guidelines</code></td>
+<td style="text-align:left">clig.dev Guidelines</td>
+<td style="text-align:left">CLI Tool</td>
+<td style="text-align:left">CLI エントリポイント、<code>--help</code>/<code>--version</code>/<code>--json</code> 対応、<code>stdout</code> と <code>stderr</code> の分離、非ゼロ終了コード</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>common/library_guidelines</code></td>
+<td style="text-align:left">Public SDK Hygiene</td>
+<td style="text-align:left">Library / SDK</td>
+<td style="text-align:left">明示的な公開エクスポート（<code>__all__</code>）、<code>py.typed</code> / <code>.d.ts</code> マーカー、import 時の副作用排除、ライブラリ内の <code>sys.exit()</code> 禁止</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>common/agent_instruction</code></td>
+<td style="text-align:left">PNI Agent Protocol</td>
+<td style="text-align:left">メタガイド</td>
+<td style="text-align:left">決定論的 Pull-Push 実行ループとゼロハルシネーション規約（<code>pni instructions</code>）</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>common/workflow_guide</code></td>
+<td style="text-align:left">PNI Authoring Spec</td>
+<td style="text-align:left">メタガイド</td>
+<td style="text-align:left">リポジトリ構造の調査手順と <code>.pni/workflows/*.yaml</code>・<code>.pni/actions/*.yaml</code> の設計仕様</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>common/migration_planning</code></td>
+<td style="text-align:left">Modernization Spec</td>
+<td style="text-align:left">メタガイド</td>
+<td style="text-align:left">マイグレーション実行前の要件明確化チェックリスト、<code>based_on</code> 監査継承、5 フェーズゲート設計ガイド</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>common/progress_tracking</code></td>
+<td style="text-align:left">Schedule &amp; Git Gov</td>
+<td style="text-align:left">メタガイド</td>
+<td style="text-align:left"><code>.pni/progress/&lt;target&gt;.yaml</code> のマイルストーン・タスク DAG 検証および Git ブランチ/コミットガバナンス規約</td>
+</tr>
+</tbody>
+</table>
+<h3>1.2 言語別・フレームワーク別ルールカタログ (<code>&lt;lang&gt;/*</code> — 36 ファイル)</h3>
+<p>対応する 6 言語それぞれに、コア評価ルール（<code>code_quality</code>, <code>typing</code>, <code>dependencies</code>, <code>testing</code>）、エコシステム別 <code>workflow_guide</code>、および <code>modern_stack</code> や <code>frameworks/*</code> ルールが用意されています。</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">言語スコープ</th>
+<th style="text-align:left">ファイル数</th>
+<th style="text-align:left">組み込みルール識別子</th>
+<th style="text-align:left">主なエコシステム・フレームワーク評価基準</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left"><strong>Python (<code>python/*</code>)</strong></td>
+<td style="text-align:left"><code>7</code></td>
+<td style="text-align:left"><code>code_quality</code>, <code>typing</code>, <code>dependencies</code>, <code>modern_stack</code>, <code>testing</code>, <code>frameworks/fastapi</code>, <code>workflow_guide</code></td>
+<td style="text-align:left">PEP 621 <code>pyproject.toml</code> + <code>uv.lock</code>、公開 API 型ヒント 100%、Google docstring、Python 3.11+ <code>pathlib</code> / <code>X | Y</code>、<code>pytest</code> ミラー構成、FastAPI <code>lifespan</code> &amp; <code>Depends()</code> DI</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>Java (<code>java/*</code>)</strong></td>
+<td style="text-align:left"><code>6</code></td>
+<td style="text-align:left"><code>code_quality</code>, <code>typing</code>, <code>dependencies</code>, <code>testing</code>, <code>frameworks/spring_boot</code>, <code>workflow_guide</code></td>
+<td style="text-align:left">Maven/Gradle ラッパーとロックファイル、ジェネリクス安全性（生型の排除）、Javadoc <code>@param</code> 同期、Java 21 <code>record</code>/<code>sealed</code>、JUnit 5 <code>@Test</code>、Spring Boot コンストラクタ DI &amp; <code>@ConfigurationProperties</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>PHP (<code>php/*</code>)</strong></td>
+<td style="text-align:left"><code>8</code></td>
+<td style="text-align:left"><code>code_quality</code>, <code>typing</code>, <code>dependencies</code>, <code>modern_stack</code>, <code>testing</code>, <code>frameworks/laravel</code>, <code>frameworks/wordpress</code>, <code>workflow_guide</code></td>
+<td style="text-align:left"><code>declare(strict_types=1)</code>、PSR-12 / PSR-4 オートロード、<code>$_GET</code>/<code>$GLOBALS</code> 直参照の排除、PHP 8.2+ <code>readonly</code>/<code>enum</code>、PHPUnit/Pest + <code>pcov</code>、Laravel FormRequest/Eloquent 安全性、WordPress <code>$wpdb-&gt;prepare</code> &amp; nonce</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>Go (<code>go/*</code>)</strong></td>
+<td style="text-align:left"><code>5</code></td>
+<td style="text-align:left"><code>code_quality</code>, <code>typing</code>, <code>dependencies</code>, <code>testing</code>, <code>workflow_guide</code></td>
+<td style="text-align:left"><code>gofmt</code>/<code>go vet</code>、エクスポートシンボルの GoDoc、明示的な <code>if err != nil</code>（<code>%w</code> ラップ、<code>_ = err</code> 禁止）、最小インターフェース（<code>any</code>/<code>unsafe.Pointer</code> 回避）、テーブル駆動 <code>t.Run</code> テスト</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>TypeScript (<code>typescript/*</code>)</strong></td>
+<td style="text-align:left"><code>5</code></td>
+<td style="text-align:left"><code>code_quality</code>, <code>typing</code>, <code>dependencies</code>, <code>testing</code>, <code>workflow_guide</code></td>
+<td style="text-align:left"><code>tsconfig.json</code> <code>&quot;strict&quot;: true</code> (<code>noImplicitAny</code>, <code>strictNullChecks</code>)、<code>: any</code> / <code>as any</code> の排除（<code>unknown</code> + Zod による絞り込み）、TSDoc コメント、Promise エラー処理、Vitest/Jest カバレッジ</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>JavaScript (<code>javascript/*</code>)</strong></td>
+<td style="text-align:left"><code>5</code></td>
+<td style="text-align:left"><code>code_quality</code>, <code>typing</code>, <code>dependencies</code>, <code>testing</code>, <code>workflow_guide</code></td>
+<td style="text-align:left">ES Module (<code>import</code>/<code>export</code>)、JSDoc <code>@param {Type}</code> &amp; <code>@returns {Type}</code> 型契約、<code>checkJs</code> / <code>// @ts-check</code>、<code>const</code>/<code>let</code> と厳密等価 <code>===</code>、Vitest/Jest/Node テストスイート</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2>2. <code>.pni/</code> ローカルオーバーライドカスケードと <code>pni.toml</code> 特例承認 (<code>[[opt_out]]</code>)</h2>
+<p><code>pni init</code> を実行するとワークスペース直下に <code>.pni/</code> ディレクトリが生成されます。PNI はルール・複合アクション・インストラクション・コンテナハーネスを非破壊の優先順位カスケードで解決するため、<code>pni501</code> 本体をフォークすることなくプロジェクト固有の閾値や Dockerfile を柔軟にカスタマイズできます。</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">ワークスペースパス</th>
+<th style="text-align:left">カスケード解決順序</th>
+<th style="text-align:left">役割とカスタマイズ方法</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left"><code>.pni/pni.toml</code></td>
+<td style="text-align:left">ワークスペースルート（または親ディレクトリの <code>.pni/pni.toml</code>）</td>
+<td style="text-align:left"><code>[project]</code>、デフォルト <code>[targets]</code>、<code>[scan]</code> 除外ルール、<code>[report]</code> 設定、および <code>[[opt_out]]</code> 特例承認を宣言します。</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>.pni/rules/&lt;scope&gt;/&lt;name&gt;.md</code></td>
+<td style="text-align:left"><code>.pni/rules/</code> $\to$ 組み込み <code>&lt;active_lang&gt;/</code> $\to$ 組み込み <code>common/</code></td>
+<td style="text-align:left"><code>.pni/rules/</code> 内の <code>.md</code> を編集すると組み込みルールより優先されます（<code>pni rules list</code> で <code>Local (.pni)</code> と表示）。メタガイド（<code>agent_instruction</code>, <code>workflow_guide</code>）は常に最新の組み込み版が参照されます。</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>.pni/actions/*.yaml</code></td>
+<td style="text-align:left"><code>.pni/actions/</code> $\to$ 組み込み <code>&lt;active_lang&gt;/</code> $\to$ 組み込み <code>common/</code></td>
+<td style="text-align:left">複合アクションの適用ルール・パラメータ・プロンプトをプロジェクト単位で上書きします。</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>.pni/workflows/*.yaml</code></td>
+<td style="text-align:left"><code>.pni/workflows/</code> 内で定義</td>
+<td style="text-align:left"><code>audit</code>・<code>migration</code> (<code>based_on</code>)・<code>progress</code> ワークフローを定義します。</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>.pni/dockerfiles/</code></td>
+<td style="text-align:left"><code>explicit_dockerfile</code> $\to$ <code>.pni/dockerfiles/_templates/&lt;lang&gt;/&lt;tool&gt;.dockerfile</code> $\to$ 組み込み <code>src/pni/_dockerfiles/</code></td>
+<td style="text-align:left">ターゲット別の検証用 Dockerfile（<code>.pni/dockerfiles/&lt;target&gt;/Dockerfile</code> + <code>.dockerignore</code>）を実体化します。</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>.pni/pentests/&lt;target&gt;/</code></td>
+<td style="text-align:left"><code>pni pentests init -w &lt;workflow_id&gt;</code> で生成</td>
+<td style="text-align:left">明示的な <code>Python + httpx</code> 動的ペネトレーションテストスイート（<code>conftest.py</code>, <code>test_*.py</code>）を保持します。</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>.pni/progress/&lt;target&gt;.yaml</code></td>
+<td style="text-align:left"><code>pni progress init</code> で生成・<code>pni progress validate</code> で検証</td>
+<td style="text-align:left">マイルストーン・タスク依存 DAG (<code>depends_on</code>)・<code>git_policy</code> ガバナンスルールを定義します。</td>
+</tr>
+</tbody>
+</table>
+<p>また、CLI ツールにおける意図的なサブプロセス呼び出しや開発専用 Dockerfile ステージなど、設計上の正当なトレードオフをグローバルルールを緩めずに除外したい場合は、<code>.pni/pni.toml</code> の <code>[[opt_out]]</code> に対象パス (<code>scope</code>) と 10 文字以上の技術的理由 (<code>reason</code>) を明記します。</p>
+<pre><code class="language-toml"><span class="k">[project]</span>
+<span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"order-dispatch"</span>
+<span class="n">language_version</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"3.12"</span>
+<span class="n">archetypes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="s2">"web_api"</span><span class="p">]</span>
+
+<span class="k">[targets]</span>
+<span class="n">root</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"."</span>
+<span class="n">source</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="s2">"src"</span><span class="p">]</span>
+<span class="n">tests</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="s2">"tests"</span><span class="p">]</span>
+<span class="n">docs</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="s2">"README.md"</span><span class="p">]</span>
+<span class="n">exclude</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="s2">"src/generated/**"</span><span class="p">]</span>
+
+<span class="k">[scan]</span>
+<span class="n">respect_gitignore</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span>
+<span class="n">include_gitignored</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="s2">"uv.lock"</span><span class="p">,</span><span class="w"> </span><span class="s2">"composer.lock"</span><span class="p">]</span>
+
+<span class="k">[report]</span>
+<span class="n">src_dir</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"reports_src"</span>
+<span class="n">output_dir</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"reports"</span>
+<span class="n">formats</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="s2">"pdf"</span><span class="p">]</span>
+<span class="n">lang</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"en"</span>
+<span class="n">style</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"google"</span>
+
+<span class="k">[[opt_out]]</span>
+<span class="n">id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"CWE-78"</span>
+<span class="n">scope</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="s2">"src/cli/sandbox_runner.py"</span><span class="p">]</span>
+<span class="n">reason</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"Command arguments are validated against an allowlist and executed with shell=False."</span>
+</code></pre>
+<hr />
+<h2>3. <code>pni</code> CLI 完全リファレンス</h2>
+<p><code>pni</code> CLI（<code>src/pni/cli.py</code>）は、ワークスペース初期化、ルール参照、ステートフルワークフロー実行、ライブペネトレーションテスト、進捗・Git ガバナンス管理、Drawlib レポートコンパイル、および Pydantic スキーマ検証を一貫したサブコマンドツリーとして提供します。</p>
+<figure class="drawlib-image" style="text-align: center;">
+  <img src="../../images/05_languages_and_reference/rules_and_cli/cli_command_tree.png" alt="rules_and_cli_2" />
+  <figcaption class="drawlib-caption">pni CLI コマンド階層と .pni/ ワークスペース成果物の対応関係</figcaption>
+</figure>
+<details class="drawlib-code-details">
+<summary>Source Code</summary>
+<pre><code class="language-python"><span class="kn">from</span><span class="w"> </span><span class="nn">drawlib.canvas</span><span class="w"> </span><span class="kn">import</span> <span class="n">save</span><span class="p">,</span> <span class="n">setup</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">drawlib.smartarts</span><span class="w"> </span><span class="kn">import</span> <span class="n">MindMapNode</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">drawlib.styles</span><span class="w"> </span><span class="kn">import</span> <span class="n">Styles</span>
+
+<span class="n">setup</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="mi">204</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">90</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">150</span><span class="p">)</span>
+
+<span class="n">txt_root</span> <span class="o">=</span> <span class="n">Styles</span><span class="o">.</span><span class="n">WhiteBold</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">text_size</span><span class="o">=</span><span class="mf">11.0</span><span class="p">)</span>
+<span class="n">txt_group</span> <span class="o">=</span> <span class="n">Styles</span><span class="o">.</span><span class="n">DarkBold</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">text_size</span><span class="o">=</span><span class="mf">10.0</span><span class="p">)</span>
+<span class="n">txt_leaf</span> <span class="o">=</span> <span class="n">Styles</span><span class="o">.</span><span class="n">Dark</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">text_size</span><span class="o">=</span><span class="mf">9.8</span><span class="p">)</span>
+
+<span class="n">root</span> <span class="o">=</span> <span class="n">MindMapNode</span><span class="p">(</span>
+    <span class="s2">"pni CLI</span><span class="se">\n</span><span class="s2">(pni501 v0.1.3)"</span><span class="p">,</span>
+    <span class="n">shape</span><span class="o">=</span><span class="s2">"rectangle"</span><span class="p">,</span>
+    <span class="n">width</span><span class="o">=</span><span class="mf">26.0</span><span class="p">,</span>
+    <span class="n">height</span><span class="o">=</span><span class="mf">13.0</span><span class="p">,</span>
+    <span class="n">style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">PrimaryFlat</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">shape_r</span><span class="o">=</span><span class="mf">2.0</span><span class="p">),</span>
+    <span class="n">text_style</span><span class="o">=</span><span class="n">txt_root</span><span class="p">,</span>
+    <span class="n">line_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">DarkBold</span><span class="p">,</span>
+    <span class="n">line_length</span><span class="o">=</span><span class="mf">6.0</span><span class="p">,</span>
+    <span class="n">horizontal_margin</span><span class="o">=</span><span class="mf">3.0</span><span class="p">,</span>
+    <span class="n">vertical_margin</span><span class="o">=</span><span class="mf">2.4</span><span class="p">,</span>
+    <span class="n">children</span><span class="o">=</span><span class="p">[</span>
+        <span class="n">MindMapNode</span><span class="p">(</span>
+            <span class="s2">"Workspace &amp; Rules"</span><span class="p">,</span>
+            <span class="n">branch</span><span class="o">=</span><span class="s2">"left"</span><span class="p">,</span>
+            <span class="n">shape</span><span class="o">=</span><span class="s2">"rectangle"</span><span class="p">,</span>
+            <span class="n">width</span><span class="o">=</span><span class="mf">31.0</span><span class="p">,</span>
+            <span class="n">height</span><span class="o">=</span><span class="mf">8.0</span><span class="p">,</span>
+            <span class="n">style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">PrimaryNeutral</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">shape_r</span><span class="o">=</span><span class="mf">1.5</span><span class="p">),</span>
+            <span class="n">text_style</span><span class="o">=</span><span class="n">txt_group</span><span class="p">,</span>
+            <span class="n">children</span><span class="o">=</span><span class="p">[</span>
+                <span class="n">MindMapNode</span><span class="p">(</span>
+                    <span class="s2">"pni init [--lang] [--force]"</span><span class="p">,</span>
+                    <span class="n">shape</span><span class="o">=</span><span class="s2">"rectangle"</span><span class="p">,</span>
+                    <span class="n">width</span><span class="o">=</span><span class="mf">36.0</span><span class="p">,</span>
+                    <span class="n">height</span><span class="o">=</span><span class="mf">6.2</span><span class="p">,</span>
+                    <span class="n">style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">Neutral</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">shape_r</span><span class="o">=</span><span class="mf">1.2</span><span class="p">),</span>
+                    <span class="n">text_style</span><span class="o">=</span><span class="n">txt_leaf</span><span class="p">,</span>
+                <span class="p">),</span>
+                <span class="n">MindMapNode</span><span class="p">(</span>
+                    <span class="s2">"pni rules list [--all]"</span><span class="p">,</span>
+                    <span class="n">shape</span><span class="o">=</span><span class="s2">"rectangle"</span><span class="p">,</span>
+                    <span class="n">width</span><span class="o">=</span><span class="mf">36.0</span><span class="p">,</span>
+                    <span class="n">height</span><span class="o">=</span><span class="mf">6.2</span><span class="p">,</span>
+                    <span class="n">style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">Neutral</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">shape_r</span><span class="o">=</span><span class="mf">1.2</span><span class="p">),</span>
+                    <span class="n">text_style</span><span class="o">=</span><span class="n">txt_leaf</span><span class="p">,</span>
+                <span class="p">),</span>
+                <span class="n">MindMapNode</span><span class="p">(</span>
+                    <span class="s2">"pni rules show &lt;id&gt; [-p]"</span><span class="p">,</span>
+                    <span class="n">shape</span><span class="o">=</span><span class="s2">"rectangle"</span><span class="p">,</span>
+                    <span class="n">width</span><span class="o">=</span><span class="mf">36.0</span><span class="p">,</span>
+                    <span class="n">height</span><span class="o">=</span><span class="mf">6.2</span><span class="p">,</span>
+                    <span class="n">style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">Neutral</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">shape_r</span><span class="o">=</span><span class="mf">1.2</span><span class="p">),</span>
+                    <span class="n">text_style</span><span class="o">=</span><span class="n">txt_leaf</span><span class="p">,</span>
+                <span class="p">),</span>
+                <span class="n">MindMapNode</span><span class="p">(</span>
+                    <span class="s2">"pni instructions | version"</span><span class="p">,</span>
+                    <span class="n">shape</span><span class="o">=</span><span class="s2">"rectangle"</span><span class="p">,</span>
+                    <span class="n">width</span><span class="o">=</span><span class="mf">36.0</span><span class="p">,</span>
+                    <span class="n">height</span><span class="o">=</span><span class="mf">6.2</span><span class="p">,</span>
+                    <span class="n">style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">Neutral</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">shape_r</span><span class="o">=</span><span class="mf">1.2</span><span class="p">),</span>
+                    <span class="n">text_style</span><span class="o">=</span><span class="n">txt_leaf</span><span class="p">,</span>
+                <span class="p">),</span>
+            <span class="p">],</span>
+        <span class="p">),</span>
+        <span class="n">MindMapNode</span><span class="p">(</span>
+            <span class="s2">"Cascaded .pni/ Assets"</span><span class="p">,</span>
+            <span class="n">branch</span><span class="o">=</span><span class="s2">"left"</span><span class="p">,</span>
+            <span class="n">shape</span><span class="o">=</span><span class="s2">"rectangle"</span><span class="p">,</span>
+            <span class="n">width</span><span class="o">=</span><span class="mf">31.0</span><span class="p">,</span>
+            <span class="n">height</span><span class="o">=</span><span class="mf">8.0</span><span class="p">,</span>
+            <span class="n">style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">SecondaryNeutral</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">shape_r</span><span class="o">=</span><span class="mf">1.5</span><span class="p">),</span>
+            <span class="n">text_style</span><span class="o">=</span><span class="n">txt_group</span><span class="p">,</span>
+            <span class="n">children</span><span class="o">=</span><span class="p">[</span>
+                <span class="n">MindMapNode</span><span class="p">(</span>
+                    <span class="s2">"actions (.pni/actions/)"</span><span class="p">,</span>
+                    <span class="n">shape</span><span class="o">=</span><span class="s2">"rectangle"</span><span class="p">,</span>
+                    <span class="n">width</span><span class="o">=</span><span class="mf">36.0</span><span class="p">,</span>
+                    <span class="n">height</span><span class="o">=</span><span class="mf">6.2</span><span class="p">,</span>
+                    <span class="n">style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">Neutral</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">shape_r</span><span class="o">=</span><span class="mf">1.2</span><span class="p">),</span>
+                    <span class="n">text_style</span><span class="o">=</span><span class="n">txt_leaf</span><span class="p">,</span>
+                <span class="p">),</span>
+                <span class="n">MindMapNode</span><span class="p">(</span>
+                    <span class="s2">"dockerfiles (.pni/)"</span><span class="p">,</span>
+                    <span class="n">shape</span><span class="o">=</span><span class="s2">"rectangle"</span><span class="p">,</span>
+                    <span class="n">width</span><span class="o">=</span><span class="mf">36.0</span><span class="p">,</span>
+                    <span class="n">height</span><span class="o">=</span><span class="mf">6.2</span><span class="p">,</span>
+                    <span class="n">style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">Neutral</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">shape_r</span><span class="o">=</span><span class="mf">1.2</span><span class="p">),</span>
+                    <span class="n">text_style</span><span class="o">=</span><span class="n">txt_leaf</span><span class="p">,</span>
+                <span class="p">),</span>
+                <span class="n">MindMapNode</span><span class="p">(</span>
+                    <span class="s2">"validate-score | plan"</span><span class="p">,</span>
+                    <span class="n">shape</span><span class="o">=</span><span class="s2">"rectangle"</span><span class="p">,</span>
+                    <span class="n">width</span><span class="o">=</span><span class="mf">36.0</span><span class="p">,</span>
+                    <span class="n">height</span><span class="o">=</span><span class="mf">6.2</span><span class="p">,</span>
+                    <span class="n">style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">Neutral</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">shape_r</span><span class="o">=</span><span class="mf">1.2</span><span class="p">),</span>
+                    <span class="n">text_style</span><span class="o">=</span><span class="n">txt_leaf</span><span class="p">,</span>
+                <span class="p">),</span>
+            <span class="p">],</span>
+        <span class="p">),</span>
+        <span class="n">MindMapNode</span><span class="p">(</span>
+            <span class="s2">"pni workflows"</span><span class="p">,</span>
+            <span class="n">branch</span><span class="o">=</span><span class="s2">"right"</span><span class="p">,</span>
+            <span class="n">shape</span><span class="o">=</span><span class="s2">"rectangle"</span><span class="p">,</span>
+            <span class="n">width</span><span class="o">=</span><span class="mf">31.0</span><span class="p">,</span>
+            <span class="n">height</span><span class="o">=</span><span class="mf">8.0</span><span class="p">,</span>
+            <span class="n">style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">PrimaryNeutral</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">shape_r</span><span class="o">=</span><span class="mf">1.5</span><span class="p">),</span>
+            <span class="n">text_style</span><span class="o">=</span><span class="n">txt_group</span><span class="p">,</span>
+            <span class="n">children</span><span class="o">=</span><span class="p">[</span>
+                <span class="n">MindMapNode</span><span class="p">(</span>
+                    <span class="s2">"list [-c] | show &lt;wf_id&gt;"</span><span class="p">,</span>
+                    <span class="n">shape</span><span class="o">=</span><span class="s2">"rectangle"</span><span class="p">,</span>
+                    <span class="n">width</span><span class="o">=</span><span class="mf">36.0</span><span class="p">,</span>
+                    <span class="n">height</span><span class="o">=</span><span class="mf">6.2</span><span class="p">,</span>
+                    <span class="n">style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">Neutral</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">shape_r</span><span class="o">=</span><span class="mf">1.2</span><span class="p">),</span>
+                    <span class="n">text_style</span><span class="o">=</span><span class="n">txt_leaf</span><span class="p">,</span>
+                <span class="p">),</span>
+                <span class="n">MindMapNode</span><span class="p">(</span>
+                    <span class="s2">"start &lt;wf_id&gt; [--supersede]"</span><span class="p">,</span>
+                    <span class="n">shape</span><span class="o">=</span><span class="s2">"rectangle"</span><span class="p">,</span>
+                    <span class="n">width</span><span class="o">=</span><span class="mf">36.0</span><span class="p">,</span>
+                    <span class="n">height</span><span class="o">=</span><span class="mf">6.2</span><span class="p">,</span>
+                    <span class="n">style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">Neutral</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">shape_r</span><span class="o">=</span><span class="mf">1.2</span><span class="p">),</span>
+                    <span class="n">text_style</span><span class="o">=</span><span class="n">txt_leaf</span><span class="p">,</span>
+                <span class="p">),</span>
+                <span class="n">MindMapNode</span><span class="p">(</span>
+                    <span class="s2">"get-action | push-action"</span><span class="p">,</span>
+                    <span class="n">shape</span><span class="o">=</span><span class="s2">"rectangle"</span><span class="p">,</span>
+                    <span class="n">width</span><span class="o">=</span><span class="mf">36.0</span><span class="p">,</span>
+                    <span class="n">height</span><span class="o">=</span><span class="mf">6.2</span><span class="p">,</span>
+                    <span class="n">style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">Neutral</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">shape_r</span><span class="o">=</span><span class="mf">1.2</span><span class="p">),</span>
+                    <span class="n">text_style</span><span class="o">=</span><span class="n">txt_leaf</span><span class="p">,</span>
+                <span class="p">),</span>
+                <span class="n">MindMapNode</span><span class="p">(</span>
+                    <span class="s2">"run-action &lt;wf_id&gt; &lt;step&gt;"</span><span class="p">,</span>
+                    <span class="n">shape</span><span class="o">=</span><span class="s2">"rectangle"</span><span class="p">,</span>
+                    <span class="n">width</span><span class="o">=</span><span class="mf">36.0</span><span class="p">,</span>
+                    <span class="n">height</span><span class="o">=</span><span class="mf">6.2</span><span class="p">,</span>
+                    <span class="n">style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">Neutral</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">shape_r</span><span class="o">=</span><span class="mf">1.2</span><span class="p">),</span>
+                    <span class="n">text_style</span><span class="o">=</span><span class="n">txt_leaf</span><span class="p">,</span>
+                <span class="p">),</span>
+                <span class="n">MindMapNode</span><span class="p">(</span>
+                    <span class="s2">"status | inspect | rewind"</span><span class="p">,</span>
+                    <span class="n">shape</span><span class="o">=</span><span class="s2">"rectangle"</span><span class="p">,</span>
+                    <span class="n">width</span><span class="o">=</span><span class="mf">36.0</span><span class="p">,</span>
+                    <span class="n">height</span><span class="o">=</span><span class="mf">6.2</span><span class="p">,</span>
+                    <span class="n">style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">Neutral</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">shape_r</span><span class="o">=</span><span class="mf">1.2</span><span class="p">),</span>
+                    <span class="n">text_style</span><span class="o">=</span><span class="n">txt_leaf</span><span class="p">,</span>
+                <span class="p">),</span>
+            <span class="p">],</span>
+        <span class="p">),</span>
+        <span class="n">MindMapNode</span><span class="p">(</span>
+            <span class="s2">"Report &amp; Governance"</span><span class="p">,</span>
+            <span class="n">branch</span><span class="o">=</span><span class="s2">"right"</span><span class="p">,</span>
+            <span class="n">shape</span><span class="o">=</span><span class="s2">"rectangle"</span><span class="p">,</span>
+            <span class="n">width</span><span class="o">=</span><span class="mf">31.0</span><span class="p">,</span>
+            <span class="n">height</span><span class="o">=</span><span class="mf">8.0</span><span class="p">,</span>
+            <span class="n">style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">SecondaryNeutral</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">shape_r</span><span class="o">=</span><span class="mf">1.5</span><span class="p">),</span>
+            <span class="n">text_style</span><span class="o">=</span><span class="n">txt_group</span><span class="p">,</span>
+            <span class="n">children</span><span class="o">=</span><span class="p">[</span>
+                <span class="n">MindMapNode</span><span class="p">(</span>
+                    <span class="s2">"pni report init | build"</span><span class="p">,</span>
+                    <span class="n">shape</span><span class="o">=</span><span class="s2">"rectangle"</span><span class="p">,</span>
+                    <span class="n">width</span><span class="o">=</span><span class="mf">36.0</span><span class="p">,</span>
+                    <span class="n">height</span><span class="o">=</span><span class="mf">6.2</span><span class="p">,</span>
+                    <span class="n">style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">Neutral</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">shape_r</span><span class="o">=</span><span class="mf">1.2</span><span class="p">),</span>
+                    <span class="n">text_style</span><span class="o">=</span><span class="n">txt_leaf</span><span class="p">,</span>
+                <span class="p">),</span>
+                <span class="n">MindMapNode</span><span class="p">(</span>
+                    <span class="s2">"pni pentests init | run"</span><span class="p">,</span>
+                    <span class="n">shape</span><span class="o">=</span><span class="s2">"rectangle"</span><span class="p">,</span>
+                    <span class="n">width</span><span class="o">=</span><span class="mf">36.0</span><span class="p">,</span>
+                    <span class="n">height</span><span class="o">=</span><span class="mf">6.2</span><span class="p">,</span>
+                    <span class="n">style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">Neutral</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">shape_r</span><span class="o">=</span><span class="mf">1.2</span><span class="p">),</span>
+                    <span class="n">text_style</span><span class="o">=</span><span class="n">txt_leaf</span><span class="p">,</span>
+                <span class="p">),</span>
+                <span class="n">MindMapNode</span><span class="p">(</span>
+                    <span class="s2">"pni progress init | validate"</span><span class="p">,</span>
+                    <span class="n">shape</span><span class="o">=</span><span class="s2">"rectangle"</span><span class="p">,</span>
+                    <span class="n">width</span><span class="o">=</span><span class="mf">36.0</span><span class="p">,</span>
+                    <span class="n">height</span><span class="o">=</span><span class="mf">6.2</span><span class="p">,</span>
+                    <span class="n">style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">Neutral</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">shape_r</span><span class="o">=</span><span class="mf">1.2</span><span class="p">),</span>
+                    <span class="n">text_style</span><span class="o">=</span><span class="n">txt_leaf</span><span class="p">,</span>
+                <span class="p">),</span>
+            <span class="p">],</span>
+        <span class="p">),</span>
+    <span class="p">],</span>
+<span class="p">)</span>
+
+<span class="n">root</span><span class="o">.</span><span class="n">draw</span><span class="p">(</span><span class="n">xy</span><span class="o">=</span><span class="p">(</span><span class="mf">102.0</span><span class="p">,</span> <span class="mf">45.0</span><span class="p">))</span>
+<span class="n">save</span><span class="p">()</span>
+</code></pre>
+</details>
+<h3>3.1 ワークスペース初期化・ルール参照・スキーマ検証コマンド</h3>
+<p>トップレベルコマンドと <code>pni rules</code> サブコマンドを使用して、<code>.pni/</code> の初期化、エンジニアリングルールの閲覧、AI エージェントのブートストラップ、および出力 JSON のスキーマ検証を行います。</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">コマンド</th>
+<th style="text-align:left">主な引数・オプション</th>
+<th style="text-align:left">概要と用途</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left"><code>pni init</code></td>
+<td style="text-align:left"><code>[--lang/-l &lt;lang&gt;] [--force/-f]</code></td>
+<td style="text-align:left">プロジェクトの主要言語（<code>python</code>, <code>java</code>, <code>php</code>, <code>go</code>, <code>typescript</code>, <code>javascript</code>）を自動検出し、<code>.pni/</code>（<code>pni.toml</code>, <code>rules/</code>, <code>actions/</code>, <code>workflows/</code>, <code>instructions.md</code>, <code>cache/.gitignore</code>）を生成します。</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>pni instructions</code></td>
+<td style="text-align:left"><em>(別名: <code>pni instruction</code>)</em></td>
+<td style="text-align:left">AI コーディングエージェント向けのブートストラップ手順とステートフル Pull-Push 実行ループガイドを標準出力に表示します。</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>pni rules list</code></td>
+<td style="text-align:left"><code>[--all/-a]</code></td>
+<td style="text-align:left"><code>common</code> と検出言語 <code>&lt;lang&gt;</code> の有効ルール一覧（<code>--all</code> 指定時は全 6 言語・52 ルールすべて）を、<code>Builtin</code> / <code>Local (.pni)</code> のステータス付きで表示します。</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>pni rules show</code></td>
+<td style="text-align:left"><code>&lt;name&gt; [--pretty/-p]</code></td>
+<td style="text-align:left">指定したルールまたはワークフローガイド（<code>common/workflow_guide</code>, <code>python/testing</code>, または短縮名 <code>testing</code>）を Markdown（<code>--pretty</code> 指定時は Rich パネル）で出力します。</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>pni validate-score</code></td>
+<td style="text-align:left"><code>[score_path]</code></td>
+<td style="text-align:left"><code>reports/&lt;target&gt;_score.json</code> を Pydantic の <code>ScoreResult</code> スキーマに対して検証します。</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>pni validate-migration-plan</code></td>
+<td style="text-align:left"><code>[plan_path]</code></td>
+<td style="text-align:left"><code>reports/&lt;target&gt;_migration_plan.json</code> を Pydantic の <code>MigrationPlanResult</code> スキーマに対して検証します。</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>pni validate-progress</code></td>
+<td style="text-align:left"><code>[progress_path]</code></td>
+<td style="text-align:left"><code>reports/&lt;target&gt;_progress.json</code> を Pydantic の <code>ProgressResult</code> スキーマに対して検証します。</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>pni version</code></td>
+<td style="text-align:left"><em>(なし)</em></td>
+<td style="text-align:left">インストールされている <code>pni501</code> のパッケージ名とバージョンを表示します。</td>
+</tr>
+</tbody>
+</table>
+<pre><code class="language-bash"><span class="c1"># Initialize .pni/ workspace and inspect active + language-specific rules</span>
+pni<span class="w"> </span>init
+pni<span class="w"> </span>rules<span class="w"> </span>list<span class="w"> </span>--all
+pni<span class="w"> </span>rules<span class="w"> </span>show<span class="w"> </span>common/workflow_guide
+pni<span class="w"> </span>rules<span class="w"> </span>show<span class="w"> </span>python/testing<span class="w"> </span>--pretty
+
+<span class="c1"># Validate emitted JSON deliverables in CI</span>
+pni<span class="w"> </span>validate-score<span class="w"> </span>reports/full_audit_score.json
+pni<span class="w"> </span>validate-migration-plan<span class="w"> </span>reports/migration_plan.json
+pni<span class="w"> </span>validate-progress<span class="w"> </span>reports/project_progress.json
+</code></pre>
+<h3>3.2 ステートフルワークフロー実行・デバッグコマンド (<code>pni workflows</code>)</h3>
+<p><code>pni workflows</code> は SQLite ステートマシン（<code>.pni/cache/workflow_state.db</code>）の実行管理に加え、事前準備不要の単一ステップ直接実行（<code>run-action</code>）や非破壊のステップ巻き戻し（<code>rewind</code>）を提供します。</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">コマンド</th>
+<th style="text-align:left">主な引数・オプション</th>
+<th style="text-align:left">概要と用途</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left"><code>pni workflows list</code></td>
+<td style="text-align:left"><code>[--category/-c audit|migration|progress]</code></td>
+<td style="text-align:left"><code>.pni/workflows/</code> 内のワークフロー一覧をカテゴリ・<code>based_on</code> 前提監査・ステップ数・対象パス・出力先とともに表示します。</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>pni workflows show</code></td>
+<td style="text-align:left"><code>&lt;workflow_id&gt;</code></td>
+<td style="text-align:left">複合アクションを正規化プリミティブステップ（<code>1..N</code>）に展開し、ペネトレーションテスト・移行計画・進捗計画の Pre-Flight チェックを実行します。</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>pni workflows start</code></td>
+<td style="text-align:left"><code>&lt;workflow_id&gt; [--supersede]</code></td>
+<td style="text-align:left"><code>.pni/cache/workflow_state.db</code> に新しい実行セッション（<code>wf-...</code>）を開始します（<code>--supersede</code> で同一ワークフローの未完了セッションを自動キャンセル）。</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>pni workflows get-action</code></td>
+<td style="text-align:left"><code>&lt;run_id&gt;</code></td>
+<td style="text-align:left">未実行の決定論的解析器（<code>project_inspect</code>, <code>ast_analyze</code>, <code>run_check</code>, <code>security_scan</code>, <code>web_pentest</code>, <code>migration_analyze</code>, <code>progress_analyze</code>）を自動実行し、次の <code>act-XX</code> プロンプトと JSON スキーマを出力します。</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>pni workflows push-action</code></td>
+<td style="text-align:left"><code>&lt;run_id&gt; &lt;action_id&gt; [json] [--file/-f &lt;path&gt;]</code></td>
+<td style="text-align:left">エージェントの JSON 出力を Pydantic スキーマおよび実在ファイルパスに対して検証・保存し、次のステップへ進めます。</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>pni workflows run-action</code></td>
+<td style="text-align:left"><code>&lt;workflow_id&gt; &lt;action&gt; [--base-url &lt;url&gt;] [--force-pentests] [--fail-on-findings]</code></td>
+<td style="text-align:left">SQLite セッション準備なしで特定のステップや解析器を単体実行します（Dockerfile 調整・ペネトレーションテスト・CI ゲートに最適）。</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>pni workflows status</code></td>
+<td style="text-align:left"><code>[run_or_wf] [-w &lt;wf&gt;] [-s &lt;status&gt;] [--latest] [-n &lt;limit&gt;] [--json]</code></td>
+<td style="text-align:left">SQLite を直接クエリすることなく、実行履歴や各ステップの進捗状況（<code>done/total</code>、現在のステップ）を確認します。</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>pni workflows inspect-action</code></td>
+<td style="text-align:left"><code>&lt;run_or_wf&gt; &lt;action&gt; [--agent-input | --deterministic] [--json] [-o &lt;path&gt;]</code></td>
+<td style="text-align:left">記録済みの決定論的解析結果 JSON やエージェント入力 JSON を SQLite から抽出・ファイル保存します。</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>pni workflows rewind</code></td>
+<td style="text-align:left"><code>&lt;run_or_wf&gt; &lt;action&gt; [--pull/-p]</code> <em>(別名: <code>retry-action</code>)</em></td>
+<td style="text-align:left">実行セッションを指定ステップまで巻き戻し、<code>.pni/workflows/&lt;id&gt;.yaml</code> の設定変更を再同期して後続ステップをクリアします。</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>pni workflows cancel</code></td>
+<td style="text-align:left"><code>&lt;run_id&gt; | --superseded [-w &lt;wf&gt;]</code></td>
+<td style="text-align:left">中断された <code>in_progress</code> セッションのキャンセル、または古い未完了セッションの一括整理を行います。</td>
+</tr>
+</tbody>
+</table>
+<pre><code class="language-bash"><span class="c1"># Inspect workflow pipeline and execute the stateful Pull-Push loop</span>
+pni<span class="w"> </span>workflows<span class="w"> </span>show<span class="w"> </span>full_audit
+pni<span class="w"> </span>workflows<span class="w"> </span>start<span class="w"> </span>full_audit<span class="w"> </span>--supersede
+pni<span class="w"> </span>workflows<span class="w"> </span>get-action<span class="w"> </span>wf-1a2b3c4d
+pni<span class="w"> </span>workflows<span class="w"> </span>push-action<span class="w"> </span>wf-1a2b3c4d<span class="w"> </span>act-02<span class="w"> </span>--file<span class="w"> </span>payload.json
+
+<span class="c1"># Debug a single step ad-hoc or rewind an existing run to re-run runtime verification</span>
+pni<span class="w"> </span>workflows<span class="w"> </span>run-action<span class="w"> </span>full_audit<span class="w"> </span>runtime_verification
+pni<span class="w"> </span>workflows<span class="w"> </span>status<span class="w"> </span>wf-1a2b3c4d
+pni<span class="w"> </span>workflows<span class="w"> </span>inspect-action<span class="w"> </span>full_audit<span class="w"> </span>emit_score<span class="w"> </span>--agent-input<span class="w"> </span>-o<span class="w"> </span>last_score.json
+pni<span class="w"> </span>workflows<span class="w"> </span>rewind<span class="w"> </span>wf-1a2b3c4d<span class="w"> </span>runtime_verification<span class="w"> </span>--pull
+</code></pre>
+<h3>3.3 ビジュアルレポート・ペネトレーションテスト・進捗ガバナンスコマンド</h3>
+<p>専用サブコマンドグループとして、Drawlib レポート生成（<code>pni report</code>）、ライブ HTTP ペネトレーションテスト管理（<code>pni pentests</code>）、および進捗・Git ガバナンス計画検証（<code>pni progress</code>）が提供されています。</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">コマンド</th>
+<th style="text-align:left">主な引数・オプション</th>
+<th style="text-align:left">概要と用途</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left"><code>pni report init</code></td>
+<td style="text-align:left"><code>[target] [--src-dir reports_src] [-l en|ja] [-s google|default|monochrome] [--keep-samples] [-f]</code></td>
+<td style="text-align:left">既存の執筆済み <code>*.md</code> チャプターを保持したまま、<code>reports_src/&lt;target&gt;_src/</code>（<code>drawlib.toml</code>, <code>styles.py</code>, <code>&lt;lang&gt;/</code>）を非破壊で初期化・更新します。</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>pni report build</code></td>
+<td style="text-align:left"><code>[target] [--src-dir reports_src] [-o reports] [-f pdf|html|markdown|images] [--toc/--no-toc] [--no-cache]</code></td>
+<td style="text-align:left"><code>lint_drawlib_chapters</code> による事前チェックを実行し、<code>reports/&lt;target&gt;.pdf</code>（A4 ベクター PDF・目次付き）をコンパイルします（<code>-f html</code> 時はリンク切れ検査も自動実行）。</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>pni pentests init</code></td>
+<td style="text-align:left"><code>[-w &lt;wf&gt;] [-t &lt;root&gt;] [-s &lt;src&gt;] [-l &lt;lang&gt;] [--force/-f]</code></td>
+<td style="text-align:left">AST 解析結果から API エンドポイントを抽出し、<code>.pni/pentests/&lt;target&gt;/</code> に <code>Python + httpx</code> ベースの DAST スイート（<code>conftest.py</code>, <code>test_*.py</code>）を生成します。</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>pni pentests run</code></td>
+<td style="text-align:left"><code>[-w &lt;wf&gt;] [-t &lt;root&gt;] [-s &lt;src&gt;] [--base-url &lt;url&gt;] [--container-engine auto|docker|podman] [-f]</code></td>
+<td style="text-align:left">隔離されたループバックコンテナを起動（または <code>--base-url</code> をプローブ）して <code>.pni/pentests/&lt;target&gt;/</code> を実行し、<code>PentestFacts</code> を出力します。</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>pni progress init</code></td>
+<td style="text-align:left"><code>[target] [-w &lt;wf&gt;] [--force/-f]</code></td>
+<td style="text-align:left">マイルストーン・タスク・<code>git_policy</code> を備えた <code>.pni/progress/&lt;target&gt;.yaml</code> の初期テンプレートを生成します。</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>pni progress validate</code></td>
+<td style="text-align:left"><code>[target_or_path]</code></td>
+<td style="text-align:left">進捗ワークフロー開始前に、<code>.pni/progress/&lt;target&gt;.yaml</code> のスキーマ・ISO-8601 日付・<code>git_policy</code>・非巡回 <code>depends_on</code> タスク DAG を検証します。</td>
+</tr>
+</tbody>
+</table>
+<pre><code class="language-bash"><span class="c1"># Scaffold and compile a 7-chapter Drawlib visual PDF report</span>
+pni<span class="w"> </span>report<span class="w"> </span>init<span class="w"> </span>full_audit<span class="w"> </span>--src-dir<span class="w"> </span>reports_src<span class="w"> </span>--lang<span class="w"> </span>en<span class="w"> </span>--style<span class="w"> </span>google
+pni<span class="w"> </span>report<span class="w"> </span>build<span class="w"> </span>full_audit<span class="w"> </span>--src-dir<span class="w"> </span>reports_src<span class="w"> </span>--output-dir<span class="w"> </span>reports
+
+<span class="c1"># Materialize and execute live HTTP penetration tests for a web service workflow</span>
+pni<span class="w"> </span>pentests<span class="w"> </span>init<span class="w"> </span>-w<span class="w"> </span>full_audit
+pni<span class="w"> </span>pentests<span class="w"> </span>run<span class="w"> </span>-w<span class="w"> </span>full_audit
+
+<span class="c1"># Initialize and validate a project progress &amp; Git governance plan</span>
+pni<span class="w"> </span>progress<span class="w"> </span>init<span class="w"> </span>project_progress<span class="w"> </span>-w<span class="w"> </span>full_audit
+pni<span class="w"> </span>progress<span class="w"> </span>validate<span class="w"> </span>project_progress
+</code></pre>
+<p>各コマンドの実践的なワークフロー手順については、<a href="../01_getting_started/quickstart.html">クイックスタートガイド</a>、<a href="../03_workflows_and_actions/workflows_guide.html">ワークフローと Pre-Flight ゲート</a>、および <a href="../04_scoring_and_reports/drawlib_reporter.html">Drawlib ビジュアルレポーター</a> を参照してください。</p>
+
+            </main>
+        </div>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Theme toggle
+            const themeBtn = document.getElementById('theme-toggle');
+            if (themeBtn) {
+                themeBtn.addEventListener('click', function() {
+                    const current = document.documentElement.getAttribute('data-theme');
+                    const next = current === 'dark' ? 'light' : 'dark';
+                    document.documentElement.setAttribute('data-theme', next);
+                    localStorage.setItem('drawlib-theme', next);
+                });
+            }
+
+            // Language dropdown outside-click & Escape close
+            const langDropdowns = document.querySelectorAll('.lang-dropdown');
+            if (langDropdowns.length > 0) {
+                document.addEventListener('click', function(e) {
+                    langDropdowns.forEach(function(dd) {
+                        if (dd.hasAttribute('open') && !dd.contains(e.target)) {
+                            dd.removeAttribute('open');
+                        }
+                    });
+                });
+                document.addEventListener('keydown', function(e) {
+                    if (e.key === 'Escape') {
+                        langDropdowns.forEach(function(dd) {
+                            dd.removeAttribute('open');
+                        });
+                    }
+                });
+            }
+
+            // Mobile menu toggle
+            const menuBtn = document.getElementById('menu-toggle');
+            const sidebar = document.querySelector('.sidebar');
+            if (menuBtn && sidebar) {
+                function setMenuOpen(open) {
+                    sidebar.classList.toggle('is-open', open);
+                    menuBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
+                    document.body.classList.toggle('menu-open', open);
+                    if (open) {
+                        const menu = sidebar.querySelector('.sidebar-menu');
+                        if (menu) {
+                            menu.scrollTop = 0;
+                        }
+                    }
+                }
+
+                menuBtn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    const willOpen = !sidebar.classList.contains('is-open');
+                    setMenuOpen(willOpen);
+                });
+
+                // Close menu when clicking outside sidebar
+                document.addEventListener('click', function(e) {
+                    if (sidebar.classList.contains('is-open') && !sidebar.contains(e.target)) {
+                        setMenuOpen(false);
+                    }
+                });
+
+                // Close menu when a navigation link is clicked
+                const navLinks = sidebar.querySelectorAll('.nav-item a');
+                navLinks.forEach(function(link) {
+                    link.addEventListener('click', function() {
+                        setMenuOpen(false);
+                    });
+                });
+
+                // Close on Escape key
+                document.addEventListener('keydown', function(e) {
+                    if (e.key === 'Escape' && sidebar.classList.contains('is-open')) {
+                        setMenuOpen(false);
+                    }
+                });
+
+                // Reset menu state when resized above mobile breakpoint
+                window.addEventListener('resize', function() {
+                    if (window.innerWidth > 768 && sidebar.classList.contains('is-open')) {
+                        setMenuOpen(false);
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>

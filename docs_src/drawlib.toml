@@ -1,0 +1,26 @@
+[project]
+name = "docs"
+type = "site"
+title = "pni501 (Project Nemesis Index)"
+description = "Deterministic + AI Software Health Auditing, Security Pentesting, and Migration Planning for Python, Java, PHP, Go, TypeScript, and JavaScript."
+style = "default"
+
+[i18n]
+default_lang = "en"
+langs = ["en", "ja"]
+
+[i18n.labels]
+en = "English"
+ja = "日本語"
+
+[i18n.descriptions]
+en = "Official documentation for pni501 (Project Nemesis Index) — Deterministic + AI Software Health Auditing, Security Pentesting, and Migration Planning."
+ja = "pni501 (Project Nemesis Index) 公式ドキュメント — 決定論的解析 × AI 推論によるソフトウェア健全性監査・ペネトレーションテスト・マイグレーション計画。"
+
+[seo]
+site_url = "https://www.pni501.com"
+og_image = "_assets/logo.png"
+twitter_card = "summary_large_image"
+sitemap = true
+robots = true
+llms_txt = true

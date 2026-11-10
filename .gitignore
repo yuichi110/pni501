@@ -223,10 +223,7 @@ __marimo__/
 # Drawlib scratch cache
 .drawlib/
 
-# Generated Drawlib docs HTML & standalone images
-docs_src/doc_html/
-docs_src/doc_images/
-docs_src/rules_and_actions_html/
-docs_src/rules_and_actions_images/
-docs_src/slide_html/
-docs_src/slide_images/
+# Generated Drawlib standalone exports (official site is built into docs/)
+docs_html/
+docs_markdown/
+docs_images/

@@ -1,0 +1,807 @@
+<!--
+ Copyright (c) 2026 Yuichi Ito (yuichi@yuichi.com)
+
+ This software is licensed under the Apache License, Version 2.0.
+ For more information, please visit: https://github.com/yuichi110/drawlib
+
+ This software is provided "as is", without warranty of any kind,
+ express or implied, including but not limited to the warranties of
+ merchantability, fitness for a particular purpose and noninfringement.
+-->
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Supported 6 Languages Matrix</title>
+    <script>
+        (function() {
+            const saved = localStorage.getItem('drawlib-theme');
+            if (saved === 'dark' || (!saved && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                document.documentElement.setAttribute('data-theme', 'dark');
+            } else {
+                document.documentElement.setAttribute('data-theme', 'light');
+            }
+        })();
+    </script>
+    
+    
+    
+    <link rel="alternate" hreflang="en" href="https://www.pni501.com/en/05_languages_and_reference/supported_languages.html">
+    
+    <link rel="alternate" hreflang="ja" href="https://www.pni501.com/ja/05_languages_and_reference/supported_languages.html">
+    
+    <link rel="alternate" hreflang="x-default" href="https://www.pni501.com/en/05_languages_and_reference/supported_languages.html">
+    
+    
+    
+    <meta name="description" content="pni501 (v0.1.3) provides first-class, deterministic static analysis (ProjectFacts and parse-once Tree-sitter AstFacts), language-specific engineering rules…">
+    <link rel="canonical" href="https://www.pni501.com/en/05_languages_and_reference/supported_languages.html">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="pni501 Documentation">
+    <meta property="og:title" content="Supported 6 Languages Matrix — pni501 Documentation">
+    <meta property="og:description" content="pni501 (v0.1.3) provides first-class, deterministic static analysis (ProjectFacts and parse-once Tree-sitter AstFacts), language-specific engineering rules…">
+    <meta property="og:url" content="https://www.pni501.com/en/05_languages_and_reference/supported_languages.html">
+    <meta property="og:image" content="https://www.pni501.com/_assets/logo.png">
+    <meta property="og:locale" content="en_US">
+    <meta property="og:locale:alternate" content="ja_JP">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Supported 6 Languages Matrix — pni501 Documentation">
+    <meta name="twitter:description" content="pni501 (v0.1.3) provides first-class, deterministic static analysis (ProjectFacts and parse-once Tree-sitter AstFacts), language-specific engineering rules…">
+    <meta name="twitter:image" content="https://www.pni501.com/_assets/logo.png">
+    
+    
+    <link rel="icon" type="image/png" href="../../_assets/favicon.png">
+    
+    
+    <link rel="stylesheet" href="../style.css">
+    
+    
+</head>
+<body>
+    
+    <div class="doc-layout">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <a href="../index.html" class="sidebar-brand" aria-label="pni501 Documentation">
+                    
+                    <img src="../../_assets/logo.png" alt="pni501 Documentation" class="sidebar-logo sidebar-logo-light">
+                    <img src="../../_assets/logo_dark.png" alt="pni501 Documentation" class="sidebar-logo sidebar-logo-dark">
+                    
+                </a>
+                <div class="sidebar-header-actions">
+                    <button type="button" id="theme-toggle" class="theme-toggle-btn" aria-label="Toggle theme">
+                        <svg class="icon-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+                        <svg class="icon-moon" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+                    </button>
+                    <button type="button" id="menu-toggle" class="menu-toggle-btn" aria-label="Toggle navigation" aria-expanded="false">
+                        <svg class="icon-hamburger" viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+                        <svg class="icon-close" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                    </button>
+                </div>
+            </div>
+            <div class="sidebar-menu">
+                
+                    
+                        
+                        <ul class="nav-list">
+                            
+                            <li class="nav-item ">
+                                <a href="../index.html" >Overview</a>
+                            </li>
+                            
+                        </ul>
+                    
+                        
+                        <div class="sidebar-heading">1. Getting Started</div>
+                        
+                        <ul class="nav-list">
+                            
+                            <li class="nav-item ">
+                                <a href="../01_getting_started/concepts.html" >Background &amp; Core Concepts</a>
+                            </li>
+                            
+                            <li class="nav-item ">
+                                <a href="../01_getting_started/quickstart.html" >Quickstart Guide</a>
+                            </li>
+                            
+                            <li class="nav-item ">
+                                <a href="../01_getting_started/use_cases.html" >Primary Use Cases</a>
+                            </li>
+                            
+                        </ul>
+                    
+                        
+                        <div class="sidebar-heading">2. Architecture</div>
+                        
+                        <ul class="nav-list">
+                            
+                            <li class="nav-item ">
+                                <a href="../02_architecture/domain_architecture.html" >Domain Architecture &amp; Cascade</a>
+                            </li>
+                            
+                            <li class="nav-item ">
+                                <a href="../02_architecture/stateful_engine.html" >Stateful Pull-Push Engine</a>
+                            </li>
+                            
+                        </ul>
+                    
+                        
+                        <div class="sidebar-heading">3. Workflows &amp; Actions</div>
+                        
+                        <ul class="nav-list">
+                            
+                            <li class="nav-item ">
+                                <a href="../03_workflows_and_actions/workflows_guide.html" >Workflows &amp; Pre-Flight Gates</a>
+                            </li>
+                            
+                            <li class="nav-item ">
+                                <a href="../03_workflows_and_actions/actions_pipeline.html" >15 Actions &amp; 12 Primitives</a>
+                            </li>
+                            
+                            <li class="nav-item ">
+                                <a href="../03_workflows_and_actions/analyzers_and_pentest.html" >Analyzers &amp; Live Pentest</a>
+                            </li>
+                            
+                        </ul>
+                    
+                        
+                        <div class="sidebar-heading">4. Scoring &amp; Reports</div>
+                        
+                        <ul class="nav-list">
+                            
+                            <li class="nav-item ">
+                                <a href="../04_scoring_and_reports/scoring_model.html" >7-Axis Scoring Model</a>
+                            </li>
+                            
+                            <li class="nav-item ">
+                                <a href="../04_scoring_and_reports/drawlib_reporter.html" >Drawlib Visual Reporter</a>
+                            </li>
+                            
+                        </ul>
+                    
+                        
+                        <div class="sidebar-heading">5. Languages &amp; Reference</div>
+                        
+                        <ul class="nav-list">
+                            
+                            <li class="nav-item active">
+                                <a href="supported_languages.html" >Supported 6 Languages</a>
+                            </li>
+                            
+                            <li class="nav-item ">
+                                <a href="rules_and_cli.html" >Rules &amp; CLI Reference</a>
+                            </li>
+                            
+                        </ul>
+                    
+                        
+                        <div class="sidebar-heading">External Links</div>
+                        
+                        <ul class="nav-list">
+                            
+                            <li class="nav-item ">
+                                <a href="https://github.com/yuichi110/pni501" target="_blank" rel="noopener noreferrer">GitHub Repository<svg class="nav-external-icon" viewBox="0 0 24 24" aria-hidden="true"><line x1="7" y1="17" x2="17" y2="7"></line><polyline points="7 7 17 7 17 17"></polyline></svg></a>
+                            </li>
+                            
+                            <li class="nav-item ">
+                                <a href="https://pypi.org/project/pni501/" target="_blank" rel="noopener noreferrer">PyPI Package<svg class="nav-external-icon" viewBox="0 0 24 24" aria-hidden="true"><line x1="7" y1="17" x2="17" y2="7"></line><polyline points="7 7 17 7 17 17"></polyline></svg></a>
+                            </li>
+                            
+                        </ul>
+                    
+                
+            </div>
+        </aside>
+        <div class="content-wrapper">
+            <header class="top-bar">
+                <div class="breadcrumbs">
+                    <span class="crumb">Docs</span>
+                    <span class="crumb-separator">&raquo;</span>
+                    <span class="crumb active">Supported 6 Languages Matrix</span>
+                </div>
+                
+                <div class="lang-switcher">
+                    <details class="lang-dropdown">
+                        <summary class="lang-dropdown-btn" aria-label="Select language">
+                            <svg class="lang-globe-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+                            <span class="lang-current-label">English</span>
+                            <svg class="lang-caret-icon" viewBox="0 0 24 24" aria-hidden="true"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                        </summary>
+                        <div class="lang-dropdown-menu" role="menu">
+                            
+                            <a href="supported_languages.html" class="lang-option active" lang="en" hreflang="en" aria-current="page">
+                                <span>English</span>
+                                
+                                <svg class="lang-check-icon" viewBox="0 0 24 24" aria-hidden="true"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                                
+                            </a>
+                            
+                            <a href="../../ja/05_languages_and_reference/supported_languages.html" class="lang-option" lang="ja" hreflang="ja" >
+                                <span>日本語</span>
+                                
+                            </a>
+                            
+                        </div>
+                    </details>
+                </div>
+                
+            </header>
+            <main class="main-content">
+                <h1>Supported 6 Languages Matrix</h1>
+<p><code>pni501</code> (<code>v0.1.3</code>) provides first-class, deterministic static analysis (<code>ProjectFacts</code> and parse-once Tree-sitter <code>AstFacts</code>), language-specific engineering rules, isolated container test/coverage harnesses (<code>.pni/dockerfiles/</code>), and Trivy security scanning across <strong>six production programming languages</strong>: <strong>Python, Java, PHP, Go, TypeScript, and JavaScript</strong>.</p>
+<figure class="drawlib-image" style="text-align: center;">
+  <img src="../../images/05_languages_and_reference/supported_languages/six_languages_matrix_hero.png" alt="supported_languages_1" />
+  <figcaption class="drawlib-caption">Supported 6 Languages Matrix: Manifests, Tree-sitter AST Parsers, Test/Coverage Toolchains, and Container Harnesses</figcaption>
+</figure>
+<details class="drawlib-code-details">
+<summary>Source Code</summary>
+<pre><code class="language-python"><span class="kn">from</span><span class="w"> </span><span class="nn">drawlib.canvas</span><span class="w"> </span><span class="kn">import</span> <span class="n">save</span><span class="p">,</span> <span class="n">setup</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">drawlib.icons</span><span class="w"> </span><span class="kn">import</span> <span class="n">code</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">drawlib.smartarts</span><span class="w"> </span><span class="kn">import</span> <span class="n">CardList</span><span class="p">,</span> <span class="n">Panel</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">drawlib.styles</span><span class="w"> </span><span class="kn">import</span> <span class="n">Styles</span>
+
+<span class="n">setup</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="mi">184</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">86</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">150</span><span class="p">)</span>
+
+<span class="n">left_panel</span> <span class="o">=</span> <span class="n">Panel</span><span class="p">(</span>
+    <span class="s2">"1. Backend &amp; Enterprise (Python / Java / PHP)"</span><span class="p">,</span>
+    <span class="n">header_variant</span><span class="o">=</span><span class="s2">"filled"</span><span class="p">,</span>
+    <span class="n">header_height</span><span class="o">=</span><span class="mf">8.5</span><span class="p">,</span>
+    <span class="n">style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">Neutral</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">shape_r</span><span class="o">=</span><span class="mf">2.0</span><span class="p">),</span>
+    <span class="n">header_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">PrimaryFlat</span><span class="p">,</span>
+    <span class="n">text_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">WhiteBold</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">text_size</span><span class="o">=</span><span class="mf">11.2</span><span class="p">),</span>
+<span class="p">)</span>
+<span class="n">left_panel</span><span class="o">.</span><span class="n">draw</span><span class="p">(</span><span class="n">xy</span><span class="o">=</span><span class="p">(</span><span class="mf">4.0</span><span class="p">,</span> <span class="mf">4.0</span><span class="p">),</span> <span class="n">width</span><span class="o">=</span><span class="mf">85.5</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mf">78.0</span><span class="p">)</span>
+
+<span class="n">left_cards</span> <span class="o">=</span> <span class="n">CardList</span><span class="p">(</span>
+    <span class="n">style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">WhiteBordered</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">shape_r</span><span class="o">=</span><span class="mf">1.5</span><span class="p">),</span>
+    <span class="n">text_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">DarkBold</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">text_size</span><span class="o">=</span><span class="mf">10.8</span><span class="p">),</span>
+    <span class="n">description_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">Dark</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">text_size</span><span class="o">=</span><span class="mf">10.0</span><span class="p">),</span>
+    <span class="n">badge_shape</span><span class="o">=</span><span class="s2">"rounded_rect"</span><span class="p">,</span>
+    <span class="n">badge_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">PrimaryNeutral</span><span class="p">,</span>
+    <span class="n">badge_text_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">PrimaryBold</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">text_size</span><span class="o">=</span><span class="mf">10.0</span><span class="p">),</span>
+    <span class="n">icon_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">PrimaryBold</span><span class="p">,</span>
+    <span class="n">direction</span><span class="o">=</span><span class="s2">"vertical"</span><span class="p">,</span>
+    <span class="n">spacing</span><span class="o">=</span><span class="mf">2.8</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">left_cards</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+    <span class="s2">"Python (python — 3.11 / 3.12 / 3.13)"</span><span class="p">,</span>
+    <span class="s2">"Manifest: pyproject.toml, uv.lock, poetry.lock</span><span class="se">\n</span><span class="s2">"</span>
+    <span class="s2">"AST/Rules: stdlib ast + ast-grep | 7 rules</span><span class="se">\n</span><span class="s2">"</span>
+    <span class="s2">"Harness: uv/poetry/pip -&gt; pytest + coverage"</span><span class="p">,</span>
+    <span class="n">badge_text</span><span class="o">=</span><span class="s2">"PY"</span><span class="p">,</span>
+    <span class="n">icon</span><span class="o">=</span><span class="n">code</span><span class="o">.</span><span class="n">python</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">left_cards</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+    <span class="s2">"Java (java — JDK 8 / 11 / 17 / 21 LTS)"</span><span class="p">,</span>
+    <span class="s2">"Manifest: pom.xml, build.gradle(.kts)</span><span class="se">\n</span><span class="s2">"</span>
+    <span class="s2">"AST/Rules: ast-grep (java) | 6 rules (Spring)</span><span class="se">\n</span><span class="s2">"</span>
+    <span class="s2">"Harness: maven/gradle -&gt; JUnit 5 + JaCoCo"</span><span class="p">,</span>
+    <span class="n">badge_text</span><span class="o">=</span><span class="s2">"JV"</span><span class="p">,</span>
+    <span class="n">icon</span><span class="o">=</span><span class="n">code</span><span class="o">.</span><span class="n">java</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">left_cards</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+    <span class="s2">"PHP (php — 8.1..8.4 &amp; Raw PHP)"</span><span class="p">,</span>
+    <span class="s2">"Manifest: composer.json, artisan, wp-config</span><span class="se">\n</span><span class="s2">"</span>
+    <span class="s2">"AST/Rules: ast-grep (php) | 8 rules (Laravel/WP)</span><span class="se">\n</span><span class="s2">"</span>
+    <span class="s2">"Harness: composer/raw -&gt; php -l + PHPUnit/PCOV"</span><span class="p">,</span>
+    <span class="n">badge_text</span><span class="o">=</span><span class="s2">"PHP"</span><span class="p">,</span>
+    <span class="n">icon</span><span class="o">=</span><span class="n">code</span><span class="o">.</span><span class="n">php</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">left_cards</span><span class="o">.</span><span class="n">draw</span><span class="p">(</span><span class="n">xy</span><span class="o">=</span><span class="p">(</span><span class="mf">6.5</span><span class="p">,</span> <span class="mf">6.5</span><span class="p">),</span> <span class="n">width</span><span class="o">=</span><span class="mf">80.5</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mf">64.5</span><span class="p">)</span>
+
+<span class="n">right_panel</span> <span class="o">=</span> <span class="n">Panel</span><span class="p">(</span>
+    <span class="s2">"2. Cloud-Native &amp; Web (Go / TypeScript / JS)"</span><span class="p">,</span>
+    <span class="n">header_variant</span><span class="o">=</span><span class="s2">"filled"</span><span class="p">,</span>
+    <span class="n">header_height</span><span class="o">=</span><span class="mf">8.5</span><span class="p">,</span>
+    <span class="n">style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">PrimaryNeutral</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">shape_r</span><span class="o">=</span><span class="mf">2.0</span><span class="p">),</span>
+    <span class="n">header_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">SecondaryFlat</span><span class="p">,</span>
+    <span class="n">text_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">WhiteBold</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">text_size</span><span class="o">=</span><span class="mf">11.2</span><span class="p">),</span>
+<span class="p">)</span>
+<span class="n">right_panel</span><span class="o">.</span><span class="n">draw</span><span class="p">(</span><span class="n">xy</span><span class="o">=</span><span class="p">(</span><span class="mf">94.5</span><span class="p">,</span> <span class="mf">4.0</span><span class="p">),</span> <span class="n">width</span><span class="o">=</span><span class="mf">85.5</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mf">78.0</span><span class="p">)</span>
+
+<span class="n">right_cards</span> <span class="o">=</span> <span class="n">CardList</span><span class="p">(</span>
+    <span class="n">style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">WhiteBordered</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">shape_r</span><span class="o">=</span><span class="mf">1.5</span><span class="p">),</span>
+    <span class="n">text_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">DarkBold</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">text_size</span><span class="o">=</span><span class="mf">10.8</span><span class="p">),</span>
+    <span class="n">description_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">Dark</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">text_size</span><span class="o">=</span><span class="mf">10.0</span><span class="p">),</span>
+    <span class="n">badge_shape</span><span class="o">=</span><span class="s2">"rounded_rect"</span><span class="p">,</span>
+    <span class="n">badge_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">SecondaryNeutral</span><span class="p">,</span>
+    <span class="n">badge_text_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">SecondaryBold</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">text_size</span><span class="o">=</span><span class="mf">10.0</span><span class="p">),</span>
+    <span class="n">icon_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">SecondaryBold</span><span class="p">,</span>
+    <span class="n">direction</span><span class="o">=</span><span class="s2">"vertical"</span><span class="p">,</span>
+    <span class="n">spacing</span><span class="o">=</span><span class="mf">2.8</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">right_cards</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+    <span class="s2">"Go (go — 1.21 / 1.22 / 1.23 / 1.24)"</span><span class="p">,</span>
+    <span class="s2">"Manifest: go.mod, go.sum (*_test.go split)</span><span class="se">\n</span><span class="s2">"</span>
+    <span class="s2">"AST/Rules: ast-grep (go) | 5 rules (GoDoc/err)</span><span class="se">\n</span><span class="s2">"</span>
+    <span class="s2">"Harness: go.dockerfile -&gt; go vet + coverprofile"</span><span class="p">,</span>
+    <span class="n">badge_text</span><span class="o">=</span><span class="s2">"GO"</span><span class="p">,</span>
+    <span class="n">icon</span><span class="o">=</span><span class="n">code</span><span class="o">.</span><span class="n">go</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">right_cards</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+    <span class="s2">"TypeScript (typescript — Node 18 / 20 / 22)"</span><span class="p">,</span>
+    <span class="s2">"Manifest: package.json + tsconfig.json</span><span class="se">\n</span><span class="s2">"</span>
+    <span class="s2">"AST/Rules: ast-grep (ts/tsx) | 5 rules (strict)</span><span class="se">\n</span><span class="s2">"</span>
+    <span class="s2">"Harness: node.dockerfile -&gt; Vitest/Jest + tsc"</span><span class="p">,</span>
+    <span class="n">badge_text</span><span class="o">=</span><span class="s2">"TS"</span><span class="p">,</span>
+    <span class="n">icon</span><span class="o">=</span><span class="n">code</span><span class="o">.</span><span class="n">typescript</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">right_cards</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+    <span class="s2">"JavaScript (javascript — Node 18 / 20 / 22)"</span><span class="p">,</span>
+    <span class="s2">"Manifest: package.json + jsconfig.json</span><span class="se">\n</span><span class="s2">"</span>
+    <span class="s2">"AST/Rules: ast-grep (tsx) | 5 rules (JSDoc)</span><span class="se">\n</span><span class="s2">"</span>
+    <span class="s2">"Harness: node.dockerfile -&gt; Vitest + node --check"</span><span class="p">,</span>
+    <span class="n">badge_text</span><span class="o">=</span><span class="s2">"JS"</span><span class="p">,</span>
+    <span class="n">icon</span><span class="o">=</span><span class="n">code</span><span class="o">.</span><span class="n">javascript</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">right_cards</span><span class="o">.</span><span class="n">draw</span><span class="p">(</span><span class="n">xy</span><span class="o">=</span><span class="p">(</span><span class="mf">97.0</span><span class="p">,</span> <span class="mf">6.5</span><span class="p">),</span> <span class="n">width</span><span class="o">=</span><span class="mf">80.5</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mf">64.5</span><span class="p">)</span>
+
+<span class="n">save</span><span class="p">()</span>
+</code></pre>
+</details>
+<hr />
+<h2>1. End-to-End 6-Language Capability Matrix</h2>
+<p>Every supported language plugs into the same <code>LanguageAnalyzerSuite</code> protocol (<code>src/pni/_actions/ast_analyze/runner.py</code>) and 4-stage containerized runtime verifier (<code>src/pni/_actions/runtime_check/runner.py</code>), producing normalized <code>ProjectFacts</code>, <code>AstFacts</code>, <code>RuntimeFacts</code>, and <code>SecurityScanFacts</code> schemas regardless of the underlying runtime.</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">Dimension</th>
+<th style="text-align:left">Python (<code>python</code>)</th>
+<th style="text-align:left">Java (<code>java</code>)</th>
+<th style="text-align:left">PHP (<code>php</code>)</th>
+<th style="text-align:left">Go (<code>go</code>)</th>
+<th style="text-align:left">TypeScript (<code>typescript</code>)</th>
+<th style="text-align:left">JavaScript (<code>javascript</code>)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left"><strong>Manifests &amp; Lockfiles</strong></td>
+<td style="text-align:left"><code>pyproject.toml</code>, <code>setup.py</code>, <code>requirements.txt</code>, <code>uv.lock</code>, <code>poetry.lock</code></td>
+<td style="text-align:left"><code>pom.xml</code>, <code>build.gradle(.kts)</code>, <code>settings.gradle(.kts)</code>, <code>gradle.lockfile</code></td>
+<td style="text-align:left"><code>composer.json</code>, <code>composer.lock</code>, <code>artisan</code>, <code>wp-config.php</code>, raw <code>*.php</code></td>
+<td style="text-align:left"><code>go.mod</code>, <code>go.sum</code>, <code>go.work</code></td>
+<td style="text-align:left"><code>package.json</code>, <code>tsconfig.json</code>, <code>pnpm-lock.yaml</code>, <code>package-lock.json</code>, <code>yarn.lock</code></td>
+<td style="text-align:left"><code>package.json</code>, <code>jsconfig.json</code>, <code>pnpm-lock.yaml</code>, <code>package-lock.json</code>, <code>yarn.lock</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>Source Extensions</strong></td>
+<td style="text-align:left"><code>.py</code></td>
+<td style="text-align:left"><code>.java</code></td>
+<td style="text-align:left"><code>.php</code>, <code>.phtml</code></td>
+<td style="text-align:left"><code>.go</code> (auto-splits <code>*_test.go</code>)</td>
+<td style="text-align:left"><code>.ts</code>, <code>.tsx</code> (excludes <code>.d.ts</code>, splits <code>*.test.ts</code>)</td>
+<td style="text-align:left"><code>.js</code>, <code>.jsx</code>, <code>.mjs</code>, <code>.cjs</code> (splits <code>*.test.js</code>)</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>AST Parser Engine</strong></td>
+<td style="text-align:left">Python <code>ast</code> + <code>ast-grep-py</code> (<code>python</code>)</td>
+<td style="text-align:left"><code>ast-grep-py</code> (<code>java</code>)</td>
+<td style="text-align:left"><code>ast-grep-py</code> (<code>php</code> + mixed HTML preprocessor)</td>
+<td style="text-align:left"><code>ast-grep-py</code> (<code>go</code>)</td>
+<td style="text-align:left"><code>ast-grep-py</code> (<code>typescript</code> / <code>tsx</code>)</td>
+<td style="text-align:left"><code>ast-grep-py</code> (<code>tsx</code>)</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>Language Actions</strong></td>
+<td style="text-align:left"><code>python_ast_audit</code>, <code>python_test_audit</code></td>
+<td style="text-align:left"><code>java_ast_audit</code>, <code>java_test_audit</code></td>
+<td style="text-align:left"><code>php_ast_audit</code>, <code>php_test_audit</code></td>
+<td style="text-align:left"><code>go_ast_audit</code>, <code>go_test_audit</code></td>
+<td style="text-align:left"><code>typescript_ast_audit</code>, <code>typescript_test_audit</code></td>
+<td style="text-align:left"><code>javascript_ast_audit</code>, <code>javascript_test_audit</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>Built-in Rule Files</strong></td>
+<td style="text-align:left"><code>7</code> files (<code>code_quality</code>, <code>typing</code>, <code>dependencies</code>, <code>modern_stack</code>, <code>testing</code>, <code>frameworks/fastapi</code>, <code>workflow_guide</code>)</td>
+<td style="text-align:left"><code>6</code> files (<code>code_quality</code>, <code>typing</code>, <code>dependencies</code>, <code>testing</code>, <code>frameworks/spring_boot</code>, <code>workflow_guide</code>)</td>
+<td style="text-align:left"><code>8</code> files (<code>code_quality</code>, <code>typing</code>, <code>dependencies</code>, <code>modern_stack</code>, <code>testing</code>, <code>frameworks/laravel</code>, <code>frameworks/wordpress</code>, <code>workflow_guide</code>)</td>
+<td style="text-align:left"><code>5</code> files (<code>code_quality</code>, <code>typing</code>, <code>dependencies</code>, <code>testing</code>, <code>workflow_guide</code>)</td>
+<td style="text-align:left"><code>5</code> files (<code>code_quality</code>, <code>typing</code>, <code>dependencies</code>, <code>testing</code>, <code>workflow_guide</code>)</td>
+<td style="text-align:left"><code>5</code> files (<code>code_quality</code>, <code>typing</code>, <code>dependencies</code>, <code>testing</code>, <code>workflow_guide</code>)</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>Container Templates</strong></td>
+<td style="text-align:left"><code>python/uv.dockerfile</code>, <code>poetry.dockerfile</code>, <code>pip.dockerfile</code> (<code>3.11</code>–<code>3.13</code>)</td>
+<td style="text-align:left"><code>java/maven.dockerfile</code>, <code>gradle.dockerfile</code> (Temurin <code>8</code>/<code>11</code>/<code>17</code>/<code>21</code>)</td>
+<td style="text-align:left"><code>php/composer.dockerfile</code>, <code>raw.dockerfile</code> (PHP CLI <code>8.1</code>–<code>8.4</code>)</td>
+<td style="text-align:left"><code>go/go.dockerfile</code> (Golang Bookworm <code>1.21</code>–<code>1.24</code>)</td>
+<td style="text-align:left"><code>typescript/node.dockerfile</code> (Node Bookworm <code>18</code>/<code>20</code>/<code>22</code>)</td>
+<td style="text-align:left"><code>javascript/node.dockerfile</code> (Node Bookworm <code>18</code>/<code>20</code>/<code>22</code>)</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>Offline Test &amp; Coverage</strong></td>
+<td style="text-align:left"><code>pytest --junitxml=/out/junit.xml --cov --cov-report=json:/out/coverage.json</code></td>
+<td style="text-align:left"><code>mvn test</code> / <code>gradle test</code> + JaCoCo XML (<code>/out/jacoco.xml</code>)</td>
+<td style="text-align:left"><code>php -l</code> syntax gate + <code>phpunit</code> + PCOV Clover (<code>/out/clover.xml</code>)</td>
+<td style="text-align:left"><code>go vet ./...</code> + <code>go test -v -coverprofile=/out/coverage.out ./...</code></td>
+<td style="text-align:left"><code>vitest run</code> / <code>jest --coverage</code> (<code>coverage-summary.json</code>) or <code>tsc --noEmit</code></td>
+<td style="text-align:left"><code>vitest run</code> / <code>jest --coverage</code> / <code>npm test</code> / <code>node --test</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>Stage 3 Smoke Probe</strong></td>
+<td style="text-align:left">ASGI/WSGI <code>TestClient</code> health probe, CLI <code>--help</code>, or <code>importlib.import_module</code></td>
+<td style="text-align:left">Spring Boot TCP <code>:18080</code> bind probe, <code>main --help</code>, or <code>target/classes</code> check</td>
+<td style="text-align:left"><code>php -S</code> HTTP route probe, <code>php artisan --version</code>, PSR-4 autoload, or WP plugin hook stub</td>
+<td style="text-align:left"><code>go build ./...</code> full module compilation &amp; link verification</td>
+<td style="text-align:left"><code>tsc --noEmit</code> compiler check or Node runtime verification</td>
+<td style="text-align:left"><code>node --check</code> syntax verification across <code>.js</code>/<code>.mjs</code>/<code>.cjs</code> files</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2>2. Deterministic Language Auto-Detection &amp; Sandboxed Execution</h2>
+<p>When you run <code>pni init</code>, <code>pni rules list</code>, or execute a workflow step, <code>detect_active_language()</code> in <code>src/pni/_rules/manager.py</code> resolves the repository's primary language deterministically without requiring manual flags:</p>
+<ol>
+<li><strong>Primary Manifest Inspection</strong>: Checks top-level build manifests in strict priority order:
+<ul>
+<li><strong>Python</strong>: <code>pyproject.toml</code>, <code>setup.py</code>, <code>requirements.txt</code></li>
+<li><strong>Java</strong>: <code>pom.xml</code>, <code>build.gradle</code>, <code>build.gradle.kts</code>, <code>settings.gradle</code>, <code>settings.gradle.kts</code></li>
+<li><strong>PHP</strong>: <code>composer.json</code>, <code>wp-config.php</code>, <code>wp-config-sample.php</code>, <code>artisan</code>, <code>phpunit.xml</code>, <code>phpunit.xml.dist</code></li>
+<li><strong>Go</strong>: <code>go.mod</code>, <code>go.work</code></li>
+</ul>
+</li>
+<li><strong>Node.js TypeScript vs. JavaScript Disambiguation (<code>_detect_node_language</code>)</strong>:
+<ul>
+<li>Returns <code>typescript</code> immediately if <code>tsconfig.json</code> or <code>tsconfig.base.json</code> exists, or if <code>package.json</code> declares <code>&quot;typescript&quot;</code> in <code>dependencies</code> or <code>devDependencies</code>.</li>
+<li>Returns <code>javascript</code> if <code>jsconfig.json</code> exists, or inspects <code>.ts</code>/<code>.tsx</code> (excluding <code>.d.ts</code>) vs. <code>.js</code>/<code>.jsx</code>/<code>.mjs</code>/<code>.cjs</code> source files under <code>src/</code>, <code>app/</code>, <code>lib/</code>, <code>packages/</code>, <code>pages/</code>, and <code>components/</code>.</li>
+</ul>
+</li>
+<li><strong>Source Tree Extension Fallback</strong>: Scans standard source directories (<code>src/main/java</code>, <code>cmd/</code>, <code>internal/</code>, <code>pkg/</code>, <code>app/</code>, <code>public/</code>, <code>includes/</code>) before defaulting to <code>python</code>.</li>
+</ol>
+<figure class="drawlib-image" style="text-align: center;">
+  <img src="../../images/05_languages_and_reference/supported_languages/language_detection_and_toolchains.png" alt="supported_languages_2" />
+  <figcaption class="drawlib-caption">Deterministic Language Auto-Detection, Parse-Once AST Checkers, and Offline Container Toolchains</figcaption>
+</figure>
+<details class="drawlib-code-details">
+<summary>Source Code</summary>
+<pre><code class="language-python"><span class="kn">from</span><span class="w"> </span><span class="nn">drawlib.canvas</span><span class="w"> </span><span class="kn">import</span> <span class="n">save</span><span class="p">,</span> <span class="n">setup</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">drawlib.diagrams.architecture</span><span class="w"> </span><span class="kn">import</span> <span class="n">ArchitectureDiagram</span><span class="p">,</span> <span class="n">Node</span><span class="p">,</span> <span class="n">NodeGroup</span><span class="p">,</span> <span class="n">PhosphorIcon</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">drawlib.styles</span><span class="w"> </span><span class="kn">import</span> <span class="n">Styles</span>
+
+<span class="n">setup</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="mi">168</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">84</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">150</span><span class="p">)</span>
+
+<span class="n">diag</span> <span class="o">=</span> <span class="n">ArchitectureDiagram</span><span class="p">(</span>
+    <span class="n">node_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">PrimaryBold</span><span class="p">,</span>
+    <span class="n">node_text_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">DarkBold</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">text_size</span><span class="o">=</span><span class="mf">10.0</span><span class="p">),</span>
+    <span class="n">edge_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">DarkBold</span><span class="p">,</span>
+    <span class="n">edge_text_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">DarkBold</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">text_size</span><span class="o">=</span><span class="mf">9.8</span><span class="p">),</span>
+    <span class="n">node_card_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">WhiteBordered</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">shape_r</span><span class="o">=</span><span class="mf">1.5</span><span class="p">),</span>
+<span class="p">)</span>
+
+<span class="n">g_detect</span> <span class="o">=</span> <span class="n">diag</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+    <span class="n">NodeGroup</span><span class="p">(</span>
+        <span class="n">title</span><span class="o">=</span><span class="s2">"1. Auto-Detection &amp; Inspect"</span><span class="p">,</span>
+        <span class="n">width</span><span class="o">=</span><span class="mf">48.0</span><span class="p">,</span>
+        <span class="n">height</span><span class="o">=</span><span class="mf">74.0</span><span class="p">,</span>
+        <span class="n">style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">Neutral</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">shape_r</span><span class="o">=</span><span class="mf">2.0</span><span class="p">),</span>
+        <span class="n">text_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">DarkBold</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">text_size</span><span class="o">=</span><span class="mf">10.5</span><span class="p">,</span> <span class="n">halign</span><span class="o">=</span><span class="s2">"left"</span><span class="p">,</span> <span class="n">valign</span><span class="o">=</span><span class="s2">"top"</span><span class="p">),</span>
+    <span class="p">),</span>
+    <span class="n">xy</span><span class="o">=</span><span class="p">(</span><span class="mf">4.0</span><span class="p">,</span> <span class="mf">5.0</span><span class="p">),</span>
+<span class="p">)</span>
+<span class="n">n_manifest</span> <span class="o">=</span> <span class="n">g_detect</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+    <span class="n">Node</span><span class="p">(</span>
+        <span class="s2">"detect_active_language()</span><span class="se">\n</span><span class="s2">Manifests &amp; tsconfig/jsconfig"</span><span class="p">,</span>
+        <span class="n">width</span><span class="o">=</span><span class="mf">42.0</span><span class="p">,</span>
+        <span class="n">height</span><span class="o">=</span><span class="mf">15.5</span><span class="p">,</span>
+        <span class="n">icon</span><span class="o">=</span><span class="n">PhosphorIcon</span><span class="o">.</span><span class="n">MAGNIFYING_GLASS</span><span class="p">,</span>
+        <span class="n">icon_size</span><span class="o">=</span><span class="mf">5.2</span><span class="p">,</span>
+        <span class="n">card_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">PrimaryNeutral</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">shape_r</span><span class="o">=</span><span class="mf">1.5</span><span class="p">),</span>
+    <span class="p">),</span>
+    <span class="n">xy</span><span class="o">=</span><span class="p">(</span><span class="mf">24.0</span><span class="p">,</span> <span class="mf">54.0</span><span class="p">),</span>
+<span class="p">)</span>
+<span class="n">n_inspect</span> <span class="o">=</span> <span class="n">g_detect</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+    <span class="n">Node</span><span class="p">(</span>
+        <span class="s2">"project_inspect (ProjectFacts)</span><span class="se">\n</span><span class="s2">Build Tool, Lockfiles &amp; Runtime"</span><span class="p">,</span>
+        <span class="n">width</span><span class="o">=</span><span class="mf">42.0</span><span class="p">,</span>
+        <span class="n">height</span><span class="o">=</span><span class="mf">15.5</span><span class="p">,</span>
+        <span class="n">icon</span><span class="o">=</span><span class="n">PhosphorIcon</span><span class="o">.</span><span class="n">PACKAGE</span><span class="p">,</span>
+        <span class="n">icon_size</span><span class="o">=</span><span class="mf">5.2</span><span class="p">,</span>
+    <span class="p">),</span>
+    <span class="n">xy</span><span class="o">=</span><span class="p">(</span><span class="mf">24.0</span><span class="p">,</span> <span class="mf">32.0</span><span class="p">),</span>
+<span class="p">)</span>
+<span class="n">n_pni_toml</span> <span class="o">=</span> <span class="n">g_detect</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+    <span class="n">Node</span><span class="p">(</span>
+        <span class="s2">".pni/pni.toml Overrides</span><span class="se">\n</span><span class="s2">Targets, Excludes &amp; [[opt_out]]"</span><span class="p">,</span>
+        <span class="n">width</span><span class="o">=</span><span class="mf">42.0</span><span class="p">,</span>
+        <span class="n">height</span><span class="o">=</span><span class="mf">15.5</span><span class="p">,</span>
+        <span class="n">icon</span><span class="o">=</span><span class="n">PhosphorIcon</span><span class="o">.</span><span class="n">SLIDERS_HORIZONTAL</span><span class="p">,</span>
+        <span class="n">icon_size</span><span class="o">=</span><span class="mf">5.2</span><span class="p">,</span>
+        <span class="n">style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">SecondaryBold</span><span class="p">,</span>
+        <span class="n">card_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">SecondaryNeutral</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">shape_r</span><span class="o">=</span><span class="mf">1.5</span><span class="p">),</span>
+    <span class="p">),</span>
+    <span class="n">xy</span><span class="o">=</span><span class="p">(</span><span class="mf">24.0</span><span class="p">,</span> <span class="mf">10.0</span><span class="p">),</span>
+<span class="p">)</span>
+
+<span class="n">g_ast</span> <span class="o">=</span> <span class="n">diag</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+    <span class="n">NodeGroup</span><span class="p">(</span>
+        <span class="n">title</span><span class="o">=</span><span class="s2">"2. Parse-Once AST Suite"</span><span class="p">,</span>
+        <span class="n">width</span><span class="o">=</span><span class="mf">52.0</span><span class="p">,</span>
+        <span class="n">height</span><span class="o">=</span><span class="mf">74.0</span><span class="p">,</span>
+        <span class="n">style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">Neutral</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">shape_r</span><span class="o">=</span><span class="mf">2.0</span><span class="p">),</span>
+        <span class="n">text_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">DarkBold</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">text_size</span><span class="o">=</span><span class="mf">10.5</span><span class="p">,</span> <span class="n">halign</span><span class="o">=</span><span class="s2">"left"</span><span class="p">,</span> <span class="n">valign</span><span class="o">=</span><span class="s2">"top"</span><span class="p">),</span>
+    <span class="p">),</span>
+    <span class="n">xy</span><span class="o">=</span><span class="p">(</span><span class="mf">58.0</span><span class="p">,</span> <span class="mf">5.0</span><span class="p">),</span>
+<span class="p">)</span>
+<span class="n">n_suite</span> <span class="o">=</span> <span class="n">g_ast</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+    <span class="n">Node</span><span class="p">(</span>
+        <span class="s2">"LanguageAnalyzerSuite</span><span class="se">\n</span><span class="s2">Single-Pass SgRoot Tree-sitter"</span><span class="p">,</span>
+        <span class="n">width</span><span class="o">=</span><span class="mf">46.0</span><span class="p">,</span>
+        <span class="n">height</span><span class="o">=</span><span class="mf">15.5</span><span class="p">,</span>
+        <span class="n">icon</span><span class="o">=</span><span class="n">PhosphorIcon</span><span class="o">.</span><span class="n">TREE_STRUCTURE</span><span class="p">,</span>
+        <span class="n">icon_size</span><span class="o">=</span><span class="mf">5.2</span><span class="p">,</span>
+        <span class="n">style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">WhiteBold</span><span class="p">,</span>
+        <span class="n">text_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">WhiteBold</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">text_size</span><span class="o">=</span><span class="mf">10.0</span><span class="p">),</span>
+        <span class="n">card_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">PrimaryFlat</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">shape_r</span><span class="o">=</span><span class="mf">1.5</span><span class="p">),</span>
+    <span class="p">),</span>
+    <span class="n">xy</span><span class="o">=</span><span class="p">(</span><span class="mf">26.0</span><span class="p">,</span> <span class="mf">54.0</span><span class="p">),</span>
+<span class="p">)</span>
+<span class="n">n_checkers</span> <span class="o">=</span> <span class="n">g_ast</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+    <span class="n">Node</span><span class="p">(</span>
+        <span class="s2">"9 Specialized Checkers</span><span class="se">\n</span><span class="s2">Imports, Typing, Docs, Quality, Test"</span><span class="p">,</span>
+        <span class="n">width</span><span class="o">=</span><span class="mf">46.0</span><span class="p">,</span>
+        <span class="n">height</span><span class="o">=</span><span class="mf">15.5</span><span class="p">,</span>
+        <span class="n">icon</span><span class="o">=</span><span class="n">PhosphorIcon</span><span class="o">.</span><span class="n">LIST_CHECKS</span><span class="p">,</span>
+        <span class="n">icon_size</span><span class="o">=</span><span class="mf">5.2</span><span class="p">,</span>
+        <span class="n">card_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">PrimaryNeutral</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">shape_r</span><span class="o">=</span><span class="mf">1.5</span><span class="p">),</span>
+    <span class="p">),</span>
+    <span class="n">xy</span><span class="o">=</span><span class="p">(</span><span class="mf">26.0</span><span class="p">,</span> <span class="mf">32.0</span><span class="p">),</span>
+<span class="p">)</span>
+<span class="n">n_sec_ast</span> <span class="o">=</span> <span class="n">g_ast</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+    <span class="n">Node</span><span class="p">(</span>
+        <span class="s2">"Framework &amp; CWE Sinks</span><span class="se">\n</span><span class="s2">dangerous_sinks + api_endpoints"</span><span class="p">,</span>
+        <span class="n">width</span><span class="o">=</span><span class="mf">46.0</span><span class="p">,</span>
+        <span class="n">height</span><span class="o">=</span><span class="mf">15.5</span><span class="p">,</span>
+        <span class="n">icon</span><span class="o">=</span><span class="n">PhosphorIcon</span><span class="o">.</span><span class="n">SHIELD_WARNING</span><span class="p">,</span>
+        <span class="n">icon_size</span><span class="o">=</span><span class="mf">5.2</span><span class="p">,</span>
+    <span class="p">),</span>
+    <span class="n">xy</span><span class="o">=</span><span class="p">(</span><span class="mf">26.0</span><span class="p">,</span> <span class="mf">10.0</span><span class="p">),</span>
+<span class="p">)</span>
+
+<span class="n">g_runtime</span> <span class="o">=</span> <span class="n">diag</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+    <span class="n">NodeGroup</span><span class="p">(</span>
+        <span class="n">title</span><span class="o">=</span><span class="s2">"3. Container Harness &amp; Scan"</span><span class="p">,</span>
+        <span class="n">width</span><span class="o">=</span><span class="mf">48.0</span><span class="p">,</span>
+        <span class="n">height</span><span class="o">=</span><span class="mf">74.0</span><span class="p">,</span>
+        <span class="n">style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">Neutral</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">shape_r</span><span class="o">=</span><span class="mf">2.0</span><span class="p">),</span>
+        <span class="n">text_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">DarkBold</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">text_size</span><span class="o">=</span><span class="mf">10.5</span><span class="p">,</span> <span class="n">halign</span><span class="o">=</span><span class="s2">"left"</span><span class="p">,</span> <span class="n">valign</span><span class="o">=</span><span class="s2">"top"</span><span class="p">),</span>
+    <span class="p">),</span>
+    <span class="n">xy</span><span class="o">=</span><span class="p">(</span><span class="mf">116.0</span><span class="p">,</span> <span class="mf">5.0</span><span class="p">),</span>
+<span class="p">)</span>
+<span class="n">n_select</span> <span class="o">=</span> <span class="n">g_runtime</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+    <span class="n">Node</span><span class="p">(</span>
+        <span class="s2">"select_harness_tool()</span><span class="se">\n</span><span class="s2">10 Built-in .dockerfile Templates"</span><span class="p">,</span>
+        <span class="n">width</span><span class="o">=</span><span class="mf">42.0</span><span class="p">,</span>
+        <span class="n">height</span><span class="o">=</span><span class="mf">15.5</span><span class="p">,</span>
+        <span class="n">icon</span><span class="o">=</span><span class="n">PhosphorIcon</span><span class="o">.</span><span class="n">CUBE</span><span class="p">,</span>
+        <span class="n">icon_size</span><span class="o">=</span><span class="mf">5.2</span><span class="p">,</span>
+        <span class="n">style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">SecondaryBold</span><span class="p">,</span>
+        <span class="n">card_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">SecondaryNeutral</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">shape_r</span><span class="o">=</span><span class="mf">1.5</span><span class="p">),</span>
+    <span class="p">),</span>
+    <span class="n">xy</span><span class="o">=</span><span class="p">(</span><span class="mf">24.0</span><span class="p">,</span> <span class="mf">54.0</span><span class="p">),</span>
+<span class="p">)</span>
+<span class="n">n_offline</span> <span class="o">=</span> <span class="n">g_runtime</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+    <span class="n">Node</span><span class="p">(</span>
+        <span class="s2">"Offline Test, Coverage &amp; Smoke</span><span class="se">\n</span><span class="s2">--network=none -&gt; /out/* XML/JSON"</span><span class="p">,</span>
+        <span class="n">width</span><span class="o">=</span><span class="mf">42.0</span><span class="p">,</span>
+        <span class="n">height</span><span class="o">=</span><span class="mf">15.5</span><span class="p">,</span>
+        <span class="n">icon</span><span class="o">=</span><span class="n">PhosphorIcon</span><span class="o">.</span><span class="n">TERMINAL_WINDOW</span><span class="p">,</span>
+        <span class="n">icon_size</span><span class="o">=</span><span class="mf">5.2</span><span class="p">,</span>
+        <span class="n">style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">WhiteBold</span><span class="p">,</span>
+        <span class="n">text_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">WhiteBold</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">text_size</span><span class="o">=</span><span class="mf">10.0</span><span class="p">),</span>
+        <span class="n">card_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">PrimaryFlat</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">shape_r</span><span class="o">=</span><span class="mf">1.5</span><span class="p">),</span>
+    <span class="p">),</span>
+    <span class="n">xy</span><span class="o">=</span><span class="p">(</span><span class="mf">24.0</span><span class="p">,</span> <span class="mf">32.0</span><span class="p">),</span>
+<span class="p">)</span>
+<span class="n">n_trivy</span> <span class="o">=</span> <span class="n">g_runtime</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+    <span class="n">Node</span><span class="p">(</span>
+        <span class="s2">"Trivy FS + Image Scan</span><span class="se">\n</span><span class="s2">App Lockfiles + OS Packages"</span><span class="p">,</span>
+        <span class="n">width</span><span class="o">=</span><span class="mf">42.0</span><span class="p">,</span>
+        <span class="n">height</span><span class="o">=</span><span class="mf">15.5</span><span class="p">,</span>
+        <span class="n">icon</span><span class="o">=</span><span class="n">PhosphorIcon</span><span class="o">.</span><span class="n">SHIELD_CHECK</span><span class="p">,</span>
+        <span class="n">icon_size</span><span class="o">=</span><span class="mf">5.2</span><span class="p">,</span>
+        <span class="n">card_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">PrimaryNeutral</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">shape_r</span><span class="o">=</span><span class="mf">1.5</span><span class="p">),</span>
+    <span class="p">),</span>
+    <span class="n">xy</span><span class="o">=</span><span class="p">(</span><span class="mf">24.0</span><span class="p">,</span> <span class="mf">10.0</span><span class="p">),</span>
+<span class="p">)</span>
+
+<span class="n">diag</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">n_manifest</span><span class="p">,</span> <span class="n">n_inspect</span><span class="p">,</span> <span class="n">routing</span><span class="o">=</span><span class="s2">"orthogonal"</span><span class="p">)</span>
+<span class="n">diag</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">n_pni_toml</span><span class="p">,</span> <span class="n">n_inspect</span><span class="p">,</span> <span class="n">routing</span><span class="o">=</span><span class="s2">"orthogonal"</span><span class="p">)</span>
+<span class="n">diag</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">n_suite</span><span class="p">,</span> <span class="n">n_checkers</span><span class="p">,</span> <span class="n">routing</span><span class="o">=</span><span class="s2">"orthogonal"</span><span class="p">)</span>
+<span class="n">diag</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">n_checkers</span><span class="p">,</span> <span class="n">n_sec_ast</span><span class="p">,</span> <span class="n">routing</span><span class="o">=</span><span class="s2">"orthogonal"</span><span class="p">)</span>
+<span class="n">diag</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">n_select</span><span class="p">,</span> <span class="n">n_offline</span><span class="p">,</span> <span class="n">routing</span><span class="o">=</span><span class="s2">"orthogonal"</span><span class="p">)</span>
+<span class="n">diag</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">n_offline</span><span class="p">,</span> <span class="n">n_trivy</span><span class="p">,</span> <span class="n">routing</span><span class="o">=</span><span class="s2">"orthogonal"</span><span class="p">)</span>
+
+<span class="n">diag</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">g_detect</span><span class="p">,</span> <span class="n">g_ast</span><span class="p">,</span> <span class="n">routing</span><span class="o">=</span><span class="s2">"orthogonal"</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">PrimaryBold</span><span class="p">)</span>
+<span class="n">diag</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">g_ast</span><span class="p">,</span> <span class="n">g_runtime</span><span class="p">,</span> <span class="n">routing</span><span class="o">=</span><span class="s2">"orthogonal"</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">PrimaryBold</span><span class="p">)</span>
+
+<span class="n">diag</span><span class="o">.</span><span class="n">draw</span><span class="p">(</span><span class="n">xy</span><span class="o">=</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">))</span>
+<span class="n">save</span><span class="p">()</span>
+</code></pre>
+</details>
+<h3>2.1 Python &amp; Java Ecosystems</h3>
+<p>For <strong>Python</strong> (<code>pyproject.toml</code>, <code>uv</code>, <code>Poetry</code>, <code>pip</code>) and <strong>Java</strong> (<code>Maven</code>, <code>Gradle</code>), configure <code>targets</code> in <code>.pni/workflows/full_audit.yaml</code> so generated artifacts (<code>target/</code>, <code>build/</code>, Alembic <code>migrations/versions/</code>) are excluded from source AST metrics:</p>
+<pre><code class="language-yaml"><span class="c1"># Python PEP 621 src/ layout (or source: ["app"] for FastAPI services)</span>
+<span class="nt">targets</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">root</span><span class="p">:</span><span class="w"> </span><span class="s">"."</span>
+<span class="w">  </span><span class="nt">source</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">"src"</span><span class="p p-Indicator">]</span>
+<span class="w">  </span><span class="nt">tests</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">"tests"</span><span class="p p-Indicator">]</span>
+<span class="w">  </span><span class="nt">docs</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">"README.md"</span><span class="p p-Indicator">]</span>
+
+<span class="c1"># Java Maven / Gradle standard layout</span>
+<span class="nt">targets</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">root</span><span class="p">:</span><span class="w"> </span><span class="s">"."</span>
+<span class="w">  </span><span class="nt">source</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">"src/main/java"</span><span class="p p-Indicator">]</span>
+<span class="w">  </span><span class="nt">tests</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">"src/test/java"</span><span class="p p-Indicator">]</span>
+<span class="w">  </span><span class="nt">docs</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">"README.md"</span><span class="p p-Indicator">]</span>
+</code></pre>
+<h3>2.2 PHP &amp; Go Ecosystems</h3>
+<p><strong>PHP</strong> supports both modern Composer/PSR-4 applications (Laravel, Symfony) and legacy Composer-less raw PHP (<code>raw.dockerfile</code>) or WordPress plugins. <strong>Go</strong> (<code>go.mod</code>) automatically partitions production <code>*.go</code> files from co-located <code>*_test.go</code> files even when <code>source</code> and <code>tests</code> point to the same directories:</p>
+<pre><code class="language-yaml"><span class="c1"># PHP Laravel layout (use source: ["."] for legacy raw PHP or WordPress plugins)</span>
+<span class="nt">targets</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">root</span><span class="p">:</span><span class="w"> </span><span class="s">"."</span>
+<span class="w">  </span><span class="nt">source</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">"app"</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">"src"</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">"routes"</span><span class="p p-Indicator">]</span>
+<span class="w">  </span><span class="nt">tests</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">"tests"</span><span class="p p-Indicator">]</span>
+<span class="w">  </span><span class="nt">docs</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">"README.md"</span><span class="p p-Indicator">]</span>
+
+<span class="c1"># Go module layout (co-located *_test.go files are separated automatically)</span>
+<span class="nt">targets</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">root</span><span class="p">:</span><span class="w"> </span><span class="s">"."</span>
+<span class="w">  </span><span class="nt">source</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">"cmd"</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">"internal"</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">"pkg"</span><span class="p p-Indicator">]</span>
+<span class="w">  </span><span class="nt">tests</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">"cmd"</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">"internal"</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">"pkg"</span><span class="p p-Indicator">]</span>
+<span class="w">  </span><span class="nt">docs</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">"README.md"</span><span class="p p-Indicator">]</span>
+</code></pre>
+<h3>2.3 TypeScript &amp; JavaScript Ecosystems</h3>
+<p>In <strong>TypeScript</strong> and <strong>JavaScript</strong> repositories, <code>LanguageAnalyzerSuite</code> automatically excludes ambient declaration files (<code>*.d.ts</code>) from production AST scoring and separates co-located <code>*.test.ts(x)</code>, <code>*.spec.ts(x)</code>, <code>*.test.js(x)</code>, <code>.spec.js(x)</code>, and <code>__tests__/</code> files into the test analyzer:</p>
+<pre><code class="language-yaml"><span class="c1"># TypeScript / JavaScript layout (supports dedicated tests/ or co-located src/**/*.test.ts)</span>
+<span class="nt">targets</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">root</span><span class="p">:</span><span class="w"> </span><span class="s">"."</span>
+<span class="w">  </span><span class="nt">source</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">"src"</span><span class="p p-Indicator">]</span>
+<span class="w">  </span><span class="nt">tests</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">"tests"</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">"src"</span><span class="p p-Indicator">]</span>
+<span class="w">  </span><span class="nt">docs</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">"README.md"</span><span class="p p-Indicator">]</span>
+</code></pre>
+<hr />
+<h2>3. Language-Specific AST Checkers &amp; CWE Security Sinks</h2>
+<p>Every <code>LanguageAnalyzerSuite</code> parses each source file <strong>once</strong> into a Tree-sitter CST (<code>SgRoot</code>) and dispatches nine specialized checkers (<code>imports</code>, <code>typing</code>, <code>docs</code>, <code>quality</code>, <code>dependencies</code>, <code>testing</code>, <code>framework</code>, <code>operational</code>, and <code>security</code>):</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">Language</th>
+<th style="text-align:left">Typing &amp; Contract Signals</th>
+<th style="text-align:left">Code Quality &amp; Operational Signals</th>
+<th style="text-align:left">Framework &amp; CWE Security Sinks (<code>dangerous_sinks</code>)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left"><strong>Python</strong></td>
+<td style="text-align:left">Public parameter/return annotation %, <code>Any</code> / bare <code>type: ignore</code>, <code>py.typed</code> marker</td>
+<td style="text-align:left"><code>isort</code> import grouping, Google/NumPy/Sphinx docstrings + <code>Args:</code> sync, McCabe (<code>&gt;7</code>) &amp; cognitive (<code>&gt;15</code>) complexity, mutable defaults, bare <code>except:</code>, missing <code>timeout=</code></td>
+<td style="text-align:left">FastAPI <code>on_event</code>, missing <code>response_model</code>, sync I/O inside <code>async def</code>; <code>eval</code>/<code>exec</code> (<code>CWE-94</code>), <code>subprocess(..., shell=True)</code> (<code>CWE-78</code>), <code>pickle</code>/<code>yaml.load</code> (<code>CWE-502</code>), raw SQL f-strings (<code>CWE-89</code>)</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>Java</strong></td>
+<td style="text-align:left">Generic type safety %, raw types (<code>List</code> without <code>&lt;T&gt;</code>), unscoped <code>@SuppressWarnings</code></td>
+<td style="text-align:left">Wildcard <code>import .*</code>, Javadoc coverage &amp; <code>@param</code> alignment, mutable <code>public static</code> fields, empty <code>catch</code> blocks, <code>System.out.println</code> in services</td>
+<td style="text-align:left">Spring Boot <code>@Autowired</code> field injection, non-public <code>@Transactional</code>, <code>javax.*</code> vs <code>jakarta.*</code>; <code>Runtime.exec</code> (<code>CWE-78</code>), <code>ObjectInputStream.readObject</code> (<code>CWE-502</code>), string-concatenated JDBC/JPQL (<code>CWE-89</code>)</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>PHP</strong></td>
+<td style="text-align:left"><code>declare(strict_types=1)</code> ratio, parameter/return/property type hints, unscoped <code>@phpstan-ignore</code></td>
+<td style="text-align:left">PSR-4 namespace vs <code>include</code>/<code>require_once</code>, mixed HTML/PHP spaghetti, <code>$_GET</code>/<code>$_POST</code>/<code>$GLOBALS</code> coupling, <code>@</code> error suppression, <code>die()</code>/<code>exit()</code>, magic-hash <code>==</code></td>
+<td style="text-align:left">Laravel <code>env()</code> outside <code>config/</code>, mass-assignment <code>$guarded = []</code>, raw <code>DB::raw()</code>; WordPress unescaped <code>$_GET</code> SQLi/XSS &amp; missing <code>check_admin_referer</code>; <code>eval</code>/<code>shell_exec</code>/<code>unserialize</code> (<code>CWE-94</code>/<code>78</code>/<code>502</code>)</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>Go</strong></td>
+<td style="text-align:left">Concrete/generic types vs untyped <code>any</code> / <code>interface{}</code>, <code>unsafe.Pointer</code> usage, bare <code>//nolint</code></td>
+<td style="text-align:left"><code>gofmt</code>/import grouping, dot imports (<code>import .</code>), GoDoc comments on exported symbols, blank error assignment (<code>_ = err</code>), <code>panic()</code> in non-<code>main</code> packages, <code>defer</code> in loops</td>
+<td style="text-align:left">Gin/Echo/Fiber/Chi/net-http route extraction (<code>api_endpoints</code>), <code>exec.Command(&quot;sh&quot;, &quot;-c&quot;, ...)</code> (<code>CWE-78</code>), formatted <code>db.Query(fmt.Sprintf(...))</code> (<code>CWE-89</code>), HTTP client without <code>Timeout</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>TypeScript</strong></td>
+<td style="text-align:left"><code>tsconfig.json</code> <code>&quot;strict&quot;: true</code>, explicit export types, <code>: any</code> / <code>as any</code>, <code>@ts-ignore</code> vs <code>@ts-expect-error</code></td>
+<td style="text-align:left">ES module import hygiene, TSDoc (<code>/** ... */</code>) coverage, unhandled Promises, empty <code>catch {}</code>, <code>var</code> declarations, <code>==</code> loose equality, <code>console.log</code> in services</td>
+<td style="text-align:left">Express/Fastify/NestJS/Hono/Next.js route discovery, <code>dangerouslySetInnerHTML</code> / <code>innerHTML</code> (<code>CWE-79</code>), <code>eval</code> / <code>new Function</code> (<code>CWE-94</code>), <code>child_process.exec</code> (<code>CWE-78</code>), SQL template literals (<code>CWE-89</code>)</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>JavaScript</strong></td>
+<td style="text-align:left">JSDoc <code>@param {Type}</code> and <code>@returns {Type}</code> contract coverage, <code>checkJs</code> / <code>// @ts-check</code>, untyped <code>@param {*}</code></td>
+<td style="text-align:left">ES module <code>import</code>/<code>export</code> vs legacy CommonJS <code>require()</code>, <code>const</code>/<code>let</code> vs <code>var</code>, strict <code>===</code>, Promise <code>.catch()</code> hygiene, cognitive complexity</td>
+<td style="text-align:left">Express/Fastify/Hono route discovery, DOM XSS (<code>innerHTML</code>, <code>document.write</code>, <code>CWE-79</code>), <code>eval()</code> (<code>CWE-94</code>), <code>child_process.exec</code> (<code>CWE-78</code>), unparameterized SQL queries (<code>CWE-89</code>)</td>
+</tr>
+</tbody>
+</table>
+<p>See <a href="rules_and_cli.html">Rules &amp; CLI Reference</a> for the complete catalog of 52 built-in rule files, <code>.pni/</code> local customization cascade, and <code>pni</code> CLI commands, or explore <a href="../03_workflows_and_actions/analyzers_and_pentest.html">Analyzers &amp; Live Pentest</a> for deep dives into containerized runtime and DAST verification.</p>
+
+            </main>
+        </div>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Theme toggle
+            const themeBtn = document.getElementById('theme-toggle');
+            if (themeBtn) {
+                themeBtn.addEventListener('click', function() {
+                    const current = document.documentElement.getAttribute('data-theme');
+                    const next = current === 'dark' ? 'light' : 'dark';
+                    document.documentElement.setAttribute('data-theme', next);
+                    localStorage.setItem('drawlib-theme', next);
+                });
+            }
+
+            // Language dropdown outside-click & Escape close
+            const langDropdowns = document.querySelectorAll('.lang-dropdown');
+            if (langDropdowns.length > 0) {
+                document.addEventListener('click', function(e) {
+                    langDropdowns.forEach(function(dd) {
+                        if (dd.hasAttribute('open') && !dd.contains(e.target)) {
+                            dd.removeAttribute('open');
+                        }
+                    });
+                });
+                document.addEventListener('keydown', function(e) {
+                    if (e.key === 'Escape') {
+                        langDropdowns.forEach(function(dd) {
+                            dd.removeAttribute('open');
+                        });
+                    }
+                });
+            }
+
+            // Mobile menu toggle
+            const menuBtn = document.getElementById('menu-toggle');
+            const sidebar = document.querySelector('.sidebar');
+            if (menuBtn && sidebar) {
+                function setMenuOpen(open) {
+                    sidebar.classList.toggle('is-open', open);
+                    menuBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
+                    document.body.classList.toggle('menu-open', open);
+                    if (open) {
+                        const menu = sidebar.querySelector('.sidebar-menu');
+                        if (menu) {
+                            menu.scrollTop = 0;
+                        }
+                    }
+                }
+
+                menuBtn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    const willOpen = !sidebar.classList.contains('is-open');
+                    setMenuOpen(willOpen);
+                });
+
+                // Close menu when clicking outside sidebar
+                document.addEventListener('click', function(e) {
+                    if (sidebar.classList.contains('is-open') && !sidebar.contains(e.target)) {
+                        setMenuOpen(false);
+                    }
+                });
+
+                // Close menu when a navigation link is clicked
+                const navLinks = sidebar.querySelectorAll('.nav-item a');
+                navLinks.forEach(function(link) {
+                    link.addEventListener('click', function() {
+                        setMenuOpen(false);
+                    });
+                });
+
+                // Close on Escape key
+                document.addEventListener('keydown', function(e) {
+                    if (e.key === 'Escape' && sidebar.classList.contains('is-open')) {
+                        setMenuOpen(false);
+                    }
+                });
+
+                // Reset menu state when resized above mobile breakpoint
+                window.addEventListener('resize', function() {
+                    if (window.innerWidth > 768 && sidebar.classList.contains('is-open')) {
+                        setMenuOpen(false);
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>
