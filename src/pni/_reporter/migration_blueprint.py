@@ -61,13 +61,16 @@ def _build_mig_cover(plan: MigrationPlanResult, titles: dict[str, str]) -> Bluep
         filename="00_cover.md",
         title=titles["00"],
         purpose=(
-            "Dedicated cover page displaying project identity, confirmed migration strategy, transformation mode, "
-            "and headline KPIs (Migration Axes, Total PRs, Decision Log items; followed by PDF Table of Contents)."
+            "Dedicated cover page displaying the official PNI501 emblem (`_assets/logo.png` / `_assets/logo_dark.png` "
+            "via `draw_pni_logo()` or `from drawlib.images import image`), project identity, confirmed migration "
+            "strategy, transformation mode, and headline KPIs (Migration Axes, Total PRs, Decision Log items; "
+            "followed by PDF Table of Contents)."
         ),
         required_diagrams=[
             (
-                "Migration Plan Hero Banner (`Panel` + `KpiCards`: Transformation Mode/Strategy, "
-                "Migration Axes Count, Total Phased PRs, Stakeholder Decisions)"
+                "Migration Plan Hero Banner (`Panel` + `KpiCards` + PNI501 Logo via `draw_pni_logo()` or "
+                "`image(xy, width=9.0, image='_assets/logo_dark.png')` / `'_assets/logo.png'`: Transformation "
+                "Mode/Strategy, Migration Axes Count, Total Phased PRs, Stakeholder Decisions)"
             ),
         ],
         sorted_data_markdown=data,

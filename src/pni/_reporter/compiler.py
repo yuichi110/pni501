@@ -325,6 +325,59 @@ def _ensure_print_table_css(src_dir: Path, created_files: Sequence[Path]) -> Non
             css_path.write_text(existing.rstrip() + "\n" + _PRINT_TABLE_CSS_BLOCK, encoding="utf-8")
 
 
+_BUNDLED_ASSETS_DIR: Final[Path] = Path(__file__).resolve().parent / "_assets"
+_BUNDLED_BRAND_FILES: Final[tuple[str, ...]] = ("logo.png", "logo_dark.png", "favicon.png")
+_STARTER_UNUSED_ASSETS: Final[tuple[str, ...]] = ("_logo.png", "_logo_dark.png", "linux.png")
+_PNI_LOGO_HELPER_MARKER: Final[str] = "def draw_pni_logo("
+_PNI_LOGO_HELPER_BLOCK: Final[str] = '''
+
+def draw_pni_logo(
+    xy: tuple[float, float] = (135.0, 48.0),
+    width: float = 9.0,
+    *,
+    dark: bool = True,
+) -> None:
+    """Draw the official PNI 501 triangle emblem from `_assets/logo.png` or `_assets/logo_dark.png`.
+
+    Args:
+        xy: Center coordinate (x, y) for the logo image.
+        width: Logo width in canvas units (default 9.0).
+        dark: Set True (default) when drawing on a dark header (e.g. `Styles.Primary`),
+            or False on a light/white background.
+    """
+    from drawlib.images import image
+
+    asset_name = "_assets/logo_dark.png" if dark else "_assets/logo.png"
+    image(xy, width=width, image=asset_name)
+'''
+
+
+def _ensure_report_brand_assets(src_dir: Path, *, clean_sample_chapters: bool = True) -> list[Path]:
+    """Copy bundled PNI501 logo/favicon assets into <src_dir>/_assets/ and inject draw_pni_logo() into utils.py."""
+    assets_dir = src_dir / "_assets"
+    assets_dir.mkdir(parents=True, exist_ok=True)
+    if clean_sample_chapters:
+        for unused_name in _STARTER_UNUSED_ASSETS:
+            unused_path = assets_dir / unused_name
+            if unused_path.is_file():
+                unused_path.unlink()
+
+    copied: list[Path] = []
+    for asset_name in _BUNDLED_BRAND_FILES:
+        src_asset = _BUNDLED_ASSETS_DIR / asset_name
+        if src_asset.is_file():
+            dest_asset = assets_dir / asset_name
+            shutil.copy2(src_asset, dest_asset)
+            copied.append(dest_asset)
+
+    utils_path = src_dir / "utils.py"
+    if utils_path.is_file():
+        existing_utils = utils_path.read_text(encoding="utf-8")
+        if _PNI_LOGO_HELPER_MARKER not in existing_utils:
+            utils_path.write_text(existing_utils.rstrip() + "\n" + _PNI_LOGO_HELPER_BLOCK, encoding="utf-8")
+    return copied
+
+
 def scaffold_report_project(
     target: str = "full_audit",
     *,
@@ -356,6 +409,7 @@ def scaffold_report_project(
     existing_chapters = _snapshot_existing_chapters(src_dir, fallback_lang=lang)
     if src_dir.is_dir() and not force:
         _ensure_print_table_css(src_dir, ())
+        _ensure_report_brand_assets(src_dir, clean_sample_chapters=False)
         return ReportScaffoldResult(
             src_base_dir=resolved_base,
             src_dir=src_dir,
@@ -386,7 +440,12 @@ def scaffold_report_project(
         clean_sample_chapters=clean_sample_chapters,
     )
     _ensure_print_table_css(src_dir, raw_created)
+    brand_files = _ensure_report_brand_assets(src_dir, clean_sample_chapters=clean_sample_chapters)
+    kept_set = {p.resolve() for p in raw_created if p.exists()}
     kept_files = [p for p in raw_created if p.exists()]
+    for bf in brand_files:
+        if bf.resolve() not in kept_set:
+            kept_files.append(bf)
     return ReportScaffoldResult(
         src_base_dir=resolved_base,
         src_dir=src_dir,

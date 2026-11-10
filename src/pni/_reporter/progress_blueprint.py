@@ -77,13 +77,16 @@ def _build_prog_cover(res: ProgressResult, titles: dict[str, str]) -> BlueprintC
         filename="00_cover.md",
         title=titles["00"],
         purpose=(
-            "Dedicated cover page displaying project identity, delivery status (`on_track` / `at_risk` / "
-            "`delayed` / `blocked`), overall progress health score, and 4-axis KPI cards (followed by PDF ToC)."
+            "Dedicated cover page displaying the official PNI501 emblem (`_assets/logo.png` / `_assets/logo_dark.png` "
+            "via `draw_pni_logo()` or `from drawlib.images import image`), project identity, delivery status "
+            "(`on_track` / `at_risk` / `delayed` / `blocked`), overall progress health score, and 4-axis KPI cards "
+            "(followed by PDF ToC)."
         ),
         required_diagrams=[
             (
-                "Progress Health Hero Banner (`Panel` + `KpiCards`: Delivery Status, Overall Health Score, "
-                "Schedule Adherence, Git & Merge Hygiene)"
+                "Progress Health Hero Banner (`Panel` + `KpiCards` + PNI501 Logo via `draw_pni_logo()` or "
+                "`image(xy, width=9.0, image='_assets/logo_dark.png')` / `'_assets/logo.png'`: Delivery Status, "
+                "Overall Health Score, Schedule Adherence, Git & Merge Hygiene)"
             ),
         ],
         sorted_data_markdown=data,

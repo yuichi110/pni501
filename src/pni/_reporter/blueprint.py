@@ -100,12 +100,15 @@ def _build_cover_chapter(
         filename="00_cover.md",
         title=titles["00"],
         purpose=(
-            "Dedicated cover page displaying project identity, evaluation metadata, and Overall Score/Grade "
-            "hero badge (Drawlib automatically inserts the Table of Contents right after `00_cover.md`)."
+            "Dedicated cover page displaying the official PNI501 emblem (`_assets/logo.png` / `_assets/logo_dark.png` "
+            "via `draw_pni_logo()` or `from drawlib.images import image`), project identity, evaluation metadata, "
+            "and Overall Score/Grade hero badge (Drawlib automatically inserts the Table of Contents right after "
+            "`00_cover.md`)."
         ),
         required_diagrams=[
             (
-                "Cover Hero Scorecard Banner (`Panel` + `KpiCards`: Overall Score/Grade, "
+                "Cover Hero Scorecard Banner (`Panel` + `KpiCards` + PNI501 Logo via `draw_pni_logo()` or "
+                "`image(xy, width=9.0, image='_assets/logo_dark.png')` / `'_assets/logo.png'`: Overall Score/Grade, "
                 "Target Language, Rule Pass Rate, Total Findings)"
             ),
         ],

@@ -23,5 +23,5 @@ primitives:
       3. CONSULT Drawlib rules on demand (`drawlib rules show agent-instruction`, `api`,
          `lib-smartarts-overview`, `lib-charts-overview`, `lib-diagrams-overview`, `project-doc`), WRITE or UPDATE the 5
          progress chapters (`00_cover.md` + `01_schedule_and_milestones.md` ..
-         `04_risks_and_next_actions.md`) inside `<src_dir>/<target>_src/<lang>/`, visually verify diagrams
+         `04_risks_and_next_actions.md`) inside `<src_dir>/<target>_src/<lang>/`, place the PNI501 logo badge (`_assets/logo_dark.png` or `_assets/logo.png` via `draw_pni_logo()` in `utils.py` or `drawlib.images.image`) on the `00_cover.md` cover diagram, visually verify diagrams
          via `drawlib show ... -g`, and compile `<output_dir>/<target>.pdf`.

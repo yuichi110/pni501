@@ -117,7 +117,13 @@ def test_scaffold_non_destructive_chapter_preservation(tmp_path: Path) -> None:
     assert (scaffold.src_dir / "drawlib.toml").is_file()
     assert (scaffold.src_dir / "styles.py").is_file()
     assert (scaffold.src_dir / "utils.py").is_file()
+    assert "def draw_pni_logo(" in (scaffold.src_dir / "utils.py").read_text(encoding="utf-8")
     assert (scaffold.src_dir / "style.css").is_file()
+    assert (scaffold.src_dir / "_assets" / "logo.png").is_file()
+    assert (scaffold.src_dir / "_assets" / "logo_dark.png").is_file()
+    assert (scaffold.src_dir / "_assets" / "favicon.png").is_file()
+    assert not (scaffold.src_dir / "_assets" / "_logo.png").exists()
+    assert not (scaffold.src_dir / "_assets" / "linux.png").exists()
     assert ja_dir.is_dir()
     assert not (ja_dir / "navbar.md").exists()
     assert not (ja_dir / "00_cover.md").exists()
@@ -309,6 +315,8 @@ def test_drawlib_guide_and_action_directive_rendering() -> None:
     assert "reports/python/lib_clean.pdf" in guide
     assert ".pni/cache/py_lib_clean/architecture.json" in guide
     assert "git diff" in guide
+    assert "draw_pni_logo" in guide
+    assert "_assets/logo.png" in guide
 
     body = render_action_task_body(
         PrimitiveType.WRITE_DRAWLIB_REPORT,

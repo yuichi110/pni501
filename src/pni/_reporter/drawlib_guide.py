@@ -33,7 +33,8 @@ from pni._reporter.progress_blueprint import (
 _FALLBACK_CHAPTER_SPECS = (
     (
         "`00_cover.md`",
-        "Dedicated Cover Page (`Panel` + `KpiCards` displaying project identity, Overall Score/Grade, "
+        "Dedicated Cover Page (`Panel` + `KpiCards` + PNI501 logo badge via `draw_pni_logo()` / "
+        "`_assets/logo.png` displaying project identity, Overall Score/Grade, "
         "and Rule Pass Rate; followed automatically by Drawlib's generated Table of Contents).",
     ),
     (
@@ -71,7 +72,8 @@ _FALLBACK_CHAPTER_SPECS = (
 _FALLBACK_MIGRATION_CHAPTER_SPECS = (
     (
         "`00_cover.md`",
-        "Dedicated Cover Page (`Panel` + `KpiCards`: Transformation Mode, Strategy, Migration Axes, "
+        "Dedicated Cover Page (`Panel` + `KpiCards` + PNI501 logo badge via `draw_pni_logo()` / "
+        "`_assets/logo.png`: Transformation Mode, Strategy, Migration Axes, "
         "Total PRs, Stakeholder Decisions; followed automatically by Drawlib's Table of Contents).",
     ),
     (
@@ -108,7 +110,8 @@ _FALLBACK_MIGRATION_CHAPTER_SPECS = (
 _FALLBACK_PROGRESS_CHAPTER_SPECS = (
     (
         "`00_cover.md`",
-        "Dedicated Cover Page (`Panel` + `KpiCards`: Delivery Status, Overall Health Score, "
+        "Dedicated Cover Page (`Panel` + `KpiCards` + PNI501 logo badge via `draw_pni_logo()` / "
+        "`_assets/logo.png`: Delivery Status, Overall Health Score, "
         "Schedule Adherence, Git & Merge Hygiene; followed automatically by Drawlib's Table of Contents).",
     ),
     (
@@ -339,8 +342,12 @@ def render_drawlib_report_guide(
         ),
         f"     - **Zero `file:///` or absolute paths** (`/usr/...`, `/home/...`) inside `{chapter_dir}/*.md`.",
         (
-            f"     - **`00_cover.md` is dedicated to the Cover Page** (1+ hero scorecard); chapters "
-            f"`01_*.md`..`{end_ch_num}_*.md`"
+            f"     - **`00_cover.md` is dedicated to the Cover Page and MUST display the PNI501 Logo**: "
+            "Place the bundled PNI501 triangle emblem (`_assets/logo.png` on light backgrounds or "
+            "`_assets/logo_dark.png` on dark `Styles.Primary` headers) inside the Cover Hero diagram via "
+            "`from drawlib.utils import draw_pni_logo; draw_pni_logo((135, 48), width=9.0, dark=True)` "
+            "(or `from drawlib.images import image; image((135, 48), width=9.0, image='_assets/logo.png')`). "
+            f"Chapters `01_*.md`..`{end_ch_num}_*.md`"
         ),
         "       MUST each start with `# N. Title`, lead prose, and **2+ diagrams** (first diagram at lines 5–15).",
         "       Every ```` ```drawlib ```` fence MUST set `file=<name>.png` and `caption=\"...\"`.",
