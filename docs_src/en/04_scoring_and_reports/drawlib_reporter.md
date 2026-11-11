@@ -357,7 +357,7 @@ save()
 
 | Chapter File | Primary Blueprint Data Slice | Standard Drawlib Visual Components |
 | :--- | :--- | :--- |
-| **`00_cover.md`** | `overall_score`, `grade`, `workflow_id`, `evaluated_at`, rule compliance summary, finding counts | Full-bleed cover `Panel` + `KpiCards` (followed by automatic PDF/HTML Table of Contents) |
+| **`00_cover.md`** | `overall_score`, `grade`, `workflow_id`, `evaluated_at`, rule compliance summary, finding counts | Full-bleed cover `Panel` + `draw_pni_logo()` + `KpiCards` (followed by automatic PDF/HTML Table of Contents) |
 | **`01_executive_summary.md`** | `category_scores` (`7` axes), `category_rationales`, `strengths`, top critical/high risks, `opt_outs` | 7-Axis `RadarChart` + `KpiCards` + `CardList` / summary tables |
 | **`02_architecture_and_structure.md`** | `architecture_record` (`layers_and_modules`, `flows_and_state`), `internal_import_graph`, `module_hotspots` | `TreeNode` / `Table` + UML `ClassDiagram` paired with `HeatmapOverlay(show_contour_lines=False)` |
 | **`03_remediation_roadmap.md`** | `action_plan` (`P0 -> P1 -> P2` remediation items, target files, effort, linked rule IDs) | Phased `Roadmap` / `ChevronProcess` + remediation traceability `Table` |
@@ -371,7 +371,7 @@ For modernization workflows (`based_on` a completed health audit run), `src/pni/
 
 | Chapter File | Primary Blueprint Data Slice | Standard Drawlib Visual Components |
 | :--- | :--- | :--- |
-| **`00_cover.md`** | `transformation_mode`, `migration_strategy`, `api_compatibility`, `bug_handling_policy`, PR & phase counts | Full-bleed migration cover `Panel` + `KpiCards` (followed by automatic ToC) |
+| **`00_cover.md`** | `transformation_mode`, `migration_strategy`, `api_compatibility`, `bug_handling_policy`, PR & phase counts | Full-bleed migration cover `Panel` + `draw_pni_logo()` + `KpiCards` (followed by automatic ToC) |
 | **`01_migration_strategy_summary.md`** | `confirmed_assumptions`, `non_goals`, `target_axes` (`As-Is -> To-Be` stack & risk vectors) | Strategy overview `CardList` + `As-Is -> To-Be` transformation matrix `Table` |
 | **`02_architecture_waves_and_contracts.md`** | `target_architecture` (`target_layers`, `component_mappings`), `refactoring_waves`, `cycle_cuts`, `implicit_contracts` | To-Be Port/Adapter `ClassDiagram` / `ArchitectureDiagram` + Wave `1..4` dependency topology |
 | **`03_spec_vs_bug_decision_log.md`** | `decision_log` (`DEC-01..NN`), `spec_vs_bug_candidates` (Hyrum's Law quirks requiring PO sign-off) | Decision workflow diagram + `DEC-01..NN` sign-off matrix `Table` |
@@ -411,9 +411,9 @@ pni report build <target> --src-dir reports_src --output-dir reports
 
 Before invoking `drawlib.tools`, `compiler.py` executes four automated verification guardrails:
 
-- **Non-Destructive Re-Scaffolding (`scaffold_report_project`)**: On initial creation, `pni report init` removes starter sample files (`00_cover.md`, `01_overview.md`, `02_design.md`). When re-run on an existing report directory—even with `--force` to refresh `drawlib.toml`, `styles.py`, or `utils.py`—all authored `<lang>/*.md` chapters are preserved intact so incremental re-audits produce clean `git diff` histories.
+- **Non-Destructive Re-Scaffolding & Brand Assets (`scaffold_report_project`)**: On initial creation, `pni report init` removes starter sample files (`00_cover.md`, `01_overview.md`, `02_design.md`), copies official brand assets (`_assets/{logo.png,logo_dark.png,favicon.png}`), and injects `draw_pni_logo()` into `utils.py`. When re-run on an existing report directory—even with `--force` to refresh `drawlib.toml`, `styles.py`, or `utils.py`—all authored `<lang>/*.md` chapters are preserved intact so incremental re-audits produce clean `git diff` histories.
 - **Multi-Series Chart Legend Check**: `lint_drawlib_chapters()` scans every ```` ```drawlib ```` fence and verifies that any `BarChart` or `LineChart` calling `.add_series(...)` two or more times also calls `.draw_legend(...)`.
-- **UML ClassDiagram + HeatmapOverlay Contour Guard**: Combining `ClassDiagram` with `HeatmapOverlay(..., show_contour_lines=True)` triggers a preflight warning (or raises `ValueError` when `strict_preflight=True`); setting `show_contour_lines=False` highlights high-risk classes with smooth thermal gradients without contour lines intersecting method signatures.
-- **Output Normalization & Broken-Link Scanning (`_verify_links`)**: `pni report build` normalizes `<target>_<default_lang>.pdf` to `reports/<target>.pdf` (`page_break=True`, `generate_index=True`). When `-f html` is included, `_verify_links()` runs `drawlib.tools.scan_broken_links()` and fails closed (`strict_links=True`) if any broken link or missing image asset is detected.
+- **UML ClassDiagram Contour & `Styles.White` Guards**: Combining `ClassDiagram` with `HeatmapOverlay(..., show_contour_lines=True)` or styling `ClassDiagram` / `ClassNode` with `Styles.White` (which renders white text on a white fill; use `Styles.Neutral` instead) triggers a preflight warning (or raises `ValueError` when `strict_preflight=True`).
+- **Output Normalization & Broken-Link Scanning (`_verify_links`)**: `pni report build` normalizes `<target>_<default_lang>.pdf` to `reports/<target>.pdf` (`page_break=True`, `generate_index=True`). When `-f html` is included, `_verify_links()` runs `drawlib.tools.scan_broken_links()` (supporting `--link-check-root <dir>` for multi-portal relative links) and fails closed (`strict_links=True`) if any broken link or missing image asset is detected.
 
 For details on the upstream JSON schemas and deterministic hotspot scoring formulas, see [7-Axis Scoring Model](scoring_model.md), or consult [Rules & CLI Reference](../05_languages_and_reference/rules_and_cli.md) for all `pni report` flags.

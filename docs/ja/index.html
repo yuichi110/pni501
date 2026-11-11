@@ -83,6 +83,16 @@
                     </button>
                 </div>
             </div>
+            <div class="sidebar-subbar">
+                
+                <a href="01_getting_started/release_notes.html" class="sidebar-version-badge" title="View Release Notes">
+                    <span class="sidebar-version-dot" aria-hidden="true"></span>
+                    <span class="sidebar-version-text">v0.1.4</span>
+                </a>
+                <a href="https://github.com/yuichi110/pni501" target="_blank" rel="noopener noreferrer" class="sidebar-github-link" aria-label="GitHub Repository" title="GitHub Repository">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg>
+                </a>
+            </div>
             <div class="sidebar-menu">
                 
                     
@@ -110,6 +120,10 @@
                             
                             <li class="nav-item ">
                                 <a href="01_getting_started/use_cases.html" >3つの主要ユースケース</a>
+                            </li>
+                            
+                            <li class="nav-item ">
+                                <a href="01_getting_started/release_notes.html" >リリースノート</a>
                             </li>
                             
                         </ul>
@@ -232,10 +246,10 @@
             </header>
             <main class="main-content">
                 <h1>pni501 (Project Nemesis Index) — 公式ドキュメント</h1>
-<p><strong>Project Nemesis Index (<code>pni501</code> <code>v0.1.3</code>)</strong> は、<strong>Python</strong>、<strong>Java</strong>、<strong>PHP</strong>、<strong>Go</strong>、<strong>TypeScript</strong>、<strong>JavaScript</strong> の6言語リポジトリに対応する AI ネイティブなソフトウェア健全性監査・ペネトレーションテスト・マイグレーション計画フレームワークです。決定論的な静的解析・隔離コンテナ実行ツールと、SQLite ベースのステートフル Pull-Push ワークフローエンジン、そして Drawlib ビジュアルレポート生成基盤を統合することで、LLM 特有の数値・パスハルシネーションを排除し、再現性のある7軸品質スコア・トポロジカル移行計画・出版品質の A4 ベクター PDF レポートを出力します。</p>
+<p><strong>Project Nemesis Index (<code>pni501</code> <code>v0.1.4</code>)</strong> は、<strong>Python</strong>、<strong>Java</strong>、<strong>PHP</strong>、<strong>Go</strong>、<strong>TypeScript</strong>、<strong>JavaScript</strong> の6言語リポジトリに対応する AI ネイティブなソフトウェア健全性監査・ペネトレーションテスト・マイグレーション計画フレームワークです。決定論的な静的解析・隔離コンテナ実行ツールと、SQLite ベースのステートフル Pull-Push ワークフローエンジン、そして Drawlib ビジュアルレポート生成基盤を統合することで、LLM 特有の数値・パスハルシネーションを排除し、再現性のある7軸品質スコア・トポロジカル移行計画・出版品質の A4 ベクター PDF レポートを出力します。</p>
 <figure class="drawlib-image" style="text-align: center;">
   <img src="../images/index/pni_overview_pillars.png" alt="index_1" />
-  <figcaption class="drawlib-caption">pni501 (v0.1.3) の4つのアーキテクチャ基盤ピラーと6言語ポリグロット対応</figcaption>
+  <figcaption class="drawlib-caption">pni501 (v0.1.4) の4つのアーキテクチャ基盤ピラーと6言語ポリグロット対応</figcaption>
 </figure>
 <details class="drawlib-code-details">
 <summary>Source Code</summary>
@@ -247,7 +261,7 @@
 <span class="n">setup</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="mi">156</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">90</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">150</span><span class="p">)</span>
 
 <span class="n">outer</span> <span class="o">=</span> <span class="n">Panel</span><span class="p">(</span>
-    <span class="s2">"Project Nemesis Index (pni501 v0.1.3) — Four Foundational Pillars"</span><span class="p">,</span>
+    <span class="s2">"Project Nemesis Index (pni501 v0.1.4) — Four Foundational Pillars"</span><span class="p">,</span>
     <span class="n">header_variant</span><span class="o">=</span><span class="s2">"filled"</span><span class="p">,</span>
     <span class="n">style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">PrimaryNeutral</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">shape_r</span><span class="o">=</span><span class="mf">2.0</span><span class="p">),</span>
     <span class="n">header_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">PrimaryFlat</span><span class="p">,</span>
@@ -316,7 +330,7 @@
 </details>
 <h2>1. エグゼクティブ概要：決定論的解析 × AI 推論のハイブリッドエンジン</h2>
 <p>単発プロンプトによる LLM コードレビューには、非決定論的なカウント誤差、実在しないファイルパスの捏造、チェック項目の抜け漏れ、そしてコンテナ実行時の挙動・依存パッケージの既知 CVE・稼働 HTTP エンドポイントの脆弱性を一切検証できないという構造的限界があります。一方で、従来の静的リンターだけでは、ドメイン境界の凝集度や3視点のシステムアーキテクチャ、段階的モダナイゼーションのトレードオフを評価することはできません。</p>
-<p><code>pni501</code> (<code>v0.1.3</code>) は、<strong>6言語</strong>（<code>Python</code>、<code>Java</code>、<code>PHP</code>、<code>Go</code>、<code>TypeScript</code>、<code>JavaScript</code>）にわたる <strong>52個のカスケード規約ルール</strong>、<strong>15個のコンポジットアクション</strong>、<strong>6言語セットのステートフルワークフロー</strong> を単一のパイプラインに統合することで、この両者の強みを融合します：</p>
+<p><code>pni501</code> (<code>v0.1.4</code>) は、<strong>6言語</strong>（<code>Python</code>、<code>Java</code>、<code>PHP</code>、<code>Go</code>、<code>TypeScript</code>、<code>JavaScript</code>）にわたる <strong>52個のカスケード規約ルール</strong>、<strong>15個のコンポジットアクション</strong>、<strong>6言語セットのステートフルワークフロー</strong> を単一のパイプラインに統合することで、この両者の強みを融合します：</p>
 <ul>
 <li><strong>プログラムによるマルチモーダルな客観ファクト抽出</strong>：<code>pni</code> は <code>project_inspect</code>、ポリグロット <code>ast_analyze</code>（Python 標準 <code>ast</code> および Java / PHP / Go / TypeScript / JavaScript 対応の <code>ast-grep-py</code>）、隔離 Docker コンテナでの <code>run_check</code>（オフライン単体テスト・カバレッジ計測・HTTP 起動確認）、ソケット非公開 Trivy による <code>security_scan</code>（CVE・IaC 設定不備・秘密情報漏洩）、ループバックコンテナに対する <code>pytest</code> + <code>httpx</code> の動的 <code>web_pentest</code>、トポロジカル依存グラフ解析 <code>migration_analyze</code>、および Git 進捗解析 <code>progress_analyze</code> を自動実行し、正確なテレメトリを <code>.pni/cache/&lt;workflow_id&gt;/facts.json</code> と <code>.pni/cache/workflow_state.db</code> に永続化します。</li>
 <li><strong>スキーマ検証付き AI 監査・連鎖プランニング・ビジュアルレポート生成</strong>：SQLite（<code>workflow_state.db</code>）のステップ管理のもと、Code AI Agent はスコープ別ルールを読み込み（<code>load_rules</code>）、実在パス照合済みの3視点アーキテクチャを記録し（<code>record_architecture</code> -&gt; <code>architecture.json</code>）、規約準拠性を評価し（<code>ai_interpret</code>）、7軸の <code>ScoreResult</code>（<code>reports/&lt;target&gt;_score.json</code>）を出力します。さらに必要に応じて <code>based_on</code> によるマイグレーション計画（<code>reports/&lt;target&gt;_migration_plan.json</code>）や進捗評価（<code>reports/&lt;target&gt;_progress.json</code>）を連鎖実行し、<strong>Drawlib ビジュアルレポート</strong>（<code>reports/&lt;target&gt;.pdf</code> および HTML）をビルドします。</li>
@@ -415,7 +429,7 @@
 <thead>
 <tr>
 <th style="text-align:left">機能領域</th>
-<th style="text-align:left">組み込みアセット (<code>v0.1.3</code>)</th>
+<th style="text-align:left">組み込みアセット (<code>v0.1.4</code>)</th>
 <th style="text-align:left">主な成果物・品質保証</th>
 </tr>
 </thead>
@@ -474,6 +488,7 @@ pni<span class="w"> </span>workflows<span class="w"> </span>start<span class="w"
 <li><a href="01_getting_started/concepts.html">背景とコアコンセプト</a> — なぜ単発の AI プロンプト監査が実務リポジトリで破綻するのか、そして PNI の4つの柱がいかにハルシネーションゼロの診断を保証するかを解説します。</li>
 <li><a href="01_getting_started/quickstart.html">クイックスタートガイド</a> — インストール、<code>.pni/</code> 初期化、Pre-Flight 準備ゲート確認、<code>get-action</code> / <code>push-action</code> ループの実行手順をステップバイステップで説明します。</li>
 <li><a href="01_getting_started/use_cases.html">3つの主要ユースケース</a> — スプリント開発での継続的品質測定、ブラックボックス化したレガシー資産の多角検査、<code>based_on</code> 連鎖によるマイグレーション計画を解説します。</li>
+<li><a href="01_getting_started/release_notes.html">リリースノート</a> — バージョン履歴 (<code>v0.1.0</code>〜<code>v0.1.4</code>)、新規アナライザー機能、CLI の拡張内容をまとめています。</li>
 </ul>
 <h3>4.2 アーキテクチャ・ワークフロー・スコアリング・リファレンス</h3>
 <ul>

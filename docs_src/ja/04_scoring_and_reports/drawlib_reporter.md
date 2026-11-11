@@ -357,7 +357,7 @@ save()
 
 | 章ファイル | 主なブループリントデータスライス | 標準 Drawlib ビジュアルコンポーネント |
 | :--- | :--- | :--- |
-| **`00_cover.md`** | `overall_score`、`grade`、`workflow_id`、`evaluated_at`、ルール準拠サマリ、ファインディング件数 | フルブリード表紙 `Panel` + `KpiCards`（直後に PDF/HTML 目次を自動生成） |
+| **`00_cover.md`** | `overall_score`、`grade`、`workflow_id`、`evaluated_at`、ルール準拠サマリ、ファインディング件数 | フルブリード表紙 `Panel` + `draw_pni_logo()` + `KpiCards`（直後に PDF/HTML 目次を自動生成） |
 | **`01_executive_summary.md`** | `category_scores`（`7` 軸）、`category_rationales`、`strengths`、主要 Critical/High リスク、`opt_outs` | 7軸 `RadarChart` + `KpiCards` + `CardList` / サマリテーブル |
 | **`02_architecture_and_structure.md`** | `architecture_record`（`layers_and_modules`、`flows_and_state`）、`internal_import_graph`、`module_hotspots` | `TreeNode` / `Table` + UML `ClassDiagram` と `HeatmapOverlay(show_contour_lines=False)` |
 | **`03_remediation_roadmap.md`** | `action_plan`（`P0 -> P1 -> P2` 改善アクション、対象ファイル、工数、関連ルール ID） | フェーズ別 `Roadmap` / `ChevronProcess` + 改善トレーサビリティ `Table` |
@@ -371,7 +371,7 @@ save()
 
 | 章ファイル | 主なブループリントデータスライス | 標準 Drawlib ビジュアルコンポーネント |
 | :--- | :--- | :--- |
-| **`00_cover.md`** | `transformation_mode`、`migration_strategy`、`api_compatibility`、`bug_handling_policy`、PR・フェーズ数 | フルブリード移行計画表紙 `Panel` + `KpiCards`（直後に目次を自動生成） |
+| **`00_cover.md`** | `transformation_mode`、`migration_strategy`、`api_compatibility`、`bug_handling_policy`、PR・フェーズ数 | フルブリード移行計画表紙 `Panel` + `draw_pni_logo()` + `KpiCards`（直後に目次を自動生成） |
 | **`01_migration_strategy_summary.md`** | `confirmed_assumptions`、`non_goals`、`target_axes`（`As-Is -> To-Be` スタック・リスク軸） | 移行戦略 `CardList` + `As-Is -> To-Be` ギャップ変換マトリクス `Table` |
 | **`02_architecture_waves_and_contracts.md`** | `target_architecture`（`target_layers`、`component_mappings`）、`refactoring_waves`、`cycle_cuts`、`implicit_contracts` | To-Be Port/Adapter `ClassDiagram` / `ArchitectureDiagram` + Wave `1..4` 依存トポロジ |
 | **`03_spec_vs_bug_decision_log.md`** | `decision_log`（`DEC-01..NN`）、`spec_vs_bug_candidates`（PO 承認を要する Hyrum の法則の挙動） | 意思決定ワークフロー図 + `DEC-01..NN` サインオフマトリクス `Table` |
@@ -411,9 +411,9 @@ pni report build <target> --src-dir reports_src --output-dir reports
 
 `drawlib.tools` を呼び出す前に、`compiler.py` は 4 つの自動検証ガードレールを実行します。
 
-- **非破壊的な再スキャフォールディング（`scaffold_report_project`）**: 初回作成時、`pni report init` はスターターサンプル（`00_cover.md`、`01_overview.md`、`02_design.md`）を削除します。既存レポートディレクトリに対して再実行された場合は、`--force` で `drawlib.toml`、`styles.py`、`utils.py` を更新する際にも執筆済みの `<lang>/*.md` 章ファイルをすべて無傷で保持し、再監査時の `git diff` をクリーンに保ちます。
+- **非破壊的な再スキャフォールディングとブランドアセット（`scaffold_report_project`）**: 初回作成時、`pni report init` はスターターサンプル（`00_cover.md`、`01_overview.md`、`02_design.md`）を削除し、公式ブランドアセット（`_assets/{logo.png,logo_dark.png,favicon.png}`）をコピーしたうえで `utils.py` に `draw_pni_logo()` を注入します。既存レポートディレクトリに対して再実行された場合は、`--force` で `drawlib.toml`、`styles.py`、`utils.py` を更新する際にも執筆済みの `<lang>/*.md` 章ファイルをすべて無傷で保持し、再監査時の `git diff` をクリーンに保ちます。
 - **複数系列チャートの凡例チェック**: `lint_drawlib_chapters()` がすべての ```` ```drawlib ```` フェンスを走査し、`.add_series(...)` を 2 回以上呼び出す `BarChart` または `LineChart` が `.draw_legend(...)` を呼び出していることを検証します。
-- **UML ClassDiagram + HeatmapOverlay の等高線衝突ガード**: `ClassDiagram` と `HeatmapOverlay(..., show_contour_lines=True)` の併用に対してプリフライト警告（`strict_preflight=True` 時は `ValueError`）を発行します。`show_contour_lines=False` を指定することで、メソッドシグネチャに等高線が重なるのを防ぎつつ高リスククラスを滑らかなサーマルグラデーションで強調できます。
-- **出力ファイル正規化とリンク切れスキャン（`_verify_links`）**: `pni report build` は `<target>_<default_lang>.pdf` を `reports/<target>.pdf`（`page_break=True`、`generate_index=True`）へ正規化します。また `-f html` 指定時には `_verify_links()` が `drawlib.tools.scan_broken_links()` を実行し、リンク切れや画像アセット欠損があればフェイルクローズ（`strict_links=True`）で検出します。
+- **UML ClassDiagram の等高線衝突・`Styles.White` ガード**: `ClassDiagram` と `HeatmapOverlay(..., show_contour_lines=True)` の併用、または `ClassDiagram` / `ClassNode` での `Styles.White` の使用（白背景に白文字となり視認不能になるため `Styles.Neutral` を推奨）に対してプリフライト警告（`strict_preflight=True` 時は `ValueError`）を発行します。
+- **出力ファイル正規化とリンク切れスキャン（`_verify_links`）**: `pni report build` は `<target>_<default_lang>.pdf` を `reports/<target>.pdf`（`page_break=True`、`generate_index=True`）へ正規化します。また `-f html` 指定時には `_verify_links()` が `drawlib.tools.scan_broken_links()`（マルチポータル相対リンク検証用の `--link-check-root <dir>` 対応）を実行し、リンク切れや画像アセット欠損があればフェイルクローズ（`strict_links=True`）で検出します。
 
 上流の JSON スキーマや決定論的ホットスポット計算式の詳細は [7軸品質スコアリングモデル](scoring_model.md) を、`pni report` の全 CLI オプションについては [ルール拡張と CLI リファレンス](../05_languages_and_reference/rules_and_cli.md) を参照してください。

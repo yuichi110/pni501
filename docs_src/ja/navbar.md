@@ -6,6 +6,7 @@
 - [背景とコアコンセプト](01_getting_started/concepts.md)
 - [クイックスタートガイド](01_getting_started/quickstart.md)
 - [3つの主要ユースケース](01_getting_started/use_cases.md)
+- [リリースノート](01_getting_started/release_notes.md)
 
 ## 2. アーキテクチャ (Architecture)
 - [ドメイン構造と3層カスケード](02_architecture/domain_architecture.md)

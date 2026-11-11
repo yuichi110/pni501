@@ -1,6 +1,6 @@
 # Primary Use Cases
 
-`pni501` (`v0.1.3`) supports the complete software engineering lifecycle across **Python**, **Java**, **PHP**, **Go**, **TypeScript**, and **JavaScript** through three primary operational scenarios: (1) **Continuous Quality Measurement** during active sprint development, (2) **Black-Box Legacy & Security Auditing** for inherited or undocumented systems, and (3) **Prerequisite-Gated Migration Planning** (`based_on`) for architectural modernization and cross-stack rewrites.
+`pni501` (`v0.1.4`) supports the complete software engineering lifecycle across **Python**, **Java**, **PHP**, **Go**, **TypeScript**, and **JavaScript** through three primary operational scenarios: (1) **Continuous Quality Measurement** during active sprint development, (2) **Black-Box Legacy & Security Auditing** for inherited or undocumented systems, and (3) **Prerequisite-Gated Migration Planning** (`based_on`) for architectural modernization and cross-stack rewrites.
 
 ```drawlib align=center code=fold file=pni_use_cases_overview.png caption="Continuous Sprint Quality Trajectory & The Three Core Engineering Scenarios of pni501"
 from drawlib.canvas import save, setup

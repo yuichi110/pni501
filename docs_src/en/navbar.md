@@ -6,6 +6,7 @@
 - [Background & Core Concepts](01_getting_started/concepts.md)
 - [Quickstart Guide](01_getting_started/quickstart.md)
 - [Primary Use Cases](01_getting_started/use_cases.md)
+- [Release Notes](01_getting_started/release_notes.md)
 
 ## 2. Architecture
 - [Domain Architecture & Cascade](02_architecture/domain_architecture.md)

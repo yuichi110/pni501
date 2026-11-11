@@ -1,6 +1,6 @@
 # ドメインアーキテクチャと3層カスケード解決
 
-`pni501` (`v0.1.3`) は `src/pni/` 配下の実装を、**7つの垂直ドメインパッケージ**（`_workflows`、`_actions`、`_reporter`、`_rules`、`_pentests`、`_dockerfiles`、`_instructions`）、プロジェクトマニフェストローダー（`_config.py`）、自己修復型キャッシュユーティリティ（`_cache.py`）、および軽量な Typer + Rich 製 CLI オーケストレーター（`cli.py`）に編成しています。各ドメインは **対応6言語**（`python`、`java`、`php`、`go`、`typescript`、`javascript`）にわたる Pydantic v2 スキーマ、実行・解決ロジック、組み込みの `.md` / `.yaml` / `.dockerfile` / `.tmpl` アセットを同一パッケージ内に同居（コロケーション）させ、モジュールレベルの厳密な有向非巡回グラフ（`circular_dependencies = []`）を維持しています。
+`pni501` (`v0.1.4`) は `src/pni/` 配下の実装を、**7つの垂直ドメインパッケージ**（`_workflows`、`_actions`、`_reporter`、`_rules`、`_pentests`、`_dockerfiles`、`_instructions`）、プロジェクトマニフェストローダー（`_config.py`）、自己修復型キャッシュユーティリティ（`_cache.py`）、および軽量な Typer + Rich 製 CLI オーケストレーター（`cli.py`）に編成しています。各ドメインは **対応6言語**（`python`、`java`、`php`、`go`、`typescript`、`javascript`）にわたる Pydantic v2 スキーマ、実行・解決ロジック、組み込みの `.md` / `.yaml` / `.dockerfile` / `.tmpl` アセットを同一パッケージ内に同居（コロケーション）させ、モジュールレベルの厳密な有向非巡回グラフ（`circular_dependencies = []`）を維持しています。
 
 ```drawlib align=center code=fold file=domain_layer_hierarchy.png caption="src/pni/ における高凝集ドメインパッケージ階層とモジュールレベル依存関係 DAG"
 from drawlib.canvas import save, setup
@@ -33,7 +33,7 @@ cli_node = ClassNode(
     row_height=3.8,
     header_style=Styles.PrimaryFlat.patch(text_color=Colors.White, text_size=10.5),
 )
-cli_node.add_attribute("sub-apps", "rules, workflows, report, pentests")
+cli_node.add_attribute("sub-apps", "rules, workflows, report, pentests, cache")
 cli_node.add_attribute("commands", "init, instructions, validate-*, version")
 diagram.add(cli_node, xy=(86.0, 93.5))
 
@@ -137,17 +137,17 @@ save()
 
 従来の CLI コードベースでは、Pydantic モデルを `models/`、YAML/Markdown ローダーを `config/`、サブプロセス実行器を `executors/`、静的ファイルを `templates/` へと水平分割（レイヤー分割）しがちです。しかしこの構造では、1つの監査機能を追加・変更するたびに4つの離れたディレクトリを同時に編集する必要が生じ、人間のメンテナーにとっても AI コーディングエージェントにとってもコンテキスト負荷が増大します。
 
-これに対し `pni501` は、`src/pni/` を **自己完結型の垂直ドメインパッケージ** として構成しています。トップレベルの `src/pni/__init__.py` はパッケージ識別定数（`LIB_NAME = "pni501"`、`LIB_VERSION = "0.1.3"`、`__version__`）のみを公開し、各サブシステムが自身のスキーマ・オーケストレーションモジュール・組み込みテンプレートを単一の境界ディレクトリ内に同居させています。
+これに対し `pni501` は、`src/pni/` を **自己完結型の垂直ドメインパッケージ** として構成しています。トップレベルの `src/pni/__init__.py` はパッケージ識別定数（`LIB_NAME = "pni501"`、`LIB_VERSION = "0.1.4"`、`__version__`）のみを公開し、各サブシステムが自身のスキーマ・オーケストレーションモジュール・組み込みテンプレートを単一の境界ディレクトリ内に同居させています。
 
 | パッケージ / モジュール | 主要 Python モジュール | 主なスキーマと責務 | 同梱の組み込みアセット |
 | :--- | :--- | :--- | :--- |
-| **`cli.py`** | `cli.py` | Typer ルート `app` + サブアプリ（`rules`, `workflows`, `report`, `pentests`, `progress`）およびルートコマンド（`init`, `instructions`, `validate-score`, `validate-migration-plan`, `version`） | Rich CLI ヘルプエピローグ & AI ブートストラップ案内 |
+| **`cli.py`** | `cli.py` | Typer ルート `app` + サブアプリ（`rules`, `workflows`, `report`, `pentests`, `progress`, `cache`）およびルートコマンド（`init`, `instructions`, `validate-score`, `validate-migration-plan`, `version`, `--version` / `-V`） | Rich CLI ヘルプエピローグ & AI ブートストラップ案内 |
 | **`_workflows/`** | `base_model.py`, `state_db.py`, `manager.py`, `engine.py`, `_migration_engine.py`, `_progress_engine.py`, `aggregator.py`, `adhoc.py`, `inspector.py` | `WorkflowDefinition`, `WorkflowFactsBundle`, `WorkflowStateDB`, `CompiledAuditDigest`。ステートフル Pull-Push エンジン、アドホック `run-action`、`rewind`、実行履歴の検査 | 6言語 × 2種のスターター（`{python,java,php,go,typescript,javascript}/{full_audit,quick_check}.yaml`、計 `12` ファイル）で6種のステートフルワークフローを支援 |
 | **`_actions/`** | `base_model.py`, `manager.py`, `ai_actions.py`, `project_inspect.py`, `_repo_governance.py`, および `ast_analyze/`, `runtime_check/`, `security_scan/`, `pentest/`, `migration_analyze/`, `progress_analyze/` | `PrimitiveType`（主要 `12` プリミティブ）、`ScoreResult`（7軸）、`ArchitectureRecord`、`MigrationPlanResult`、および6言語対応の決定論的ファクト抽出器 | 言語あたり `15` 個の複合 YAML アクション（`common/` 共通 `12` 個 + 各 `<lang>/` 固有 `3` 個） |
-| **`_reporter/`** | `base_model.py`, `blueprint.py`, `migration_blueprint.py`, `progress_blueprint.py`, `drawlib_guide.py`, `compiler.py` | `ReportBlueprint`, `ReportScaffoldResult`, `ReportBuildResult`。7章構成の監査・移行ブループリントを事前編成し、`compiler.py` で `drawlib.tools` を遅延インポート | 7章構成 Drawlib `doc` スキャフォールド & 章リンター |
+| **`_reporter/`** | `base_model.py`, `blueprint.py`, `migration_blueprint.py`, `progress_blueprint.py`, `drawlib_guide.py`, `compiler.py` | `ReportBlueprint`, `ReportScaffoldResult`, `ReportBuildResult`。7章構成の監査・移行ブループリントの事前編成、`utils.py` への `draw_pni_logo()` スキャフォールド、`compiler.py` での `drawlib.tools` 遅延インポート | 7章構成 Drawlib `doc` スキャフォールド、章リンター、および `_assets/{logo.png,logo_dark.png,favicon.png}` |
 | **`_rules/`** | `base_model.py`, `manager.py` | `RuleInfo`, `SUPPORTED_LANGUAGES = ("python", "java", "php", "go", "typescript", "javascript")`, `detect_active_language()`、および `<scope>/<name>` カスケード解決 | `common/` と6言語パック（`python/`, `java/`, `php/`, `go/`, `typescript/`, `javascript/`）にわたる `50+` 個の Markdown ルール |
 | **`_pentests/`** | `manager.py`, `surface_codegen.py` | ターゲット別の `pytest + httpx` Web ペネトレーションテストを `.pni/pentests/<target>/` に生成・検証し、`AstFacts.api_endpoints` から `test_target_surface.py` を自動生成 | プローブテンプレート `2` 種: `conftest.py.tmpl`, `test_baseline_http.py.tmpl` |
-| **`_dockerfiles/`** | `manager.py` | `.pni/dockerfiles/_templates/` オーバーライドまたは組み込みコンテナハーネスを解決し、分離 `.dockerignore` とともに `.pni/dockerfiles/` に展開 | `10` テンプレート: `python/{pip,poetry,uv}`, `java/{gradle,maven}`, `php/{composer,raw}`, `go/go`, `typescript/node`, `javascript/node.dockerfile` |
+| **`_dockerfiles/`** | `manager.py` | `.pni/dockerfiles/_templates/` オーバーライドまたは組み込みコンテナハーネスを解決し、分離 `.dockerignore` とともに `.pni/dockerfiles/` に展開（`prune_pni_container_artifacts()` も提供） | `10` テンプレート: `python/{pip,poetry,uv}`, `java/{gradle,maven}`, `php/{composer,raw}`, `go/go`, `typescript/node`, `javascript/node.dockerfile` |
 | **`_instructions/` & `_config.py`** | `base_model.py`, `manager.py`, `_config.py` | `InstructionInfo`, `PniConfig`, `OptOutEntry`。`.pni/instructions.md` および `.pni/pni.toml` プロジェクトマニフェスト・`[[opt_out]]` 免除設定を解決 | `agent.md` およびデフォルト `.pni/pni.toml` テンプレート |
 | **`_cache.py`** | `_cache.py` | 自己修復型 `.pni/cache/` 初期化（`ensure_cache_dir`, `ensure_cache_parent`）とワークスペース安全なパス解決（`normalize_target_subpath`） | 自動生成される `.pni/cache/.gitignore` (`*`) と `CACHEDIR.TAG` |
 

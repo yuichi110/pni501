@@ -1,6 +1,6 @@
 # Quickstart Guide
 
-Get up and running with `pni501` (`v0.1.3`) in minutes. This guide walks through installing the CLI, initializing `.pni/` in a target repository, verifying pre-flight readiness gates, and executing the stateful Pull-Push workflow loop to generate a 7-axis score JSON and a 7-chapter A4 PDF report.
+Get up and running with `pni501` (`v0.1.4`) in minutes. This guide walks through installing the CLI, initializing `.pni/` in a target repository, verifying pre-flight readiness gates, and executing the stateful Pull-Push workflow loop to generate a 7-axis score JSON and a 7-chapter A4 PDF report.
 
 ```drawlib align=center code=fold file=pni_quickstart_flow.png caption="Four-Step Quickstart Lifecycle: From pni init to Validated 7-Axis Score & 7-Chapter A4 PDF Report"
 from drawlib.canvas import save, setup
@@ -95,7 +95,7 @@ pip install pni501
 uv add pni501
 
 # Verify installation and inspect top-level CLI subcommands
-pni version
+pni --version   # or: pni version
 pni --help
 ```
 

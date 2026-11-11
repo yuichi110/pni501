@@ -37,19 +37,19 @@
     
     
     
-    <meta name="description" content="数分で pni501 (v0.1.3) の導入から初回レポート生成までを体験できます。本ガイドでは、CLI のインストール、対象リポジトリでの .pni/ 初期化、Pre-Flight 準備ゲートの確認、そしてステートフル Pull-Push ワークフローループを実行して7軸スコア JSON と7章構成 A4…">
+    <meta name="description" content="数分で pni501 (v0.1.4) の導入から初回レポート生成までを体験できます。本ガイドでは、CLI のインストール、対象リポジトリでの .pni/ 初期化、Pre-Flight 準備ゲートの確認、そしてステートフル Pull-Push ワークフローループを実行して7軸スコア JSON と7章構成 A4…">
     <link rel="canonical" href="https://www.pni501.com/ja/01_getting_started/quickstart.html">
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="pni501 ドキュメント">
     <meta property="og:title" content="クイックスタートガイド — pni501 ドキュメント">
-    <meta property="og:description" content="数分で pni501 (v0.1.3) の導入から初回レポート生成までを体験できます。本ガイドでは、CLI のインストール、対象リポジトリでの .pni/ 初期化、Pre-Flight 準備ゲートの確認、そしてステートフル Pull-Push ワークフローループを実行して7軸スコア JSON と7章構成 A4…">
+    <meta property="og:description" content="数分で pni501 (v0.1.4) の導入から初回レポート生成までを体験できます。本ガイドでは、CLI のインストール、対象リポジトリでの .pni/ 初期化、Pre-Flight 準備ゲートの確認、そしてステートフル Pull-Push ワークフローループを実行して7軸スコア JSON と7章構成 A4…">
     <meta property="og:url" content="https://www.pni501.com/ja/01_getting_started/quickstart.html">
     <meta property="og:image" content="https://www.pni501.com/_assets/logo.png">
     <meta property="og:locale" content="ja_JP">
     <meta property="og:locale:alternate" content="en_US">
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="クイックスタートガイド — pni501 ドキュメント">
-    <meta name="twitter:description" content="数分で pni501 (v0.1.3) の導入から初回レポート生成までを体験できます。本ガイドでは、CLI のインストール、対象リポジトリでの .pni/ 初期化、Pre-Flight 準備ゲートの確認、そしてステートフル Pull-Push ワークフローループを実行して7軸スコア JSON と7章構成 A4…">
+    <meta name="twitter:description" content="数分で pni501 (v0.1.4) の導入から初回レポート生成までを体験できます。本ガイドでは、CLI のインストール、対象リポジトリでの .pni/ 初期化、Pre-Flight 準備ゲートの確認、そしてステートフル Pull-Push ワークフローループを実行して7軸スコア JSON と7章構成 A4…">
     <meta name="twitter:image" content="https://www.pni501.com/_assets/logo.png">
     
     
@@ -83,6 +83,16 @@
                     </button>
                 </div>
             </div>
+            <div class="sidebar-subbar">
+                
+                <a href="../01_getting_started/release_notes.html" class="sidebar-version-badge" title="View Release Notes">
+                    <span class="sidebar-version-dot" aria-hidden="true"></span>
+                    <span class="sidebar-version-text">v0.1.4</span>
+                </a>
+                <a href="https://github.com/yuichi110/pni501" target="_blank" rel="noopener noreferrer" class="sidebar-github-link" aria-label="GitHub Repository" title="GitHub Repository">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg>
+                </a>
+            </div>
             <div class="sidebar-menu">
                 
                     
@@ -110,6 +120,10 @@
                             
                             <li class="nav-item ">
                                 <a href="use_cases.html" >3つの主要ユースケース</a>
+                            </li>
+                            
+                            <li class="nav-item ">
+                                <a href="release_notes.html" >リリースノート</a>
                             </li>
                             
                         </ul>
@@ -232,7 +246,7 @@
             </header>
             <main class="main-content">
                 <h1>クイックスタートガイド</h1>
-<p>数分で <code>pni501</code> (<code>v0.1.3</code>) の導入から初回レポート生成までを体験できます。本ガイドでは、CLI のインストール、対象リポジトリでの <code>.pni/</code> 初期化、Pre-Flight 準備ゲートの確認、そしてステートフル Pull-Push ワークフローループを実行して7軸スコア JSON と7章構成 A4 PDF レポートを生成するまでの手順を解説します。</p>
+<p>数分で <code>pni501</code> (<code>v0.1.4</code>) の導入から初回レポート生成までを体験できます。本ガイドでは、CLI のインストール、対象リポジトリでの <code>.pni/</code> 初期化、Pre-Flight 準備ゲートの確認、そしてステートフル Pull-Push ワークフローループを実行して7軸スコア JSON と7章構成 A4 PDF レポートを生成するまでの手順を解説します。</p>
 <figure class="drawlib-image" style="text-align: center;">
   <img src="../../images/01_getting_started/quickstart/pni_quickstart_flow.png" alt="quickstart_1" />
   <figcaption class="drawlib-caption">4ステップのクイックスタートライフサイクル：pni init から検証済み7軸スコア・7章構成 A4 PDF レポート生成まで</figcaption>
@@ -327,7 +341,7 @@ pip<span class="w"> </span>install<span class="w"> </span>pni501
 uv<span class="w"> </span>add<span class="w"> </span>pni501
 
 <span class="c1"># インストールの確認と CLI サブコマンド一覧の表示</span>
-pni<span class="w"> </span>version
+pni<span class="w"> </span>--version<span class="w">   </span><span class="c1"># または: pni version</span>
 pni<span class="w"> </span>--help
 </code></pre>
 <h2>2. ステップ 1：対象リポジトリで <code>.pni/</code> を初期化する</h2>

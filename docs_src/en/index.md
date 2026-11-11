@@ -1,8 +1,8 @@
 # pni501 (Project Nemesis Index) — Official Documentation
 
-**Project Nemesis Index (`pni501` `v0.1.3`)** is an AI-native software health auditing, security penetration testing, and migration planning framework for **Python**, **Java**, **PHP**, **Go**, **TypeScript**, and **JavaScript** repositories. By combining deterministic static and container analyzers with a SQLite-backed stateful Pull-Push workflow engine and Drawlib visual reporting, `pni501` eliminates LLM metric and path hallucinations while delivering reproducible 7-axis health scores, topological migration plans, and publication-grade A4 PDF reports.
+**Project Nemesis Index (`pni501` `v0.1.4`)** is an AI-native software health auditing, security penetration testing, and migration planning framework for **Python**, **Java**, **PHP**, **Go**, **TypeScript**, and **JavaScript** repositories. By combining deterministic static and container analyzers with a SQLite-backed stateful Pull-Push workflow engine and Drawlib visual reporting, `pni501` eliminates LLM metric and path hallucinations while delivering reproducible 7-axis health scores, topological migration plans, and publication-grade A4 PDF reports.
 
-```drawlib align=center code=fold file=pni_overview_pillars.png caption="Core Architectural Pillars & Polyglot Capabilities of pni501 (v0.1.3)"
+```drawlib align=center code=fold file=pni_overview_pillars.png caption="Core Architectural Pillars & Polyglot Capabilities of pni501 (v0.1.4)"
 from drawlib.canvas import save, setup
 from drawlib.icons import phosphor
 from drawlib.smartarts import KpiCards, Panel
@@ -11,7 +11,7 @@ from drawlib.styles import Styles
 setup(width=156, height=90, dpi=150)
 
 outer = Panel(
-    "Project Nemesis Index (pni501 v0.1.3) — Four Foundational Pillars",
+    "Project Nemesis Index (pni501 v0.1.4) — Four Foundational Pillars",
     header_variant="filled",
     style=Styles.PrimaryNeutral.patch(shape_r=2.0),
     header_style=Styles.PrimaryFlat,
@@ -82,7 +82,7 @@ save()
 
 Purely prompt-driven LLM code reviews suffer from non-deterministic counting errors, invented file paths, skipped audit categories, and blindness to container runtime behavior, dependency CVEs, and live HTTP attack surfaces. Conversely, purely static linters cannot evaluate domain boundary cohesion, aspect-separated system architecture, or phased modernization trade-offs.
 
-`pni501` (`v0.1.3`) bridges both worlds across **6 languages** (`Python`, `Java`, `PHP`, `Go`, `TypeScript`, and `JavaScript`) by orchestrating **52 cascading engineering rules**, **15 composite actions**, and **6 stateful workflow templates** in a unified pipeline:
+`pni501` (`v0.1.4`) bridges both worlds across **6 languages** (`Python`, `Java`, `PHP`, `Go`, `TypeScript`, and `JavaScript`) by orchestrating **52 cascading engineering rules**, **15 composite actions**, and **6 stateful workflow templates** in a unified pipeline:
 
 - **Programmatic Multi-Modal Fact Extraction**: `pni` executes deterministic analyzers—`project_inspect`, polyglot `ast_analyze` (Python `ast` and `ast-grep-py` across Java, PHP, Go, TypeScript, and JavaScript), isolated Docker `run_check` (offline unit tests, coverage, and HTTP boot probes), socketless Trivy `security_scan` (CVEs, IaC misconfigurations, and leaked secrets), loopback `pytest` + `httpx` `web_pentest`, topological `migration_analyze`, and Git `progress_analyze`—persisting exact telemetry into `.pni/cache/<workflow_id>/facts.json` and `.pni/cache/workflow_state.db`.
 - **Schema-Enforced AI Reasoning & Visual Reporting**: Guided step-by-step via SQLite (`workflow_state.db`), the Code AI Agent loads scoped rules (`load_rules`), records path-verified 3-aspect architecture (`record_architecture` -> `architecture.json`), evaluates rule compliance (`ai_interpret`), emits a 7-axis `ScoreResult` (`reports/<target>_score.json`), optionally chains `based_on` migration (`reports/<target>_migration_plan.json`) or progress (`reports/<target>_progress.json`) workflows, and compiles a **Drawlib visual report** (`reports/<target>.pdf` and HTML).
@@ -173,7 +173,7 @@ save()
 
 ## 2. Key Capabilities at a Glance
 
-| Capability Area | Built-In Assets (`v0.1.3`) | Primary Output / Guarantee |
+| Capability Area | Built-In Assets (`v0.1.4`) | Primary Output / Guarantee |
 | :--- | :--- | :--- |
 | **Supported Languages** | **6 languages**: `Python`, `Java`, `PHP`, `Go`, `TypeScript`, `JavaScript` | Auto-detected from repository manifests & source files (`detect_active_language`) |
 | **Cascading Engineering Rules** | **52 built-in rules** (`common/` + 6 language scopes) + `.pni/rules/` overrides | Enforces OWASP ASVS, OpenSSF Scorecard, 12-Factor, SRE PRR, CLI & library standards |
@@ -209,6 +209,7 @@ Explore the complete `pni501` documentation by section:
 - [Background & Core Concepts](01_getting_started/concepts.md) — Why ad-hoc AI prompting fails on real-world repositories and how PNI's four pillars guarantee zero-hallucination audits.
 - [Quickstart Guide](01_getting_started/quickstart.md) — Step-by-step installation, `.pni/` initialization, pre-flight readiness checks, and executing the `get-action` / `push-action` loop.
 - [Primary Use Cases](01_getting_started/use_cases.md) — Continuous sprint health monitoring, black-box legacy auditing, and prerequisite-gated migration planning.
+- [Release Notes](01_getting_started/release_notes.md) — Version history (`v0.1.0`–`v0.1.4`), new analyzer features, and CLI enhancements.
 
 ### 4.2 Architecture, Workflows, Scoring & Reference
 - [Domain Architecture & Cascade](02_architecture/domain_architecture.md) and [Stateful Pull-Push Engine](02_architecture/stateful_engine.md) — Internal package design and SQLite state transitions.

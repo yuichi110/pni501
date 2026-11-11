@@ -115,7 +115,7 @@ Code AI Agent（`Claude Code`、`Gemini CLI`、`Cursor`、`GitHub Copilot` な�
 
 ## 2. PNI501 のアプローチ：決定論的 AI 監査と移行を支える4つの柱
 
-**Project Nemesis Index (`pni501` `v0.1.3`)** は、制御の主導権を逆転させることでこれらの課題を解決します。LLM に監査手順を即興で考えさせるのではなく、**決定論的な `pni` CLI と SQLite ステートマシン** がプロセス全体を主導し、AI エージェントには「検証済みファクトに基づく推論」と「ビジュアルレポート執筆」のみを委譲します。
+**Project Nemesis Index (`pni501` `v0.1.4`)** は、制御の主導権を逆転させることでこれらの課題を解決します。LLM に監査手順を即興で考えさせるのではなく、**決定論的な `pni` CLI と SQLite ステートマシン** がプロセス全体を主導し、AI エージェントには「検証済みファクトに基づく推論」と「ビジュアルレポート執筆」のみを委譲します。
 
 ```drawlib align=center code=fold file=pni_four_step_architecture.png caption="PNI501 の4ステップ・アーキテクチャ：ポリグロット解析器・SQLite Pull-Push AI 推論・連鎖移行計画・ビジュアルレポートの統合"
 from drawlib.canvas import save, setup

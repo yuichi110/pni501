@@ -1,6 +1,6 @@
 # ルール拡張と CLI リファレンス
 
-`pni501` (`v0.1.3`) は、`common/*`（16 個の普遍的エンジニアリング規約とオーケストレーションガイド）および `<lang>/*`（6 言語・36 個の言語/フレームワーク規約）からなる **全 52 個の組み込み Markdown ルールファイル**を同梱しており、決定論的な `.pni/` ローカルオーバーライドカスケードと統合 `pni` CLI によってあらゆるプロジェクトの要件に柔軟に適応します。
+`pni501` (`v0.1.4`) は、`common/*`（16 個の普遍的エンジニアリング規約とオーケストレーションガイド）および `<lang>/*`（6 言語・36 個の言語/フレームワーク規約）からなる **全 52 個の組み込み Markdown ルールファイル**を同梱しており、決定論的な `.pni/` ローカルオーバーライドカスケードと統合 `pni` CLI によってあらゆるプロジェクトの要件に柔軟に適応します。
 
 ```drawlib align=center code=fold file=rules_taxonomy_and_override.png caption="直交ルール体系（common/* + <lang>/*）と .pni/ ローカルオーバーライドカスケード"
 from drawlib.canvas import save, setup
@@ -185,7 +185,7 @@ exclude = ["src/generated/**"]
 
 [scan]
 respect_gitignore = true
-include_gitignored = ["uv.lock", "composer.lock"]
+include_gitignored = ["uv.lock", "composer.lock", "go.sum"]
 
 [report]
 src_dir = "reports_src"
@@ -204,7 +204,7 @@ reason = "Command arguments are validated against an allowlist and executed with
 
 ## 3. `pni` CLI 完全リファレンス
 
-`pni` CLI（`src/pni/cli.py`）は、ワークスペース初期化、ルール参照、ステートフルワークフロー実行、ライブペネトレーションテスト、進捗・Git ガバナンス管理、Drawlib レポートコンパイル、および Pydantic スキーマ検証を一貫したサブコマンドツリーとして提供します。
+`pni` CLI（`src/pni/cli.py`）は、ワークスペース初期化、ルール参照、ステートフルワークフロー実行、ライブペネトレーションテスト、進捗・Git ガバナンス管理、Drawlib レポートコンパイル、ローカル/Docker キャッシュ削除、および Pydantic スキーマ検証を一貫したサブコマンドツリーとして提供します。
 
 ```drawlib align=center code=fold file=cli_command_tree.png caption="pni CLI コマンド階層と .pni/ ワークスペース成果物の対応関係"
 from drawlib.canvas import save, setup
@@ -218,7 +218,7 @@ txt_group = Styles.DarkBold.patch(text_size=10.0)
 txt_leaf = Styles.Dark.patch(text_size=9.8)
 
 root = MindMapNode(
-    "pni CLI\n(pni501 v0.1.3)",
+    "pni CLI\n(pni501 v0.1.4)",
     shape="rectangle",
     width=26.0,
     height=13.0,
@@ -384,7 +384,7 @@ root = MindMapNode(
                     text_style=txt_leaf,
                 ),
                 MindMapNode(
-                    "pni progress init | validate",
+                    "pni progress | cache clean",
                     shape="rectangle",
                     width=36.0,
                     height=6.2,
@@ -400,9 +400,9 @@ root.draw(xy=(102.0, 45.0))
 save()
 ```
 
-### 3.1 ワークスペース初期化・ルール参照・スキーマ検証コマンド
+### 3.1 ワークスペース初期化・ルール参照・キャッシュ削除・スキーマ検証コマンド
 
-トップレベルコマンドと `pni rules` サブコマンドを使用して、`.pni/` の初期化、エンジニアリングルールの閲覧、AI エージェントのブートストラップ、および出力 JSON のスキーマ検証を行います。
+トップレベルコマンド、`pni rules`、および `pni cache` サブコマンドを使用して、`.pni/` の初期化、エンジニアリングルールの閲覧、AI エージェントのブートストラップ、ローカル/Docker キャッシュの一括削除、および出力 JSON のスキーマ検証を行います。
 
 | コマンド | 主な引数・オプション | 概要と用途 |
 | :--- | :--- | :--- |
@@ -410,10 +410,11 @@ save()
 | `pni instructions` | *(別名: `pni instruction`)* | AI コーディングエージェント向けのブートストラップ手順とステートフル Pull-Push 実行ループガイドを標準出力に表示します。 |
 | `pni rules list` | `[--all/-a]` | `common` と検出言語 `<lang>` の有効ルール一覧（`--all` 指定時は全 6 言語・52 ルールすべて）を、`Builtin` / `Local (.pni)` のステータス付きで表示します。 |
 | `pni rules show` | `<name> [--pretty/-p]` | 指定したルールまたはワークフローガイド（`common/workflow_guide`, `python/testing`, または短縮名 `testing`）を Markdown（`--pretty` 指定時は Rich パネル）で出力します。 |
+| `pni cache clean` | `[--docker] [--container-engine auto\|docker\|podman]` | `.pni/cache/` を削除し、`--docker` 指定時は一時生成された `pni-harness-*`, `pni-proj-*`, `pni-sec-*`, `pni-pentest-*` コンテナイメージやダングリングレイヤー、ビルドキャッシュを一括パージします。 |
 | `pni validate-score` | `[score_path]` | `reports/<target>_score.json` を Pydantic の `ScoreResult` スキーマに対して検証します。 |
 | `pni validate-migration-plan` | `[plan_path]` | `reports/<target>_migration_plan.json` を Pydantic の `MigrationPlanResult` スキーマに対して検証します。 |
 | `pni validate-progress` | `[progress_path]` | `reports/<target>_progress.json` を Pydantic の `ProgressResult` スキーマに対して検証します。 |
-| `pni version` | *(なし)* | インストールされている `pni501` のパッケージ名とバージョンを表示します。 |
+| `pni version` | *(または `pni --version` / `-V`)* | インストールされている `pni501` のパッケージ名とバージョン（`pni501 v0.1.4`）を表示します。 |
 
 ```bash
 # Initialize .pni/ workspace and inspect active + language-specific rules
@@ -422,10 +423,11 @@ pni rules list --all
 pni rules show common/workflow_guide
 pni rules show python/testing --pretty
 
-# Validate emitted JSON deliverables in CI
+# Validate emitted JSON deliverables and clean local + Docker cache artifacts
 pni validate-score reports/full_audit_score.json
 pni validate-migration-plan reports/migration_plan.json
 pni validate-progress reports/project_progress.json
+pni cache clean --docker
 ```
 
 ### 3.2 ステートフルワークフロー実行・デバッグコマンド (`pni workflows`)
@@ -436,7 +438,7 @@ pni validate-progress reports/project_progress.json
 | :--- | :--- | :--- |
 | `pni workflows list` | `[--category/-c audit\|migration\|progress]` | `.pni/workflows/` 内のワークフロー一覧をカテゴリ・`based_on` 前提監査・ステップ数・対象パス・出力先とともに表示します。 |
 | `pni workflows show` | `<workflow_id>` | 複合アクションを正規化プリミティブステップ（`1..N`）に展開し、ペネトレーションテスト・移行計画・進捗計画の Pre-Flight チェックを実行します。 |
-| `pni workflows start` | `<workflow_id> [--supersede]` | `.pni/cache/workflow_state.db` に新しい実行セッション（`wf-...`）を開始します（`--supersede` で同一ワークフローの未完了セッションを自動キャンセル）。 |
+| `pni workflows start` | `<workflow_id> [--supersede]` | `.pni/cache/workflow_state.db` に新しい実行セッション（`wf-...`）を開始します（デフォルトの `supersede=True` で同一ワークフローの未完了セッションを自動キャンセル）。 |
 | `pni workflows get-action` | `<run_id>` | 未実行の決定論的解析器（`project_inspect`, `ast_analyze`, `run_check`, `security_scan`, `web_pentest`, `migration_analyze`, `progress_analyze`）を自動実行し、次の `act-XX` プロンプトと JSON スキーマを出力します。 |
 | `pni workflows push-action` | `<run_id> <action_id> [json] [--file/-f <path>]` | エージェントの JSON 出力を Pydantic スキーマおよび実在ファイルパスに対して検証・保存し、次のステップへ進めます。 |
 | `pni workflows run-action` | `<workflow_id> <action> [--base-url <url>] [--force-pentests] [--fail-on-findings]` | SQLite セッション準備なしで特定のステップや解析器を単体実行します（Dockerfile 調整・ペネトレーションテスト・CI ゲートに最適）。 |
@@ -465,16 +467,18 @@ pni workflows rewind wf-1a2b3c4d runtime_verification --pull
 
 | コマンド | 主な引数・オプション | 概要と用途 |
 | :--- | :--- | :--- |
-| `pni report init` | `[target] [--src-dir reports_src] [-l en\|ja] [-s google\|default\|monochrome] [--keep-samples] [-f]` | 既存の執筆済み `*.md` チャプターを保持したまま、`reports_src/<target>_src/`（`drawlib.toml`, `styles.py`, `<lang>/`）を非破壊で初期化・更新します。 |
-| `pni report build` | `[target] [--src-dir reports_src] [-o reports] [-f pdf\|html\|markdown\|images] [--toc/--no-toc] [--no-cache]` | `lint_drawlib_chapters` による事前チェックを実行し、`reports/<target>.pdf`（A4 ベクター PDF・目次付き）をコンパイルします（`-f html` 時はリンク切れ検査も自動実行）。 |
+| `pni report init` | `[target] [--src-dir reports_src] [-l en\|ja] [-s google\|default\|monochrome] [--keep-samples] [-f]` | 既存の執筆済み `*.md` チャプターを保持したまま、`reports_src/<target>_src/`（`drawlib.toml`, `styles.py`, `utils.py`, `_assets/`, `<lang>/`）を非破壊で初期化・更新します。 |
+| `pni report check` | `[target] [--src-dir reports_src]` | 出力ファイルをビルドせずに `lint_drawlib_chapters` による事前チェック（複数系列凡例、`ClassDiagram` 等高線・`Styles.White` ガード）のみを実行します。 |
+| `pni report build` | `[target] [--src-dir reports_src] [-o reports] [-f pdf\|html\|markdown\|images] [--toc/--no-toc] [--no-cache] [--link-check-root <dir>]` | `lint_drawlib_chapters` による事前チェックを実行し、`reports/<target>.pdf`（A4 ベクター PDF・目次付き）をコンパイルします（`-f html` 時はリンク切れ検査も自動実行）。 |
 | `pni pentests init` | `[-w <wf>] [-t <root>] [-s <src>] [-l <lang>] [--force/-f]` | AST 解析結果から API エンドポイントを抽出し、`.pni/pentests/<target>/` に `Python + httpx` ベースの DAST スイート（`conftest.py`, `test_*.py`）を生成します。 |
 | `pni pentests run` | `[-w <wf>] [-t <root>] [-s <src>] [--base-url <url>] [--container-engine auto\|docker\|podman] [-f]` | 隔離されたループバックコンテナを起動（または `--base-url` をプローブ）して `.pni/pentests/<target>/` を実行し、`PentestFacts` を出力します。 |
 | `pni progress init` | `[target] [-w <wf>] [--force/-f]` | マイルストーン・タスク・`git_policy` を備えた `.pni/progress/<target>.yaml` の初期テンプレートを生成します。 |
 | `pni progress validate` | `[target_or_path]` | 進捗ワークフロー開始前に、`.pni/progress/<target>.yaml` のスキーマ・ISO-8601 日付・`git_policy`・非巡回 `depends_on` タスク DAG を検証します。 |
 
 ```bash
-# Scaffold and compile a 7-chapter Drawlib visual PDF report
+# Scaffold, lint, and compile a 7-chapter Drawlib visual PDF report
 pni report init full_audit --src-dir reports_src --lang en --style google
+pni report check full_audit --src-dir reports_src
 pni report build full_audit --src-dir reports_src --output-dir reports
 
 # Materialize and execute live HTTP penetration tests for a web service workflow

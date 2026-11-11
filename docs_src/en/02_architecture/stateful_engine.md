@@ -1,6 +1,6 @@
 # Stateful Pull-Push Engine, SQLite Persistence & Chaining
 
-Once a workflow passes its pre-flight readiness gates, `pni501` (`v0.1.3`) transitions into a **deterministic stateful execution loop** orchestrated by `src/pni/_workflows/engine.py`, `state_db.py`, `aggregator.py`, and `_migration_engine.py`. Rather than trusting an AI agent to track multi-step progress in volatile chat memory or self-grade code paths without verification, the CLI acts as an authoritative state machine: executing static and container analyzers across all **6 languages** (`python`, `java`, `php`, `go`, `typescript`, `javascript`) exactly once per step, synthesizing context-rich prompts on `get-action`, validating Pydantic schemas and repository path grounding on `push-action`, and chaining completed As-Is audit facts directly into downstream To-Be migration workflows.
+Once a workflow passes its pre-flight readiness gates, `pni501` (`v0.1.4`) transitions into a **deterministic stateful execution loop** orchestrated by `src/pni/_workflows/engine.py`, `state_db.py`, `aggregator.py`, and `_migration_engine.py`. Rather than trusting an AI agent to track multi-step progress in volatile chat memory or self-grade code paths without verification, the CLI acts as an authoritative state machine: executing static and container analyzers across all **6 languages** (`python`, `java`, `php`, `go`, `typescript`, `javascript`) exactly once per step, synthesizing context-rich prompts on `get-action`, validating Pydantic schemas and repository path grounding on `push-action`, and chaining completed As-Is audit facts directly into downstream To-Be migration workflows.
 
 ```drawlib align=center code=fold file=pull_push_sequence.png caption="Chronological Pull-Push Execution & Validation Sequence Across AI Agent, pni Engine, Grounding Analyzers, SQLite, and Cache"
 from drawlib.canvas import save, setup
@@ -111,7 +111,7 @@ Every stateful workflow run progresses through three CLI phases in `src/pni/_wor
 1. Loads `.pni/workflows/<id>.yaml` with `based_on` target inheritance and `.pni/pni.toml` defaults resolved.
 2. Enforces pre-flight gates (`inspect_base_audit_status` and `inspect_pentests_prerequisite`), raising `WorkflowPrerequisiteError` before touching SQLite if any prerequisite is unmet.
 3. Normalizes composite steps into flat `PrimitiveStep` entries (`act-01` .. `act-NN`) across the **15 composite actions** and resolves effective `WorkflowOutputs` (`facts`, `score`, `report`).
-4. When `--supersede` is passed, calls `db.cancel_active_runs_for_workflow(workflow_id)` to mark older unfinished runs and their remaining steps `cancelled`.
+4. When `supersede=True` (the default in `start_workflow_run`, or via `--supersede`), calls `db.cancel_active_runs_for_workflow(workflow_id)` to mark older unfinished runs and their remaining steps `cancelled`.
 5. Inserts a new `workflow_runs` row (`run_id = wf-<8hex>`, `status = in_progress`, recording `based_on` and `based_on_run_id` when applicable) and `N` sequential `action_runs` rows (`status = pending`).
 
 ### Phase 2: Deterministic Execution & Prompt Synthesis (`get_workflow_action`)

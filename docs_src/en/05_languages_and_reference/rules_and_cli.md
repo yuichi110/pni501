@@ -1,6 +1,6 @@
 # Rules Customization & CLI Reference
 
-`pni501` (`v0.1.3`) ships **52 built-in Markdown rule files** across `common/*` (`16` universal standards and orchestration guides) and `<lang>/*` (`36` language and framework standards across 6 languages), resolves workspace customizations through a deterministic `.pni/` override cascade, and exposes every lifecycle operation via the unified `pni` CLI.
+`pni501` (`v0.1.4`) ships **52 built-in Markdown rule files** across `common/*` (`16` universal standards and orchestration guides) and `<lang>/*` (`36` language and framework standards across 6 languages), resolves workspace customizations through a deterministic `.pni/` override cascade, and exposes every lifecycle operation via the unified `pni` CLI.
 
 ```drawlib align=center code=fold file=rules_taxonomy_and_override.png caption="Orthogonal Rule Taxonomy (common/* + <lang>/*) and .pni/ Local Override Cascade"
 from drawlib.canvas import save, setup
@@ -185,7 +185,7 @@ exclude = ["src/generated/**"]
 
 [scan]
 respect_gitignore = true
-include_gitignored = ["uv.lock", "composer.lock"]
+include_gitignored = ["uv.lock", "composer.lock", "go.sum"]
 
 [report]
 src_dir = "reports_src"
@@ -204,7 +204,7 @@ reason = "Command arguments are validated against an allowlist and executed with
 
 ## 3. Complete `pni` CLI Reference
 
-The `pni` CLI (`src/pni/cli.py`) organizes all workspace initialization, rule discovery, stateful workflow orchestration, live penetration testing, progress governance, Drawlib report compilation, and Pydantic schema validation commands into a cohesive command hierarchy.
+The `pni` CLI (`src/pni/cli.py`) organizes all workspace initialization, rule discovery, stateful workflow orchestration, live penetration testing, progress governance, Drawlib report compilation, cache cleanup, and Pydantic schema validation commands into a cohesive command hierarchy.
 
 ```drawlib align=center code=fold file=cli_command_tree.png caption="The pni CLI Command Hierarchy and Workspace Artifact Mapping"
 from drawlib.canvas import save, setup
@@ -218,7 +218,7 @@ txt_group = Styles.DarkBold.patch(text_size=10.0)
 txt_leaf = Styles.Dark.patch(text_size=9.8)
 
 root = MindMapNode(
-    "pni CLI\n(pni501 v0.1.3)",
+    "pni CLI\n(pni501 v0.1.4)",
     shape="rectangle",
     width=26.0,
     height=13.0,
@@ -384,7 +384,7 @@ root = MindMapNode(
                     text_style=txt_leaf,
                 ),
                 MindMapNode(
-                    "pni progress init | validate",
+                    "pni progress | cache clean",
                     shape="rectangle",
                     width=36.0,
                     height=6.2,
@@ -400,9 +400,9 @@ root.draw(xy=(102.0, 45.0))
 save()
 ```
 
-### 3.1 Workspace Bootstrap, Rules & Validation Commands
+### 3.1 Workspace Bootstrap, Rules, Cache & Validation Commands
 
-Use top-level commands and `pni rules` to initialize `.pni/`, inspect engineering standards, bootstrap AI coding agents, and validate emitted JSON artifacts:
+Use top-level commands, `pni rules`, and `pni cache` to initialize `.pni/`, inspect engineering standards, bootstrap AI coding agents, clean local/Docker cache artifacts, and validate emitted JSON artifacts:
 
 | Command | Arguments & Key Options | Description |
 | :--- | :--- | :--- |
@@ -410,10 +410,11 @@ Use top-level commands and `pni rules` to initialize `.pni/`, inspect engineerin
 | `pni instructions` | *(alias: `pni instruction`)* | Print the AI agent bootstrap and stateful pull-push execution loop guide in Markdown to `stdout`. |
 | `pni rules list` | `[--all/-a]` | List active rules for `common` + detected `<lang>` (or all 52 rules across all 6 languages with `--all`), showing `Builtin` vs `Local (.pni)` source status. |
 | `pni rules show` | `<name> [--pretty/-p]` | Output a rule or workflow guide (`common/workflow_guide`, `python/testing`, or short name `testing`) in raw Markdown or a styled Rich panel (`--pretty`). |
+| `pni cache clean` | `[--docker] [--container-engine auto\|docker\|podman]` | Clean `.pni/cache/` and optionally prune temporary `pni-harness-*`, `pni-proj-*`, `pni-sec-*`, and `pni-pentest-*` container images, dangling layers, and builder caches. |
 | `pni validate-score` | `[score_path]` | Validate a `reports/<target>_score.json` file against the Pydantic `ScoreResult` schema. |
 | `pni validate-migration-plan` | `[plan_path]` | Validate a `reports/<target>_migration_plan.json` file against the Pydantic `MigrationPlanResult` schema. |
 | `pni validate-progress` | `[progress_path]` | Validate a `reports/<target>_progress.json` file against the Pydantic `ProgressResult` schema. |
-| `pni version` | *(none)* | Print the installed `pni501` package name and version string. |
+| `pni version` | *(or `pni --version` / `-V`)* | Print the installed `pni501` package name and version string (`pni501 v0.1.4`). |
 
 ```bash
 # Initialize .pni/ workspace and inspect active + language-specific rules
@@ -422,10 +423,11 @@ pni rules list --all
 pni rules show common/workflow_guide
 pni rules show python/testing --pretty
 
-# Validate emitted JSON deliverables in CI
+# Validate emitted JSON deliverables and clean local + Docker cache artifacts
 pni validate-score reports/full_audit_score.json
 pni validate-migration-plan reports/migration_plan.json
 pni validate-progress reports/project_progress.json
+pni cache clean --docker
 ```
 
 ### 3.2 Stateful Workflow Execution & Debugging Commands (`pni workflows`)
@@ -436,7 +438,7 @@ pni validate-progress reports/project_progress.json
 | :--- | :--- | :--- |
 | `pni workflows list` | `[--category/-c audit\|migration\|progress]` | List workflows in `.pni/workflows/` with category, `based_on` prerequisite link, step count, source targets, and outputs. |
 | `pni workflows show` | `<workflow_id>` | Expand composite actions into normalized primitive steps (`1..N`) and run preflight readiness checks for pentests, migrations, and progress plans. |
-| `pni workflows start` | `<workflow_id> [--supersede]` | Start a stateful workflow run (`wf-...`) in `.pni/cache/workflow_state.db` (`--supersede` cancels older unfinished runs of `<workflow_id>`). |
+| `pni workflows start` | `<workflow_id> [--supersede]` | Start a stateful workflow run (`wf-...`) in `.pni/cache/workflow_state.db` (`supersede=True` by default cancels older unfinished runs of `<workflow_id>`). |
 | `pni workflows get-action` | `<run_id>` | Automatically execute pending deterministic analyzers (`project_inspect`, `ast_analyze`, `run_check`, `security_scan`, `web_pentest`, `migration_analyze`, `progress_analyze`) and emit the next `act-XX` prompt & JSON schema. |
 | `pni workflows push-action` | `<run_id> <action_id> [json] [--file/-f <path>]` | Validate agent JSON output against Pydantic schemas and repository file paths, persist to SQLite, and advance to the next step. |
 | `pni workflows run-action` | `<workflow_id> <action> [--base-url <url>] [--force-pentests] [--fail-on-findings]` | Execute a single step or analyzer inside `<workflow_id>` directly with zero prior SQLite run setup (ideal for debugging Dockerfiles, pentests, or CI gates). |
@@ -465,16 +467,18 @@ Dedicated subcommand groups manage Drawlib report compilation (`pni report`), li
 
 | Command | Arguments & Key Options | Description |
 | :--- | :--- | :--- |
-| `pni report init` | `[target] [--src-dir reports_src] [-l en\|ja] [-s google\|default\|monochrome] [--keep-samples] [-f]` | Non-destructively scaffold or refresh `reports_src/<target>_src/` (`drawlib.toml`, `styles.py`, `<lang>/`) while preserving existing authored `*.md` chapters. |
-| `pni report build` | `[target] [--src-dir reports_src] [-o reports] [-f pdf\|html\|markdown\|images] [--toc/--no-toc] [--no-cache]` | Run `lint_drawlib_chapters` preflight checks, compile `reports/<target>.pdf` (default A4 vector PDF with ToC), and verify zero broken links when `-f html` is enabled. |
+| `pni report init` | `[target] [--src-dir reports_src] [-l en\|ja] [-s google\|default\|monochrome] [--keep-samples] [-f]` | Non-destructively scaffold or refresh `reports_src/<target>_src/` (`drawlib.toml`, `styles.py`, `utils.py`, `_assets/`, `<lang>/`) while preserving existing authored `*.md` chapters. |
+| `pni report check` | `[target] [--src-dir reports_src]` | Run `lint_drawlib_chapters` preflight checks (multi-series legend check, `ClassDiagram` contour & `Styles.White` guards) without compiling outputs. |
+| `pni report build` | `[target] [--src-dir reports_src] [-o reports] [-f pdf\|html\|markdown\|images] [--toc/--no-toc] [--no-cache] [--link-check-root <dir>]` | Run `lint_drawlib_chapters` preflight checks, compile `reports/<target>.pdf` (default A4 vector PDF with ToC), and verify zero broken links when `-f html` is enabled. |
 | `pni pentests init` | `[-w <wf>] [-t <root>] [-s <src>] [-l <lang>] [--force/-f]` | Discover API endpoints from AST facts and materialize explicit `Python + httpx` DAST suites (`conftest.py`, `test_*.py`) in `.pni/pentests/<target>/`. |
 | `pni pentests run` | `[-w <wf>] [-t <root>] [-s <src>] [--base-url <url>] [--container-engine auto\|docker\|podman] [-f]` | Boot an isolated loopback container (or target `--base-url`) and execute `.pni/pentests/<target>/` to verify exploitability (`PentestFacts`). |
 | `pni progress init` | `[target] [-w <wf>] [--force/-f]` | Scaffold a starter `.pni/progress/<target>.yaml` manifest with milestones, tasks, and `git_policy`. |
 | `pni progress validate` | `[target_or_path]` | Validate `.pni/progress/<target>.yaml` schema, ISO-8601 dates, `git_policy`, and acyclic `depends_on` task DAG before starting a progress workflow. |
 
 ```bash
-# Scaffold and compile a 7-chapter Drawlib visual PDF report
+# Scaffold, lint, and compile a 7-chapter Drawlib visual PDF report
 pni report init full_audit --src-dir reports_src --lang en --style google
+pni report check full_audit --src-dir reports_src
 pni report build full_audit --src-dir reports_src --output-dir reports
 
 # Materialize and execute live HTTP penetration tests for a web service workflow

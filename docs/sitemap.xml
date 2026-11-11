@@ -25,6 +25,12 @@
     <xhtml:link rel="alternate" hreflang="x-default" href="https://www.pni501.com/en/01_getting_started/quickstart.html" />
   </url>
   <url>
+    <loc>https://www.pni501.com/en/01_getting_started/release_notes.html</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.pni501.com/en/01_getting_started/release_notes.html" />
+    <xhtml:link rel="alternate" hreflang="ja" href="https://www.pni501.com/ja/01_getting_started/release_notes.html" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.pni501.com/en/01_getting_started/release_notes.html" />
+  </url>
+  <url>
     <loc>https://www.pni501.com/en/01_getting_started/use_cases.html</loc>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.pni501.com/en/01_getting_started/use_cases.html" />
     <xhtml:link rel="alternate" hreflang="ja" href="https://www.pni501.com/ja/01_getting_started/use_cases.html" />
@@ -101,6 +107,12 @@
     <xhtml:link rel="alternate" hreflang="en" href="https://www.pni501.com/en/01_getting_started/quickstart.html" />
     <xhtml:link rel="alternate" hreflang="ja" href="https://www.pni501.com/ja/01_getting_started/quickstart.html" />
     <xhtml:link rel="alternate" hreflang="x-default" href="https://www.pni501.com/en/01_getting_started/quickstart.html" />
+  </url>
+  <url>
+    <loc>https://www.pni501.com/ja/01_getting_started/release_notes.html</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.pni501.com/en/01_getting_started/release_notes.html" />
+    <xhtml:link rel="alternate" hreflang="ja" href="https://www.pni501.com/ja/01_getting_started/release_notes.html" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.pni501.com/en/01_getting_started/release_notes.html" />
   </url>
   <url>
     <loc>https://www.pni501.com/ja/01_getting_started/use_cases.html</loc>

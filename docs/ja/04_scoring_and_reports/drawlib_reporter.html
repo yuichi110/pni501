@@ -83,6 +83,16 @@
                     </button>
                 </div>
             </div>
+            <div class="sidebar-subbar">
+                
+                <a href="../01_getting_started/release_notes.html" class="sidebar-version-badge" title="View Release Notes">
+                    <span class="sidebar-version-dot" aria-hidden="true"></span>
+                    <span class="sidebar-version-text">v0.1.4</span>
+                </a>
+                <a href="https://github.com/yuichi110/pni501" target="_blank" rel="noopener noreferrer" class="sidebar-github-link" aria-label="GitHub Repository" title="GitHub Repository">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg>
+                </a>
+            </div>
             <div class="sidebar-menu">
                 
                     
@@ -110,6 +120,10 @@
                             
                             <li class="nav-item ">
                                 <a href="../01_getting_started/use_cases.html" >3つの主要ユースケース</a>
+                            </li>
+                            
+                            <li class="nav-item ">
+                                <a href="../01_getting_started/release_notes.html" >リリースノート</a>
                             </li>
                             
                         </ul>
@@ -601,7 +615,7 @@
 <tr>
 <td style="text-align:left"><strong><code>00_cover.md</code></strong></td>
 <td style="text-align:left"><code>overall_score</code>、<code>grade</code>、<code>workflow_id</code>、<code>evaluated_at</code>、ルール準拠サマリ、ファインディング件数</td>
-<td style="text-align:left">フルブリード表紙 <code>Panel</code> + <code>KpiCards</code>（直後に PDF/HTML 目次を自動生成）</td>
+<td style="text-align:left">フルブリード表紙 <code>Panel</code> + <code>draw_pni_logo()</code> + <code>KpiCards</code>（直後に PDF/HTML 目次を自動生成）</td>
 </tr>
 <tr>
 <td style="text-align:left"><strong><code>01_executive_summary.md</code></strong></td>
@@ -649,7 +663,7 @@
 <tr>
 <td style="text-align:left"><strong><code>00_cover.md</code></strong></td>
 <td style="text-align:left"><code>transformation_mode</code>、<code>migration_strategy</code>、<code>api_compatibility</code>、<code>bug_handling_policy</code>、PR・フェーズ数</td>
-<td style="text-align:left">フルブリード移行計画表紙 <code>Panel</code> + <code>KpiCards</code>（直後に目次を自動生成）</td>
+<td style="text-align:left">フルブリード移行計画表紙 <code>Panel</code> + <code>draw_pni_logo()</code> + <code>KpiCards</code>（直後に目次を自動生成）</td>
 </tr>
 <tr>
 <td style="text-align:left"><strong><code>01_migration_strategy_summary.md</code></strong></td>
@@ -707,10 +721,10 @@ pni<span class="w"> </span>report<span class="w"> </span>build<span class="w"> <
 <h3>3.2 プリフライトビジュアルリンター（lint_drawlib_chapters）とリンク検証</h3>
 <p><code>drawlib.tools</code> を呼び出す前に、<code>compiler.py</code> は 4 つの自動検証ガードレールを実行します。</p>
 <ul>
-<li><strong>非破壊的な再スキャフォールディング（<code>scaffold_report_project</code>）</strong>: 初回作成時、<code>pni report init</code> はスターターサンプル（<code>00_cover.md</code>、<code>01_overview.md</code>、<code>02_design.md</code>）を削除します。既存レポートディレクトリに対して再実行された場合は、<code>--force</code> で <code>drawlib.toml</code>、<code>styles.py</code>、<code>utils.py</code> を更新する際にも執筆済みの <code>&lt;lang&gt;/*.md</code> 章ファイルをすべて無傷で保持し、再監査時の <code>git diff</code> をクリーンに保ちます。</li>
+<li><strong>非破壊的な再スキャフォールディングとブランドアセット（<code>scaffold_report_project</code>）</strong>: 初回作成時、<code>pni report init</code> はスターターサンプル（<code>00_cover.md</code>、<code>01_overview.md</code>、<code>02_design.md</code>）を削除し、公式ブランドアセット（<code>_assets/{logo.png,logo_dark.png,favicon.png}</code>）をコピーしたうえで <code>utils.py</code> に <code>draw_pni_logo()</code> を注入します。既存レポートディレクトリに対して再実行された場合は、<code>--force</code> で <code>drawlib.toml</code>、<code>styles.py</code>、<code>utils.py</code> を更新する際にも執筆済みの <code>&lt;lang&gt;/*.md</code> 章ファイルをすべて無傷で保持し、再監査時の <code>git diff</code> をクリーンに保ちます。</li>
 <li><strong>複数系列チャートの凡例チェック</strong>: <code>lint_drawlib_chapters()</code> がすべての <code>```drawlib</code> フェンスを走査し、<code>.add_series(...)</code> を 2 回以上呼び出す <code>BarChart</code> または <code>LineChart</code> が <code>.draw_legend(...)</code> を呼び出していることを検証します。</li>
-<li><strong>UML ClassDiagram + HeatmapOverlay の等高線衝突ガード</strong>: <code>ClassDiagram</code> と <code>HeatmapOverlay(..., show_contour_lines=True)</code> の併用に対してプリフライト警告（<code>strict_preflight=True</code> 時は <code>ValueError</code>）を発行します。<code>show_contour_lines=False</code> を指定することで、メソッドシグネチャに等高線が重なるのを防ぎつつ高リスククラスを滑らかなサーマルグラデーションで強調できます。</li>
-<li><strong>出力ファイル正規化とリンク切れスキャン（<code>_verify_links</code>）</strong>: <code>pni report build</code> は <code>&lt;target&gt;_&lt;default_lang&gt;.pdf</code> を <code>reports/&lt;target&gt;.pdf</code>（<code>page_break=True</code>、<code>generate_index=True</code>）へ正規化します。また <code>-f html</code> 指定時には <code>_verify_links()</code> が <code>drawlib.tools.scan_broken_links()</code> を実行し、リンク切れや画像アセット欠損があればフェイルクローズ（<code>strict_links=True</code>）で検出します。</li>
+<li><strong>UML ClassDiagram の等高線衝突・<code>Styles.White</code> ガード</strong>: <code>ClassDiagram</code> と <code>HeatmapOverlay(..., show_contour_lines=True)</code> の併用、または <code>ClassDiagram</code> / <code>ClassNode</code> での <code>Styles.White</code> の使用（白背景に白文字となり視認不能になるため <code>Styles.Neutral</code> を推奨）に対してプリフライト警告（<code>strict_preflight=True</code> 時は <code>ValueError</code>）を発行します。</li>
+<li><strong>出力ファイル正規化とリンク切れスキャン（<code>_verify_links</code>）</strong>: <code>pni report build</code> は <code>&lt;target&gt;_&lt;default_lang&gt;.pdf</code> を <code>reports/&lt;target&gt;.pdf</code>（<code>page_break=True</code>、<code>generate_index=True</code>）へ正規化します。また <code>-f html</code> 指定時には <code>_verify_links()</code> が <code>drawlib.tools.scan_broken_links()</code>（マルチポータル相対リンク検証用の <code>--link-check-root &lt;dir&gt;</code> 対応）を実行し、リンク切れや画像アセット欠損があればフェイルクローズ（<code>strict_links=True</code>）で検出します。</li>
 </ul>
 <p>上流の JSON スキーマや決定論的ホットスポット計算式の詳細は <a href="scoring_model.html">7軸品質スコアリングモデル</a> を、<code>pni report</code> の全 CLI オプションについては <a href="../05_languages_and_reference/rules_and_cli.html">ルール拡張と CLI リファレンス</a> を参照してください。</p>
 

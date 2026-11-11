@@ -1,6 +1,6 @@
 # クイックスタートガイド
 
-数分で `pni501` (`v0.1.3`) の導入から初回レポート生成までを体験できます。本ガイドでは、CLI のインストール、対象リポジトリでの `.pni/` 初期化、Pre-Flight 準備ゲートの確認、そしてステートフル Pull-Push ワークフローループを実行して7軸スコア JSON と7章構成 A4 PDF レポートを生成するまでの手順を解説します。
+数分で `pni501` (`v0.1.4`) の導入から初回レポート生成までを体験できます。本ガイドでは、CLI のインストール、対象リポジトリでの `.pni/` 初期化、Pre-Flight 準備ゲートの確認、そしてステートフル Pull-Push ワークフローループを実行して7軸スコア JSON と7章構成 A4 PDF レポートを生成するまでの手順を解説します。
 
 ```drawlib align=center code=fold file=pni_quickstart_flow.png caption="4ステップのクイックスタートライフサイクル：pni init から検証済み7軸スコア・7章構成 A4 PDF レポート生成まで"
 from drawlib.canvas import save, setup
@@ -95,7 +95,7 @@ pip install pni501
 uv add pni501
 
 # インストールの確認と CLI サブコマンド一覧の表示
-pni version
+pni --version   # または: pni version
 pni --help
 ```
 

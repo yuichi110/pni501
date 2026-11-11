@@ -1,0 +1,518 @@
+<!--
+ Copyright (c) 2026 Yuichi Ito (yuichi@yuichi.com)
+
+ This software is licensed under the Apache License, Version 2.0.
+ For more information, please visit: https://github.com/yuichi110/drawlib
+
+ This software is provided "as is", without warranty of any kind,
+ express or implied, including but not limited to the warranties of
+ merchantability, fitness for a particular purpose and noninfringement.
+-->
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Release Notes</title>
+    <script>
+        (function() {
+            const saved = localStorage.getItem('drawlib-theme');
+            if (saved === 'dark' || (!saved && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                document.documentElement.setAttribute('data-theme', 'dark');
+            } else {
+                document.documentElement.setAttribute('data-theme', 'light');
+            }
+        })();
+    </script>
+    
+    
+    
+    <link rel="alternate" hreflang="en" href="https://www.pni501.com/en/01_getting_started/release_notes.html">
+    
+    <link rel="alternate" hreflang="ja" href="https://www.pni501.com/ja/01_getting_started/release_notes.html">
+    
+    <link rel="alternate" hreflang="x-default" href="https://www.pni501.com/en/01_getting_started/release_notes.html">
+    
+    
+    
+    <meta name="description" content="Complete release history, key architectural additions, and feature highlights for Project Nemesis Index (pni501).">
+    <link rel="canonical" href="https://www.pni501.com/en/01_getting_started/release_notes.html">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="pni501 Documentation">
+    <meta property="og:title" content="Release Notes — pni501 Documentation">
+    <meta property="og:description" content="Complete release history, key architectural additions, and feature highlights for Project Nemesis Index (pni501).">
+    <meta property="og:url" content="https://www.pni501.com/en/01_getting_started/release_notes.html">
+    <meta property="og:image" content="https://www.pni501.com/_assets/logo.png">
+    <meta property="og:locale" content="en_US">
+    <meta property="og:locale:alternate" content="ja_JP">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Release Notes — pni501 Documentation">
+    <meta name="twitter:description" content="Complete release history, key architectural additions, and feature highlights for Project Nemesis Index (pni501).">
+    <meta name="twitter:image" content="https://www.pni501.com/_assets/logo.png">
+    
+    
+    <link rel="icon" type="image/png" href="../../_assets/favicon.png">
+    
+    
+    <link rel="stylesheet" href="../style.css">
+    
+    
+</head>
+<body>
+    
+    <div class="doc-layout">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <a href="../index.html" class="sidebar-brand" aria-label="pni501 Documentation">
+                    
+                    <img src="../../_assets/logo.png" alt="pni501 Documentation" class="sidebar-logo sidebar-logo-light">
+                    <img src="../../_assets/logo_dark.png" alt="pni501 Documentation" class="sidebar-logo sidebar-logo-dark">
+                    <span class="sidebar-brand-text">PNI501</span>
+                    
+                </a>
+                <div class="sidebar-header-actions">
+                    <button type="button" id="theme-toggle" class="theme-toggle-btn" aria-label="Toggle theme">
+                        <svg class="icon-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+                        <svg class="icon-moon" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+                    </button>
+                    <button type="button" id="menu-toggle" class="menu-toggle-btn" aria-label="Toggle navigation" aria-expanded="false">
+                        <svg class="icon-hamburger" viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+                        <svg class="icon-close" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                    </button>
+                </div>
+            </div>
+            <div class="sidebar-subbar">
+                
+                <a href="../01_getting_started/release_notes.html" class="sidebar-version-badge" title="View Release Notes">
+                    <span class="sidebar-version-dot" aria-hidden="true"></span>
+                    <span class="sidebar-version-text">v0.1.4</span>
+                </a>
+                <a href="https://github.com/yuichi110/pni501" target="_blank" rel="noopener noreferrer" class="sidebar-github-link" aria-label="GitHub Repository" title="GitHub Repository">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg>
+                </a>
+            </div>
+            <div class="sidebar-menu">
+                
+                    
+                        
+                        <ul class="nav-list">
+                            
+                            <li class="nav-item ">
+                                <a href="../index.html" >Overview</a>
+                            </li>
+                            
+                        </ul>
+                    
+                        
+                        <div class="sidebar-heading">1. Getting Started</div>
+                        
+                        <ul class="nav-list">
+                            
+                            <li class="nav-item ">
+                                <a href="concepts.html" >Background &amp; Core Concepts</a>
+                            </li>
+                            
+                            <li class="nav-item ">
+                                <a href="quickstart.html" >Quickstart Guide</a>
+                            </li>
+                            
+                            <li class="nav-item ">
+                                <a href="use_cases.html" >Primary Use Cases</a>
+                            </li>
+                            
+                            <li class="nav-item active">
+                                <a href="release_notes.html" >Release Notes</a>
+                            </li>
+                            
+                        </ul>
+                    
+                        
+                        <div class="sidebar-heading">2. Architecture</div>
+                        
+                        <ul class="nav-list">
+                            
+                            <li class="nav-item ">
+                                <a href="../02_architecture/domain_architecture.html" >Domain Architecture &amp; Cascade</a>
+                            </li>
+                            
+                            <li class="nav-item ">
+                                <a href="../02_architecture/stateful_engine.html" >Stateful Pull-Push Engine</a>
+                            </li>
+                            
+                        </ul>
+                    
+                        
+                        <div class="sidebar-heading">3. Workflows &amp; Actions</div>
+                        
+                        <ul class="nav-list">
+                            
+                            <li class="nav-item ">
+                                <a href="../03_workflows_and_actions/workflows_guide.html" >Workflows &amp; Pre-Flight Gates</a>
+                            </li>
+                            
+                            <li class="nav-item ">
+                                <a href="../03_workflows_and_actions/actions_pipeline.html" >15 Actions &amp; 12 Primitives</a>
+                            </li>
+                            
+                            <li class="nav-item ">
+                                <a href="../03_workflows_and_actions/analyzers_and_pentest.html" >Analyzers &amp; Live Pentest</a>
+                            </li>
+                            
+                        </ul>
+                    
+                        
+                        <div class="sidebar-heading">4. Scoring &amp; Reports</div>
+                        
+                        <ul class="nav-list">
+                            
+                            <li class="nav-item ">
+                                <a href="../04_scoring_and_reports/scoring_model.html" >7-Axis Scoring Model</a>
+                            </li>
+                            
+                            <li class="nav-item ">
+                                <a href="../04_scoring_and_reports/drawlib_reporter.html" >Drawlib Visual Reporter</a>
+                            </li>
+                            
+                        </ul>
+                    
+                        
+                        <div class="sidebar-heading">5. Languages &amp; Reference</div>
+                        
+                        <ul class="nav-list">
+                            
+                            <li class="nav-item ">
+                                <a href="../05_languages_and_reference/supported_languages.html" >Supported 6 Languages</a>
+                            </li>
+                            
+                            <li class="nav-item ">
+                                <a href="../05_languages_and_reference/rules_and_cli.html" >Rules &amp; CLI Reference</a>
+                            </li>
+                            
+                        </ul>
+                    
+                        
+                        <div class="sidebar-heading">External Links</div>
+                        
+                        <ul class="nav-list">
+                            
+                            <li class="nav-item ">
+                                <a href="https://github.com/yuichi110/pni501" target="_blank" rel="noopener noreferrer">GitHub Repository<svg class="nav-external-icon" viewBox="0 0 24 24" aria-hidden="true"><line x1="7" y1="17" x2="17" y2="7"></line><polyline points="7 7 17 7 17 17"></polyline></svg></a>
+                            </li>
+                            
+                            <li class="nav-item ">
+                                <a href="https://pypi.org/project/pni501/" target="_blank" rel="noopener noreferrer">PyPI Package<svg class="nav-external-icon" viewBox="0 0 24 24" aria-hidden="true"><line x1="7" y1="17" x2="17" y2="7"></line><polyline points="7 7 17 7 17 17"></polyline></svg></a>
+                            </li>
+                            
+                        </ul>
+                    
+                
+            </div>
+        </aside>
+        <div class="content-wrapper">
+            <header class="top-bar">
+                <div class="breadcrumbs">
+                    <span class="crumb">Docs</span>
+                    <span class="crumb-separator">&raquo;</span>
+                    <span class="crumb active">Release Notes</span>
+                </div>
+                
+                <div class="lang-switcher">
+                    <details class="lang-dropdown">
+                        <summary class="lang-dropdown-btn" aria-label="Select language">
+                            <svg class="lang-globe-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+                            <span class="lang-current-label">English</span>
+                            <svg class="lang-caret-icon" viewBox="0 0 24 24" aria-hidden="true"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                        </summary>
+                        <div class="lang-dropdown-menu" role="menu">
+                            
+                            <a href="release_notes.html" class="lang-option active" lang="en" hreflang="en" aria-current="page">
+                                <span>English</span>
+                                
+                                <svg class="lang-check-icon" viewBox="0 0 24 24" aria-hidden="true"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                                
+                            </a>
+                            
+                            <a href="../../ja/01_getting_started/release_notes.html" class="lang-option" lang="ja" hreflang="ja" >
+                                <span>日本語</span>
+                                
+                            </a>
+                            
+                        </div>
+                    </details>
+                </div>
+                
+            </header>
+            <main class="main-content">
+                <h1>Release Notes</h1>
+<p>Complete release history, key architectural additions, and feature highlights for <strong>Project Nemesis Index (<code>pni501</code>)</strong>.</p>
+<hr />
+<h2>Version 0.1.4</h2>
+<p><em>Release Date: 2026/11/10</em></p>
+<p>Version <code>0.1.4</code> introduces official PNI501 brand assets and cover helper utilities for Drawlib PDF reports, the <code>pni cache clean</code> CLI subcommand for local and container artifact pruning, and deep static and runtime analysis improvements for <strong>Go</strong>, <strong>TypeScript</strong>, and <strong>JavaScript</strong> (including monorepo lockfile scoping, <code>.d.ts</code> companion declarations, IIFE/ES2022 <code>#private</code> classes, and Playwright headless Chromium auto-provisioning).</p>
+<h3>1. Official Brand Assets &amp; Report Compiler Enhancements (<code>pni._reporter</code>)</h3>
+<ul>
+<li><strong>Bundled Brand Assets &amp; <code>draw_pni_logo()</code> Cover Helper</strong>:
+<ul>
+<li><code>pni report init</code> now copies official brand assets (<code>logo.png</code>, <code>logo_dark.png</code>, and <code>favicon.png</code>) into <code>&lt;src_dir&gt;/&lt;target&gt;_src/_assets/</code> across Audit, Migration, and Progress blueprints.</li>
+<li>Scaffolded <code>utils.py</code> modules now include <code>draw_pni_logo(xy=(135.0, 48.0), width=9.0, *, dark=True)</code> for rendering the official PNI501 emblem on <code>00_cover.md</code> dark and light covers without boilerplate coordinate math.</li>
+</ul>
+</li>
+<li><strong>Drawlib Linter Check for <code>ClassDiagram</code> / <code>ClassNode</code></strong>:
+<ul>
+<li><code>lint_drawlib_chapters()</code> (<code>pni report check</code> and <code>pni report build</code>) now detects and warns when <code>ClassDiagram</code> or <code>ClassNode</code> uses <code>Styles.White</code> (which renders invisible white text on a white background) and recommends <code>Styles.Neutral</code>.</li>
+</ul>
+</li>
+<li><strong>Multi-Portal Relative Link Verification (<code>--link-check-root</code>)</strong>:
+<ul>
+<li>Added <code>--link-check-root &lt;dir&gt;</code> (<code>link_check_root</code>) to <code>pni report build</code> / <code>compile_report_project()</code> so reports nested inside multi-target HTML portals can validate parent-relative links (<code>../index.html</code>) against the portal root directory.</li>
+</ul>
+</li>
+</ul>
+<h3>2. CLI Additions (<code>pni cache clean</code> &amp; <code>--version</code>)</h3>
+<ul>
+<li><strong><code>pni cache clean</code> Subcommand</strong>:
+<ul>
+<li>Added <code>pni cache clean [--docker] [--container-engine auto|docker|podman]</code> to clean local <code>.pni/cache/</code> directories and optionally prune temporary <code>pni-harness-*</code>, <code>pni-proj-*</code>, <code>pni-sec-*</code>, and <code>pni-pentest-*</code> container images, dangling layers, and builder caches.</li>
+</ul>
+<pre><code class="language-bash">uv<span class="w"> </span>run<span class="w"> </span>pni<span class="w"> </span>cache<span class="w"> </span>clean<span class="w"> </span>--docker
+</code></pre>
+</li>
+<li><strong>Root <code>--version</code> / <code>-V</code> Flag</strong>:
+<ul>
+<li>Added <code>pni --version</code> (<code>-V</code>) alongside <code>pni version</code> to display <code>pni501 v0.1.4</code> and exit immediately.</li>
+</ul>
+</li>
+<li><strong>Automatic Workflow Superseding</strong>:
+<ul>
+<li><code>start_workflow_run()</code> now defaults to <code>supersede=True</code>, automatically marking older unfinished runs of the same workflow as <code>CANCELLED</code> (<code>superseded_by_&lt;run_id&gt;</code>) when starting a fresh run.</li>
+</ul>
+</li>
+</ul>
+<h3>3. TypeScript &amp; JavaScript Analysis &amp; Runtime Harness Enhancements</h3>
+<ul>
+<li><strong>AST Analysis Refinements (<code>ast_analyze/ts_js/</code>)</strong>:
+<ul>
+<li><strong>Barrel Re-Export Cycle Separation</strong>: Distinguishes intentional <code>index.ts</code> barrel re-export loops (<code>type_checking_cycles</code>) from true implementation <code>circular_dependencies</code>.</li>
+<li><strong>IIFE / UMD Unwrapping &amp; ES2022 <code>#private</code> Classes</strong>: Unwraps top-level IIFE/UMD factory closures (<code>var lib = (() =&gt; { ... })()</code>) and inspects <code>private_field_definition</code> / <code>#private</code> methods for accurate symbol and doc-coverage metrics.</li>
+<li><strong>Companion <code>.d.ts</code> Type Declarations</strong>: Automatically detects companion <code>.d.ts</code> files (<code>package.json</code> <code>&quot;types&quot;</code>/<code>&quot;typings&quot;</code> or co-located <code>*.d.ts</code>) as <code>has_type_marker = True</code> for JavaScript packages and credits exported <code>.d.ts</code> type signatures.</li>
+<li><strong>Type-Level &amp; Helper Test Recognition</strong>: Credits <code>expectTypeOf&lt;T&gt;()</code>, <code>assertType&lt;T&gt;()</code>, <code>// @ts-expect-error</code>, suffix-less test files under <code>test/</code>/<code>tests/</code> (while filtering out non-test helpers), custom <code>assert*</code>/<code>verify*</code>/<code>check*</code> helpers, and external CDN script dependencies in <code>web-test-runner.config.*</code>.</li>
+</ul>
+</li>
+<li><strong>Playwright Browser Harness &amp; Coverage Parsers (<code>runtime_check/</code>)</strong>:
+<ul>
+<li>Updated <code>typescript/node.dockerfile</code> and <code>javascript/node.dockerfile</code> to pre-install <code>@vitest/coverage-v8</code> and automatically provision <strong>Playwright Headless Chromium</strong> (<code>PLAYWRIGHT_BROWSERS_PATH=/ms-playwright</code>) and OS shared libraries whenever <code>@playwright/test</code>, <code>playwright</code>, or <code>@vitest/browser</code> is detected.</li>
+<li>Added <code>lcov.info</code> (<code>parse_lcov_info</code>), <code>@web/test-runner</code> (WTR), and Mocha (<code>parse_node_test_output</code>) output parsers, multi-suite Vitest coverage merging (<code>--coverage.clean=false</code>), and monorepo subpackage <code>tsc --noEmit -p &lt;subpkg&gt;/tsconfig.json</code> scoping.</li>
+</ul>
+</li>
+<li><strong>Monorepo Lockfile &amp; Container Vulnerability Scoping (<code>security_scan/</code>)</strong>:
+<ul>
+<li><code>discover_non_core_packages()</code> now parses workspace importers across <code>pnpm-lock.yaml</code>, <code>package-lock.json</code>, and <code>yarn.lock</code> (isolating workspace/docs packages for zero-dependency targets) and classifies global container toolchain paths (<code>/usr/local/lib/node_modules</code>, etc.) as <code>harness_os</code> / <code>os_package</code>.</li>
+</ul>
+</li>
+</ul>
+<h3>4. Go AST Refinements &amp; Non-Root Container Harness (<code>go</code>)</h3>
+<ul>
+<li><strong>Go AST Refinements (<code>ast_analyze/go/</code>)</strong>:
+<ul>
+<li>Detects partially ignored error returns (<code>val, _ := ...</code>) in <code>check_exception_hygiene()</code>.</li>
+<li>Exempts multiline raw backtick strings (SQL/HTML/templates) from function LOC bloat in <code>check_complexity()</code>.</li>
+<li>Exempts <code>fmt.Printf</code>-style variadic <code>...any</code> / <code>...interface{}</code> parameters when accompanied by a <code>format string</code> parameter in <code>check_type_safety()</code>.</li>
+<li>Credits <code>t.Run</code> method-value delegation and helper function assertions in <code>check_test_quality()</code>.</li>
+</ul>
+</li>
+<li><strong>Hardened Go Container Template (<code>go/go.dockerfile</code>)</strong>:
+<ul>
+<li>Enforces a Go <code>1.22</code> Bookworm image floor (<code>1.22</code>–<code>1.24</code>), runs tests as non-root <code>USER pni</code> (<code>UID 10001</code>), and pre-warms <code>/go/cache</code> during image build for reliable <code>--network=none</code> offline test execution.</li>
+<li>Default <code>.pni/pni.toml</code> now includes <code>&quot;go.sum&quot;</code> in <code>include_gitignored</code> and excludes <code>&quot;docs/**&quot;</code> and <code>&quot;docs_src/**&quot;</code>.</li>
+</ul>
+</li>
+</ul>
+<hr />
+<h2>Version 0.1.3</h2>
+<p><em>Release Date: 2026/11/10</em></p>
+<p>Version <code>0.1.3</code> expands <strong>pni501</strong> from 3 to <strong>6 first-class target languages</strong> by introducing complete Tree-sitter AST analyzers, engineering rule cascades, offline Docker harnesses, test/coverage parsers, and migration analyzers for <strong>Go (<code>go</code>)</strong>, <strong>TypeScript (<code>typescript</code>)</strong>, and <strong>JavaScript (<code>javascript</code>)</strong>, alongside major enhancements for <strong>Java</strong> and <strong>PHP</strong>.</p>
+<h3>1. Go, TypeScript, and JavaScript Support (<code>6</code> Supported Languages)</h3>
+<ul>
+<li><strong>Tree-Sitter AST Analyzers (<code>27</code> New Checkers)</strong>:
+<ul>
+<li>Implemented <code>9</code> deterministic AST checkers each for <code>go</code>, <code>typescript</code>, and <code>javascript</code> (<code>complexity</code>, <code>type_safety</code>, <code>doc_coverage</code>, <code>architecture</code>, <code>code_hygiene</code>, <code>exception_hygiene</code>, <code>test_quality</code>, <code>security_patterns</code>, and <code>resource_safety</code>).</li>
+</ul>
+</li>
+<li><strong>Built-in Language Rule Cascades (<code>15</code> New Rule Files)</strong>:
+<ul>
+<li>Added <code>coding_convention.md</code>, <code>architecture_design.md</code>, <code>test_strategy.md</code>, <code>security_policy.md</code>, and <code>audit_rubric.md</code> under <code>rules/go/</code>, <code>rules/typescript/</code>, and <code>rules/javascript/</code>.</li>
+</ul>
+</li>
+<li><strong>Composite Actions, Workflows &amp; Offline Container Templates</strong>:
+<ul>
+<li>Added <code>go.audit_analyze</code>, <code>typescript.audit_analyze</code>, and <code>javascript.audit_analyze</code> composite actions, <code>full_audit</code> and <code>quick_check</code> workflows, and hermetic Docker templates (<code>go/go.dockerfile</code>, <code>typescript/node.dockerfile</code>, <code>javascript/node.dockerfile</code>) with <code>go-cover</code> and <code>istanbul-summary</code> coverage parsers.</li>
+</ul>
+</li>
+<li><strong>Migration Analyzers</strong>:
+<ul>
+<li>Added external dependency touchpoint scanners, public API contract extractors, and AST codemod candidate detectors for Go, TypeScript, and JavaScript.</li>
+</ul>
+</li>
+</ul>
+<h3>2. Java &amp; PHP Analyzer Enhancements</h3>
+<ul>
+<li><strong>Java (<code>java</code>)</strong>:
+<ul>
+<li>Recognizes JUnit 4 <code>@Test(expected=...)</code>, AssertJ, Hamcrest, and Spring <code>MockMvc</code> assertions; excludes Javadoc comments from method LOC; supports custom Maven build arguments; and filters <code>test</code>, <code>provided</code>, and <code>optional</code> scopes in <code>pom.xml</code>.</li>
+</ul>
+</li>
+<li><strong>PHP (<code>php</code>)</strong>:
+<ul>
+<li>Formats anonymous class symbols cleanly, distinguishes PSR-3 logger calls from raw <code>error_log()</code> debug statements, and auto-detects target source directories from <code>composer.json</code> PSR-4 mappings.</li>
+</ul>
+</li>
+</ul>
+<hr />
+<h2>Version 0.1.2</h2>
+<p><em>Release Date: 2026/11/08</em></p>
+<p>Version <code>0.1.2</code> introduces granular <strong>4-tier vulnerability scope classification</strong> in <code>security_scan</code>, Python AST analyzer refinements, and workflow state management commands (<code>rewind</code> and <code>cancel</code>).</p>
+<h3>1. 4-Tier Vulnerability Scope Classification (<code>security_scan</code>)</h3>
+<ul>
+<li><strong><code>dep_scopes.py</code> Dependency Scope Classifier</strong>:
+<ul>
+<li>Automatically classifies Trivy and OSV findings into four scopes to eliminate false-positive scoring penalties from dev/docs dependencies or container base images:
+<ol>
+<li><code>runtime_core</code>: Production application dependencies (full scoring impact).</li>
+<li><code>dev_or_optional</code>: Test/linter/docs dependencies and optional extras.</li>
+<li><code>os_package</code>: Debian/Alpine OS packages inside the application container.</li>
+<li><code>harness_os</code>: Audit container harness packages (<code>pni-sec-*</code> / <code>pni-harness-*</code>).</li>
+</ol>
+</li>
+</ul>
+</li>
+</ul>
+<h3>2. Workflow Rewind &amp; Cancellation CLI &amp; Python AST Refinements</h3>
+<ul>
+<li><strong>Workflow State Recovery (<code>pni workflows rewind</code> &amp; <code>cancel</code>)</strong>:
+<ul>
+<li>Added <code>pni workflows rewind &lt;action_id&gt;</code> (alias <code>retry-action</code>) to roll back a workflow run to any action and clear downstream artifacts, and <code>pni workflows cancel</code> (<code>--superseded</code> / <code>--supersede</code>) to clean up stale runs.</li>
+</ul>
+</li>
+<li><strong>Python AST Refinements</strong>:
+<ul>
+<li>Improved <code>TYPE_CHECKING</code> conditional import handling, <code>@overload</code> / <code>@abstractmethod</code> stub filtering, and docstring coverage calculation in <code>ast_analyze/python/</code>.</li>
+</ul>
+</li>
+</ul>
+<hr />
+<h2>Version 0.1.1</h2>
+<p><em>Release Date: 2026/11/06</em></p>
+<ul>
+<li><strong>PyPI Packaging &amp; Metadata Refinements</strong>:
+<ul>
+<li>Refined package classifiers, entry points (<code>pni</code> CLI), bundled rule/workflow package data, and release verification workflows.</li>
+</ul>
+</li>
+</ul>
+<hr />
+<h2>Version 0.1.0</h2>
+<p><em>Release Date: 2026/11/06</em></p>
+<p>Initial public release of <strong>Project Nemesis Index (<code>pni501</code>)</strong> — an AI-orchestrated software engineering audit, security verification, migration planning, and visual reporting framework.</p>
+<ul>
+<li><strong>Core Architecture</strong>:
+<ul>
+<li>Stateful <strong>Pull-Push SQLite Workflow Engine</strong> (<code>.pni/state.db</code>) with deterministic action execution and LLM judgment gates.</li>
+<li><strong>3-Layer Cascading Rule System</strong> (<code>common/</code> → <code>&lt;language&gt;/</code> → <code>.pni/rules/</code>) and <strong>2-Tier Config Loader</strong> (<code>.pni/pni.toml</code>).</li>
+<li>Deterministic analyzers (<code>project_inspect</code>, <code>ast_analyze</code>, <code>run_check</code>, <code>security_scan</code>, <code>web_pentest</code>, <code>migration_analyze</code>, <code>progress_analyze</code>) for <strong>Python</strong>, <strong>Java</strong>, and <strong>PHP</strong>.</li>
+<li><strong>7-Axis <code>ScoreResult</code></strong> (100-point weighted rubric with <code>S</code>/<code>A</code>/<code>B</code>/<code>C</code>/<code>D</code> grades) and <strong><code>MigrationPlanResult</code></strong>.</li>
+<li><strong>Drawlib Visual PDF Reporting</strong> (<code>pni report init</code>, <code>pni report check</code>, <code>pni report build</code>) producing 7-chapter 16:9 vector PDF and HTML slide decks.</li>
+</ul>
+</li>
+</ul>
+
+            </main>
+        </div>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Theme toggle
+            const themeBtn = document.getElementById('theme-toggle');
+            if (themeBtn) {
+                themeBtn.addEventListener('click', function() {
+                    const current = document.documentElement.getAttribute('data-theme');
+                    const next = current === 'dark' ? 'light' : 'dark';
+                    document.documentElement.setAttribute('data-theme', next);
+                    localStorage.setItem('drawlib-theme', next);
+                });
+            }
+
+            // Language dropdown outside-click & Escape close
+            const langDropdowns = document.querySelectorAll('.lang-dropdown');
+            if (langDropdowns.length > 0) {
+                document.addEventListener('click', function(e) {
+                    langDropdowns.forEach(function(dd) {
+                        if (dd.hasAttribute('open') && !dd.contains(e.target)) {
+                            dd.removeAttribute('open');
+                        }
+                    });
+                });
+                document.addEventListener('keydown', function(e) {
+                    if (e.key === 'Escape') {
+                        langDropdowns.forEach(function(dd) {
+                            dd.removeAttribute('open');
+                        });
+                    }
+                });
+            }
+
+            // Mobile menu toggle
+            const menuBtn = document.getElementById('menu-toggle');
+            const sidebar = document.querySelector('.sidebar');
+            if (menuBtn && sidebar) {
+                function setMenuOpen(open) {
+                    sidebar.classList.toggle('is-open', open);
+                    menuBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
+                    document.body.classList.toggle('menu-open', open);
+                    if (open) {
+                        const menu = sidebar.querySelector('.sidebar-menu');
+                        if (menu) {
+                            menu.scrollTop = 0;
+                        }
+                    }
+                }
+
+                menuBtn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    const willOpen = !sidebar.classList.contains('is-open');
+                    setMenuOpen(willOpen);
+                });
+
+                // Close menu when clicking outside sidebar
+                document.addEventListener('click', function(e) {
+                    if (sidebar.classList.contains('is-open') && !sidebar.contains(e.target)) {
+                        setMenuOpen(false);
+                    }
+                });
+
+                // Close menu when a navigation link is clicked
+                const navLinks = sidebar.querySelectorAll('.nav-item a');
+                navLinks.forEach(function(link) {
+                    link.addEventListener('click', function() {
+                        setMenuOpen(false);
+                    });
+                });
+
+                // Close on Escape key
+                document.addEventListener('keydown', function(e) {
+                    if (e.key === 'Escape' && sidebar.classList.contains('is-open')) {
+                        setMenuOpen(false);
+                    }
+                });
+
+                // Reset menu state when resized above mobile breakpoint
+                window.addEventListener('resize', function() {
+                    if (window.innerWidth > 768 && sidebar.classList.contains('is-open')) {
+                        setMenuOpen(false);
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>

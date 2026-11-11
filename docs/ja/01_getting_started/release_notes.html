@@ -1,0 +1,520 @@
+<!--
+ Copyright (c) 2026 Yuichi Ito (yuichi@yuichi.com)
+
+ This software is licensed under the Apache License, Version 2.0.
+ For more information, please visit: https://github.com/yuichi110/drawlib
+
+ This software is provided "as is", without warranty of any kind,
+ express or implied, including but not limited to the warranties of
+ merchantability, fitness for a particular purpose and noninfringement.
+-->
+<!DOCTYPE html>
+<html lang="ja" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>リリースノート (Release Notes)</title>
+    <script>
+        (function() {
+            const saved = localStorage.getItem('drawlib-theme');
+            if (saved === 'dark' || (!saved && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                document.documentElement.setAttribute('data-theme', 'dark');
+            } else {
+                document.documentElement.setAttribute('data-theme', 'light');
+            }
+        })();
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+    
+    
+    <link rel="alternate" hreflang="en" href="https://www.pni501.com/en/01_getting_started/release_notes.html">
+    
+    <link rel="alternate" hreflang="ja" href="https://www.pni501.com/ja/01_getting_started/release_notes.html">
+    
+    <link rel="alternate" hreflang="x-default" href="https://www.pni501.com/en/01_getting_started/release_notes.html">
+    
+    
+    
+    <meta name="description" content="Project Nemesis Index (pni501) のリリース履歴、アーキテクチャの拡張、および各バージョンの主な新機能一覧です。">
+    <link rel="canonical" href="https://www.pni501.com/ja/01_getting_started/release_notes.html">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="pni501 ドキュメント">
+    <meta property="og:title" content="リリースノート (Release Notes) — pni501 ドキュメント">
+    <meta property="og:description" content="Project Nemesis Index (pni501) のリリース履歴、アーキテクチャの拡張、および各バージョンの主な新機能一覧です。">
+    <meta property="og:url" content="https://www.pni501.com/ja/01_getting_started/release_notes.html">
+    <meta property="og:image" content="https://www.pni501.com/_assets/logo.png">
+    <meta property="og:locale" content="ja_JP">
+    <meta property="og:locale:alternate" content="en_US">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="リリースノート (Release Notes) — pni501 ドキュメント">
+    <meta name="twitter:description" content="Project Nemesis Index (pni501) のリリース履歴、アーキテクチャの拡張、および各バージョンの主な新機能一覧です。">
+    <meta name="twitter:image" content="https://www.pni501.com/_assets/logo.png">
+    
+    
+    <link rel="icon" type="image/png" href="../../_assets/favicon.png">
+    
+    
+    <link rel="stylesheet" href="../style.css">
+    
+    
+</head>
+<body>
+    
+    <div class="doc-layout">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <a href="../index.html" class="sidebar-brand" aria-label="pni501 ドキュメント">
+                    
+                    <img src="../../_assets/logo.png" alt="pni501 ドキュメント" class="sidebar-logo sidebar-logo-light">
+                    <img src="../../_assets/logo_dark.png" alt="pni501 ドキュメント" class="sidebar-logo sidebar-logo-dark">
+                    <span class="sidebar-brand-text">PNI501</span>
+                    
+                </a>
+                <div class="sidebar-header-actions">
+                    <button type="button" id="theme-toggle" class="theme-toggle-btn" aria-label="Toggle theme">
+                        <svg class="icon-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+                        <svg class="icon-moon" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+                    </button>
+                    <button type="button" id="menu-toggle" class="menu-toggle-btn" aria-label="Toggle navigation" aria-expanded="false">
+                        <svg class="icon-hamburger" viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+                        <svg class="icon-close" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                    </button>
+                </div>
+            </div>
+            <div class="sidebar-subbar">
+                
+                <a href="../01_getting_started/release_notes.html" class="sidebar-version-badge" title="View Release Notes">
+                    <span class="sidebar-version-dot" aria-hidden="true"></span>
+                    <span class="sidebar-version-text">v0.1.4</span>
+                </a>
+                <a href="https://github.com/yuichi110/pni501" target="_blank" rel="noopener noreferrer" class="sidebar-github-link" aria-label="GitHub Repository" title="GitHub Repository">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg>
+                </a>
+            </div>
+            <div class="sidebar-menu">
+                
+                    
+                        
+                        <ul class="nav-list">
+                            
+                            <li class="nav-item ">
+                                <a href="../index.html" >概要 (Overview)</a>
+                            </li>
+                            
+                        </ul>
+                    
+                        
+                        <div class="sidebar-heading">1. はじめに (Getting Started)</div>
+                        
+                        <ul class="nav-list">
+                            
+                            <li class="nav-item ">
+                                <a href="concepts.html" >背景とコアコンセプト</a>
+                            </li>
+                            
+                            <li class="nav-item ">
+                                <a href="quickstart.html" >クイックスタートガイド</a>
+                            </li>
+                            
+                            <li class="nav-item ">
+                                <a href="use_cases.html" >3つの主要ユースケース</a>
+                            </li>
+                            
+                            <li class="nav-item active">
+                                <a href="release_notes.html" >リリースノート</a>
+                            </li>
+                            
+                        </ul>
+                    
+                        
+                        <div class="sidebar-heading">2. アーキテクチャ (Architecture)</div>
+                        
+                        <ul class="nav-list">
+                            
+                            <li class="nav-item ">
+                                <a href="../02_architecture/domain_architecture.html" >ドメイン構造と3層カスケード</a>
+                            </li>
+                            
+                            <li class="nav-item ">
+                                <a href="../02_architecture/stateful_engine.html" >ステートフル Pull-Push エンジン</a>
+                            </li>
+                            
+                        </ul>
+                    
+                        
+                        <div class="sidebar-heading">3. ワークフローとアクション</div>
+                        
+                        <ul class="nav-list">
+                            
+                            <li class="nav-item ">
+                                <a href="../03_workflows_and_actions/workflows_guide.html" >ワークフローと Pre-Flight ゲート</a>
+                            </li>
+                            
+                            <li class="nav-item ">
+                                <a href="../03_workflows_and_actions/actions_pipeline.html" >15 アクションと 12 プリミティブ</a>
+                            </li>
+                            
+                            <li class="nav-item ">
+                                <a href="../03_workflows_and_actions/analyzers_and_pentest.html" >決定論的解析器とペネトレーションテスト</a>
+                            </li>
+                            
+                        </ul>
+                    
+                        
+                        <div class="sidebar-heading">4. スコアリングとレポート</div>
+                        
+                        <ul class="nav-list">
+                            
+                            <li class="nav-item ">
+                                <a href="../04_scoring_and_reports/scoring_model.html" >7軸品質スコアリングモデル</a>
+                            </li>
+                            
+                            <li class="nav-item ">
+                                <a href="../04_scoring_and_reports/drawlib_reporter.html" >Drawlib ビジュアルレポーター</a>
+                            </li>
+                            
+                        </ul>
+                    
+                        
+                        <div class="sidebar-heading">5. 対応言語とリファレンス</div>
+                        
+                        <ul class="nav-list">
+                            
+                            <li class="nav-item ">
+                                <a href="../05_languages_and_reference/supported_languages.html" >対応 6 言語マトリクス</a>
+                            </li>
+                            
+                            <li class="nav-item ">
+                                <a href="../05_languages_and_reference/rules_and_cli.html" >ルール拡張と CLI リファレンス</a>
+                            </li>
+                            
+                        </ul>
+                    
+                        
+                        <div class="sidebar-heading">外部リンク (External Links)</div>
+                        
+                        <ul class="nav-list">
+                            
+                            <li class="nav-item ">
+                                <a href="https://github.com/yuichi110/pni501" target="_blank" rel="noopener noreferrer">GitHub リポジトリ<svg class="nav-external-icon" viewBox="0 0 24 24" aria-hidden="true"><line x1="7" y1="17" x2="17" y2="7"></line><polyline points="7 7 17 7 17 17"></polyline></svg></a>
+                            </li>
+                            
+                            <li class="nav-item ">
+                                <a href="https://pypi.org/project/pni501/" target="_blank" rel="noopener noreferrer">PyPI パッケージ<svg class="nav-external-icon" viewBox="0 0 24 24" aria-hidden="true"><line x1="7" y1="17" x2="17" y2="7"></line><polyline points="7 7 17 7 17 17"></polyline></svg></a>
+                            </li>
+                            
+                        </ul>
+                    
+                
+            </div>
+        </aside>
+        <div class="content-wrapper">
+            <header class="top-bar">
+                <div class="breadcrumbs">
+                    <span class="crumb">Docs</span>
+                    <span class="crumb-separator">&raquo;</span>
+                    <span class="crumb active">リリースノート (Release Notes)</span>
+                </div>
+                
+                <div class="lang-switcher">
+                    <details class="lang-dropdown">
+                        <summary class="lang-dropdown-btn" aria-label="Select language">
+                            <svg class="lang-globe-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+                            <span class="lang-current-label">日本語</span>
+                            <svg class="lang-caret-icon" viewBox="0 0 24 24" aria-hidden="true"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                        </summary>
+                        <div class="lang-dropdown-menu" role="menu">
+                            
+                            <a href="../../en/01_getting_started/release_notes.html" class="lang-option" lang="en" hreflang="en" >
+                                <span>English</span>
+                                
+                            </a>
+                            
+                            <a href="release_notes.html" class="lang-option active" lang="ja" hreflang="ja" aria-current="page">
+                                <span>日本語</span>
+                                
+                                <svg class="lang-check-icon" viewBox="0 0 24 24" aria-hidden="true"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                                
+                            </a>
+                            
+                        </div>
+                    </details>
+                </div>
+                
+            </header>
+            <main class="main-content">
+                <h1>リリースノート (Release Notes)</h1>
+<p><strong>Project Nemesis Index (<code>pni501</code>)</strong> のリリース履歴、アーキテクチャの拡張、および各バージョンの主な新機能一覧です。</p>
+<hr />
+<h2>Version 0.1.4</h2>
+<p><em>Release Date: 2026/11/10</em></p>
+<p>バージョン <code>0.1.4</code> では、Drawlib PDF レポート向けの公式 PNI501 ブランドアセットと表紙ロゴ描画ヘルパー、ローカルキャッシュおよびコンテナイメージを一括削除する <code>pni cache clean</code> CLI サブコマンド、さらに <strong>Go</strong>・<strong>TypeScript</strong>・<strong>JavaScript</strong> の静的解析・ランタイムハーネス機能（モノレポのロックファイルスコープ解決、<code>.d.ts</code> 型定義の自動認識、IIFE / ES2022 <code>#private</code> クラス解析、Playwright Headless Chromium の自動プロビジョニングなど）の大幅な強化が導入されました。</p>
+<h3>1. 公式ブランドアセットとレポートコンパイラの強化 (<code>pni._reporter</code>)</h3>
+<ul>
+<li><strong>公式ブランドアセットの同梱と <code>draw_pni_logo()</code> 表紙ヘルパー</strong>:
+<ul>
+<li><code>pni report init</code> 実行時、Audit・Migration・Progress の全ブループリントで <code>&lt;src_dir&gt;/&lt;target&gt;_src/_assets/</code> に公式ブランドアセット (<code>logo.png</code>, <code>logo_dark.png</code>, <code>favicon.png</code>) が自動コピーされるようになりました。</li>
+<li>スキャフォールドされる <code>utils.py</code> に <code>draw_pni_logo(xy=(135.0, 48.0), width=9.0, *, dark=True)</code> ヘルパーが追加され、<code>00_cover.md</code> のダーク／ライト表紙に PNI501 公式エンブレムを簡潔に配置できます。</li>
+</ul>
+</li>
+<li><strong><code>ClassDiagram</code> / <code>ClassNode</code> に対する Drawlib リンターチェック</strong>:
+<ul>
+<li><code>lint_drawlib_chapters()</code> (<code>pni report check</code> および <code>pni report build</code>) が、<code>ClassDiagram</code> や <code>ClassNode</code> での <code>Styles.White</code> の使用（白背景に白文字となり視認不能になる問題）を自動検出し、<code>Styles.Neutral</code> を推奨する警告を出力するようになりました。</li>
+</ul>
+</li>
+<li><strong>マルチポータル環境向けの相対リンク検証 (<code>--link-check-root</code>)</strong>:
+<ul>
+<li><code>pni report build</code> / <code>compile_report_project()</code> に <code>--link-check-root &lt;dir&gt;</code> (<code>link_check_root</code>) オプションを追加し、複数ターゲットの HTML ポータル配下にネストされたレポートから親ポータル (<code>../index.html</code>) への相対リンクをルートディレクトリ基準で検証できるようになりました。</li>
+</ul>
+</li>
+</ul>
+<h3>2. CLI の機能追加 (<code>pni cache clean</code> と <code>--version</code>)</h3>
+<ul>
+<li><strong><code>pni cache clean</code> サブコマンド</strong>:
+<ul>
+<li>ローカルの <code>.pni/cache/</code> ディレクトリの削除に加え、<code>--docker</code> 指定時に一時生成された <code>pni-harness-*</code>、<code>pni-proj-*</code>、<code>pni-sec-*</code>、<code>pni-pentest-*</code> コンテナイメージやダングリングレイヤー、ビルドキャッシュを一括パージする <code>pni cache clean [--docker] [--container-engine auto|docker|podman]</code> を追加しました。</li>
+</ul>
+<pre><code class="language-bash">uv<span class="w"> </span>run<span class="w"> </span>pni<span class="w"> </span>cache<span class="w"> </span>clean<span class="w"> </span>--docker
+</code></pre>
+</li>
+<li><strong>ルート <code>--version</code> / <code>-V</code> フラグ</strong>:
+<ul>
+<li><code>pni version</code> サブコマンドに加え、<code>pni --version</code> (<code>-V</code>) フラグで即座にバージョン (<code>pni501 v0.1.4</code>) を確認できるようになりました。</li>
+</ul>
+</li>
+<li><strong>ワークフロー実行時の自動 Supersede（置き換え）</strong>:
+<ul>
+<li><code>start_workflow_run()</code> のデフォルトが <code>supersede=True</code> となり、同一ワークフローの新しい実行を開始した際、未完了の古い実行レコードを自動的に <code>CANCELLED</code> (<code>superseded_by_&lt;run_id&gt;</code>) として整理するようになりました。</li>
+</ul>
+</li>
+</ul>
+<h3>3. TypeScript / JavaScript 解析およびランタイムハーネスの強化</h3>
+<ul>
+<li><strong>AST 静的解析の精度向上 (<code>ast_analyze/ts_js/</code>)</strong>:
+<ul>
+<li><strong>バレル再エクスポート循環と実装循環の分離</strong>: <code>index.ts</code> などのバレルファイルを経由する意図的な再エクスポート循環 (<code>type_checking_cycles</code>) を、実際のモジュール間の実装循環 (<code>circular_dependencies</code>) から分離して計上します。</li>
+<li><strong>IIFE / UMD クロージャの展開と ES2022 <code>#private</code> クラス対応</strong>: トップレベルの IIFE/UMD ファクトリ (<code>var lib = (() =&gt; { ... })()</code>) 内部の関数や、ES2022 の <code>private_field_definition</code> / <code>#private</code> メソッドを展開してシンボル数・ドキュメントカバレッジを正確に算出します。</li>
+<li><strong>コンパニオン <code>.d.ts</code> 型定義の自動認識</strong>: <code>package.json</code> の <code>&quot;types&quot;</code> / <code>&quot;typings&quot;</code> または同梱の <code>*.d.ts</code> ファイルを検出し、JavaScript パッケージの <code>has_type_marker = True</code> 判定および公開 <code>.d.ts</code> 型シグネチャの型安全性評価を自動適用します。</li>
+<li><strong>型レベルテストとカスタムアサーションの認識</strong>: <code>expectTypeOf&lt;T&gt;()</code>、<code>assertType&lt;T&gt;()</code>、<code>// @ts-expect-error</code>、<code>test/</code>・<code>tests/</code> 配下のサフィックスなしテストファイル（非テストヘルパーを除外）、<code>assert*</code> / <code>verify*</code> / <code>check*</code> ヘルパー関数、<code>web-test-runner.config.*</code> の外部 CDN スクリプト依存を正確に認識します。</li>
+</ul>
+</li>
+<li><strong>Playwright ブラウザハーネスとカバレッジパーサーの拡充 (<code>runtime_check/</code>)</strong>:
+<ul>
+<li><code>typescript/node.dockerfile</code> および <code>javascript/node.dockerfile</code> に <code>@vitest/coverage-v8</code> をプリインストールし、<code>@playwright/test</code>、<code>playwright</code>、または <code>@vitest/browser</code> が検出された場合は <strong>Playwright Headless Chromium</strong> (<code>PLAYWRIGHT_BROWSERS_PATH=/ms-playwright</code>) と OS 共有ライブラリを自動プロビジョニングします。</li>
+<li><code>lcov.info</code> (<code>parse_lcov_info</code>)、<code>@web/test-runner</code> (WTR)、Mocha (<code>parse_node_test_output</code>) の出力パーサー、複数スイート実行時の Vitest カバレッジマージ (<code>--coverage.clean=false</code>)、およびモノレポのサブパッケージ単位の <code>tsc --noEmit -p &lt;subpkg&gt;/tsconfig.json</code> スコープ実行に対応しました。</li>
+</ul>
+</li>
+<li><strong>モノレポのロックファイルとコンテナ脆弱性スコープの精緻化 (<code>security_scan/</code>)</strong>:
+<ul>
+<li><code>discover_non_core_packages()</code> が <code>pnpm-lock.yaml</code>、<code>package-lock.json</code>、<code>yarn.lock</code> のワークスペース構成を解析し（ゼロ依存ターゲットにおける docs/workspace パッケージの分離を含む）、コンテナ内のグローバルツールチェーンパス (<code>/usr/local/lib/node_modules</code> 等) を <code>harness_os</code> / <code>os_package</code> として分類します。</li>
+</ul>
+</li>
+</ul>
+<h3>4. Go AST 解析の改善と非 root コンテナハーネス (<code>go</code>)</h3>
+<ul>
+<li><strong>Go AST 解析の改善 (<code>ast_analyze/go/</code>)</strong>:
+<ul>
+<li><code>check_exception_hygiene()</code> で部分的に無視されたエラー戻り値 (<code>val, _ := ...</code>) を検出します。</li>
+<li><code>check_complexity()</code> で複数行の raw バッククォート文字列（SQL・HTML・テンプレート等）を関数 LOC 肥大化のペナルティから除外します。</li>
+<li><code>check_type_safety()</code> で <code>format string</code> 引数を伴う <code>fmt.Printf</code> スタイルの可変長引数 (<code>...any</code> / <code>...interface{}</code>) を weak-type ペナルティから除外します。</li>
+<li><code>check_test_quality()</code> で <code>t.Run</code> のメソッド値デリゲーションおよびヘルパー関数内のアサーションを認識します。</li>
+</ul>
+</li>
+<li><strong>堅牢化された Go コンテナテンプレート (<code>go/go.dockerfile</code>)</strong>:
+<ul>
+<li>Go <code>1.22</code> Bookworm イメージを下限 (<code>1.22</code>〜<code>1.24</code>) とし、非 root ユーザー <code>USER pni</code> (<code>UID 10001</code>) でのテスト実行と、ビルド時の <code>/go/cache</code> 事前ウォームアップによる <code>--network=none</code> オフライン実行の安定化を実現しました。</li>
+<li>デフォルトの <code>.pni/pni.toml</code> の <code>include_gitignored</code> に <code>&quot;go.sum&quot;</code> を追加し、<code>exclude_patterns</code> に <code>&quot;docs/**&quot;</code> と <code>&quot;docs_src/**&quot;</code> を追加しました。</li>
+</ul>
+</li>
+</ul>
+<hr />
+<h2>Version 0.1.3</h2>
+<p><em>Release Date: 2026/11/10</em></p>
+<p>バージョン <code>0.1.3</code> では、従来の 3 言語から <strong>6 つのターゲット言語</strong> へと対応範囲を拡大し、<strong>Go (<code>go</code>)</strong>・<strong>TypeScript (<code>typescript</code>)</strong>・<strong>JavaScript (<code>javascript</code>)</strong> 向けの Tree-sitter AST アナライザー、カスケードルール、オフライン Docker ハーネス、テスト／カバレッジパーサー、マイグレーション解析器を追加するとともに、<strong>Java</strong> および <strong>PHP</strong> の解析精度を強化しました。</p>
+<h3>1. Go・TypeScript・JavaScript のフルサポート（計 6 言語対応）</h3>
+<ul>
+<li><strong>Tree-Sitter AST アナライザー（計 27 個の新規チェッカー）</strong>:
+<ul>
+<li><code>go</code>、<code>typescript</code>、<code>javascript</code> の各言語に 9 個ずつの決定論的 AST チェッカー（<code>complexity</code>, <code>type_safety</code>, <code>doc_coverage</code>, <code>architecture</code>, <code>code_hygiene</code>, <code>exception_hygiene</code>, <code>test_quality</code>, <code>security_patterns</code>, <code>resource_safety</code>）を実装しました。</li>
+</ul>
+</li>
+<li><strong>ビルトイン言語ルールカスケード（計 15 個の新規ルールファイル）</strong>:
+<ul>
+<li><code>rules/go/</code>、<code>rules/typescript/</code>、<code>rules/javascript/</code> 配下に <code>coding_convention.md</code>、<code>architecture_design.md</code>、<code>test_strategy.md</code>、<code>security_policy.md</code>、<code>audit_rubric.md</code> を追加しました。</li>
+</ul>
+</li>
+<li><strong>複合アクション・ワークフロー・オフライン Docker ハーネス</strong>:
+<ul>
+<li><code>go.audit_analyze</code>、<code>typescript.audit_analyze</code>、<code>javascript.audit_analyze</code> 複合アクション、<code>full_audit</code> / <code>quick_check</code> ワークフロー、および <code>go-cover</code>・<code>istanbul-summary</code> カバレッジパーサーを備えた Docker テンプレート (<code>go/go.dockerfile</code>, <code>typescript/node.dockerfile</code>, <code>javascript/node.dockerfile</code>) を追加しました。</li>
+</ul>
+</li>
+<li><strong>マイグレーション解析器</strong>:
+<ul>
+<li>Go、TypeScript、JavaScript 向けに外部依存タッチポイントスキャナー、公開 API コントラクト抽出器、AST コードモッド候補検出器を追加しました。</li>
+</ul>
+</li>
+</ul>
+<h3>2. Java および PHP アナライザーの強化</h3>
+<ul>
+<li><strong>Java (<code>java</code>)</strong>:
+<ul>
+<li>JUnit 4 の <code>@Test(expected=...)</code>、AssertJ、Hamcrest、Spring <code>MockMvc</code> アサーションの認識、Javadoc コメントのメソッド LOC 除外、カスタム Maven ビルド引数のサポート、および <code>pom.xml</code> の <code>test</code> / <code>provided</code> / <code>optional</code> スコープの自動フィルタリングを追加しました。</li>
+</ul>
+</li>
+<li><strong>PHP (<code>php</code>)</strong>:
+<ul>
+<li>無名クラスシンボルの整形、PSR-3 ロガー呼び出しと生の <code>error_log()</code> デバッグ出力の区別、および <code>composer.json</code> の PSR-4 マッピングからの対象ソースディレクトリ自動検出を追加しました。</li>
+</ul>
+</li>
+</ul>
+<hr />
+<h2>Version 0.1.2</h2>
+<p><em>Release Date: 2026/11/08</em></p>
+<p>バージョン <code>0.1.2</code> では、<code>security_scan</code> における <strong>4 段階の脆弱性スコープ分類</strong>、Python AST アナライザーの精緻化、およびワークフロー状態管理コマンド (<code>rewind</code> と <code>cancel</code>) を導入しました。</p>
+<h3>1. 4 段階の脆弱性スコープ分類 (<code>security_scan</code>)</h3>
+<ul>
+<li><strong><code>dep_scopes.py</code> による依存関係スコープ自動分類</strong>:
+<ul>
+<li>開発・ドキュメント用依存関係やコンテナベースイメージ由来の誤検知ペナルティを排除するため、Trivy および OSV の検出結果を以下の 4 スコープに自動分類します。
+<ol>
+<li><code>runtime_core</code>: 本番ランタイムのコア依存パッケージ（スコア評価の主対象）。</li>
+<li><code>dev_or_optional</code>: テスト・リンター・ドキュメント生成ツールやオプション依存。</li>
+<li><code>os_package</code>: アプリケーションコンテナ内の Debian/Alpine OS パッケージ。</li>
+<li><code>harness_os</code>: 監査用コンテナハーネス (<code>pni-sec-*</code> / <code>pni-harness-*</code>) の OS パッケージ。</li>
+</ol>
+</li>
+</ul>
+</li>
+</ul>
+<h3>2. ワークフローの巻き戻し・キャンセル CLI と Python AST の改善</h3>
+<ul>
+<li><strong>ワークフロー状態リカバリ (<code>pni workflows rewind</code> &amp; <code>cancel</code>)</strong>:
+<ul>
+<li>指定したアクションまでワークフローを巻き戻して後続アーティファクトをクリアする <code>pni workflows rewind &lt;action_id&gt;</code>（エイリアス <code>retry-action</code>）と、古い実行を整理する <code>pni workflows cancel</code> (<code>--superseded</code> / <code>--supersede</code>) を追加しました。</li>
+</ul>
+</li>
+<li><strong>Python AST 解析の改善</strong>:
+<ul>
+<li><code>ast_analyze/python/</code> における <code>TYPE_CHECKING</code> 条件付きインポートの扱い、<code>@overload</code> / <code>@abstractmethod</code> スタブの除外、および docstring カバレッジ算出ロジックを改善しました。</li>
+</ul>
+</li>
+</ul>
+<hr />
+<h2>Version 0.1.1</h2>
+<p><em>Release Date: 2026/11/06</em></p>
+<ul>
+<li><strong>PyPI パッケージングおよびメタデータの改善</strong>:
+<ul>
+<li>パッケージ分類情報、<code>pni</code> CLI エントリポイント、同梱ルール／ワークフローのパッケージデータ構成、およびリリース検証ワークフローを改善しました。</li>
+</ul>
+</li>
+</ul>
+<hr />
+<h2>Version 0.1.0</h2>
+<p><em>Release Date: 2026/11/06</em></p>
+<p>AI オーケストレーション型ソフトウェアエンジニアリング監査・セキュリティ検証・マイグレーション計画・ビジュアルレポートフレームワーク <strong>Project Nemesis Index (<code>pni501</code>)</strong> の初回パブリックリリースです。</p>
+<ul>
+<li><strong>コアアーキテクチャ</strong>:
+<ul>
+<li>決定論的アクション実行と LLM 審査ゲートを統合したステートフルな <strong>Pull-Push 型 SQLite ワークフローエンジン</strong> (<code>.pni/state.db</code>)。</li>
+<li><strong>3 層カスケードルールシステム</strong> (<code>common/</code> → <code>&lt;language&gt;/</code> → <code>.pni/rules/</code>) と <strong>2 層設定ローダー</strong> (<code>.pni/pni.toml</code>)。</li>
+<li><strong>Python</strong>・<strong>Java</strong>・<strong>PHP</strong> 向けの決定論的アナライザー群 (<code>project_inspect</code>, <code>ast_analyze</code>, <code>run_check</code>, <code>security_scan</code>, <code>web_pentest</code>, <code>migration_analyze</code>, <code>progress_analyze</code>)。</li>
+<li><strong>7 軸 <code>ScoreResult</code></strong>（100 点満点の重み付けルーブリックおよび <code>S</code>/<code>A</code>/<code>B</code>/<code>C</code>/<code>D</code> グレード判定）と <strong><code>MigrationPlanResult</code></strong>。</li>
+<li>7 章構成の 16:9 ベクター PDF および HTML スライドデッキを生成する <strong>Drawlib ビジュアル PDF レポーター</strong> (<code>pni report init</code>, <code>pni report check</code>, <code>pni report build</code>)。</li>
+</ul>
+</li>
+</ul>
+
+            </main>
+        </div>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Theme toggle
+            const themeBtn = document.getElementById('theme-toggle');
+            if (themeBtn) {
+                themeBtn.addEventListener('click', function() {
+                    const current = document.documentElement.getAttribute('data-theme');
+                    const next = current === 'dark' ? 'light' : 'dark';
+                    document.documentElement.setAttribute('data-theme', next);
+                    localStorage.setItem('drawlib-theme', next);
+                });
+            }
+
+            // Language dropdown outside-click & Escape close
+            const langDropdowns = document.querySelectorAll('.lang-dropdown');
+            if (langDropdowns.length > 0) {
+                document.addEventListener('click', function(e) {
+                    langDropdowns.forEach(function(dd) {
+                        if (dd.hasAttribute('open') && !dd.contains(e.target)) {
+                            dd.removeAttribute('open');
+                        }
+                    });
+                });
+                document.addEventListener('keydown', function(e) {
+                    if (e.key === 'Escape') {
+                        langDropdowns.forEach(function(dd) {
+                            dd.removeAttribute('open');
+                        });
+                    }
+                });
+            }
+
+            // Mobile menu toggle
+            const menuBtn = document.getElementById('menu-toggle');
+            const sidebar = document.querySelector('.sidebar');
+            if (menuBtn && sidebar) {
+                function setMenuOpen(open) {
+                    sidebar.classList.toggle('is-open', open);
+                    menuBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
+                    document.body.classList.toggle('menu-open', open);
+                    if (open) {
+                        const menu = sidebar.querySelector('.sidebar-menu');
+                        if (menu) {
+                            menu.scrollTop = 0;
+                        }
+                    }
+                }
+
+                menuBtn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    const willOpen = !sidebar.classList.contains('is-open');
+                    setMenuOpen(willOpen);
+                });
+
+                // Close menu when clicking outside sidebar
+                document.addEventListener('click', function(e) {
+                    if (sidebar.classList.contains('is-open') && !sidebar.contains(e.target)) {
+                        setMenuOpen(false);
+                    }
+                });
+
+                // Close menu when a navigation link is clicked
+                const navLinks = sidebar.querySelectorAll('.nav-item a');
+                navLinks.forEach(function(link) {
+                    link.addEventListener('click', function() {
+                        setMenuOpen(false);
+                    });
+                });
+
+                // Close on Escape key
+                document.addEventListener('keydown', function(e) {
+                    if (e.key === 'Escape' && sidebar.classList.contains('is-open')) {
+                        setMenuOpen(false);
+                    }
+                });
+
+                // Reset menu state when resized above mobile breakpoint
+                window.addEventListener('resize', function() {
+                    if (window.innerWidth > 768 && sidebar.classList.contains('is-open')) {
+                        setMenuOpen(false);
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>

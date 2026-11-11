@@ -115,7 +115,7 @@ While Code AI Agents (`Claude Code`, `Gemini CLI`, `Cursor`, `GitHub Copilot`, e
 
 ## 2. The PNI501 Approach: Four Foundational Pillars
 
-**Project Nemesis Index (`pni501` `v0.1.3`)** solves these challenges by inverting control: instead of letting an LLM improvise the audit flow, the **deterministic `pni` CLI and SQLite state machine** drive the process, delegating only bounded, evidence-grounded reasoning and visual report authoring to the AI agent.
+**Project Nemesis Index (`pni501` `v0.1.4`)** solves these challenges by inverting control: instead of letting an LLM improvise the audit flow, the **deterministic `pni` CLI and SQLite state machine** drive the process, delegating only bounded, evidence-grounded reasoning and visual report authoring to the AI agent.
 
 ```drawlib align=center code=fold file=pni_four_step_architecture.png caption="The Four-Step PNI501 Architecture: Uniting Polyglot Analyzers, SQLite Pull-Push Reasoning, Chained Plans & Visual Reports"
 from drawlib.canvas import save, setup

@@ -1,6 +1,6 @@
 # Domain Architecture & Three-Tier Cascade Resolution
 
-`pni501` (`v0.1.3`) organizes its implementation under `src/pni/` around **seven vertical domain packages** (`_workflows`, `_actions`, `_reporter`, `_rules`, `_pentests`, `_dockerfiles`, and `_instructions`), a project manifest loader (`_config.py`), a self-healing cache utility (`_cache.py`), and a thin Typer + Rich CLI orchestrator (`cli.py`). Each domain colocates its Pydantic v2 schemas, execution or resolution logic, and built-in `.md`, `.yaml`, `.dockerfile`, or `.tmpl` assets across all **6 supported languages** (`python`, `java`, `php`, `go`, `typescript`, and `javascript`)—preserving a strict module-level Directed Acyclic Graph (`circular_dependencies = []`).
+`pni501` (`v0.1.4`) organizes its implementation under `src/pni/` around **seven vertical domain packages** (`_workflows`, `_actions`, `_reporter`, `_rules`, `_pentests`, `_dockerfiles`, and `_instructions`), a project manifest loader (`_config.py`), a self-healing cache utility (`_cache.py`), and a thin Typer + Rich CLI orchestrator (`cli.py`). Each domain colocates its Pydantic v2 schemas, execution or resolution logic, and built-in `.md`, `.yaml`, `.dockerfile`, or `.tmpl` assets across all **6 supported languages** (`python`, `java`, `php`, `go`, `typescript`, and `javascript`)—preserving a strict module-level Directed Acyclic Graph (`circular_dependencies = []`).
 
 ```drawlib align=center code=fold file=domain_layer_hierarchy.png caption="High-Cohesion Domain Package Hierarchy and Module-Level Dependency DAG in src/pni/"
 from drawlib.canvas import save, setup
@@ -33,7 +33,7 @@ cli_node = ClassNode(
     row_height=3.8,
     header_style=Styles.PrimaryFlat.patch(text_color=Colors.White, text_size=10.5),
 )
-cli_node.add_attribute("sub-apps", "rules, workflows, report, pentests")
+cli_node.add_attribute("sub-apps", "rules, workflows, report, pentests, cache")
 cli_node.add_attribute("commands", "init, instructions, validate-*, version")
 diagram.add(cli_node, xy=(86.0, 93.5))
 
@@ -137,17 +137,17 @@ save()
 
 Traditional CLI codebases often slice code horizontally—scattering Pydantic models across `models/`, YAML/Markdown loaders across `config/`, subprocess runners across `executors/`, and static files across `templates/`. Modifying a single audit capability then forces synchronized edits across four disconnected directories and inflates context overhead for both human maintainers and AI coding agents.
 
-`pni501` instead organizes `src/pni/` into **self-contained vertical domain packages**. Top-level `src/pni/__init__.py` exports only package identity constants (`LIB_NAME = "pni501"`, `LIB_VERSION = "0.1.3"`, and `__version__`), while every subsystem colocates its schemas, orchestration modules, and packaged templates inside its own bounded directory:
+`pni501` instead organizes `src/pni/` into **self-contained vertical domain packages**. Top-level `src/pni/__init__.py` exports only package identity constants (`LIB_NAME = "pni501"`, `LIB_VERSION = "0.1.4"`, and `__version__`), while every subsystem colocates its schemas, orchestration modules, and packaged templates inside its own bounded directory:
 
 | Package / Module | Core Python Modules | Key Schemas & Responsibilities | Packaged Built-in Assets |
 | :--- | :--- | :--- | :--- |
-| **`cli.py`** | `cli.py` | Typer root `app` + sub-apps (`rules`, `workflows`, `report`, `pentests`, `progress`) and root commands (`init`, `instructions`, `validate-score`, `validate-migration-plan`, `version`) | Rich CLI help epilog & AI bootstrap instructions |
+| **`cli.py`** | `cli.py` | Typer root `app` + sub-apps (`rules`, `workflows`, `report`, `pentests`, `progress`, `cache`) and root commands (`init`, `instructions`, `validate-score`, `validate-migration-plan`, `version`, `--version` / `-V`) | Rich CLI help epilog & AI bootstrap instructions |
 | **`_workflows/`** | `base_model.py`, `state_db.py`, `manager.py`, `engine.py`, `_migration_engine.py`, `_progress_engine.py`, `aggregator.py`, `adhoc.py`, `inspector.py` | `WorkflowDefinition`, `WorkflowFactsBundle`, `WorkflowStateDB`, `CompiledAuditDigest`; stateful pull/push engine, ad-hoc `run-action`, rewind, and run history inspection | `12` starter workflows across 6 languages (`{python,java,php,go,typescript,javascript}/{full_audit,quick_check}.yaml`) supporting 6 stateful workflow patterns |
 | **`_actions/`** | `base_model.py`, `manager.py`, `ai_actions.py`, `project_inspect.py`, `_repo_governance.py`, plus `ast_analyze/`, `runtime_check/`, `security_scan/`, `pentest/`, `migration_analyze/`, `progress_analyze/` | `PrimitiveType` (`12` core audit/migration primitives), `ScoreResult` (7 axes), `ArchitectureRecord`, `MigrationPlanResult`, and deterministic fact extractors across 6 languages | `15` active composite YAML actions per language (`12` universal in `common/` + `3` in each `<lang>/` directory) |
-| **`_reporter/`** | `base_model.py`, `blueprint.py`, `migration_blueprint.py`, `progress_blueprint.py`, `drawlib_guide.py`, `compiler.py` | `ReportBlueprint`, `ReportScaffoldResult`, `ReportBuildResult`; pre-sorts 7-chapter audit/migration blueprints and lazily imports `drawlib.tools` in `compiler.py` | 7-chapter Drawlib `doc` scaffolding & automated chapter linter |
+| **`_reporter/`** | `base_model.py`, `blueprint.py`, `migration_blueprint.py`, `progress_blueprint.py`, `drawlib_guide.py`, `compiler.py` | `ReportBlueprint`, `ReportScaffoldResult`, `ReportBuildResult`; pre-sorts 7-chapter audit/migration blueprints, scaffolds `draw_pni_logo()` in `utils.py`, and lazily imports `drawlib.tools` in `compiler.py` | 7-chapter Drawlib `doc` scaffolding, automated chapter linter, and `_assets/{logo.png,logo_dark.png,favicon.png}` |
 | **`_rules/`** | `base_model.py`, `manager.py` | `RuleInfo`, `SUPPORTED_LANGUAGES = ("python", "java", "php", "go", "typescript", "javascript")`, `detect_active_language()`, and `<scope>/<name>` cascade resolution | `50+` Markdown files across `common/` and 6 language packs (`python/`, `java/`, `php/`, `go/`, `typescript/`, `javascript/`) |
 | **`_pentests/`** | `manager.py`, `surface_codegen.py` | Materializes and validates target-scoped `pytest + httpx` Web penetration suites in `.pni/pentests/<target>/`, generating `test_target_surface.py` from `AstFacts.api_endpoints` | `2` probe templates: `conftest.py.tmpl`, `test_baseline_http.py.tmpl` |
-| **`_dockerfiles/`** | `manager.py` | Resolves `.pni/dockerfiles/_templates/` overrides or built-in container harnesses into `.pni/dockerfiles/` alongside an isolated `.dockerignore` | `10` templates: `python/{pip,poetry,uv}`, `java/{gradle,maven}`, `php/{composer,raw}`, `go/go`, `typescript/node`, `javascript/node.dockerfile` |
+| **`_dockerfiles/`** | `manager.py` | Resolves `.pni/dockerfiles/_templates/` overrides or built-in container harnesses into `.pni/dockerfiles/` alongside an isolated `.dockerignore` and `prune_pni_container_artifacts()` | `10` templates: `python/{pip,poetry,uv}`, `java/{gradle,maven}`, `php/{composer,raw}`, `go/go`, `typescript/node`, `javascript/node.dockerfile` |
 | **`_instructions/` & `_config.py`** | `base_model.py`, `manager.py`, `_config.py` | `InstructionInfo`, `PniConfig`, `OptOutEntry`; resolves `.pni/instructions.md` and `.pni/pni.toml` project manifests & `[[opt_out]]` waivers | `agent.md` & default `.pni/pni.toml` template |
 | **`_cache.py`** | `_cache.py` | Self-healing `.pni/cache/` initializer (`ensure_cache_dir`, `ensure_cache_parent`) and workspace-safe path resolvers (`normalize_target_subpath`) | Auto-generated `.pni/cache/.gitignore` (`*`) and `CACHEDIR.TAG` |
 

@@ -81,6 +81,16 @@
                     </button>
                 </div>
             </div>
+            <div class="sidebar-subbar">
+                
+                <a href="../01_getting_started/release_notes.html" class="sidebar-version-badge" title="View Release Notes">
+                    <span class="sidebar-version-dot" aria-hidden="true"></span>
+                    <span class="sidebar-version-text">v0.1.4</span>
+                </a>
+                <a href="https://github.com/yuichi110/pni501" target="_blank" rel="noopener noreferrer" class="sidebar-github-link" aria-label="GitHub Repository" title="GitHub Repository">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg>
+                </a>
+            </div>
             <div class="sidebar-menu">
                 
                     
@@ -108,6 +118,10 @@
                             
                             <li class="nav-item ">
                                 <a href="../01_getting_started/use_cases.html" >Primary Use Cases</a>
+                            </li>
+                            
+                            <li class="nav-item ">
+                                <a href="../01_getting_started/release_notes.html" >Release Notes</a>
                             </li>
                             
                         </ul>
@@ -599,7 +613,7 @@
 <tr>
 <td style="text-align:left"><strong><code>00_cover.md</code></strong></td>
 <td style="text-align:left"><code>overall_score</code>, <code>grade</code>, <code>workflow_id</code>, <code>evaluated_at</code>, rule compliance summary, finding counts</td>
-<td style="text-align:left">Full-bleed cover <code>Panel</code> + <code>KpiCards</code> (followed by automatic PDF/HTML Table of Contents)</td>
+<td style="text-align:left">Full-bleed cover <code>Panel</code> + <code>draw_pni_logo()</code> + <code>KpiCards</code> (followed by automatic PDF/HTML Table of Contents)</td>
 </tr>
 <tr>
 <td style="text-align:left"><strong><code>01_executive_summary.md</code></strong></td>
@@ -647,7 +661,7 @@
 <tr>
 <td style="text-align:left"><strong><code>00_cover.md</code></strong></td>
 <td style="text-align:left"><code>transformation_mode</code>, <code>migration_strategy</code>, <code>api_compatibility</code>, <code>bug_handling_policy</code>, PR &amp; phase counts</td>
-<td style="text-align:left">Full-bleed migration cover <code>Panel</code> + <code>KpiCards</code> (followed by automatic ToC)</td>
+<td style="text-align:left">Full-bleed migration cover <code>Panel</code> + <code>draw_pni_logo()</code> + <code>KpiCards</code> (followed by automatic ToC)</td>
 </tr>
 <tr>
 <td style="text-align:left"><strong><code>01_migration_strategy_summary.md</code></strong></td>
@@ -705,10 +719,10 @@ pni<span class="w"> </span>report<span class="w"> </span>build<span class="w"> <
 <h3>3.2 Preflight Visual Linter (lint_drawlib_chapters) &amp; Link Verification</h3>
 <p>Before invoking <code>drawlib.tools</code>, <code>compiler.py</code> executes four automated verification guardrails:</p>
 <ul>
-<li><strong>Non-Destructive Re-Scaffolding (<code>scaffold_report_project</code>)</strong>: On initial creation, <code>pni report init</code> removes starter sample files (<code>00_cover.md</code>, <code>01_overview.md</code>, <code>02_design.md</code>). When re-run on an existing report directory—even with <code>--force</code> to refresh <code>drawlib.toml</code>, <code>styles.py</code>, or <code>utils.py</code>—all authored <code>&lt;lang&gt;/*.md</code> chapters are preserved intact so incremental re-audits produce clean <code>git diff</code> histories.</li>
+<li><strong>Non-Destructive Re-Scaffolding &amp; Brand Assets (<code>scaffold_report_project</code>)</strong>: On initial creation, <code>pni report init</code> removes starter sample files (<code>00_cover.md</code>, <code>01_overview.md</code>, <code>02_design.md</code>), copies official brand assets (<code>_assets/{logo.png,logo_dark.png,favicon.png}</code>), and injects <code>draw_pni_logo()</code> into <code>utils.py</code>. When re-run on an existing report directory—even with <code>--force</code> to refresh <code>drawlib.toml</code>, <code>styles.py</code>, or <code>utils.py</code>—all authored <code>&lt;lang&gt;/*.md</code> chapters are preserved intact so incremental re-audits produce clean <code>git diff</code> histories.</li>
 <li><strong>Multi-Series Chart Legend Check</strong>: <code>lint_drawlib_chapters()</code> scans every <code>```drawlib</code> fence and verifies that any <code>BarChart</code> or <code>LineChart</code> calling <code>.add_series(...)</code> two or more times also calls <code>.draw_legend(...)</code>.</li>
-<li><strong>UML ClassDiagram + HeatmapOverlay Contour Guard</strong>: Combining <code>ClassDiagram</code> with <code>HeatmapOverlay(..., show_contour_lines=True)</code> triggers a preflight warning (or raises <code>ValueError</code> when <code>strict_preflight=True</code>); setting <code>show_contour_lines=False</code> highlights high-risk classes with smooth thermal gradients without contour lines intersecting method signatures.</li>
-<li><strong>Output Normalization &amp; Broken-Link Scanning (<code>_verify_links</code>)</strong>: <code>pni report build</code> normalizes <code>&lt;target&gt;_&lt;default_lang&gt;.pdf</code> to <code>reports/&lt;target&gt;.pdf</code> (<code>page_break=True</code>, <code>generate_index=True</code>). When <code>-f html</code> is included, <code>_verify_links()</code> runs <code>drawlib.tools.scan_broken_links()</code> and fails closed (<code>strict_links=True</code>) if any broken link or missing image asset is detected.</li>
+<li><strong>UML ClassDiagram Contour &amp; <code>Styles.White</code> Guards</strong>: Combining <code>ClassDiagram</code> with <code>HeatmapOverlay(..., show_contour_lines=True)</code> or styling <code>ClassDiagram</code> / <code>ClassNode</code> with <code>Styles.White</code> (which renders white text on a white fill; use <code>Styles.Neutral</code> instead) triggers a preflight warning (or raises <code>ValueError</code> when <code>strict_preflight=True</code>).</li>
+<li><strong>Output Normalization &amp; Broken-Link Scanning (<code>_verify_links</code>)</strong>: <code>pni report build</code> normalizes <code>&lt;target&gt;_&lt;default_lang&gt;.pdf</code> to <code>reports/&lt;target&gt;.pdf</code> (<code>page_break=True</code>, <code>generate_index=True</code>). When <code>-f html</code> is included, <code>_verify_links()</code> runs <code>drawlib.tools.scan_broken_links()</code> (supporting <code>--link-check-root &lt;dir&gt;</code> for multi-portal relative links) and fails closed (<code>strict_links=True</code>) if any broken link or missing image asset is detected.</li>
 </ul>
 <p>For details on the upstream JSON schemas and deterministic hotspot scoring formulas, see <a href="scoring_model.html">7-Axis Scoring Model</a>, or consult <a href="../05_languages_and_reference/rules_and_cli.html">Rules &amp; CLI Reference</a> for all <code>pni report</code> flags.</p>
 

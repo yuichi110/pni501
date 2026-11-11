@@ -27,7 +27,7 @@ docs_src/
 ├── en/                                  # English documentation pages (default_lang = "en")
 │   ├── navbar.md                        # Sidebar navigation hierarchy
 │   ├── index.md                         # Home / Overview
-│   ├── 01_getting_started/              # Background & Core Concepts, Quickstart, Primary Use Cases
+│   ├── 01_getting_started/              # Background & Core Concepts, Quickstart, Use Cases, Release Notes
 │   ├── 02_architecture/                 # Domain Architecture & Cascade, Stateful Pull-Push Engine
 │   ├── 03_workflows_and_actions/        # Workflows & Pre-Flight Gates, 15 Actions & 12 Primitives, Analyzers & Pentest
 │   ├── 04_scoring_and_reports/          # 7-Axis Scoring Model, Drawlib Visual Reporter

@@ -35,19 +35,19 @@
     
     
     
-    <meta name="description" content="pni501 (v0.1.3) ships 52 built-in Markdown rule files across common/ (16 universal standards and orchestration guides) and / (36 language and framework…">
+    <meta name="description" content="pni501 (v0.1.4) ships 52 built-in Markdown rule files across common/ (16 universal standards and orchestration guides) and / (36 language and framework…">
     <link rel="canonical" href="https://www.pni501.com/en/05_languages_and_reference/rules_and_cli.html">
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="pni501 Documentation">
     <meta property="og:title" content="Rules Customization &amp; CLI Reference — pni501 Documentation">
-    <meta property="og:description" content="pni501 (v0.1.3) ships 52 built-in Markdown rule files across common/ (16 universal standards and orchestration guides) and / (36 language and framework…">
+    <meta property="og:description" content="pni501 (v0.1.4) ships 52 built-in Markdown rule files across common/ (16 universal standards and orchestration guides) and / (36 language and framework…">
     <meta property="og:url" content="https://www.pni501.com/en/05_languages_and_reference/rules_and_cli.html">
     <meta property="og:image" content="https://www.pni501.com/_assets/logo.png">
     <meta property="og:locale" content="en_US">
     <meta property="og:locale:alternate" content="ja_JP">
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="Rules Customization &amp; CLI Reference — pni501 Documentation">
-    <meta name="twitter:description" content="pni501 (v0.1.3) ships 52 built-in Markdown rule files across common/ (16 universal standards and orchestration guides) and / (36 language and framework…">
+    <meta name="twitter:description" content="pni501 (v0.1.4) ships 52 built-in Markdown rule files across common/ (16 universal standards and orchestration guides) and / (36 language and framework…">
     <meta name="twitter:image" content="https://www.pni501.com/_assets/logo.png">
     
     
@@ -81,6 +81,16 @@
                     </button>
                 </div>
             </div>
+            <div class="sidebar-subbar">
+                
+                <a href="../01_getting_started/release_notes.html" class="sidebar-version-badge" title="View Release Notes">
+                    <span class="sidebar-version-dot" aria-hidden="true"></span>
+                    <span class="sidebar-version-text">v0.1.4</span>
+                </a>
+                <a href="https://github.com/yuichi110/pni501" target="_blank" rel="noopener noreferrer" class="sidebar-github-link" aria-label="GitHub Repository" title="GitHub Repository">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg>
+                </a>
+            </div>
             <div class="sidebar-menu">
                 
                     
@@ -108,6 +118,10 @@
                             
                             <li class="nav-item ">
                                 <a href="../01_getting_started/use_cases.html" >Primary Use Cases</a>
+                            </li>
+                            
+                            <li class="nav-item ">
+                                <a href="../01_getting_started/release_notes.html" >Release Notes</a>
                             </li>
                             
                         </ul>
@@ -230,7 +244,7 @@
             </header>
             <main class="main-content">
                 <h1>Rules Customization &amp; CLI Reference</h1>
-<p><code>pni501</code> (<code>v0.1.3</code>) ships <strong>52 built-in Markdown rule files</strong> across <code>common/*</code> (<code>16</code> universal standards and orchestration guides) and <code>&lt;lang&gt;/*</code> (<code>36</code> language and framework standards across 6 languages), resolves workspace customizations through a deterministic <code>.pni/</code> override cascade, and exposes every lifecycle operation via the unified <code>pni</code> CLI.</p>
+<p><code>pni501</code> (<code>v0.1.4</code>) ships <strong>52 built-in Markdown rule files</strong> across <code>common/*</code> (<code>16</code> universal standards and orchestration guides) and <code>&lt;lang&gt;/*</code> (<code>36</code> language and framework standards across 6 languages), resolves workspace customizations through a deterministic <code>.pni/</code> override cascade, and exposes every lifecycle operation via the unified <code>pni</code> CLI.</p>
 <figure class="drawlib-image" style="text-align: center;">
   <img src="../../images/05_languages_and_reference/rules_and_cli/rules_taxonomy_and_override.png" alt="rules_and_cli_1" />
   <figcaption class="drawlib-caption">Orthogonal Rule Taxonomy (common/* + <lang>/*) and .pni/ Local Override Cascade</figcaption>
@@ -571,7 +585,7 @@
 
 <span class="k">[scan]</span>
 <span class="n">respect_gitignore</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span>
-<span class="n">include_gitignored</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="s2">"uv.lock"</span><span class="p">,</span><span class="w"> </span><span class="s2">"composer.lock"</span><span class="p">]</span>
+<span class="n">include_gitignored</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="s2">"uv.lock"</span><span class="p">,</span><span class="w"> </span><span class="s2">"composer.lock"</span><span class="p">,</span><span class="w"> </span><span class="s2">"go.sum"</span><span class="p">]</span>
 
 <span class="k">[report]</span>
 <span class="n">src_dir</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"reports_src"</span>
@@ -587,7 +601,7 @@
 </code></pre>
 <hr />
 <h2>3. Complete <code>pni</code> CLI Reference</h2>
-<p>The <code>pni</code> CLI (<code>src/pni/cli.py</code>) organizes all workspace initialization, rule discovery, stateful workflow orchestration, live penetration testing, progress governance, Drawlib report compilation, and Pydantic schema validation commands into a cohesive command hierarchy.</p>
+<p>The <code>pni</code> CLI (<code>src/pni/cli.py</code>) organizes all workspace initialization, rule discovery, stateful workflow orchestration, live penetration testing, progress governance, Drawlib report compilation, cache cleanup, and Pydantic schema validation commands into a cohesive command hierarchy.</p>
 <figure class="drawlib-image" style="text-align: center;">
   <img src="../../images/05_languages_and_reference/rules_and_cli/cli_command_tree.png" alt="rules_and_cli_2" />
   <figcaption class="drawlib-caption">The pni CLI Command Hierarchy and Workspace Artifact Mapping</figcaption>
@@ -605,7 +619,7 @@
 <span class="n">txt_leaf</span> <span class="o">=</span> <span class="n">Styles</span><span class="o">.</span><span class="n">Dark</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">text_size</span><span class="o">=</span><span class="mf">9.8</span><span class="p">)</span>
 
 <span class="n">root</span> <span class="o">=</span> <span class="n">MindMapNode</span><span class="p">(</span>
-    <span class="s2">"pni CLI</span><span class="se">\n</span><span class="s2">(pni501 v0.1.3)"</span><span class="p">,</span>
+    <span class="s2">"pni CLI</span><span class="se">\n</span><span class="s2">(pni501 v0.1.4)"</span><span class="p">,</span>
     <span class="n">shape</span><span class="o">=</span><span class="s2">"rectangle"</span><span class="p">,</span>
     <span class="n">width</span><span class="o">=</span><span class="mf">26.0</span><span class="p">,</span>
     <span class="n">height</span><span class="o">=</span><span class="mf">13.0</span><span class="p">,</span>
@@ -771,7 +785,7 @@
                     <span class="n">text_style</span><span class="o">=</span><span class="n">txt_leaf</span><span class="p">,</span>
                 <span class="p">),</span>
                 <span class="n">MindMapNode</span><span class="p">(</span>
-                    <span class="s2">"pni progress init | validate"</span><span class="p">,</span>
+                    <span class="s2">"pni progress | cache clean"</span><span class="p">,</span>
                     <span class="n">shape</span><span class="o">=</span><span class="s2">"rectangle"</span><span class="p">,</span>
                     <span class="n">width</span><span class="o">=</span><span class="mf">36.0</span><span class="p">,</span>
                     <span class="n">height</span><span class="o">=</span><span class="mf">6.2</span><span class="p">,</span>
@@ -787,8 +801,8 @@
 <span class="n">save</span><span class="p">()</span>
 </code></pre>
 </details>
-<h3>3.1 Workspace Bootstrap, Rules &amp; Validation Commands</h3>
-<p>Use top-level commands and <code>pni rules</code> to initialize <code>.pni/</code>, inspect engineering standards, bootstrap AI coding agents, and validate emitted JSON artifacts:</p>
+<h3>3.1 Workspace Bootstrap, Rules, Cache &amp; Validation Commands</h3>
+<p>Use top-level commands, <code>pni rules</code>, and <code>pni cache</code> to initialize <code>.pni/</code>, inspect engineering standards, bootstrap AI coding agents, clean local/Docker cache artifacts, and validate emitted JSON artifacts:</p>
 <table>
 <thead>
 <tr>
@@ -819,6 +833,11 @@
 <td style="text-align:left">Output a rule or workflow guide (<code>common/workflow_guide</code>, <code>python/testing</code>, or short name <code>testing</code>) in raw Markdown or a styled Rich panel (<code>--pretty</code>).</td>
 </tr>
 <tr>
+<td style="text-align:left"><code>pni cache clean</code></td>
+<td style="text-align:left"><code>[--docker] [--container-engine auto|docker|podman]</code></td>
+<td style="text-align:left">Clean <code>.pni/cache/</code> and optionally prune temporary <code>pni-harness-*</code>, <code>pni-proj-*</code>, <code>pni-sec-*</code>, and <code>pni-pentest-*</code> container images, dangling layers, and builder caches.</td>
+</tr>
+<tr>
 <td style="text-align:left"><code>pni validate-score</code></td>
 <td style="text-align:left"><code>[score_path]</code></td>
 <td style="text-align:left">Validate a <code>reports/&lt;target&gt;_score.json</code> file against the Pydantic <code>ScoreResult</code> schema.</td>
@@ -835,8 +854,8 @@
 </tr>
 <tr>
 <td style="text-align:left"><code>pni version</code></td>
-<td style="text-align:left"><em>(none)</em></td>
-<td style="text-align:left">Print the installed <code>pni501</code> package name and version string.</td>
+<td style="text-align:left"><em>(or <code>pni --version</code> / <code>-V</code>)</em></td>
+<td style="text-align:left">Print the installed <code>pni501</code> package name and version string (<code>pni501 v0.1.4</code>).</td>
 </tr>
 </tbody>
 </table>
@@ -846,10 +865,11 @@ pni<span class="w"> </span>rules<span class="w"> </span>list<span class="w"> </s
 pni<span class="w"> </span>rules<span class="w"> </span>show<span class="w"> </span>common/workflow_guide
 pni<span class="w"> </span>rules<span class="w"> </span>show<span class="w"> </span>python/testing<span class="w"> </span>--pretty
 
-<span class="c1"># Validate emitted JSON deliverables in CI</span>
+<span class="c1"># Validate emitted JSON deliverables and clean local + Docker cache artifacts</span>
 pni<span class="w"> </span>validate-score<span class="w"> </span>reports/full_audit_score.json
 pni<span class="w"> </span>validate-migration-plan<span class="w"> </span>reports/migration_plan.json
 pni<span class="w"> </span>validate-progress<span class="w"> </span>reports/project_progress.json
+pni<span class="w"> </span>cache<span class="w"> </span>clean<span class="w"> </span>--docker
 </code></pre>
 <h3>3.2 Stateful Workflow Execution &amp; Debugging Commands (<code>pni workflows</code>)</h3>
 <p><code>pni workflows</code> manages the SQLite state machine (<code>.pni/cache/workflow_state.db</code>) as well as zero-setup ad-hoc step execution (<code>run-action</code>) and non-destructive step rewinding (<code>rewind</code>):</p>
@@ -875,7 +895,7 @@ pni<span class="w"> </span>validate-progress<span class="w"> </span>reports/proj
 <tr>
 <td style="text-align:left"><code>pni workflows start</code></td>
 <td style="text-align:left"><code>&lt;workflow_id&gt; [--supersede]</code></td>
-<td style="text-align:left">Start a stateful workflow run (<code>wf-...</code>) in <code>.pni/cache/workflow_state.db</code> (<code>--supersede</code> cancels older unfinished runs of <code>&lt;workflow_id&gt;</code>).</td>
+<td style="text-align:left">Start a stateful workflow run (<code>wf-...</code>) in <code>.pni/cache/workflow_state.db</code> (<code>supersede=True</code> by default cancels older unfinished runs of <code>&lt;workflow_id&gt;</code>).</td>
 </tr>
 <tr>
 <td style="text-align:left"><code>pni workflows get-action</code></td>
@@ -940,11 +960,16 @@ pni<span class="w"> </span>workflows<span class="w"> </span>rewind<span class="w
 <tr>
 <td style="text-align:left"><code>pni report init</code></td>
 <td style="text-align:left"><code>[target] [--src-dir reports_src] [-l en|ja] [-s google|default|monochrome] [--keep-samples] [-f]</code></td>
-<td style="text-align:left">Non-destructively scaffold or refresh <code>reports_src/&lt;target&gt;_src/</code> (<code>drawlib.toml</code>, <code>styles.py</code>, <code>&lt;lang&gt;/</code>) while preserving existing authored <code>*.md</code> chapters.</td>
+<td style="text-align:left">Non-destructively scaffold or refresh <code>reports_src/&lt;target&gt;_src/</code> (<code>drawlib.toml</code>, <code>styles.py</code>, <code>utils.py</code>, <code>_assets/</code>, <code>&lt;lang&gt;/</code>) while preserving existing authored <code>*.md</code> chapters.</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>pni report check</code></td>
+<td style="text-align:left"><code>[target] [--src-dir reports_src]</code></td>
+<td style="text-align:left">Run <code>lint_drawlib_chapters</code> preflight checks (multi-series legend check, <code>ClassDiagram</code> contour &amp; <code>Styles.White</code> guards) without compiling outputs.</td>
 </tr>
 <tr>
 <td style="text-align:left"><code>pni report build</code></td>
-<td style="text-align:left"><code>[target] [--src-dir reports_src] [-o reports] [-f pdf|html|markdown|images] [--toc/--no-toc] [--no-cache]</code></td>
+<td style="text-align:left"><code>[target] [--src-dir reports_src] [-o reports] [-f pdf|html|markdown|images] [--toc/--no-toc] [--no-cache] [--link-check-root &lt;dir&gt;]</code></td>
 <td style="text-align:left">Run <code>lint_drawlib_chapters</code> preflight checks, compile <code>reports/&lt;target&gt;.pdf</code> (default A4 vector PDF with ToC), and verify zero broken links when <code>-f html</code> is enabled.</td>
 </tr>
 <tr>
@@ -969,8 +994,9 @@ pni<span class="w"> </span>workflows<span class="w"> </span>rewind<span class="w
 </tr>
 </tbody>
 </table>
-<pre><code class="language-bash"><span class="c1"># Scaffold and compile a 7-chapter Drawlib visual PDF report</span>
+<pre><code class="language-bash"><span class="c1"># Scaffold, lint, and compile a 7-chapter Drawlib visual PDF report</span>
 pni<span class="w"> </span>report<span class="w"> </span>init<span class="w"> </span>full_audit<span class="w"> </span>--src-dir<span class="w"> </span>reports_src<span class="w"> </span>--lang<span class="w"> </span>en<span class="w"> </span>--style<span class="w"> </span>google
+pni<span class="w"> </span>report<span class="w"> </span>check<span class="w"> </span>full_audit<span class="w"> </span>--src-dir<span class="w"> </span>reports_src
 pni<span class="w"> </span>report<span class="w"> </span>build<span class="w"> </span>full_audit<span class="w"> </span>--src-dir<span class="w"> </span>reports_src<span class="w"> </span>--output-dir<span class="w"> </span>reports
 
 <span class="c1"># Materialize and execute live HTTP penetration tests for a web service workflow</span>

@@ -1,6 +1,6 @@
 # ステートフル Pull-Push エンジン・SQLite 永続化・ワークフロー連鎖
 
-ワークフローが Pre-Flight 準備完了ゲートを通過すると、`pni501` (`v0.1.3`) は `src/pni/_workflows/engine.py`、`state_db.py`、`aggregator.py`、および `_migration_engine.py` によって統括される **決定論的ステートフル実行ループ** へと移行します。AI エージェントの揮発しやすいチャットメモリに複数ステップの進捗管理を委ねたり、検証なしの自己採点を許したりする代わりに、CLI 自身が権威あるステートマシンとして機能します。すなわち、**対応6言語**（`python`、`java`、`php`、`go`、`typescript`、`javascript`）の静的解析器やコンテナ解析器を各ステップで1回だけ実行し、`get-action` で文脈を完備したプロンプトを合成し、`push-action` で Pydantic スキーマと実在ファイルパスのグラウンディングを検証し、完了した As-Is 監査ファクトを後続の To-Be マイグレーションワークフローへ直接引き継ぎます。
+ワークフローが Pre-Flight 準備完了ゲートを通過すると、`pni501` (`v0.1.4`) は `src/pni/_workflows/engine.py`、`state_db.py`、`aggregator.py`、および `_migration_engine.py` によって統括される **決定論的ステートフル実行ループ** へと移行します。AI エージェントの揮発しやすいチャットメモリに複数ステップの進捗管理を委ねたり、検証なしの自己採点を許したりする代わりに、CLI 自身が権威あるステートマシンとして機能します。すなわち、**対応6言語**（`python`、`java`、`php`、`go`、`typescript`、`javascript`）の静的解析器やコンテナ解析器を各ステップで1回だけ実行し、`get-action` で文脈を完備したプロンプトを合成し、`push-action` で Pydantic スキーマと実在ファイルパスのグラウンディングを検証し、完了した As-Is 監査ファクトを後続の To-Be マイグレーションワークフローへ直接引き継ぎます。
 
 ```drawlib align=center code=fold file=pull_push_sequence.png caption="AI エージェント・pni エンジン・グラウンディング解析器・SQLite・キャッシュ間の時系列 Pull-Push 実行＆検証シーケンス"
 from drawlib.canvas import save, setup
@@ -111,7 +111,7 @@ save()
 1. `based_on` からのターゲット継承および `.pni/pni.toml` のデフォルト設定を解決した上で `.pni/workflows/<id>.yaml` をロードします。
 2. Pre-Flight ゲート（`inspect_base_audit_status` および `inspect_pentests_prerequisite`）を強制し、前提条件が満たされていない場合は SQLite に触れる前に `WorkflowPrerequisiteError` を送出します。
 3. **15種の複合アクション** をフラットな `PrimitiveStep` 列（`act-01` .. `act-NN`）へと正規化し、有効な `WorkflowOutputs`（`facts`、`score`、`report`）を確定します。
-4. `--supersede` が指定された場合、`db.cancel_active_runs_for_workflow(workflow_id)` を呼び出し、同一ワークフローの未完了セッションと残りステップを `cancelled` に更新します。
+4. `supersede=True`（`start_workflow_run` のデフォルト、または `--supersede` 指定時）の場合、`db.cancel_active_runs_for_workflow(workflow_id)` を呼び出し、同一ワークフローの未完了セッションと残りステップを `cancelled` に更新します。
 5. 新しい `workflow_runs` レコード（`run_id = wf-<8hex>`、`status = in_progress`、該当する場合は `based_on` と `based_on_run_id` を記録）と、`N` 個の連番 `action_runs` レコード（`status = pending`）を SQLite に挿入します。
 
 ### フェーズ 2: 決定論的解析の単発実行とプロンプト合成 (`get_workflow_action`)

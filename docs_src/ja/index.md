@@ -1,8 +1,8 @@
 # pni501 (Project Nemesis Index) — 公式ドキュメント
 
-**Project Nemesis Index (`pni501` `v0.1.3`)** は、**Python**、**Java**、**PHP**、**Go**、**TypeScript**、**JavaScript** の6言語リポジトリに対応する AI ネイティブなソフトウェア健全性監査・ペネトレーションテスト・マイグレーション計画フレームワークです。決定論的な静的解析・隔離コンテナ実行ツールと、SQLite ベースのステートフル Pull-Push ワークフローエンジン、そして Drawlib ビジュアルレポート生成基盤を統合することで、LLM 特有の数値・パスハルシネーションを排除し、再現性のある7軸品質スコア・トポロジカル移行計画・出版品質の A4 ベクター PDF レポートを出力します。
+**Project Nemesis Index (`pni501` `v0.1.4`)** は、**Python**、**Java**、**PHP**、**Go**、**TypeScript**、**JavaScript** の6言語リポジトリに対応する AI ネイティブなソフトウェア健全性監査・ペネトレーションテスト・マイグレーション計画フレームワークです。決定論的な静的解析・隔離コンテナ実行ツールと、SQLite ベースのステートフル Pull-Push ワークフローエンジン、そして Drawlib ビジュアルレポート生成基盤を統合することで、LLM 特有の数値・パスハルシネーションを排除し、再現性のある7軸品質スコア・トポロジカル移行計画・出版品質の A4 ベクター PDF レポートを出力します。
 
-```drawlib align=center code=fold file=pni_overview_pillars.png caption="pni501 (v0.1.3) の4つのアーキテクチャ基盤ピラーと6言語ポリグロット対応"
+```drawlib align=center code=fold file=pni_overview_pillars.png caption="pni501 (v0.1.4) の4つのアーキテクチャ基盤ピラーと6言語ポリグロット対応"
 from drawlib.canvas import save, setup
 from drawlib.icons import phosphor
 from drawlib.smartarts import KpiCards, Panel
@@ -11,7 +11,7 @@ from drawlib.styles import Styles
 setup(width=156, height=90, dpi=150)
 
 outer = Panel(
-    "Project Nemesis Index (pni501 v0.1.3) — Four Foundational Pillars",
+    "Project Nemesis Index (pni501 v0.1.4) — Four Foundational Pillars",
     header_variant="filled",
     style=Styles.PrimaryNeutral.patch(shape_r=2.0),
     header_style=Styles.PrimaryFlat,
@@ -82,7 +82,7 @@ save()
 
 単発プロンプトによる LLM コードレビューには、非決定論的なカウント誤差、実在しないファイルパスの捏造、チェック項目の抜け漏れ、そしてコンテナ実行時の挙動・依存パッケージの既知 CVE・稼働 HTTP エンドポイントの脆弱性を一切検証できないという構造的限界があります。一方で、従来の静的リンターだけでは、ドメイン境界の凝集度や3視点のシステムアーキテクチャ、段階的モダナイゼーションのトレードオフを評価することはできません。
 
-`pni501` (`v0.1.3`) は、**6言語**（`Python`、`Java`、`PHP`、`Go`、`TypeScript`、`JavaScript`）にわたる **52個のカスケード規約ルール**、**15個のコンポジットアクション**、**6言語セットのステートフルワークフロー** を単一のパイプラインに統合することで、この両者の強みを融合します：
+`pni501` (`v0.1.4`) は、**6言語**（`Python`、`Java`、`PHP`、`Go`、`TypeScript`、`JavaScript`）にわたる **52個のカスケード規約ルール**、**15個のコンポジットアクション**、**6言語セットのステートフルワークフロー** を単一のパイプラインに統合することで、この両者の強みを融合します：
 
 - **プログラムによるマルチモーダルな客観ファクト抽出**：`pni` は `project_inspect`、ポリグロット `ast_analyze`（Python 標準 `ast` および Java / PHP / Go / TypeScript / JavaScript 対応の `ast-grep-py`）、隔離 Docker コンテナでの `run_check`（オフライン単体テスト・カバレッジ計測・HTTP 起動確認）、ソケット非公開 Trivy による `security_scan`（CVE・IaC 設定不備・秘密情報漏洩）、ループバックコンテナに対する `pytest` + `httpx` の動的 `web_pentest`、トポロジカル依存グラフ解析 `migration_analyze`、および Git 進捗解析 `progress_analyze` を自動実行し、正確なテレメトリを `.pni/cache/<workflow_id>/facts.json` と `.pni/cache/workflow_state.db` に永続化します。
 - **スキーマ検証付き AI 監査・連鎖プランニング・ビジュアルレポート生成**：SQLite（`workflow_state.db`）のステップ管理のもと、Code AI Agent はスコープ別ルールを読み込み（`load_rules`）、実在パス照合済みの3視点アーキテクチャを記録し（`record_architecture` -> `architecture.json`）、規約準拠性を評価し（`ai_interpret`）、7軸の `ScoreResult`（`reports/<target>_score.json`）を出力します。さらに必要に応じて `based_on` によるマイグレーション計画（`reports/<target>_migration_plan.json`）や進捗評価（`reports/<target>_progress.json`）を連鎖実行し、**Drawlib ビジュアルレポート**（`reports/<target>.pdf` および HTML）をビルドします。
@@ -173,7 +173,7 @@ save()
 
 ## 2. 主要機能サマリー
 
-| 機能領域 | 組み込みアセット (`v0.1.3`) | 主な成果物・品質保証 |
+| 機能領域 | 組み込みアセット (`v0.1.4`) | 主な成果物・品質保証 |
 | :--- | :--- | :--- |
 | **対応プログラミング言語** | **6言語**: `Python`, `Java`, `PHP`, `Go`, `TypeScript`, `JavaScript` | マニフェストおよびソースから自動判定 (`detect_active_language`) |
 | **カスケード設計規約ルール** | **52個の標準ルール** (`common/` + 6言語スコープ) + `.pni/rules/` 上書き | OWASP ASVS, OpenSSF Scorecard, 12-Factor, SRE PRR, CLI・ライブラリ規約を適用 |
@@ -209,6 +209,7 @@ pni workflows start full_audit
 - [背景とコアコンセプト](01_getting_started/concepts.md) — なぜ単発の AI プロンプト監査が実務リポジトリで破綻するのか、そして PNI の4つの柱がいかにハルシネーションゼロの診断を保証するかを解説します。
 - [クイックスタートガイド](01_getting_started/quickstart.md) — インストール、`.pni/` 初期化、Pre-Flight 準備ゲート確認、`get-action` / `push-action` ループの実行手順をステップバイステップで説明します。
 - [3つの主要ユースケース](01_getting_started/use_cases.md) — スプリント開発での継続的品質測定、ブラックボックス化したレガシー資産の多角検査、`based_on` 連鎖によるマイグレーション計画を解説します。
+- [リリースノート](01_getting_started/release_notes.md) — バージョン履歴 (`v0.1.0`〜`v0.1.4`)、新規アナライザー機能、CLI の拡張内容をまとめています。
 
 ### 4.2 アーキテクチャ・ワークフロー・スコアリング・リファレンス
 - [ドメイン構造と3層カスケード](02_architecture/domain_architecture.md) および [ステートフル Pull-Push エンジン](02_architecture/stateful_engine.md) — 内部パッケージ設計と SQLite 状態遷移の仕組み。
