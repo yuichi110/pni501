@@ -13,8 +13,7 @@ from __future__ import annotations
 
 from typing import ClassVar, Final
 
-from ast_grep_py import SgNode
-
+from pni._actions.ast_analyze._cst import CstNode
 from pni._actions.ast_analyze.base import BaseQualityChecker
 from pni._actions.ast_analyze.models import (
     CodeLocation,
@@ -179,11 +178,11 @@ class PythonQualityChecker(BaseQualityChecker):
         """Count class_definition nodes in a Python file."""
         return len(unit.root.find_all(kind="class_definition"))
 
-    def iter_callables(self, unit: ParsedUnit) -> list[tuple[str, SgNode]]:
+    def iter_callables(self, unit: ParsedUnit) -> list[tuple[str, CstNode]]:
         """Return (function_name, function_definition_node) pairs."""
         return [(function_symbol_name(fn), fn) for fn in unit.root.find_all(kind="function_definition")]
 
-    def count_callable_params(self, node: SgNode) -> int:
+    def count_callable_params(self, node: CstNode) -> int:
         """Count Python function parameters excluding 'self', 'cls', and bare separators."""
         return len(extract_callable_param_names(node))
 

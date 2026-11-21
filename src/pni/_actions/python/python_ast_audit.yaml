@@ -9,6 +9,7 @@ rules:
   - python/code_quality
   - python/typing
   - python/modern_stack
+  - python/frameworks/fastapi
 primitives:
   - type: ast_analyze
     name: Extract Deterministic Python AST & Framework Metrics

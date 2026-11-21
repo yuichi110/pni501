@@ -1,5 +1,7 @@
 # Spring Boot Best Practices (`java/frameworks/spring_boot`)
 
+Apply when `spring-boot` is present in `ProjectFacts.detected_frameworks`. Mark `not_applicable` for non-Spring Java libraries, CLI tools, or Quarkus/Micronaut applications.
+
 ## 1. Constructor Injection Over Field Injection
 - Always use constructor injection (`private final OrderRepository repo;`) rather than `@Autowired` / `@Inject` field injection so components remain immutable and unit-testable without starting a Spring container.
 

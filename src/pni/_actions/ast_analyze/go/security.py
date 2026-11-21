@@ -14,8 +14,7 @@ from __future__ import annotations
 import re
 from typing import Final
 
-from ast_grep_py import SgNode
-
+from pni._actions.ast_analyze._cst import CstNode
 from pni._actions.ast_analyze.base import BaseSecurityChecker
 from pni._actions.ast_analyze.models import (
     ApiEndpointFact,
@@ -45,7 +44,7 @@ _HTTP_ROUTE_METHODS: Final[dict[str, str]] = {
 _INSECURE_TLS_RE: Final[re.Pattern[str]] = re.compile(r"\bInsecureSkipVerify\s*:\s*true\b")
 
 
-def _extract_call_args(call_node: SgNode) -> list[SgNode]:
+def _extract_call_args(call_node: CstNode) -> list[CstNode]:
     """Return positional argument expression nodes inside a Go `call_expression`."""
     args_node = call_node.field("arguments")
     if args_node is None:
@@ -57,7 +56,7 @@ def _extract_call_args(call_node: SgNode) -> list[SgNode]:
     ]
 
 
-def _inspect_go_call_sinks(call: SgNode, rel_path: str) -> list[SecuritySinkLocation]:
+def _inspect_go_call_sinks(call: CstNode, rel_path: str) -> list[SecuritySinkLocation]:
     """Inspect a single Go call_expression for CWE command injection, SQLi, XSS, and weak crypto."""
     fn_node = call.field("function")
     if fn_node is None:

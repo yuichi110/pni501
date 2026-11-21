@@ -14,8 +14,7 @@ from __future__ import annotations
 import re
 from typing import Final
 
-from ast_grep_py import SgNode
-
+from pni._actions.ast_analyze._cst import CstNode
 from pni._actions.ast_analyze.base import BaseDocChecker
 from pni._actions.ast_analyze.models import CodeLocation, ParsedUnit, UnitDocStats
 from pni._actions.ast_analyze.python._helpers import (
@@ -61,7 +60,7 @@ def _unquote_string_literal(raw_text: str) -> str:
     return clean
 
 
-def _extract_string_arg_text(arg_node: SgNode) -> str | None:
+def _extract_string_arg_text(arg_node: CstNode) -> str | None:
     """Extract string text from a string or concatenated_string CST argument node."""
     if arg_node.kind() == "string":
         return _unquote_string_literal(arg_node.text())
@@ -71,7 +70,7 @@ def _extract_string_arg_text(arg_node: SgNode) -> str | None:
     return None
 
 
-def _extract_annotated_doc_texts(type_node: SgNode | None) -> list[str]:
+def _extract_annotated_doc_texts(type_node: CstNode | None) -> list[str]:
     """Extract PEP 727 `Doc("...")` string literals inside an `Annotated[...]` type annotation."""
     if type_node is None or "Annotated" not in type_node.text():
         return []
@@ -98,7 +97,7 @@ def _extract_annotated_doc_texts(type_node: SgNode | None) -> list[str]:
     return docs
 
 
-def _inspect_callable_annotated_docs(fn_node: SgNode) -> tuple[set[str], list[str]]:
+def _inspect_callable_annotated_docs(fn_node: CstNode) -> tuple[set[str], list[str]]:
     """Collect parameter names documented via PEP 727 `Annotated[..., Doc()]` and all extracted Doc strings."""
     annotated_params: set[str] = set()
     all_texts: list[str] = []
@@ -169,7 +168,7 @@ def _extract_documented_params(doc_text: str) -> list[str]:
 
 
 def _check_signature_mismatch(
-    fn_node: SgNode,
+    fn_node: CstNode,
     fn_name: str,
     doc_text: str,
     rel_path: str,
@@ -203,7 +202,7 @@ def _check_signature_mismatch(
 
 
 def _evaluate_doc_target(
-    container: SgNode | None,
+    container: CstNode | None,
     rel_path: str,
     line: int,
     symbol: str,
@@ -230,7 +229,7 @@ def _evaluate_doc_target(
 
 
 def _evaluate_callable_doc(
-    fn_node: SgNode,
+    fn_node: CstNode,
     fn_name: str,
     rel_path: str,
     missing: list[CodeLocation],
@@ -285,7 +284,7 @@ def _evaluate_callable_doc(
     return False, False
 
 
-def _is_private_or_protocol_stub_method(fn_node: SgNode) -> bool:
+def _is_private_or_protocol_stub_method(fn_node: CstNode) -> bool:
     """Return True if fn_node belongs to a private _Class or is an ellipsis (...) stub in a Protocol."""
     curr = fn_node.parent()
     while curr is not None:
@@ -303,7 +302,7 @@ def _is_private_or_protocol_stub_method(fn_node: SgNode) -> bool:
     return False
 
 
-def _should_skip_callable_doc(fn_node: SgNode, fn_name: str) -> bool:
+def _should_skip_callable_doc(fn_node: CstNode, fn_name: str) -> bool:
     """Return True if a Python callable is private, nested, @overload, or a Protocol/private-class stub."""
     is_nested = fn_node.parent() is not None and fn_node.inside(kind="function_definition")
     return (

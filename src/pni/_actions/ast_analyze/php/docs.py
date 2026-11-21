@@ -14,8 +14,7 @@ from __future__ import annotations
 import re
 from typing import Final
 
-from ast_grep_py import SgNode
-
+from pni._actions.ast_analyze._cst import CstNode
 from pni._actions.ast_analyze.base import BaseDocChecker
 from pni._actions.ast_analyze.models import CodeLocation, ParsedUnit, UnitDocStats
 from pni._actions.ast_analyze.php._helpers import (
@@ -39,7 +38,7 @@ def _clean_phpdoc_body(doc: str) -> str:
     return "\n".join(ln for ln in lines if ln)
 
 
-def _has_override_attribute(method_node: SgNode) -> bool:
+def _has_override_attribute(method_node: CstNode) -> bool:
     """Return True if a PHP method carries `#[Override]` or `@inheritdoc`."""
     for child in method_node.children():
         if child.kind() == "attribute_list" and "Override" in child.text():
@@ -111,7 +110,7 @@ class PhpDocChecker(BaseDocChecker):
     @staticmethod
     def _check_callable_doc(
         unit: ParsedUnit,
-        cnode: SgNode,
+        cnode: CstNode,
         symbol: str,
         missing: list[CodeLocation],
         empty: list[CodeLocation],

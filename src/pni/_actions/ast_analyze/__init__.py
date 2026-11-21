@@ -14,6 +14,7 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Final, Optional
 
+from pni._actions.ast_analyze._cst import CstNode, CstPos, CstRange, parse_cst
 from pni._actions.ast_analyze.base import (
     BaseDependencyChecker,
     BaseDocChecker,
@@ -110,7 +111,7 @@ def run_ast_analyze(
     declared_lang_version: Optional[str] = None,
     exclude_globs: Optional[list[str]] = None,
 ) -> AstFacts:
-    """Analyze source and test files in target directories deterministically using ast-grep-py.
+    """Analyze source and test files in target directories deterministically using tree-sitter.
 
     Args:
         project_root: Target project root directory.
@@ -158,9 +159,13 @@ __all__ = [
     "BaseTestChecker",
     "BaseTypingChecker",
     "CodeLocation",
+    "CstNode",
+    "CstPos",
+    "CstRange",
     "LanguageAnalyzerSuite",
     "ModuleAstSummary",
     "ParsedUnit",
     "SecuritySinkLocation",
+    "parse_cst",
     "run_ast_analyze",
 ]

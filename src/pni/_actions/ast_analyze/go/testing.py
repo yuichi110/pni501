@@ -15,8 +15,7 @@ import re
 from pathlib import Path
 from typing import Final
 
-from ast_grep_py import SgNode
-
+from pni._actions.ast_analyze._cst import CstNode
 from pni._actions.ast_analyze.base import BaseTestChecker
 from pni._actions.ast_analyze.go._helpers import (
     get_go_callable_params,
@@ -59,7 +58,7 @@ def _collect_helper_functions(test_units: list[ParsedUnit]) -> set[str]:
     return helpers
 
 
-def _extract_testing_param_names(node: SgNode) -> set[str]:
+def _extract_testing_param_names(node: CstNode) -> set[str]:
     """Return `*testing.T` / `*testing.B` / `*testing.F` parameter names declared on a test callable."""
     names: set[str] = {"t", "b", "f"}
     for pname, ptype in get_go_callable_params(node):
@@ -68,7 +67,7 @@ def _extract_testing_param_names(node: SgNode) -> set[str]:
     return names
 
 
-def _call_delegates_assertion(call: SgNode, helper_names: set[str], testing_params: set[str]) -> bool:
+def _call_delegates_assertion(call: CstNode, helper_names: set[str], testing_params: set[str]) -> bool:
     """Return True if `call` invokes a known helper, passes `t` to a helper, or delegates `t.Run(name, fn)`."""
     fn = call.field("function")
     callee_short = ""
@@ -87,7 +86,7 @@ def _call_delegates_assertion(call: SgNode, helper_names: set[str], testing_para
     return any(arg.kind() == "identifier" and arg.text().strip() in testing_params for arg in arg_nodes)
 
 
-def _test_has_assertion(node: SgNode, short_name: str, helper_names: set[str]) -> bool:
+def _test_has_assertion(node: CstNode, short_name: str, helper_names: set[str]) -> bool:
     """Return True if a Go test function verifies outcomes via `testing.T`, `testify`, `Example` output, or helpers."""
     if short_name.startswith(("Benchmark", "Example")):
         return True

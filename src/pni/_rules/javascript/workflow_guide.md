@@ -21,7 +21,7 @@ Inspect `package.json` and module directories to configure `targets` accurately.
 1. **Core Built-in JavaScript Actions**:
    - `repo_structure_audit` (`javascript` scope): Inspects `package.json`, `jsconfig.json`, lockfiles (`pnpm-lock.yaml`, `package-lock.json`, `yarn.lock`), Node engine constraints, and dependency pinning.
    - `architecture_analysis`: Records system archetype, entry points (Express/Fastify/Hono routes, React components, CLI bins), module layering, and execution flows into `.pni/cache/<workflow_id>/architecture.json`.
-   - `javascript_ast_audit`: Parses `.js`/`.jsx`/`.mjs`/`.cjs` files once via `ast-grep-py` to extract ES import/require hygiene, JSDoc `@param`/`@returns` type contract coverage, cognitive complexity, loose equality (`==`), unhandled promises/empty catches, DOM/XSS/SQL/exec CWE sinks, and API routes.
+   - `javascript_ast_audit`: Parses `.js`/`.jsx`/`.mjs`/`.cjs` files once via `tree-sitter` to extract ES import/require hygiene, JSDoc `@param`/`@returns` type contract coverage, cognitive complexity, loose equality (`==`), unhandled promises/empty catches, DOM/XSS/SQL/exec CWE sinks, and API routes.
    - `javascript_test_audit`: Evaluates Vitest/Jest/Mocha/Node test files (`*.test.js`, `*.spec.js`), assertion-free `it()`/`test()` blocks, and test coverage alignment.
    - `container_runtime_audit`: Builds an isolated Node harness image via `.pni/dockerfiles/.../Dockerfile`, runs Vitest/Jest/`npm test` + ESLint offline (`--network=none`), and evaluates `common/runtime_verification`.
    - `security_vulnerability_audit`: Runs Trivy (`security_scan`) against `package.json`/lockfiles and the resolved container image, evaluating CVEs, IaC misconfigs, redacted secrets, AST `dangerous_sinks`, and `api_endpoints`.
@@ -55,6 +55,7 @@ steps:
   - id: arch_recording
     uses: architecture_analysis
 
+  # Optional archetype audit: service_readiness_audit | cli_guidelines_audit | library_hygiene_audit
   - id: test_health
     uses: javascript_test_audit
 

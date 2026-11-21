@@ -1,6 +1,6 @@
 id: go_ast_audit
 name: Go AST, Imports, Types, GoDoc, Error Handling & Security Audit
-description: Parse Go AST via ast-grep-py to extract import hygiene, interface{}/any & unsafe usage, GoDoc coverage, cognitive complexity, ignored errors, CWE sinks, and HTTP/gRPC route metrics.
+description: Parse Go AST via tree-sitter to extract import hygiene, interface{}/any & unsafe usage, GoDoc coverage, cognitive complexity, ignored errors, CWE sinks, and HTTP/gRPC route metrics.
 rules:
   - common/architecture
   - common/maintainability
@@ -8,6 +8,7 @@ rules:
   - common/security_vulnerability
   - go/code_quality
   - go/typing
+  - go/modern_stack
 primitives:
   - type: ast_analyze
     name: Extract Deterministic Go AST & Package Metrics

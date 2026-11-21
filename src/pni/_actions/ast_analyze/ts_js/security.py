@@ -15,8 +15,7 @@ import contextlib
 import re
 from typing import Final
 
-from ast_grep_py import SgNode
-
+from pni._actions.ast_analyze._cst import CstNode
 from pni._actions.ast_analyze.base import BaseSecurityChecker
 from pni._actions.ast_analyze.models import (
     ApiEndpointFact,
@@ -42,7 +41,7 @@ _SQL_TEMPLATE_RE: Final[re.Pattern[str]] = re.compile(
 _REJECT_UNAUTH_RE: Final[re.Pattern[str]] = re.compile(r"\brejectUnauthorized\s*:\s*false\b")
 
 
-def _extract_call_args(call_node: SgNode) -> list[SgNode]:
+def _extract_call_args(call_node: CstNode) -> list[CstNode]:
     """Return positional argument expression nodes inside a TS/JS `call_expression`."""
     args_node = call_node.field("arguments")
     if args_node is None:
@@ -52,7 +51,7 @@ def _extract_call_args(call_node: SgNode) -> list[SgNode]:
 
 def _inspect_ts_js_sql_or_crypto_sink(
     fn_text: str,
-    args: list[SgNode],
+    args: list[CstNode],
     rel_path: str,
     line_no: int,
 ) -> SecuritySinkLocation | None:
@@ -104,7 +103,7 @@ def _inspect_ts_js_sql_or_crypto_sink(
     return None
 
 
-def _inspect_ts_js_call_sink(call: SgNode, rel_path: str) -> SecuritySinkLocation | None:
+def _inspect_ts_js_call_sink(call: CstNode, rel_path: str) -> SecuritySinkLocation | None:
     """Return a SecuritySinkLocation if a TS/JS call_expression matches a CWE sink."""
     fn_node = call.field("function")
     if fn_node is None:

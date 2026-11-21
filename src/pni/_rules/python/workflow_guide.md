@@ -30,9 +30,11 @@ Inspect `pyproject.toml` (`[project]`, `[tool.uv]`, `[tool.poetry]`, `[tool.hatc
 
 2. **Framework-Specific & Modernization Customization**:
    - **FastAPI / Pydantic / SQLAlchemy / Typer Projects**:
-     Include `python/frameworks/fastapi` (when `fastapi` is in `pyproject.toml`) and `python/modern_stack` in your AST/architecture audit step's `rules:` list.
-   - **Flask / Legacy `setup.py` / `argparse` / Fat `.sh` or `.pl` Repos**:
-     Ensure `architecture_analysis` runs before `repo_structure_audit` or `python_ast_audit` interpretation so the system archetype (`rest_api` vs `web_ssr` vs `cli`) is established first—enabling accurate `Flask -> FastAPI` (for JSON APIs) and `argparse -> Typer` modernization recommendations without false positives.
+     `python_ast_audit` automatically includes `python/modern_stack` and `python/frameworks/fastapi` (which marks `not_applicable` on non-FastAPI projects).
+   - **Archetype & Security Extensions**:
+     Add the matching archetype action (`service_readiness_audit` + `web_penetration_audit` for Web APIs/services, `cli_guidelines_audit` for CLIs, or `library_hygiene_audit` for libraries) after `architecture_analysis`.
+   - **Step Ordering (`python_ast_audit` Before `architecture_analysis`)**:
+     Always run `python_ast_audit` **before** `architecture_analysis` so the 3-aspect architecture recorder grounds every file path and entry point against `AstFacts.module_inventory`.
 
 ---
 
@@ -40,6 +42,7 @@ Inspect `pyproject.toml` (`[project]`, `[tool.uv]`, `[tool.poetry]`, `[tool.hatc
 
 ```yaml
 id: full_audit
+category: audit
 name: Full Python Project Health Audit & Report
 description: Complete deterministic Python AST/project inspection, 3-aspect architecture recording, rule evaluation, and Drawlib PDF report.
 
@@ -56,12 +59,13 @@ steps:
   - id: repo_and_deps
     uses: repo_structure_audit
 
-  - id: architecture_map
-    uses: architecture_analysis
-
   - id: ast_and_quality
     uses: python_ast_audit
 
+  - id: architecture_map
+    uses: architecture_analysis
+
+  # Optional archetype audit: service_readiness_audit | cli_guidelines_audit | library_hygiene_audit
   - id: test_health
     uses: python_test_audit
 

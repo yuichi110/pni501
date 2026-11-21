@@ -20,8 +20,8 @@ Inspect `composer.json`, `artisan`, `wp-config.php`, or root `*.php` scripts to 
 ## 2. Selecting PHP Actions & Rules
 
 1. **Core Built-in PHP Actions**:
-   - `repo_structure_audit` (`php` scope): Inspects `composer.json` / `composer.lock` (or flags Composer-less `raw_php`), PHP version constraints (`< 8.1` EOL), PSR-4 autoloading, WordPress headers, and supply-chain hygiene.
-   - `php_ast_audit`: Parses PHP & mixed HTML+PHP files once via `ast-grep-py` (`lang="php"`) to extract namespace/`use` vs `include`/`require` hygiene, `declare(strict_types=1)` & type-hint coverage, PHPDoc `@param` alignment, superglobal coupling (`$_GET`/`$_POST`), `@` error suppression, CWE dangerous sinks (SQLi, XSS, LFI, Command Injection, `unserialize`, `md5` + `==` type juggling), API endpoints, and Laravel / WordPress framework violations.
+   - `repo_structure_audit` (`php` scope): Inspects `composer.json` / `composer.lock` (or flags Composer-less `raw_php`), PHP version constraints (`<= 8.1` EOL, `8.3+` recommended), PSR-4 autoloading, WordPress headers, and supply-chain hygiene.
+   - `php_ast_audit`: Parses PHP & mixed HTML+PHP files once via `tree-sitter` (`lang="php"`) to extract namespace/`use` vs `include`/`require` hygiene, `declare(strict_types=1)` & type-hint coverage, PHPDoc `@param` alignment, superglobal coupling (`$_GET`/`$_POST`), `@` error suppression, CWE dangerous sinks (SQLi, XSS, LFI, Command Injection, `unserialize`, `md5` + `==` type juggling), API endpoints, and Laravel / WordPress framework violations.
    - `architecture_analysis`: Records system archetype, HTTP/CLI/WordPress hook entry points, namespace or include layering, and execution flows into `.pni/cache/<workflow_id>/architecture.json`.
    - `php_test_audit`: Evaluates PHPUnit / Pest test suite completeness, assertion density, and test isolation.
    - `container_runtime_audit`: Builds an isolated PHP container via `.pni/dockerfiles/.../Dockerfile` (`composer.dockerfile` or `raw.dockerfile`), runs `php -l` syntax checks across all `.php` files, executes PHPUnit + `pcov` Clover coverage offline (`--network=none`), and runs archetype smoke checks (`artisan`, `php -S`, PSR-4 autoload, or WordPress plugin bootstrap stub).
@@ -33,6 +33,7 @@ Inspect `composer.json`, `artisan`, `wp-config.php`, or root `*.php` scripts to 
 
 ```yaml
 id: full_audit
+category: audit
 name: Full PHP Project Health Audit & Report
 description: Deterministic PHP AST/Composer/Raw-PHP analysis, 3-aspect architecture recording, container syntax/test/Trivy verification, and Drawlib PDF report.
 
@@ -57,6 +58,7 @@ steps:
   - id: arch_recording
     uses: architecture_analysis
 
+  # Optional archetype audit: service_readiness_audit | cli_guidelines_audit | library_hygiene_audit
   - id: test_health
     uses: php_test_audit
 

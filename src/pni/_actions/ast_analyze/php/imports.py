@@ -13,8 +13,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from ast_grep_py import SgNode
-
+from pni._actions.ast_analyze._cst import CstNode
 from pni._actions.ast_analyze.base import BaseImportChecker
 from pni._actions.ast_analyze.models import CodeLocation, ParsedUnit, UnitImportStats
 from pni._actions.ast_analyze.php._helpers import (
@@ -37,7 +36,7 @@ _NESTED_SCOPE_KINDS = frozenset(
 )
 
 
-def _extract_use_targets(use_node: SgNode) -> list[str]:
+def _extract_use_targets(use_node: CstNode) -> list[str]:
     """Extract normalized fully qualified symbol names from a `namespace_use_declaration`."""
     group = use_node.find(kind="namespace_use_group")
     if group is not None:
@@ -53,7 +52,7 @@ def _extract_use_targets(use_node: SgNode) -> list[str]:
     return [c.text().strip().lstrip("\\") for c in clauses if c.text().strip()]
 
 
-def _is_inside_nested_scope(node: SgNode) -> bool:
+def _is_inside_nested_scope(node: CstNode) -> bool:
     """Return True if node sits inside a function, method, or conditional/loop block."""
     curr = node.parent()
     while curr is not None:
@@ -63,7 +62,7 @@ def _is_inside_nested_scope(node: SgNode) -> bool:
     return False
 
 
-def _is_trait_use_inside_class(node: SgNode) -> bool:
+def _is_trait_use_inside_class(node: CstNode) -> bool:
     """Return True if node is inside a class/trait body rather than top-level namespace imports."""
     curr = node.parent()
     while curr is not None:

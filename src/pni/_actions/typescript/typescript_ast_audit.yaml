@@ -1,6 +1,6 @@
 id: typescript_ast_audit
 name: TypeScript AST, Imports, Strict Types, TSDoc, Quality & Security Audit
-description: Parse TypeScript/TSX AST via ast-grep-py to extract import hygiene, type annotation coverage, any/@ts-ignore usage, TSDoc sync, cognitive complexity, bug idioms, CWE sinks, and API routes.
+description: Parse TypeScript/TSX AST via tree-sitter to extract import hygiene, type annotation coverage, any/@ts-ignore usage, TSDoc sync, cognitive complexity, bug idioms, CWE sinks, and API routes.
 rules:
   - common/architecture
   - common/maintainability
@@ -8,6 +8,7 @@ rules:
   - common/security_vulnerability
   - typescript/code_quality
   - typescript/typing
+  - typescript/modern_stack
 primitives:
   - type: ast_analyze
     name: Extract Deterministic TypeScript AST & Module Metrics

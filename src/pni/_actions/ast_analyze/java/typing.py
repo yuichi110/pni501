@@ -13,15 +13,14 @@ from __future__ import annotations
 
 from typing import Final
 
-from ast_grep_py import SgNode
-
+from pni._actions.ast_analyze._cst import CstNode
 from pni._actions.ast_analyze.base import BaseTypingChecker
 from pni._actions.ast_analyze.java._helpers import (
     JAVA_CALLABLE_KINDS,
     JAVA_TYPE_KINDS,
     callable_symbol_name,
     find_unchecked_suppress,
-     get_modifiers_node,
+    get_modifiers_node,
     has_override_annotation,
 )
 from pni._actions.ast_analyze.models import CodeLocation, ParsedUnit, UnitTypingStats
@@ -55,7 +54,7 @@ _COMMON_GENERIC_TYPES: Final[frozenset[str]] = frozenset(
 )
 
 
-def _find_broad_suppress_all(decl: SgNode) -> str | None:
+def _find_broad_suppress_all(decl: CstNode) -> str | None:
     """Return @SuppressWarnings('all') annotation text when present on decl."""
     mods = get_modifiers_node(decl)
     if mods is None:
@@ -67,7 +66,7 @@ def _find_broad_suppress_all(decl: SgNode) -> str | None:
     return None
 
 
-def _is_scope_qualifier_or_parameterized(tid: SgNode) -> bool:
+def _is_scope_qualifier_or_parameterized(tid: CstNode) -> bool:
     """Return True if a type_identifier is an enclosing scope prefix (e.g. Map in Map.Entry) or parameterized."""
     parent = tid.parent()
     if parent is None:
@@ -92,7 +91,7 @@ def _is_scope_qualifier_or_parameterized(tid: SgNode) -> bool:
     )
 
 
-def _find_raw_generics_in_type(type_node: SgNode | None) -> list[str]:
+def _find_raw_generics_in_type(type_node: CstNode | None) -> list[str]:
     """Find unparameterized raw generic type identifiers inside a Java type node."""
     if type_node is None:
         return []
@@ -115,7 +114,7 @@ def _find_raw_generics_in_type(type_node: SgNode | None) -> list[str]:
 
 
 def _inspect_callable_signature(
-    m_node: SgNode,
+    m_node: CstNode,
     rel_path: str,
 ) -> tuple[bool, list[CodeLocation], list[CodeLocation], list[CodeLocation]]:
     """Inspect a Java method or constructor signature for raw generics, Object, and suppressions."""

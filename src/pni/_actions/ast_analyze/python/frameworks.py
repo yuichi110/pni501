@@ -13,8 +13,7 @@ from __future__ import annotations
 
 from typing import ClassVar, Final
 
-from ast_grep_py import SgNode
-
+from pni._actions.ast_analyze._cst import CstNode
 from pni._actions.ast_analyze.base import BaseFrameworkChecker
 from pni._actions.ast_analyze.models import (
     CodeLocation,
@@ -41,12 +40,12 @@ _LEGACY_TYPING_ALIASES: Final[frozenset[str]] = frozenset(
 )
 
 
-def _is_async_function(fn_node: SgNode) -> bool:
+def _is_async_function(fn_node: CstNode) -> bool:
     """Return True if a Python function_definition is declared with 'async def'."""
     return fn_node.text().lstrip().startswith("async ")
 
 
-def _check_async_blocking_calls(fn_node: SgNode, rel_path: str) -> list[CodeLocation]:
+def _check_async_blocking_calls(fn_node: CstNode, rel_path: str) -> list[CodeLocation]:
     """Detect synchronous blocking calls inside an async def coroutine."""
     issues: list[CodeLocation] = []
     fn_name = function_symbol_name(fn_node)

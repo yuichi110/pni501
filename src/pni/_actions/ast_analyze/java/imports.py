@@ -13,8 +13,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
-from ast_grep_py import SgNode
-
+from pni._actions.ast_analyze._cst import CstNode
 from pni._actions.ast_analyze.base import BaseImportChecker
 from pni._actions.ast_analyze.models import CodeLocation, ParsedUnit, UnitImportStats
 
@@ -30,7 +29,7 @@ class _JavaImportEntry:
     target: str
 
 
-def _parse_java_import(node: SgNode) -> _JavaImportEntry:
+def _parse_java_import(node: CstNode) -> _JavaImportEntry:
     """Extract target FQN, static modifier, and wildcard flag from a Java import node."""
     raw = node.text().removeprefix("import").strip().removesuffix(";").strip()
     is_static = raw.startswith("static ")

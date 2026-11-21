@@ -18,8 +18,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Final
 
-from ast_grep_py import SgNode
-
+from pni._actions.ast_analyze._cst import CstNode
 from pni._actions.ast_analyze.base import BaseImportChecker
 from pni._actions.ast_analyze.models import CodeLocation, ImportResult, ParsedUnit, UnitImportStats
 from pni._actions.ast_analyze.python._helpers import module_name_from_path
@@ -131,7 +130,7 @@ def _matches_isort_spec(raw_mod: str, specs: frozenset[str]) -> bool:
 class _ImportEntry:
     """Normalized top-level import statement metadata for isort validation."""
 
-    node: SgNode
+    node: CstNode
     start_line: int
     end_line: int
     group: int
@@ -154,7 +153,7 @@ def _member_type_rank(symbol: str) -> tuple[int, str, str]:
     return (rank, clean.lower(), clean)
 
 
-def _are_imported_members_sorted(stmt: SgNode) -> bool:
+def _are_imported_members_sorted(stmt: CstNode) -> bool:
     """Check whether imported names inside a single statement follow isort order-by-type."""
     members = [n.text().strip() for n in stmt.field_children("name") if n.kind() != "wildcard_import"]
     if len(members) <= 1:
@@ -205,7 +204,7 @@ def _has_skip_comment(source_lines: list[str], start_line: int, end_line: int) -
 
 
 def _build_import_entry(
-    stmt: SgNode,
+    stmt: CstNode,
     root_packages: set[str],
     isort_cfg: _IsortConfig | None = None,
 ) -> _ImportEntry:
@@ -245,7 +244,7 @@ def _has_blank_line_between(source_lines: list[str], prev_end: int, curr_start: 
 
 
 def _validate_import_block(
-    stmts: list[SgNode],
+    stmts: list[CstNode],
     root_packages: set[str],
     source_lines: list[str],
     rel_path: str,
@@ -309,7 +308,7 @@ def _validate_import_block(
     return issues
 
 
-def _is_type_checking_if(node: SgNode) -> bool:
+def _is_type_checking_if(node: CstNode) -> bool:
     """Return True if node is an `if TYPE_CHECKING:` or `if typing.TYPE_CHECKING:` block."""
     if node.kind() != "if_statement":
         return False
@@ -320,7 +319,7 @@ def _is_type_checking_if(node: SgNode) -> bool:
     return "TYPE_CHECKING" in cond_text and "not" not in cond_text.split()
 
 
-def _is_generated_facade_wildcard(wnode: SgNode, unit: ParsedUnit) -> bool:
+def _is_generated_facade_wildcard(wnode: CstNode, unit: ParsedUnit) -> bool:
     """Return True if wildcard import re-exports a *_generated module inside __init__.py or an __all__ facade."""
     if unit.file_path.name != "__init__.py" and "__all__" not in unit.source:
         return False
@@ -335,7 +334,7 @@ def _is_generated_facade_wildcard(wnode: SgNode, unit: ParsedUnit) -> bool:
     return leaf == "_generated" or leaf.endswith("_generated")
 
 
-def _is_docstring_expr(child: SgNode) -> bool:
+def _is_docstring_expr(child: CstNode) -> bool:
     """Return True if child is a string literal expression_statement."""
     if child.kind() != "expression_statement":
         return False
@@ -343,7 +342,7 @@ def _is_docstring_expr(child: SgNode) -> bool:
     return bool(sub and sub[0].kind() == "string")
 
 
-def _collect_nested_late_imports(root: SgNode, rel_path: str, seen_stmt_ids: set[int]) -> list[CodeLocation]:
+def _collect_nested_late_imports(root: CstNode, rel_path: str, seen_stmt_ids: set[int]) -> list[CodeLocation]:
     """Collect non-top-level imports inside function or class bodies (excluding top-level try blocks)."""
     late: list[CodeLocation] = []
     for ikind in _IMPORT_KINDS:
@@ -364,12 +363,12 @@ def _collect_nested_late_imports(root: SgNode, rel_path: str, seen_stmt_ids: set
 
 
 def _extract_import_blocks_and_late_imports(
-    root: SgNode,
+    root: CstNode,
     rel_path: str,
-) -> tuple[list[list[SgNode]], list[CodeLocation]]:
+) -> tuple[list[list[CstNode]], list[CodeLocation]]:
     """Partition module imports into top-level/TYPE_CHECKING blocks vs late/nested imports."""
-    blocks: list[list[SgNode]] = []
-    top_imports: list[SgNode] = []
+    blocks: list[list[CstNode]] = []
+    top_imports: list[CstNode] = []
     late: list[CodeLocation] = []
     seen_stmt_ids: set[int] = set()
     seen_non_comment = False

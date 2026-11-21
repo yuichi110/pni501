@@ -23,7 +23,7 @@ Before running `pni workflows start <migration_id>`, execute this 4-step pre-fli
 ### Step 2: Scrutinize the 6 Ambiguity Dimensions
 Check whether any of the following 6 architectural decisions are missing, contradictory, or phrased vaguely (e.g., `"latest"`, `"最新"`, `"いい感じ"`, `"TBD"`, `"未定"`):
 
-1. **Concrete Target Stack & Versions**: Exact language/runtime and framework versions (e.g., `Java 21 LTS + Spring Boot 3.4`, `PHP 8.3 + Laravel 11`, `Python 3.12 + FastAPI`) rather than generic "upgrade to latest".
+1. **Concrete Target Stack & Versions**: Exact language/runtime and framework versions (e.g., `Java 21 LTS + Spring Boot 3.4/3.5`, `PHP 8.3/8.4 + Laravel 11/12`, `Python 3.12+ + FastAPI`, `Go 1.24+`, `Node 22 LTS + TypeScript 5.x`) rather than generic "upgrade to latest".
 2. **Stateful Middleware (Database / Cache / Session / Queue)**: When As-Is code holds process-local state (`static HashMap`, singleton mutable fields, `$_SESSION`, cookie `unserialize`) or raw SQL, confirm target backing stores (e.g., `PostgreSQL 16 + Spring Data JPA + Flyway`, `Redis 7` with TTL, or stateless refactoring).
 3. **Architecture Philosophy & Boundary Scope**: When architectural modernization (e.g., Clean Architecture, Hexagonal / Port & Adapter, Modular Monolith) is requested, clarify the target ring/package layout (`domain` / `usecase` / `port` / `adapter`) and whether strict framework-free `domain` isolation applies across all modules or only around external I/O boundaries.
 4. **External Contract Compatibility (`api_compatibility`)**: Confirm whether public URLs, HTTP methods, JSON request/response field names, and auth headers must remain 100% backward-compatible (`strict`) or whether a versioned contract (`versioned_v2` / `flexible`) is permitted.
@@ -61,7 +61,7 @@ Structure every migration execution plan across **5 sequential phase gates** (`P
 - **Phase 1 — Cycle Cuts & Domain / Port Extraction (Behavior-Preserving)**:
   - Follow `refactoring_waves` (`Wave 1` leaves -> `Wave 3` cycle cuts). Break circular dependencies (`cycle_cuts`) and extract Domain entities, UseCases, and Port interfaces wrapped initially by lightweight legacy/in-memory adapters.
 - **Phase 2 — Runtime/Framework Upgrade (Codemods) & New Infrastructure Adapters**:
-  - Apply deterministic codemods (`mechanical_codemods`: OpenRewrite, Rector, Ruff) Separate mechanical codemod PRs from manual logic edits so diffs stay reviewable. Implement target DB (PostgreSQL/JPA/PDO/SQLAlchemy) and Cache (Redis) Outbound Adapters verified by integration/contract tests.
+  - Apply deterministic codemods (`mechanical_codemods`: OpenRewrite, Rector, Ruff). Separate mechanical codemod PRs from manual logic edits so diffs stay reviewable. Implement target DB (PostgreSQL/JPA/PDO/SQLAlchemy) and Cache (Redis) Outbound Adapters verified by integration/contract tests.
 - **Phase 3 — Typed Inbound DTOs, Security Hardening & Approved Decision Log Fixes**:
   - Replace untyped `Map` / `$_POST` / `dict` payloads with validated Request/Response DTOs, remediate SQLi/XSS/command-injection/loose-auth sinks, and apply stakeholder-approved `decision_log` fixes.
 - **Phase 4 — Container / CI Hardening, Cutover & Final Verification**:

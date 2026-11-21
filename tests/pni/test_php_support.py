@@ -14,8 +14,6 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-from ast_grep_py import SgRoot
-
 from pni._actions import (
     CategoryScores,
     ScoreResult,
@@ -24,6 +22,7 @@ from pni._actions import (
     run_ast_analyze,
     run_project_inspect,
 )
+from pni._actions.ast_analyze._cst import parse_cst
 from pni._actions.ast_analyze.php._helpers import iter_php_callables, normalize_php_source_for_cst
 from pni._actions.runtime_check.parsers import parse_clover_xml, parse_junit_xml_files
 from pni._actions.runtime_check.selector import (
@@ -921,7 +920,7 @@ final class MiddlewareDispatcherTest extends TestCase
     assert 'tst_arg="tests"' in cmd[2]
     assert "--coverage-clover /out/clover.xml $tst_arg" in cmd[2]
 
-    mw_root = SgRoot((slim_dir / "Slim" / "MiddlewareDispatcher.php").read_text(encoding="utf-8"), "php").root()
+    mw_root = parse_cst((slim_dir / "Slim" / "MiddlewareDispatcher.php").read_text(encoding="utf-8"), "php")
     callable_syms = [sym for sym, _ in iter_php_callables(mw_root)]
     assert "MiddlewareDispatcher::addDeferred" in callable_syms
     assert "MiddlewareDispatcher::handle" in callable_syms

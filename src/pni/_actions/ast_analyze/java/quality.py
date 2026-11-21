@@ -13,8 +13,7 @@ from __future__ import annotations
 
 from typing import ClassVar
 
-from ast_grep_py import SgNode
-
+from pni._actions.ast_analyze._cst import CstNode
 from pni._actions.ast_analyze.base import BaseQualityChecker
 from pni._actions.ast_analyze.java._helpers import (
     JAVA_CALLABLE_KINDS,
@@ -108,7 +107,7 @@ def _find_java_idiom_risks(unit: ParsedUnit) -> list[CodeLocation]:
     return findings
 
 
-def _collect_type_public_callables(tnode: SgNode, tkind: str, pub_methods: set[str]) -> None:
+def _collect_type_public_callables(tnode: CstNode, tkind: str, pub_methods: set[str]) -> None:
     """Populate implicitly public annotation elements and interface methods into pub_methods."""
     if tkind == "annotation_type_declaration":
         for enode in tnode.find_all(kind="annotation_type_element_declaration"):
@@ -145,15 +144,15 @@ class JavaQualityChecker(BaseQualityChecker):
         """Count class, interface, enum, record, and annotation (@interface) declarations in a Java unit."""
         return sum(len(unit.root.find_all(kind=tkind)) for tkind in JAVA_TYPE_KINDS)
 
-    def iter_callables(self, unit: ParsedUnit) -> list[tuple[str, SgNode]]:
+    def iter_callables(self, unit: ParsedUnit) -> list[tuple[str, CstNode]]:
         """Return (callable_name, cst_node) pairs for all Java methods and constructors."""
-        callables: list[tuple[str, SgNode]] = []
+        callables: list[tuple[str, CstNode]] = []
         for mkind in JAVA_CALLABLE_KINDS:
             for mnode in unit.root.find_all(kind=mkind):
                 callables.append((callable_symbol_name(mnode), mnode))
         return callables
 
-    def count_callable_params(self, node: SgNode) -> int:
+    def count_callable_params(self, node: CstNode) -> int:
         """Count formal and varargs parameters on a Java method or constructor."""
         params_node = node.field("parameters")
         if params_node is None:

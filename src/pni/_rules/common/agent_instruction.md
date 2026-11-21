@@ -1,6 +1,6 @@
 # Agent Bootstrap & Execution Instructions (Common)
 
-This guide mirrors `pni instructions` so AI coding agents can access the complete PNI bootstrap procedure directly via `pni rules show common/agent_instruction` (or `pni rules show agent-instruction`).
+This guide provides the concise PNI bootstrap and execution procedure via `pni rules show common/agent_instruction` (or `pni rules show agent-instruction`). Run `pni instructions` for the full CLI command reference.
 
 ## 1. Bootstrap & Workflow Setup
 
@@ -14,6 +14,9 @@ This guide mirrors `pni instructions` so AI coding agents can access the complet
    pni rules show python/workflow_guide
    pni rules show java/workflow_guide
    pni rules show php/workflow_guide
+   pni rules show go/workflow_guide
+   pni rules show typescript/workflow_guide
+   pni rules show javascript/workflow_guide
    ```
 4. Tailor `.pni/workflows/*.yaml` (and `.pni/actions/*.yaml` if needed) to the repository's real source, test, and documentation paths, then verify step expansion with `pni workflows show <workflow_id>`.
 5. **For Web Service Workflows (`uses: web_penetration_audit` / `web_pentest`)**: `pni workflows start <workflow_id>` fails closed if `.pni/pentests/<target>/` does not yet contain `conftest.py` and `test_*.py`. Implement and verify the target's penetration tests **first**:
@@ -43,7 +46,7 @@ This guide mirrors `pni instructions` so AI coding agents can access the complet
 
 - **Never estimate counts manually**: Use the deterministic numbers in `ProjectFacts` and `AstFacts` (`import_hygiene_coverage_pct`, `type_safety_coverage_pct`, `docstring_coverage_pct`, `circular_dependencies`, etc.).
 - **Never invent file paths or symbols**: Every module path, entry point, and flow step submitted during architecture recording or rule findings must exist in the repository's `module_inventory`.
-- **Never guess `drawlib` APIs or coordinate anchors on report steps**: When entering `write_drawlib_report` / `write_migration_report`, query Drawlib's built-in CLI help and documentation on demand (prefix with `uv run` in `uv` workspaces):
+- **Never guess `drawlib` APIs or coordinate anchors on report steps**: When entering `write_drawlib_report` / `write_migration_report` / `write_progress_report`, query Drawlib's built-in CLI help and documentation on demand (prefix with `uv run` in `uv` workspaces):
   ```bash
   drawlib -h                                # CLI subcommands (init, build, show, serve, rules, styles, colors, cache)
   drawlib rules list                        # List all guideline & module API topics
@@ -52,9 +55,9 @@ This guide mirrors `pni instructions` so AI coding agents can access the complet
   drawlib rules show project-doc            # Single-document cover/ToC, 720pt typography & A4 PDF rules
   drawlib rules show api                    # Full module/class signature cheat sheet
   drawlib rules show lib-smartarts-overview # Panel, KpiCards, Roadmap, Table, TreeNode, CardList APIs
-  drawlib rules show lib-charts-overview    # RadarChart, BarChart, HeatmapChart, LineChart APIs
+  drawlib rules show lib-charts-overview    # Radar, Bar, Box, Heatmap, Line, Gantt Chart APIs
   drawlib rules show lib-diagrams-overview  # ClassDiagram, HeatmapOverlay, architecture/flow/sequence APIs
   drawlib rules show lib-icons-overview     # Phosphor, FontAwesome & cloud icon helpers
   ```
 - **Place the PNI501 logo badge on `00_cover.md`**: `pni report init` automatically copies `_assets/logo.png`, `_assets/logo_dark.png`, and `_assets/favicon.png` into `<src_dir>/<target>_src/_assets/` and injects `draw_pni_logo(xy=(135.0, 48.0), width=9.0, *, dark=True)` into `<src_dir>/<target>_src/utils.py`. Always render the PNI501 logo badge on the `00_cover.md` cover diagram (e.g. `draw_pni_logo()` inside the dark cover header bar, or `draw_pni_logo(dark=False)` / `from drawlib.images import image; image((135.0, 48.0), width=9.0, image="_assets/logo.png")` on light headers).
-- **Verify diagrams visually with `-g` grid export & update non-destructively**: Keep Drawlib Markdown sources in `reports_src/<target>_src/<lang>/` (with `drawlib.toml` at `reports_src/<target>_src/drawlib.toml`) and update chapters in-place so `git diff` cleanly tracks report evolution; inspect rendered diagrams via `drawlib show <lang>/<chapter.md> <diagram.png> -s styles.py -u utils.py -g -o .drawlib/scratch/<unique_name>_grid.png` + image viewing to eliminate text clipping or collisions before compiling `reports/<target>.pdf` with `pni report build`.
+- **Verify diagrams visually with `-g` grid export & update non-destructively**: Keep Drawlib Markdown sources in `reports_src/<target>_src/<lang>/` (with `drawlib.toml` at `reports_src/<target>_src/drawlib.toml`) and update chapters in-place so `git diff` cleanly tracks report evolution; inspect rendered diagrams via `drawlib show <lang>/<chapter.md> <diagram.png> -s styles.py -u utils.py -g -o .drawlib/scratch/<unique_name>_grid.png` + image viewing, resolve any `[Geometry Warning]` diagnostics, and eliminate text clipping or collisions before compiling `reports/<target>.pdf` with `pni report build`.

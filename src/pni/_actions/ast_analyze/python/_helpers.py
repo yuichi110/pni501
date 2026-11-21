@@ -14,7 +14,7 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Final
 
-from ast_grep_py import SgNode
+from pni._actions.ast_analyze._cst import CstNode
 
 VALID_PARAM_KINDS: Final[frozenset[str]] = frozenset(
     {
@@ -43,13 +43,13 @@ def module_name_from_path(py_file: Path, project_root: Path) -> str:
     return ".".join(parts) if parts else py_file.stem
 
 
-def function_symbol_name(fn_node: SgNode) -> str:
+def function_symbol_name(fn_node: CstNode) -> str:
     """Extract the identifier of a Python function_definition CST node."""
     name_node = fn_node.field("name")
     return name_node.text() if name_node is not None else "<anonymous>"
 
 
-def extract_python_docstring_text(container: SgNode | None) -> str | None:
+def extract_python_docstring_text(container: CstNode | None) -> str | None:
     """Extract unquoted text of the leading docstring literal in container, or None if absent."""
     if container is None:
         return None
@@ -66,12 +66,12 @@ def extract_python_docstring_text(container: SgNode | None) -> str | None:
     return raw
 
 
-def has_python_docstring(container: SgNode | None) -> bool:
+def has_python_docstring(container: CstNode | None) -> bool:
     """Return True if the first statement inside container is a string literal docstring."""
     return extract_python_docstring_text(container) is not None
 
 
-def is_overload_decorated(fn_node: SgNode) -> bool:
+def is_overload_decorated(fn_node: CstNode) -> bool:
     """Return True if fn_node is decorated with @overload or @typing.overload."""
     parent = fn_node.parent()
     if parent is None or parent.kind() != "decorated_definition":
@@ -84,11 +84,11 @@ def is_overload_decorated(fn_node: SgNode) -> bool:
     return False
 
 
-def is_in_type_checking_guard(node: SgNode) -> bool:
+def is_in_type_checking_guard(node: CstNode) -> bool:
     """Return True if node resides inside the consequence block of an `if TYPE_CHECKING:` guard."""
     node_start = node.range().start.index
     node_end = node.range().end.index
-    curr: SgNode | None = node.parent()
+    curr: CstNode | None = node.parent()
     while curr is not None:
         if curr.kind() == "if_statement":
             cond = curr.field("condition")
@@ -106,7 +106,7 @@ def is_in_type_checking_guard(node: SgNode) -> bool:
     return False
 
 
-def extract_param_name(param: SgNode) -> str:
+def extract_param_name(param: CstNode) -> str:
     """Extract clean parameter identifier name (without leading '*') from a parameter CST node."""
     name_node = param.field("name")
     if name_node is not None:
@@ -117,7 +117,7 @@ def extract_param_name(param: SgNode) -> str:
     return param.text().split(":")[0].split("=")[0].strip().lstrip("*")
 
 
-def extract_callable_param_names(fn_node: SgNode) -> list[str]:
+def extract_callable_param_names(fn_node: CstNode) -> list[str]:
     """Return ordered parameter names of fn_node excluding 'self', 'cls', comments, and separators."""
     params_node = fn_node.field("parameters")
     if params_node is None:

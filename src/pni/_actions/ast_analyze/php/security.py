@@ -14,8 +14,7 @@ from __future__ import annotations
 import re
 from typing import Final
 
-from ast_grep_py import SgNode
-
+from pni._actions.ast_analyze._cst import CstNode
 from pni._actions.ast_analyze.base import BaseSecurityChecker
 from pni._actions.ast_analyze.models import (
     ApiEndpointFact,
@@ -102,7 +101,7 @@ _WP_AJAX_HOOK_RE: Final[re.Pattern[str]] = re.compile(
 )
 
 
-def _extract_call_args_text(call_node: SgNode) -> list[str]:
+def _extract_call_args_text(call_node: CstNode) -> list[str]:
     """Return top-level argument text strings inside `arguments` of a PHP call expression."""
     args_node = call_node.find(kind="arguments")
     if args_node is None:
@@ -214,7 +213,7 @@ class PhpSecurityChecker(BaseSecurityChecker):
     def _classify_crypto_tls_or_scope_call(
         self,
         unit: ParsedUnit,
-        fcall: SgNode,
+        fcall: CstNode,
         callee: str,
         args: list[str],
         full_txt: str,
@@ -607,7 +606,7 @@ class PhpSecurityChecker(BaseSecurityChecker):
         return mw_tokens
 
     @staticmethod
-    def _collect_route_attributes(node: SgNode) -> tuple[list[re.Match[str]], bool]:
+    def _collect_route_attributes(node: CstNode) -> tuple[list[re.Match[str]], bool]:
         """Return (`#[Route(...)]` regex matches, has_auth_attribute) on a PHP class or method node."""
         matches: list[re.Match[str]] = []
         has_auth = False

@@ -1,5 +1,7 @@
 # FastAPI Best Practices (`python/frameworks/fastapi`)
 
+Apply when `fastapi` is present in `ProjectFacts.detected_frameworks`. Mark `not_applicable` when the project does not use FastAPI.
+
 ## 1. Async Event-Loop Safety
 - Never invoke blocking synchronous I/O (`time.sleep()`, `requests.get()`, `urllib.request.urlopen()`, blocking `subprocess.run()`, or synchronous ORM calls) inside `async def` route handlers—either use `httpx.AsyncClient` / `asyncio.sleep` or define the route with plain `def` so FastAPI runs it in a threadpool.
 

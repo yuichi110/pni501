@@ -13,8 +13,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from ast_grep_py import SgNode
-
+from pni._actions.ast_analyze._cst import CstNode
 from pni._actions.ast_analyze.base import BaseImportChecker
 from pni._actions.ast_analyze.go._helpers import parse_go_module_info
 from pni._actions.ast_analyze.models import (
@@ -24,7 +23,7 @@ from pni._actions.ast_analyze.models import (
 )
 
 
-def _extract_import_spec_info(spec: SgNode) -> tuple[str, bool, int]:
+def _extract_import_spec_info(spec: CstNode) -> tuple[str, bool, int]:
     """Return `(import_path, is_dot_import, line_1based)` from a Go `import_spec` node."""
     path_node = spec.field("path")
     imp_path = path_node.text().strip().strip('"`') if path_node is not None else ""

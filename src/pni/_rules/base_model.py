@@ -13,11 +13,13 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 
 
 class RuleInfo(BaseModel):
     """Metadata describing a best practice rule."""
+
+    model_config = ConfigDict(frozen=True)
 
     scope: str
     name: str

@@ -88,7 +88,7 @@ def lint_drawlib_chapters(chapters: Sequence[Path]) -> list[str]:
 
 
 class _DrawlibToolsProtocol(Protocol):
-    """Typed protocol for lazily imported drawlib.tools functions (drawlib >= 0.3.5)."""
+    """Typed protocol for lazily imported drawlib.tools functions (drawlib >= 0.3.15)."""
 
     def init_project(
         self,
@@ -493,7 +493,7 @@ def _normalize_compiled_pdf(
     pdf_candidate: Path,
     raw_ret: object,
 ) -> Path:
-    """Normalize drawlib >= 0.3.5 '<target>_<default_lang>.pdf' output to '<target>.pdf'."""
+    """Normalize drawlib >= 0.3.15 '<target>_<default_lang>.pdf' output to '<target>.pdf'."""
     if isinstance(raw_ret, (str, Path)) and str(raw_ret).strip():
         emitted = Path(raw_ret).resolve()
     else:

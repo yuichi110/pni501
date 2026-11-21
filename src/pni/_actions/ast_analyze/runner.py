@@ -17,8 +17,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Optional
 
-from ast_grep_py import SgRoot
-
+from pni._actions.ast_analyze._cst import parse_cst
 from pni._actions.ast_analyze.base import (
     BaseDependencyChecker,
     BaseDocChecker,
@@ -287,7 +286,7 @@ class LanguageAnalyzerSuite:
                 continue
             cst_source = self.source_preprocessor(source) if self.source_preprocessor is not None else source
             grammar = self._resolve_ast_grep_lang(src_file)
-            root = SgRoot(cst_source, grammar).root()
+            root = parse_cst(cst_source, grammar)
             if root.has(kind="ERROR"):
                 continue
             rel_str = (

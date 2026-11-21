@@ -1,6 +1,6 @@
 id: javascript_ast_audit
 name: JavaScript AST, Imports, JSDoc Types, Quality & Security Audit
-description: Parse JavaScript/JSX AST via ast-grep-py to extract import/require hygiene, JSDoc type contract coverage, cognitive complexity, bug idioms, CWE sinks, and API routes.
+description: Parse JavaScript/JSX AST via tree-sitter to extract import/require hygiene, JSDoc type contract coverage, cognitive complexity, bug idioms, CWE sinks, and API routes.
 rules:
   - common/architecture
   - common/maintainability
@@ -8,6 +8,7 @@ rules:
   - common/security_vulnerability
   - javascript/code_quality
   - javascript/typing
+  - javascript/modern_stack
 primitives:
   - type: ast_analyze
     name: Extract Deterministic JavaScript AST & Module Metrics

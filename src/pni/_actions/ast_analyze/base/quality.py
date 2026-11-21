@@ -15,8 +15,7 @@ import contextlib
 from abc import ABC, abstractmethod
 from typing import ClassVar, Final
 
-from ast_grep_py import SgNode
-
+from pni._actions.ast_analyze._cst import CstNode
 from pni._actions.ast_analyze.models import (
     MAX_BRANCH_COUNT,
     MAX_CALLABLE_PARAMS,
@@ -45,7 +44,7 @@ _NESTED_CALLABLE_BOUNDARY_KINDS: Final[frozenset[str]] = frozenset(
 )
 
 
-def _is_owned_by_callable(node: SgNode, callable_start_index: int) -> bool:
+def _is_owned_by_callable(node: CstNode, callable_start_index: int) -> bool:
     """Return True if `node` is not enclosed by a nested callable or anonymous class inside the outer callable."""
     curr = node.parent()
     while curr is not None and curr.range().start.index > callable_start_index:
@@ -55,7 +54,7 @@ def _is_owned_by_callable(node: SgNode, callable_start_index: int) -> bool:
     return True
 
 
-def _effective_callable_lines(node: SgNode) -> int:
+def _effective_callable_lines(node: CstNode) -> int:
     """Return line span of `node` excluding lines belonging to nested `method_declaration` or `anonymous_class`."""
     total_lines = node.range().end.line - node.range().start.line + 1
     if node.kind() != "method_declaration":
@@ -142,7 +141,7 @@ class BaseQualityChecker(ABC):
             bug_risk_idioms=bug_idioms,
         )
 
-    def compute_cognitive_complexity(self, node: SgNode) -> int:
+    def compute_cognitive_complexity(self, node: CstNode) -> int:
         """Compute nesting-weighted cognitive complexity for a callable CST node."""
         nesting_kinds = self.nesting_node_kinds or self.branch_node_kinds
         callable_start = node.range().start.index
@@ -160,11 +159,11 @@ class BaseQualityChecker(ABC):
                 score += 1 + depth
         return score
 
-    def effective_callable_lines(self, node: SgNode) -> int:
+    def effective_callable_lines(self, node: CstNode) -> int:
         """Return effective line span of `node` for unit-size evaluation."""
         return _effective_callable_lines(node)
 
-    def evaluate_complexity(self, node: SgNode, symbol: str, rel_path: str) -> CodeLocation | None:
+    def evaluate_complexity(self, node: CstNode, symbol: str, rel_path: str) -> CodeLocation | None:
         """Check whether a callable exceeds line length, McCabe branch, or cognitive thresholds."""
         callable_start = node.range().start.index
         func_len = self.effective_callable_lines(node)
@@ -188,7 +187,7 @@ class BaseQualityChecker(ABC):
             )
         return None
 
-    def count_callable_params(self, node: SgNode) -> int:
+    def count_callable_params(self, node: CstNode) -> int:
         """Count effective parameters on a callable CST node (excluding receiver 'self'/'cls')."""
         _ = node
         return 0
@@ -212,7 +211,7 @@ class BaseQualityChecker(ABC):
         """Count class/interface/enum/record type declarations in unit."""
 
     @abstractmethod
-    def iter_callables(self, unit: ParsedUnit) -> list[tuple[str, SgNode]]:
+    def iter_callables(self, unit: ParsedUnit) -> list[tuple[str, CstNode]]:
         """Return (symbol_name, cst_node) pairs for all functions/methods/constructors in unit."""
 
     @abstractmethod

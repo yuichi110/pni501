@@ -14,8 +14,7 @@ from __future__ import annotations
 import re
 from typing import Final
 
-from ast_grep_py import SgNode
-
+from pni._actions.ast_analyze._cst import CstNode
 from pni._actions.ast_analyze.base import BaseTypingChecker
 from pni._actions.ast_analyze.models import CodeLocation, ParsedUnit, UnitTypingStats
 from pni._actions.ast_analyze.php._helpers import (
@@ -31,7 +30,7 @@ _UNSCOPED_IGNORE_RE: Final[re.Pattern[str]] = re.compile(
 )
 
 
-def _has_strict_types_declaration(root: SgNode) -> bool:
+def _has_strict_types_declaration(root: CstNode) -> bool:
     """Return True if unit declares `declare(strict_types=1);`."""
     for decl in root.find_all(kind="declare_statement"):
         compact = re.sub(r"\s+", "", decl.text())
@@ -40,7 +39,7 @@ def _has_strict_types_declaration(root: SgNode) -> bool:
     return False
 
 
-def _param_type_text(param_node: SgNode) -> str:
+def _param_type_text(param_node: CstNode) -> str:
     """Return the type annotation text of a PHP parameter node, or empty string if untyped."""
     for child in param_node.children():
         ckind = child.kind()
@@ -51,7 +50,7 @@ def _param_type_text(param_node: SgNode) -> str:
     return ""
 
 
-def _return_type_text(callable_node: SgNode) -> str:
+def _return_type_text(callable_node: CstNode) -> str:
     """Return the return type annotation text of a PHP callable node, or empty string if untyped."""
     saw_colon = False
     for child in callable_node.children():
@@ -71,7 +70,7 @@ class PhpTypingChecker(BaseTypingChecker):
         self,
         unit: ParsedUnit,
         symbol: str,
-        cnode: SgNode,
+        cnode: CstNode,
         *,
         has_strict: bool,
         issues: list[CodeLocation],

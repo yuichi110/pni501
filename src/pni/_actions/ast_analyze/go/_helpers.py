@@ -16,8 +16,7 @@ import re
 from pathlib import Path
 from typing import Optional
 
-from ast_grep_py import SgNode
-
+from pni._actions.ast_analyze._cst import CstNode
 from pni._actions.ast_analyze.models import ParsedUnit
 
 
@@ -38,7 +37,7 @@ def is_exported_go_name(name: str) -> bool:
     return bool(clean) and clean[0].isupper()
 
 
-def extract_receiver_type_name(method_node: SgNode) -> str:
+def extract_receiver_type_name(method_node: CstNode) -> str:
     """Extract base receiver type name (stripping `*` and generic type arguments) from a method_declaration."""
     recv = method_node.field("receiver")
     if recv is None:
@@ -56,9 +55,9 @@ def extract_receiver_type_name(method_node: SgNode) -> str:
     return ""
 
 
-def iter_go_type_specs(unit: ParsedUnit) -> list[tuple[str, str, SgNode, SgNode]]:
+def iter_go_type_specs(unit: ParsedUnit) -> list[tuple[str, str, CstNode, CstNode]]:
     """Return `(type_name, type_kind, spec_node, decl_node)` for all top-level type declarations."""
-    results: list[tuple[str, str, SgNode, SgNode]] = []
+    results: list[tuple[str, str, CstNode, CstNode]] = []
     for child in unit.root.children():
         if child.kind() != "type_declaration":
             continue
@@ -80,9 +79,9 @@ def iter_go_type_specs(unit: ParsedUnit) -> list[tuple[str, str, SgNode, SgNode]
     return results
 
 
-def iter_go_callables(unit: ParsedUnit) -> list[tuple[str, str, SgNode]]:
+def iter_go_callables(unit: ParsedUnit) -> list[tuple[str, str, CstNode]]:
     """Return `(qualified_symbol, short_name, node)` for all top-level functions and methods in unit."""
-    callables: list[tuple[str, str, SgNode]] = []
+    callables: list[tuple[str, str, CstNode]] = []
     for child in unit.root.children():
         kind = child.kind()
         if kind == "function_declaration":
@@ -102,7 +101,7 @@ def iter_go_callables(unit: ParsedUnit) -> list[tuple[str, str, SgNode]]:
     return callables
 
 
-def get_go_callable_params(node: SgNode) -> list[tuple[str, str]]:
+def get_go_callable_params(node: CstNode) -> list[tuple[str, str]]:
     """Return `(param_name, param_type_text)` pairs for a Go function or method declaration."""
     params_node = node.field("parameters")
     if params_node is None:
@@ -127,7 +126,7 @@ def get_go_callable_params(node: SgNode) -> list[tuple[str, str]]:
     return pairs
 
 
-def extract_preceding_godoc(target_node: SgNode, parent_decl: Optional[SgNode] = None) -> Optional[str]:
+def extract_preceding_godoc(target_node: CstNode, parent_decl: Optional[CstNode] = None) -> Optional[str]:
     """Extract contiguous GoDoc comment text immediately preceding target_node or its single-spec parent_decl."""
     anchor = target_node
     if parent_decl is not None:

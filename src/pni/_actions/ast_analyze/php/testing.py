@@ -15,8 +15,7 @@ import re
 from pathlib import Path
 from typing import Final
 
-from ast_grep_py import SgNode
-
+from pni._actions.ast_analyze._cst import CstNode
 from pni._actions.ast_analyze.base import BaseTestChecker
 from pni._actions.ast_analyze.models import CodeLocation, ParsedUnit, TestAstResult
 from pni._actions.ast_analyze.php._helpers import (
@@ -45,7 +44,7 @@ _ASSERTION_RE: Final[re.Pattern[str]] = re.compile(
 _PEST_TEST_CALL_NAMES: Final[frozenset[str]] = frozenset({"test", "it"})
 
 
-def _is_phpunit_test_method(mnode: SgNode) -> bool:
+def _is_phpunit_test_method(mnode: CstNode) -> bool:
     """Return True if a PHP method is a public `test*` method or carries `#[Test]` / `@test`."""
     if get_visibility(mnode) != "public":
         return False

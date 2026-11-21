@@ -22,7 +22,7 @@ Inspect `package.json` and `tsconfig.json` to configure `targets` accurately. No
 1. **Core Built-in TypeScript Actions**:
    - `repo_structure_audit` (`typescript` scope): Inspects `package.json`, `tsconfig.json` (`strict` mode), lockfiles (`pnpm-lock.yaml`, `package-lock.json`, `yarn.lock`), Node engine constraints, and dependency pinning.
    - `architecture_analysis`: Records system archetype, entry points (Express/Fastify/NestJS/Hono/Next.js routes, React components, CLI bins), module layering, and execution flows into `.pni/cache/<workflow_id>/architecture.json`.
-   - `typescript_ast_audit`: Parses `.ts`/`.tsx` files once via `ast-grep-py` to extract ES import hygiene, parameter/return type coverage, `: any` / `as any` & `@ts-ignore` usage, TSDoc coverage, cognitive complexity, unhandled promises/empty catches, DOM/XSS/SQL/exec CWE sinks, and API routes.
+   - `typescript_ast_audit`: Parses `.ts`/`.tsx` files once via `tree-sitter` to extract ES import hygiene, parameter/return type coverage, `: any` / `as any` & `@ts-ignore` usage, TSDoc coverage, cognitive complexity, unhandled promises/empty catches, DOM/XSS/SQL/exec CWE sinks, and API routes.
    - `typescript_test_audit`: Evaluates Vitest/Jest test files (`*.test.ts`, `*.spec.ts`), assertion-free `it()`/`test()` blocks, and test coverage alignment.
    - `container_runtime_audit`: Builds an isolated Node harness image via `.pni/dockerfiles/.../Dockerfile`, runs Vitest/Jest + `tsc --noEmit` offline (`--network=none`), and evaluates `common/runtime_verification`.
    - `security_vulnerability_audit`: Runs Trivy (`security_scan`) against `package.json`/lockfiles and the resolved container image, evaluating CVEs, IaC misconfigs, redacted secrets, AST `dangerous_sinks`, and `api_endpoints`.
@@ -56,6 +56,7 @@ steps:
   - id: arch_recording
     uses: architecture_analysis
 
+  # Optional archetype audit: service_readiness_audit | cli_guidelines_audit | library_hygiene_audit
   - id: test_health
     uses: typescript_test_audit
 

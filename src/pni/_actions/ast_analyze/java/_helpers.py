@@ -13,8 +13,7 @@ from __future__ import annotations
 
 from typing import Final
 
-from ast_grep_py import SgNode
-
+from pni._actions.ast_analyze._cst import CstNode
 from pni._actions.ast_analyze.models import ParsedUnit
 
 JAVA_TYPE_KINDS: Final[tuple[str, ...]] = (
@@ -46,7 +45,7 @@ _LOGGER_SUPERTYPE_TOKENS: Final[tuple[str, ...]] = (
 )
 
 
-def extract_java_package(root: SgNode) -> str:
+def extract_java_package(root: CstNode) -> str:
     """Extract the package name from a Java compilation unit CST root."""
     pkg_decl = root.find(kind="package_declaration")
     if pkg_decl is None:
@@ -65,7 +64,7 @@ def unit_fqn(unit: ParsedUnit) -> tuple[str, str]:
     return pkg, fqn
 
 
-def get_modifiers_node(decl: SgNode) -> SgNode | None:
+def get_modifiers_node(decl: CstNode) -> CstNode | None:
     """Return the modifiers child node of a Java declaration if present."""
     for child in decl.children():
         if child.kind() == "modifiers":
@@ -73,7 +72,7 @@ def get_modifiers_node(decl: SgNode) -> SgNode | None:
     return None
 
 
-def modifier_tokens(decl: SgNode) -> set[str]:
+def modifier_tokens(decl: CstNode) -> set[str]:
     """Return modifier keywords ('public', 'static', 'final', etc.) on a Java declaration."""
     mods = get_modifiers_node(decl)
     if mods is None:
@@ -81,7 +80,7 @@ def modifier_tokens(decl: SgNode) -> set[str]:
     return {c.kind() for c in mods.children() if c.is_leaf()}
 
 
-def has_override_annotation(decl: SgNode) -> bool:
+def has_override_annotation(decl: CstNode) -> bool:
     """Return True if a method declaration carries @Override."""
     mods = get_modifiers_node(decl)
     if mods is None:
@@ -89,7 +88,7 @@ def has_override_annotation(decl: SgNode) -> bool:
     return any("@Override" in c.text() for c in mods.named_children())
 
 
-def find_unchecked_suppress(decl: SgNode) -> str | None:
+def find_unchecked_suppress(decl: CstNode) -> str | None:
     """Return matched suppression token if @SuppressWarnings suppresses unchecked or rawtypes."""
     mods = get_modifiers_node(decl)
     if mods is None:
@@ -101,7 +100,7 @@ def find_unchecked_suppress(decl: SgNode) -> str | None:
     return None
 
 
-def callable_symbol_name(m_node: SgNode) -> str:
+def callable_symbol_name(m_node: CstNode) -> str:
     """Return method or constructor name for a Java callable CST node."""
     name_node = m_node.field("name")
     return name_node.text() if name_node is not None else "<init>"

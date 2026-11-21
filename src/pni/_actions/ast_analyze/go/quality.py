@@ -14,8 +14,7 @@ from __future__ import annotations
 import re
 from typing import ClassVar, Final
 
-from ast_grep_py import SgNode
-
+from pni._actions.ast_analyze._cst import CstNode
 from pni._actions.ast_analyze.base import BaseQualityChecker
 from pni._actions.ast_analyze.base.quality import _is_owned_by_callable
 from pni._actions.ast_analyze.go._helpers import (
@@ -54,7 +53,7 @@ _SAFE_BLANK_CALL_RE: Final[re.Pattern[str]] = re.compile(
 )
 
 
-def _enclosing_callable_name(node: SgNode) -> str:
+def _enclosing_callable_name(node: CstNode) -> str:
     """Return the enclosing Go function or method name for a CST node."""
     curr = node.parent()
     while curr is not None:
@@ -70,7 +69,7 @@ def _enclosing_callable_name(node: SgNode) -> str:
     return "<package>"
 
 
-def _is_inside_for_loop(node: SgNode) -> bool:
+def _is_inside_for_loop(node: CstNode) -> bool:
     """Return True if node is inside a `for_statement` without an intervening `func_literal`."""
     curr = node.parent()
     while curr is not None:
@@ -83,14 +82,14 @@ def _is_inside_for_loop(node: SgNode) -> bool:
     return False
 
 
-def _extract_rhs_call_node(right: SgNode) -> SgNode | None:
+def _extract_rhs_call_node(right: CstNode) -> CstNode | None:
     """Return the top-level `call_expression` assigned on the RHS, ignoring nested index/type-assertion calls."""
     if right.kind() == "call_expression":
         return right
     return next((child for child in right.children() if child.kind() == "call_expression"), None)
 
 
-def _extract_callee_display_name(call_node: SgNode) -> str:
+def _extract_callee_display_name(call_node: CstNode) -> str:
     """Extract the outer function or chained selector expression from a `call_expression`."""
     fn_node = call_node.field("function")
     if fn_node is not None:
@@ -154,7 +153,7 @@ class GoQualityChecker(BaseQualityChecker):
         }
     )
 
-    def effective_callable_lines(self, node: SgNode) -> int:
+    def effective_callable_lines(self, node: CstNode) -> int:
         """Return Go callable line span excluding interior newlines of multiline raw string literals."""
         total_lines = node.range().end.line - node.range().start.line + 1
         raw_literal_lines: set[int] = set()
@@ -165,7 +164,7 @@ class GoQualityChecker(BaseQualityChecker):
                 raw_literal_lines.update(range(start_ln + 1, end_ln + 1))
         return max(1, total_lines - len(raw_literal_lines))
 
-    def evaluate_complexity(self, node: SgNode, symbol: str, rel_path: str) -> CodeLocation | None:
+    def evaluate_complexity(self, node: CstNode, symbol: str, rel_path: str) -> CodeLocation | None:
         """Check whether a Go callable exceeds effective line length (with branch/cognitive floor) or complexity."""
         callable_start = node.range().start.index
         func_len = self.effective_callable_lines(node)
@@ -211,11 +210,11 @@ class GoQualityChecker(BaseQualityChecker):
         """Count top-level struct, interface, and named type definitions in unit."""
         return len(iter_go_type_specs(unit))
 
-    def iter_callables(self, unit: ParsedUnit) -> list[tuple[str, SgNode]]:
+    def iter_callables(self, unit: ParsedUnit) -> list[tuple[str, CstNode]]:
         """Return `(symbol_name, node)` for all top-level functions and methods in unit."""
         return [(qual, node) for qual, _short, node in iter_go_callables(unit)]
 
-    def count_callable_params(self, node: SgNode) -> int:
+    def count_callable_params(self, node: CstNode) -> int:
         """Count parameters on a Go function or method declaration."""
         return len(get_go_callable_params(node))
 

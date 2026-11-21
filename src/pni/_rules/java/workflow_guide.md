@@ -36,6 +36,7 @@ Inspect `pom.xml`, `build.gradle(.kts)`, and `settings.gradle(.kts)` to configur
 
 ```yaml
 id: full_audit
+category: audit
 name: Full Java Project Health Audit & Report
 description: Deterministic Java AST/manifest analysis, 3-aspect architecture recording, rule evaluation, and Drawlib PDF report.
 
@@ -52,12 +53,13 @@ steps:
   - id: repo_and_deps
     uses: repo_structure_audit
 
-  - id: architecture_map
-    uses: architecture_analysis
-
   - id: ast_and_quality
     uses: java_ast_audit
 
+  - id: architecture_map
+    uses: architecture_analysis
+
+  # Optional archetype audit: service_readiness_audit | cli_guidelines_audit | library_hygiene_audit
   - id: test_health
     uses: java_test_audit
 

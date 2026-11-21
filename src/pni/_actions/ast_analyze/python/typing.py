@@ -14,8 +14,7 @@ from __future__ import annotations
 import re
 from typing import Final
 
-from ast_grep_py import SgNode
-
+from pni._actions.ast_analyze._cst import CstNode
 from pni._actions.ast_analyze.base import BaseTypingChecker
 from pni._actions.ast_analyze.models import CodeLocation, ParsedUnit, UnitTypingStats
 from pni._actions.ast_analyze.python._helpers import (
@@ -33,14 +32,14 @@ _EXEMPT_CLASS_ATTRS: Final[frozenset[str]] = frozenset({"model_config", "__all__
 _UNSCOPED_IGNORE_RE = re.compile(r"#\s*(type|pyright)\s*:\s*ignore(?!\s*\[)")
 
 
-def _node_uses_any(type_node: SgNode | None) -> bool:
+def _node_uses_any(type_node: CstNode | None) -> bool:
     """Return True if a type annotation node references typing.Any or Any."""
     if type_node is None:
         return False
     return any(ident.text() == "Any" for ident in type_node.find_all(kind="identifier"))
 
 
-def _find_bare_generics(type_node: SgNode | None) -> list[str]:
+def _find_bare_generics(type_node: CstNode | None) -> list[str]:
     """Find unparameterized builtin container types (e.g. bare 'list' instead of 'list[T]')."""
     if type_node is None:
         return []
@@ -62,7 +61,7 @@ def _find_bare_generics(type_node: SgNode | None) -> list[str]:
 
 
 def _collect_type_weaknesses(
-    type_node: SgNode | None,
+    type_node: CstNode | None,
     rel_file: str,
     lineno: int,
     symbol: str,
@@ -84,13 +83,13 @@ def _collect_type_weaknesses(
     return weak
 
 
-def _is_init_method(fn_node: SgNode, fn_name: str) -> bool:
+def _is_init_method(fn_node: CstNode, fn_name: str) -> bool:
     """Return True if fn_node is a class `__init__` method."""
     return fn_name == "__init__" and fn_node.inside(kind="class_definition")
 
 
 def _inspect_callable_parameters(
-    fn_node: SgNode,
+    fn_node: CstNode,
     fn_name: str,
     rel_file: str,
     lineno: int,
@@ -121,7 +120,7 @@ def _inspect_callable_parameters(
 
 
 def _inspect_function_typing(
-    fn_node: SgNode,
+    fn_node: CstNode,
     rel_file: str,
 ) -> tuple[bool, list[CodeLocation], list[CodeLocation], list[CodeLocation]]:
     """Inspect a Python function_definition node for missing annotations, __init__ -> None omissions, and weak types."""
@@ -161,7 +160,7 @@ def _inspect_function_typing(
     return is_typed, missing, omitted_init, weak_locs
 
 
-def _is_enum_class(cls_node: SgNode) -> bool:
+def _is_enum_class(cls_node: CstNode) -> bool:
     """Return True if cls_node inherits from Enum / StrEnum / IntEnum."""
     superclasses = cls_node.field("superclasses")
     if superclasses is None:

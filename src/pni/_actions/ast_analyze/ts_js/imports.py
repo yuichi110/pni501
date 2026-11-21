@@ -14,8 +14,7 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Final
 
-from ast_grep_py import SgNode
-
+from pni._actions.ast_analyze._cst import CstNode
 from pni._actions.ast_analyze.base import BaseImportChecker
 from pni._actions.ast_analyze.models import (
     CodeLocation,
@@ -28,7 +27,7 @@ _ALLOWED_NAMESPACE_IMPORTS: Final[frozenset[str]] = frozenset(
 )
 
 
-def _extract_import_source(imp_node: SgNode) -> str:
+def _extract_import_source(imp_node: CstNode) -> str:
     """Return the unquoted module specifier string from an ES `import_statement`."""
     src_node = imp_node.field("source")
     if src_node is not None:
@@ -47,7 +46,7 @@ def _import_sort_group(specifier: str) -> int:
     return 1
 
 
-def _is_top_level_require(call: SgNode) -> bool:
+def _is_top_level_require(call: CstNode) -> bool:
     """Return True if a `require(...)` call_expression is at module top level."""
     curr = call.parent()
     while curr is not None:

@@ -14,8 +14,7 @@ from __future__ import annotations
 import re
 from typing import Final, Optional
 
-from ast_grep_py import SgNode
-
+from pni._actions.ast_analyze._cst import CstNode
 from pni._actions.ast_analyze.base.security import BaseSecurityChecker
 from pni._actions.ast_analyze.models import (
     ApiEndpointFact,
@@ -62,7 +61,7 @@ _PATH_ATTR_RE: Final[re.Pattern[str]] = re.compile(r'(?:value|path)\s*=\s*\{?\s*
 _REQ_METHOD_RE: Final[re.Pattern[str]] = re.compile(r"RequestMethod\.(GET|POST|PUT|DELETE|PATCH|OPTIONS|HEAD)")
 
 
-def _first_java_arg(args_node: Optional[SgNode]) -> Optional[SgNode]:
+def _first_java_arg(args_node: Optional[CstNode]) -> Optional[CstNode]:
     """Return the first named argument node inside a Java argument_list."""
     if args_node is None:
         return None
@@ -72,7 +71,7 @@ def _first_java_arg(args_node: Optional[SgNode]) -> Optional[SgNode]:
     return None
 
 
-def _is_dynamic_java_sql(arg: Optional[SgNode]) -> bool:
+def _is_dynamic_java_sql(arg: Optional[CstNode]) -> bool:
     """Return True if a Java SQL argument uses string concatenation (+) or String.format."""
     if arg is None:
         return False
@@ -83,7 +82,7 @@ def _is_dynamic_java_sql(arg: Optional[SgNode]) -> bool:
     return False
 
 
-def _check_java_invocation_sink(unit: ParsedUnit, inv: SgNode) -> Optional[SecuritySinkLocation]:
+def _check_java_invocation_sink(unit: ParsedUnit, inv: CstNode) -> Optional[SecuritySinkLocation]:
     """Inspect a Java method_invocation for SQLi, Runtime.exec, weak crypto, or CORS wildcard."""
     obj = inv.field("object")
     name_node = inv.field("name")
@@ -213,7 +212,7 @@ def _extract_mapping_path(ann_text: str) -> str:
     return ""
 
 
-def _extract_annotations_text(decl_node: SgNode) -> list[str]:
+def _extract_annotations_text(decl_node: CstNode) -> list[str]:
     """Return all annotation texts attached inside a Java modifiers node."""
     out: list[str] = []
     for child in decl_node.children():
@@ -239,7 +238,7 @@ def _extract_method_endpoints(
     cls_name: str,
     base_path: str,
     cls_auth: set[str],
-    member: SgNode,
+    member: CstNode,
 ) -> list[ApiEndpointFact]:
     """Extract Spring route mappings declared on a single method_declaration."""
     mname_node = member.field("name")

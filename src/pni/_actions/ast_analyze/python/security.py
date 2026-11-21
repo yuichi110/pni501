@@ -14,8 +14,7 @@ from __future__ import annotations
 import re
 from typing import Final, Optional
 
-from ast_grep_py import SgNode
-
+from pni._actions.ast_analyze._cst import CstNode
 from pni._actions.ast_analyze.base.security import BaseSecurityChecker
 from pni._actions.ast_analyze.models import (
     ApiEndpointFact,
@@ -58,7 +57,7 @@ _FIRST_QUOTED_STR_RE: Final[re.Pattern[str]] = re.compile(r"""['"]([^'"]*)['"]""
 _METHODS_LIST_RE: Final[re.Pattern[str]] = re.compile(r"methods\s*=\s*\[([^\]]+)\]")
 
 
-def _first_positional_arg(args_node: Optional[SgNode]) -> Optional[SgNode]:
+def _first_positional_arg(args_node: Optional[CstNode]) -> Optional[CstNode]:
     """Return the first positional expression inside a Python argument_list."""
     if args_node is None:
         return None
@@ -68,7 +67,7 @@ def _first_positional_arg(args_node: Optional[SgNode]) -> Optional[SgNode]:
     return None
 
 
-def _is_dynamic_sql_arg(arg: Optional[SgNode]) -> bool:
+def _is_dynamic_sql_arg(arg: Optional[CstNode]) -> bool:
     """Return True if a SQL query expression uses f-string interpolation, +/%, or .format()."""
     if arg is None:
         return False
@@ -86,7 +85,7 @@ def _is_dynamic_sql_arg(arg: Optional[SgNode]) -> bool:
 def _check_sql_or_cmd_call(
     unit: ParsedUnit,
     fn_text: str,
-    args_node: Optional[SgNode],
+    args_node: Optional[CstNode],
     compact_args: str,
     lineno: int,
 ) -> Optional[SecuritySinkLocation]:
@@ -118,7 +117,7 @@ def _check_sql_or_cmd_call(
 
 def _check_eval_crypto_or_tls_call(
     unit: ParsedUnit,
-    fn: SgNode,
+    fn: CstNode,
     fn_text: str,
     compact_args: str,
     lineno: int,

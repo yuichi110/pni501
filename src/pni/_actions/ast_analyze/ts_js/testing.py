@@ -15,8 +15,7 @@ import re
 from pathlib import Path
 from typing import Final
 
-from ast_grep_py import SgNode
-
+from pni._actions.ast_analyze._cst import CstNode
 from pni._actions.ast_analyze.base import BaseTestChecker
 from pni._actions.ast_analyze.models import (
     CodeLocation,
@@ -40,7 +39,7 @@ _EXTERNAL_CDN_SCRIPT_RE: Final[re.Pattern[str]] = re.compile(
 )
 
 
-def _extract_test_case_name(args_node: SgNode) -> str:
+def _extract_test_case_name(args_node: CstNode) -> str:
     """Extract the string description of an `it('...', fn)` or `test('...', fn)` call."""
     for child in args_node.children():
         if child.kind() in {"string", "template_string"}:
@@ -48,7 +47,7 @@ def _extract_test_case_name(args_node: SgNode) -> str:
     return "<test>"
 
 
-def _extract_test_callback(args_node: SgNode) -> SgNode | None:
+def _extract_test_callback(args_node: CstNode) -> CstNode | None:
     """Return the callback function node from an `it(...)` or `test(...)` argument list."""
     for child in reversed(list(args_node.children())):
         if child.kind() in {"arrow_function", "function_expression"}:

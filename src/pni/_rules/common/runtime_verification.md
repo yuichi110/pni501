@@ -23,4 +23,4 @@ Apply this standard whenever `RuntimeFacts` (`run_check` / `container_runtime_au
    - The software must boot or initialize cleanly for its archetype (`RuntimeFacts.smoke_check.status == "passed"`):
      - `library`: Clean top-level package import without import-time side effects or missing runtime dependencies.
      - `cli`: Entry-point `--help` exits `0` without stack traces.
-     - `web_api` / `worker`: ASGI/WSGI lifespan or Spring `ApplicationContext` initializes cleanly without circular DI errors (`import_or_di_error`), unguarded startup connections (`external_service_unreachable`), or crashes.
+     - `web_api` / `worker`: ASGI/WSGI lifespan (Python), Spring `ApplicationContext` (Java), Laravel `artisan` / PHP built-in server / WordPress stub (PHP), HTTP/gRPC server initialization (Go), or Express/Fastify/Hono/Next.js boot (TypeScript/JavaScript) initializes cleanly without circular DI errors (`import_or_di_error`), unguarded startup connections (`external_service_unreachable`), or crashes.

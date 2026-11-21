@@ -18,8 +18,7 @@ import sys
 from pathlib import Path, PurePosixPath
 from typing import Final
 
-from ast_grep_py import SgNode
-
+from pni._actions.ast_analyze._cst import CstNode
 from pni._actions.ast_analyze.base import BaseDependencyChecker
 from pni._actions.ast_analyze.models import CodeLocation, ParsedUnit
 from pni._actions.ast_analyze.python._helpers import (
@@ -73,6 +72,7 @@ _NAMESPACE_DIST_PREFIXES: Final[dict[str, tuple[str, ...]]] = {
     "zope": ("zope_",),
     "jaraco": ("jaraco_",),
     "mpl_toolkits": ("matplotlib", "mpl_toolkits_"),
+    "tree_sitter": ("tree_sitter_",),
 }
 _RUNTIME_DRIVER_ALLOWLIST: Final[frozenset[str]] = frozenset(
     {
@@ -94,7 +94,7 @@ _RUNTIME_DRIVER_ALLOWLIST: Final[frozenset[str]] = frozenset(
 
 
 def _resolve_from_import(
-    stmt: SgNode,
+    stmt: CstNode,
     current_mod: str,
     root_packages: set[str],
     known_modules: set[str],
@@ -126,7 +126,7 @@ def _resolve_from_import(
 
 
 def _extract_unit_imports(
-    root: SgNode,
+    root: CstNode,
     current_mod: str,
     root_packages: set[str],
     known_modules: set[str],

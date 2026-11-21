@@ -13,8 +13,7 @@ from __future__ import annotations
 
 from typing import ClassVar
 
-from ast_grep_py import SgNode
-
+from pni._actions.ast_analyze._cst import CstNode
 from pni._actions.ast_analyze.base import BaseQualityChecker
 from pni._actions.ast_analyze.models import CodeLocation, ParsedUnit
 from pni._actions.ast_analyze.ts_js._helpers import (
@@ -25,7 +24,7 @@ from pni._actions.ast_analyze.ts_js._helpers import (
 )
 
 
-def _enclosing_ts_js_callable_name(node: SgNode) -> str:
+def _enclosing_ts_js_callable_name(node: CstNode) -> str:
     """Return the enclosing function or method name for a CST node."""
     curr = node.parent()
     while curr is not None:
@@ -98,11 +97,11 @@ class TsJsQualityChecker(BaseQualityChecker):
         dts_names = set(extract_companion_dts_types(unit))
         return len(own_names | dts_names)
 
-    def iter_callables(self, unit: ParsedUnit) -> list[tuple[str, SgNode]]:
+    def iter_callables(self, unit: ParsedUnit) -> list[tuple[str, CstNode]]:
         """Return `(qualified_name, fn_node)` for all functions and methods in unit."""
         return [(qual, fn_node) for qual, _short, _is_exp, fn_node, _anchor in iter_ts_js_callables(unit)]
 
-    def count_callable_params(self, node: SgNode) -> int:
+    def count_callable_params(self, node: CstNode) -> int:
         """Count formal parameters on a TypeScript/JavaScript function or method."""
         return len(get_ts_js_params(node))
 

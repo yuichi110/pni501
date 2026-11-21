@@ -14,8 +14,7 @@ from __future__ import annotations
 import re
 from typing import Final
 
-from ast_grep_py import SgNode
-
+from pni._actions.ast_analyze._cst import CstNode
 from pni._actions.ast_analyze.base import BaseTypingChecker
 from pni._actions.ast_analyze.models import (
     CodeLocation,
@@ -43,7 +42,7 @@ _TS_CHECK_HEADER_RE: Final[re.Pattern[str]] = re.compile(r"//\s*@ts-check\b")
 def _inspect_ts_callable(
     qual: str,
     short: str,
-    fn_node: SgNode,
+    fn_node: CstNode,
     rel_path: str,
 ) -> tuple[bool, list[CodeLocation]]:
     """Verify parameter and return type annotations on a TypeScript callable."""
@@ -80,8 +79,8 @@ def _inspect_js_callable(
     qual: str,
     short: str,
     is_exp: bool,
-    fn_node: SgNode,
-    anchor_node: SgNode,
+    fn_node: CstNode,
+    anchor_node: CstNode,
     rel_path: str,
     has_companion_dts: bool,
 ) -> tuple[bool, list[CodeLocation], list[CodeLocation]]:

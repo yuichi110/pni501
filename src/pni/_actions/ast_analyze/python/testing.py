@@ -15,8 +15,7 @@ import contextlib
 from pathlib import Path
 from typing import Final
 
-from ast_grep_py import SgNode, SgRoot
-
+from pni._actions.ast_analyze._cst import CstNode, parse_cst
 from pni._actions.ast_analyze.base import BaseTestChecker
 from pni._actions.ast_analyze.models import CodeLocation, ParsedUnit, TestAstResult
 from pni._actions.ast_analyze.python._helpers import (
@@ -45,7 +44,7 @@ _PYTEST_ASSERTION_HOOKS: Final[frozenset[str]] = frozenset(
 )
 
 
-def _has_test_assertion(fn_node: SgNode) -> bool:
+def _has_test_assertion(fn_node: CstNode) -> bool:
     """Return True if a Python test function contains an assert statement or assertion helper call."""
     if fn_node.find_all(kind="assert_statement"):
         return True
@@ -53,7 +52,7 @@ def _has_test_assertion(fn_node: SgNode) -> bool:
     return any(tok in body_text for tok in _ASSERT_CALL_TOKENS)
 
 
-def _is_autouse_post_yield_assertion_fixture(fn_node: SgNode) -> bool:
+def _is_autouse_post_yield_assertion_fixture(fn_node: CstNode) -> bool:
     """Return True if fn_node is an @pytest.fixture(..., autouse=True) with post-yield verification."""
     parent = fn_node.parent()
     if parent is None or parent.kind() != "decorated_definition":
@@ -75,7 +74,7 @@ def _is_autouse_post_yield_assertion_fixture(fn_node: SgNode) -> bool:
     return any(tok in tail_text for tok in _ASSERT_CALL_TOKENS)
 
 
-def _inspect_conftest_root(root: SgNode, rel_path: str) -> list[str]:
+def _inspect_conftest_root(root: CstNode, rel_path: str) -> list[str]:
     """Return harness notes if a conftest.py CST defines automated test-verification hooks/fixtures."""
     notes: list[str] = []
     for fn_node in root.find_all(kind="function_definition"):
@@ -122,7 +121,7 @@ def _discover_conftest_assertion_scopes(
         checked_paths.add(cfile)
         with contextlib.suppress(Exception):
             src = cfile.read_text(encoding="utf-8")
-            root = SgRoot(src, "python").root()
+            root = parse_cst(src, "python")
             rel = cfile.relative_to(root_resolved).as_posix() if cfile.is_relative_to(root_resolved) else cfile.name
             extra_notes = _inspect_conftest_root(root, rel)
             if extra_notes:

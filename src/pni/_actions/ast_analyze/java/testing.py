@@ -14,8 +14,7 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Final
 
-from ast_grep_py import SgNode
-
+from pni._actions.ast_analyze._cst import CstNode
 from pni._actions.ast_analyze.base import BaseTestChecker
 from pni._actions.ast_analyze.java._helpers import callable_symbol_name, get_modifiers_node, unit_fqn
 from pni._actions.ast_analyze.models import CodeLocation, ParsedUnit, TestAstResult
@@ -60,7 +59,7 @@ _ASSERTION_FLUENT_METHODS: Final[frozenset[str]] = frozenset(
 )
 
 
-def _is_junit_test_method(mnode: SgNode) -> bool:
+def _is_junit_test_method(mnode: CstNode) -> bool:
     """Return True if a Java method carries a JUnit test annotation."""
     mods = get_modifiers_node(mnode)
     if mods is None:
@@ -69,7 +68,7 @@ def _is_junit_test_method(mnode: SgNode) -> bool:
     return any(ann in text for ann in _TEST_ANNOTATIONS)
 
 
-def _extract_method_callees(mnode: SgNode) -> set[str]:
+def _extract_method_callees(mnode: CstNode) -> set[str]:
     """Return all invoked method names inside a Java method declaration."""
     callees: set[str] = set()
     for inv in mnode.find_all(kind="method_invocation"):
@@ -79,7 +78,7 @@ def _extract_method_callees(mnode: SgNode) -> set[str]:
     return callees
 
 
-def _method_has_assertion(mnode: SgNode) -> bool:
+def _method_has_assertion(mnode: CstNode) -> bool:
     """Return True if a Java test method invokes an assertion/verification helper or @Test(expected=...)."""
     mods = get_modifiers_node(mnode)
     if mods is not None and "expected" in mods.text():
@@ -94,7 +93,7 @@ def _method_has_assertion(mnode: SgNode) -> bool:
     return False
 
 
-def _collect_unit_asserting_methods(tunit: ParsedUnit) -> tuple[list[SgNode], set[str], dict[int, set[str]]]:
+def _collect_unit_asserting_methods(tunit: ParsedUnit) -> tuple[list[CstNode], set[str], dict[int, set[str]]]:
     """Collect all method nodes, transitive intra-class asserting method names, and per-node callees."""
     methods = list(tunit.root.find_all(kind="method_declaration"))
     asserting_names: set[str] = set()

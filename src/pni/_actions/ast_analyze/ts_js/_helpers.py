@@ -17,8 +17,7 @@ import re
 from pathlib import Path
 from typing import Final, Optional
 
-from ast_grep_py import SgNode, SgRoot
-
+from pni._actions.ast_analyze._cst import CstNode, parse_cst
 from pni._actions.ast_analyze.models import ParsedUnit
 
 _TYPE_DECL_KINDS: Final[dict[str, str]] = {
@@ -38,7 +37,7 @@ _JSDOC_RETURN_RE: Final[re.Pattern[str]] = re.compile(r"@returns?\s*\{([^}]*)\}"
 _JSDOC_TYPE_RE: Final[re.Pattern[str]] = re.compile(r"@type\s*\{([^}]*)\}")
 
 
-def _unwrap_parens_and_unary(node: Optional[SgNode]) -> Optional[SgNode]:
+def _unwrap_parens_and_unary(node: Optional[CstNode]) -> Optional[CstNode]:
     """Unwrap `parenthesized_expression` and prefix `unary_expression` wrappers around an AST node."""
     curr = node
     for _ in range(4):
@@ -60,12 +59,12 @@ def _unwrap_parens_and_unary(node: Optional[SgNode]) -> Optional[SgNode]:
     return curr
 
 
-def _extract_call_iife_bodies(call_node: SgNode) -> list[SgNode]:
+def _extract_call_iife_bodies(call_node: CstNode) -> list[CstNode]:
     """Return `statement_block` bodies from an IIFE or UMD `call_expression`."""
     fn_node = _unwrap_parens_and_unary(call_node.field("function"))
     if fn_node is None or fn_node.kind() not in _FN_VALUE_KINDS:
         return []
-    bodies: list[SgNode] = []
+    bodies: list[CstNode] = []
     fn_body = fn_node.field("body")
     if fn_body is not None and fn_body.kind() == "statement_block":
         bodies.append(fn_body)
@@ -80,7 +79,7 @@ def _extract_call_iife_bodies(call_node: SgNode) -> list[SgNode]:
     return bodies
 
 
-def _extract_stmt_iife_bodies(stmt_node: SgNode) -> list[SgNode]:
+def _extract_stmt_iife_bodies(stmt_node: CstNode) -> list[CstNode]:
     """Extract IIFE/UMD `statement_block` bodies from a top-level expression or variable statement."""
     kind = stmt_node.kind()
     if kind == "expression_statement":
@@ -90,7 +89,7 @@ def _extract_stmt_iife_bodies(stmt_node: SgNode) -> list[SgNode]:
                 return _extract_call_iife_bodies(unwrapped)
         return []
     if kind in {"lexical_declaration", "variable_declaration"}:
-        bodies: list[SgNode] = []
+        bodies: list[CstNode] = []
         for declarator in stmt_node.find_all(kind="variable_declarator"):
             if declarator.parent() != stmt_node:
                 continue
@@ -102,13 +101,13 @@ def _extract_stmt_iife_bodies(stmt_node: SgNode) -> list[SgNode]:
 
 
 def iter_top_level_statements(
-    root: SgNode,
+    root: CstNode,
     *,
     _depth: int = 0,
     _in_iife: bool = False,
-) -> list[tuple[SgNode, bool]]:
+) -> list[tuple[CstNode, bool]]:
     """Yield `(statement_node, in_iife)` across module root and unwrapped IIFE/UMD bodies."""
-    items: list[tuple[SgNode, bool]] = []
+    items: list[tuple[CstNode, bool]] = []
     for child in root.children():
         if _depth < 3:
             iife_bodies = _extract_stmt_iife_bodies(child)
@@ -144,7 +143,7 @@ def _collect_named_exports(unit: ParsedUnit) -> set[str]:
     return exported
 
 
-def _is_exported_node(node: SgNode, name: str, named_exports: set[str]) -> bool:
+def _is_exported_node(node: CstNode, name: str, named_exports: set[str]) -> bool:
     """Return True if `node` is directly inside an `export_statement` or listed in `named_exports`."""
     if name in named_exports:
         return True
@@ -158,11 +157,11 @@ def _is_exported_node(node: SgNode, name: str, named_exports: set[str]) -> bool:
     return False
 
 
-def iter_ts_js_type_declarations(unit: ParsedUnit) -> list[tuple[str, str, bool, SgNode, SgNode]]:
+def iter_ts_js_type_declarations(unit: ParsedUnit) -> list[tuple[str, str, bool, CstNode, CstNode]]:
     """Return `(name, kind_label, is_exported, decl_node, doc_anchor)` for all type/class declarations."""
     named_exports = _collect_named_exports(unit)
     has_es_export = unit.root.find(kind="export_statement") is not None
-    results: list[tuple[str, str, bool, SgNode, SgNode]] = []
+    results: list[tuple[str, str, bool, CstNode, CstNode]] = []
     for child, in_iife in iter_top_level_statements(unit.root):
         target = child
         anchor = child
@@ -190,15 +189,15 @@ def iter_ts_js_type_declarations(unit: ParsedUnit) -> list[tuple[str, str, bool,
 
 
 def _iter_class_methods(
-    class_node: SgNode,
+    class_node: CstNode,
     class_name: str,
     class_exported: bool,
-) -> list[tuple[str, str, bool, SgNode, SgNode]]:
+) -> list[tuple[str, str, bool, CstNode, CstNode]]:
     """Return `(qualified_name, method_name, is_public_exported, method_node, doc_anchor)` for a class."""
     body = class_node.field("body")
     if body is None:
         return []
-    methods: list[tuple[str, str, bool, SgNode, SgNode]] = []
+    methods: list[tuple[str, str, bool, CstNode, CstNode]] = []
     for member in body.children():
         if member.kind() != "method_definition":
             continue
@@ -217,16 +216,16 @@ def _iter_class_methods(
 
 
 def _iter_var_callables(
-    target: SgNode,
-    anchor: SgNode,
+    target: CstNode,
+    anchor: CstNode,
     is_exp_stmt: bool,
     named_exports: set[str],
     *,
     in_iife: bool = False,
     has_es_export: bool = True,
-) -> list[tuple[str, str, bool, SgNode, SgNode]]:
+) -> list[tuple[str, str, bool, CstNode, CstNode]]:
     """Extract arrow_function / function_expression / class declarators from a lexical/variable declaration."""
-    found: list[tuple[str, str, bool, SgNode, SgNode]] = []
+    found: list[tuple[str, str, bool, CstNode, CstNode]] = []
     for declarator in target.find_all(kind="variable_declarator"):
         if declarator.parent() != target:
             continue
@@ -244,11 +243,11 @@ def _iter_var_callables(
     return found
 
 
-def iter_ts_js_callables(unit: ParsedUnit) -> list[tuple[str, str, bool, SgNode, SgNode]]:
+def iter_ts_js_callables(unit: ParsedUnit) -> list[tuple[str, str, bool, CstNode, CstNode]]:
     """Return `(qualified_name, short_name, is_exported, fn_node, doc_anchor)` for functions and methods."""
     named_exports = _collect_named_exports(unit)
     has_es_export = unit.root.find(kind="export_statement") is not None
-    callables: list[tuple[str, str, bool, SgNode, SgNode]] = []
+    callables: list[tuple[str, str, bool, CstNode, CstNode]] = []
 
     for child, in_iife in iter_top_level_statements(unit.root):
         target = child
@@ -291,7 +290,7 @@ def iter_ts_js_callables(unit: ParsedUnit) -> list[tuple[str, str, bool, SgNode,
     return callables
 
 
-def get_ts_js_params(fn_node: SgNode) -> list[tuple[str, bool, str]]:
+def get_ts_js_params(fn_node: CstNode) -> list[tuple[str, bool, str]]:
     """Return `(param_name, has_type_annotation, type_text)` for a TypeScript or JavaScript callable node."""
     params_node = fn_node.field("parameters")
     if params_node is None:
@@ -320,7 +319,7 @@ def get_ts_js_params(fn_node: SgNode) -> list[tuple[str, bool, str]]:
     return results
 
 
-def has_ts_return_type(fn_node: SgNode) -> tuple[bool, str]:
+def has_ts_return_type(fn_node: CstNode) -> tuple[bool, str]:
     """Return `(has_return_annotation, return_type_text)` for a TypeScript callable node."""
     ret_node = fn_node.field("return_type")
     if ret_node is not None:
@@ -335,7 +334,7 @@ def has_ts_return_type(fn_node: SgNode) -> tuple[bool, str]:
     return False, ""
 
 
-def extract_preceding_jsdoc(anchor_node: SgNode) -> Optional[str]:
+def extract_preceding_jsdoc(anchor_node: CstNode) -> Optional[str]:
     """Return the `/** ... */` JSDoc/TSDoc comment immediately preceding `anchor_node` if present."""
     curr = anchor_node
     prev = curr.prev()
@@ -413,7 +412,7 @@ def extract_companion_dts_types(unit: ParsedUnit) -> list[str]:
     for dts_path in dts_files:
         with contextlib.suppress(Exception):
             dts_src = dts_path.read_text(encoding="utf-8")
-            root = SgRoot(dts_src, "typescript").root()
+            root = parse_cst(dts_src, "typescript")
             for kind_key in _TYPE_DECL_KINDS:
                 for node in root.find_all(kind=kind_key):
                     nm = node.field("name")

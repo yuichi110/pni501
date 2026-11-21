@@ -14,7 +14,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Final, Optional
 
-from ast_grep_py import SgNode
+from pni._actions.ast_analyze._cst import CstNode
 
 TYPE_DECL_KINDS: Final[tuple[str, ...]] = (
     "class_declaration",
@@ -182,7 +182,7 @@ def normalize_php_source_for_cst(source: str) -> str:
     return "".join(out)
 
 
-def extract_php_namespace(root: SgNode) -> str:
+def extract_php_namespace(root: CstNode) -> str:
     r"""Return the declared PHP namespace in root (e.g. 'App\Services'), or empty string if global."""
     ns_def = root.find(kind="namespace_definition")
     if ns_def is None:
@@ -191,7 +191,7 @@ def extract_php_namespace(root: SgNode) -> str:
     return ns_name.text().strip() if ns_name is not None else ""
 
 
-def extract_node_name(node: SgNode) -> str:
+def extract_node_name(node: CstNode) -> str:
     """Extract the identifier child (`kind == 'name'`) of a PHP declaration node."""
     for child in node.children():
         if child.kind() == "name":
@@ -199,7 +199,7 @@ def extract_node_name(node: SgNode) -> str:
     return "<anonymous>"
 
 
-def get_visibility(node: SgNode) -> str:
+def get_visibility(node: CstNode) -> str:
     """Return 'public', 'protected', or 'private' for a PHP member declaration (default 'public')."""
     for child in node.children():
         if child.kind() == "visibility_modifier":
@@ -207,9 +207,9 @@ def get_visibility(node: SgNode) -> str:
     return "public"
 
 
-def iter_php_types(root: SgNode) -> list[tuple[str, SgNode]]:
+def iter_php_types(root: CstNode) -> list[tuple[str, CstNode]]:
     """Return (type_name, cst_node) pairs for all class/interface/trait/enum declarations in root."""
-    found: list[tuple[str, SgNode]] = []
+    found: list[tuple[str, CstNode]] = []
     for kind in TYPE_DECL_KINDS:
         for tnode in root.find_all(kind=kind):
             found.append((extract_node_name(tnode), tnode))
@@ -217,7 +217,7 @@ def iter_php_types(root: SgNode) -> list[tuple[str, SgNode]]:
     return found
 
 
-def enclosing_anon_class_node(node: SgNode) -> Optional[SgNode]:
+def enclosing_anon_class_node(node: CstNode) -> Optional[CstNode]:
     """Return the enclosing anonymous class CST node (`anonymous_class` or `object_creation_expression`), if any."""
     curr = node.parent()
     while curr is not None:
@@ -230,12 +230,12 @@ def enclosing_anon_class_node(node: SgNode) -> Optional[SgNode]:
     return None
 
 
-def iter_direct_type_methods(tnode: SgNode) -> list[SgNode]:
+def iter_direct_type_methods(tnode: CstNode) -> list[CstNode]:
     """Return direct `method_declaration` nodes of `tnode`, excluding methods inside anonymous classes."""
     return [m for m in tnode.find_all(kind="method_declaration") if enclosing_anon_class_node(m) is None]
 
 
-def format_method_symbol(mnode: SgNode) -> str:
+def format_method_symbol(mnode: CstNode) -> str:
     """Format a PHP `method_declaration` symbol, qualifying methods inside anonymous classes."""
     mname = extract_node_name(mnode)
     anon_line: Optional[int] = None
@@ -261,9 +261,9 @@ def format_method_symbol(mnode: SgNode) -> str:
     return f"{owner_type}::{mname}" if owner_type else mname
 
 
-def iter_php_callables(root: SgNode) -> list[tuple[str, SgNode]]:
+def iter_php_callables(root: CstNode) -> list[tuple[str, CstNode]]:
     """Return (symbol, cst_node) pairs for all top-level functions and class/trait/anonymous methods in root."""
-    callables: list[tuple[str, SgNode]] = [
+    callables: list[tuple[str, CstNode]] = [
         (extract_node_name(fn_node), fn_node) for fn_node in root.find_all(kind="function_definition")
     ]
     for mnode in root.find_all(kind="method_declaration"):
@@ -273,7 +273,7 @@ def iter_php_callables(root: SgNode) -> list[tuple[str, SgNode]]:
     return callables
 
 
-def extract_formal_param_nodes(callable_node: SgNode) -> list[SgNode]:
+def extract_formal_param_nodes(callable_node: CstNode) -> list[CstNode]:
     """Return parameter CST nodes inside `formal_parameters` of a function or method."""
     for child in callable_node.children():
         if child.kind() == "formal_parameters":
@@ -281,7 +281,7 @@ def extract_formal_param_nodes(callable_node: SgNode) -> list[SgNode]:
     return []
 
 
-def find_preceding_phpdoc(node: SgNode) -> Optional[str]:
+def find_preceding_phpdoc(node: CstNode) -> Optional[str]:
     """Return the immediately preceding `/** ... */` PHPDoc comment text for node if present."""
     prev = node.prev()
     while prev is not None and prev.kind() == "attribute_list":
@@ -295,7 +295,7 @@ def find_preceding_phpdoc(node: SgNode) -> Optional[str]:
     return None
 
 
-def enclosing_callable_symbol(node: SgNode) -> Optional[str]:
+def enclosing_callable_symbol(node: CstNode) -> Optional[str]:
     """Return the enclosing function or `ClassName::method` symbol for node, if any."""
     curr = node.parent()
     while curr is not None:

@@ -14,8 +14,7 @@ from __future__ import annotations
 import re
 from typing import Final
 
-from ast_grep_py import SgNode
-
+from pni._actions.ast_analyze._cst import CstNode
 from pni._actions.ast_analyze.base import BaseDocChecker
 from pni._actions.ast_analyze.java._helpers import (
     JAVA_CALLABLE_KINDS,
@@ -30,7 +29,7 @@ _STUB_WORDS: Final[frozenset[str]] = frozenset({"todo", "tbd", "fixme", "wip", "
 _PARAM_TAG_RE: Final[re.Pattern[str]] = re.compile(r"@param\s+([A-Za-z_$][A-Za-z0-9_$]*)")
 
 
-def _extract_javadoc_text(decl: SgNode) -> str | None:
+def _extract_javadoc_text(decl: CstNode) -> str | None:
     """Return raw /** ... */ Javadoc block text immediately preceding decl, or None."""
     prev = decl.prev()
     while prev is not None and prev.kind() == "line_comment":
@@ -54,7 +53,7 @@ def _is_empty_javadoc(raw_doc: str) -> bool:
     return len(meaningful) == 0
 
 
-def _check_javadoc_params(mnode: SgNode, raw_doc: str, m_name: str, rel_path: str) -> CodeLocation | None:
+def _check_javadoc_params(mnode: CstNode, raw_doc: str, m_name: str, rel_path: str) -> CodeLocation | None:
     """Compare @param tags in Javadoc against formal method parameters when @param is used."""
     doc_params = _PARAM_TAG_RE.findall(raw_doc)
     if not doc_params:

@@ -14,8 +14,7 @@ from __future__ import annotations
 import re
 from typing import ClassVar, Final
 
-from ast_grep_py import SgNode
-
+from pni._actions.ast_analyze._cst import CstNode
 from pni._actions.ast_analyze.base import BaseFrameworkChecker
 from pni._actions.ast_analyze.models import CodeLocation, FrameworkCheckResult, ParsedUnit
 from pni._actions.ast_analyze.php._helpers import (
@@ -50,7 +49,7 @@ class LaravelFrameworkChecker(BaseFrameworkChecker):
         self,
         unit: ParsedUnit,
         type_name: str,
-        tnode: SgNode,
+        tnode: CstNode,
         issues: list[CodeLocation],
     ) -> None:
         """Flag `DB::table(...)` and `$request->all()` mass assignment inside Laravel controllers."""
@@ -80,7 +79,7 @@ class LaravelFrameworkChecker(BaseFrameworkChecker):
         self,
         unit: ParsedUnit,
         type_name: str,
-        tnode: SgNode,
+        tnode: CstNode,
         issues: list[CodeLocation],
         hints: list[CodeLocation],
     ) -> None:

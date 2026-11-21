@@ -11,8 +11,7 @@
 
 from __future__ import annotations
 
-from ast_grep_py import SgNode
-
+from pni._actions.ast_analyze._cst import CstNode
 from pni._actions.ast_analyze.base import BaseDocChecker
 from pni._actions.ast_analyze.models import (
     CodeLocation,
@@ -32,7 +31,7 @@ def _check_jsdoc_param_mismatch(
     rel_path: str,
     line_no: int,
     qual: str,
-    fn_node: SgNode,
+    fn_node: CstNode,
     param_types: dict[str, str],
 ) -> CodeLocation | None:
     """Return a CodeLocation if JSDoc `@param` names do not match callable signature parameters."""

@@ -15,10 +15,10 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Final, Literal, Optional
 
-from ast_grep_py import SgNode
 from pydantic import BaseModel, Field
 
 from pni._actions._repo_governance import matches_exclude_globs
+from pni._actions.ast_analyze._cst import CstNode
 
 SecuritySinkCategory = Literal[
     "sql_injection",
@@ -172,12 +172,12 @@ class AstFacts(BaseModel):
 
 @dataclass(frozen=True)
 class ParsedUnit:
-    """Single source file parsed once via ast-grep-py and shared across all AST checkers."""
+    """Single source file parsed once via tree-sitter and shared across all AST checkers."""
 
     file_path: Path
     rel_path: str
     source: str
-    root: SgNode
+    root: CstNode
 
 
 @dataclass(frozen=True)

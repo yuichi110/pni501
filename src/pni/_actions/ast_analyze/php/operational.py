@@ -14,8 +14,7 @@ from __future__ import annotations
 import re
 from typing import Final
 
-from ast_grep_py import SgNode
-
+from pni._actions.ast_analyze._cst import CstNode
 from pni._actions.ast_analyze.base import BaseOperationalChecker
 from pni._actions.ast_analyze.models import CodeLocation, ParsedUnit
 from pni._actions.ast_analyze.php._helpers import (
@@ -44,7 +43,7 @@ def _is_config_module(rel_path: str) -> bool:
     return any(hint in low for hint in _CONFIG_FILE_HINTS)
 
 
-def _is_inside_psr3_logger_class(node: SgNode) -> bool:
+def _is_inside_psr3_logger_class(node: CstNode) -> bool:
     """Return True if `node` is inside a class implementing/extending PSR-3 `LoggerInterface` or `AbstractLogger`."""
     curr = node.parent()
     while curr is not None:

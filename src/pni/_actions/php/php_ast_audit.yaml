@@ -1,6 +1,6 @@
 id: php_ast_audit
 name: PHP AST, Strict Types, Superglobals, Security Sinks & Framework Audit
-description: Parse PHP & mixed HTML/PHP CSTs via ast-grep-py to extract use/include hygiene, strict_types & type hints, PHPDoc sync, superglobal coupling, CWE dangerous sinks, API/WP endpoints, and Laravel/WordPress framework issues.
+description: Parse PHP & mixed HTML/PHP CSTs via tree-sitter to extract use/include hygiene, strict_types & type hints, PHPDoc sync, superglobal coupling, CWE dangerous sinks, API/WP endpoints, and Laravel/WordPress framework issues.
 rules:
   - common/architecture
   - common/maintainability

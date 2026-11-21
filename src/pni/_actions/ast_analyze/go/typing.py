@@ -14,8 +14,7 @@ from __future__ import annotations
 import re
 from typing import Final
 
-from ast_grep_py import SgNode
-
+from pni._actions.ast_analyze._cst import CstNode
 from pni._actions.ast_analyze.base import BaseTypingChecker
 from pni._actions.ast_analyze.go._helpers import iter_go_callables
 from pni._actions.ast_analyze.models import (
@@ -41,7 +40,7 @@ _FMT_VARIADIC_NAME_PREFIXES: Final[tuple[str, ...]] = (
 )
 
 
-def _is_exempt_fmt_variadic(param_decls: list[SgNode], short_name: str) -> bool:
+def _is_exempt_fmt_variadic(param_decls: list[CstNode], short_name: str) -> bool:
     """Return True if the final variadic parameter is a `fmt.Printf` / logging style `...any` / `...interface{}`."""
     if not param_decls or param_decls[-1].kind() != "variadic_parameter_declaration":
         return False
@@ -59,7 +58,7 @@ def _is_exempt_fmt_variadic(param_decls: list[SgNode], short_name: str) -> bool:
     return False
 
 
-def _params_use_weak_any(params_node: SgNode, short_name: str) -> bool:
+def _params_use_weak_any(params_node: CstNode, short_name: str) -> bool:
     """Return True if parameter declarations contain non-exempt `any` or `interface{}`."""
     param_decls = [
         c for c in params_node.children() if c.kind() in {"parameter_declaration", "variadic_parameter_declaration"}
@@ -74,7 +73,7 @@ def _params_use_weak_any(params_node: SgNode, short_name: str) -> bool:
     return not _is_exempt_fmt_variadic(param_decls, short_name)
 
 
-def _signature_uses_weak_any(callable_node: SgNode, short_name: str = "") -> list[str]:
+def _signature_uses_weak_any(callable_node: CstNode, short_name: str = "") -> list[str]:
     """Return list of parameter or result segments using untyped `any` or `interface{}`."""
     matches: list[str] = []
     params = callable_node.field("parameters")

@@ -14,8 +14,7 @@ from __future__ import annotations
 import re
 from typing import ClassVar, Final
 
-from ast_grep_py import SgNode
-
+from pni._actions.ast_analyze._cst import CstNode
 from pni._actions.ast_analyze.base import BaseQualityChecker
 from pni._actions.ast_analyze.models import CodeLocation, ParsedUnit
 from pni._actions.ast_analyze.php._helpers import (
@@ -90,11 +89,11 @@ class PhpQualityChecker(BaseQualityChecker):
         """Count class, interface, trait, and enum declarations in unit."""
         return len(iter_php_types(unit.root))
 
-    def iter_callables(self, unit: ParsedUnit) -> list[tuple[str, SgNode]]:
+    def iter_callables(self, unit: ParsedUnit) -> list[tuple[str, CstNode]]:
         """Return (symbol, cst_node) pairs for all functions and methods in unit."""
         return iter_php_callables(unit.root)
 
-    def count_callable_params(self, node: SgNode) -> int:
+    def count_callable_params(self, node: CstNode) -> int:
         """Count formal parameters on a PHP function or method."""
         return len(extract_formal_param_nodes(node))
 

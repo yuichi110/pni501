@@ -14,8 +14,7 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Final
 
-from ast_grep_py import SgNode
-
+from pni._actions.ast_analyze._cst import CstNode
 from pni._actions.ast_analyze.base.operational import BaseOperationalChecker
 from pni._actions.ast_analyze.models import CodeLocation, ParsedUnit
 
@@ -65,7 +64,7 @@ def _has_module_role(rel_path: str, allowed_stems: frozenset[str]) -> bool:
     return bool(parts & {s.lstrip("_") for s in allowed_stems} or p.stem in allowed_stems)
 
 
-def _extract_assign_lhs_name(left: SgNode) -> str:
+def _extract_assign_lhs_name(left: CstNode) -> str:
     """Extract clean variable/attribute identifier from the left-hand side of a Python assignment."""
     if left.kind() == "identifier":
         return left.text()

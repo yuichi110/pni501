@@ -1,16 +1,17 @@
 # Workflow Authoring & Repository Inspection Guide (Common)
 
-When asked to audit a project or create `.pni/workflows/*.yaml`, AI agents **must inspect the repository first** rather than blindly assuming default directory layouts or applying service-only rules to libraries. Follow this 4-step procedure to design accurate, hallucination-free workflows.
+When asked to audit a project or create `.pni/workflows/*.yaml`, AI agents **must inspect the repository first** rather than blindly assuming default directory layouts or applying service-only rules to libraries. Follow this 6-step procedure to design accurate, hallucination-free workflows.
 
 ---
 
 ## Step 1: Inspect Repository Languages, Runtime Archetype & Boundaries
 
 1. **Identify Manifests & Languages**:
-   - Python: `pyproject.toml`, `setup.py`, `requirements.txt`, `uv.lock`
+   - Python: `pyproject.toml`, `setup.py`, `setup.cfg`, `requirements.txt`, `Pipfile`, `uv.lock`
    - Java: `pom.xml`, `build.gradle`, `build.gradle.kts`, `settings.gradle*`
-   - TypeScript / JS: `package.json`, `tsconfig.json`
-   - Go / Rust: `go.mod`, `Cargo.toml`
+   - PHP: `composer.json`, `composer.lock`, `artisan`, `wp-config.php`, `phpunit.xml*`, root `*.php`
+   - Go: `go.mod`, `go.work`, `go.sum`
+   - TypeScript / JavaScript: `package.json`, `tsconfig.json`, `jsconfig.json`, `pnpm-lock.yaml`, `package-lock.json`, `yarn.lock`
    - Legacy / Scripting assets: `.sh` (Bash), `.pl`/`.pm` (Perl), `.bat`/`.vbs`
 2. **Determine Runtime Archetypes (`runtime_types: list[str]`)**:
    - **`web_api` / `worker`**: Networked APIs, microservices, or queue workers (`fastapi`, `flask`, `django`, `spring-boot`, `celery`, etc.) → evaluate **12-Factor App** & **Google SRE Production Readiness Review (PRR)**.
@@ -32,6 +33,10 @@ Read the workflow best-practice guide for each language present in the target:
 ```bash
 pni rules show python/workflow_guide
 pni rules show java/workflow_guide
+pni rules show php/workflow_guide
+pni rules show go/workflow_guide
+pni rules show typescript/workflow_guide
+pni rules show javascript/workflow_guide
 pni rules list --all
 ```
 
@@ -68,7 +73,7 @@ steps:
 
   # Stage 2: Language AST + SIG Maintainability + operational signal extraction
   - id: ast_and_quality
-    uses: python_ast_audit          # Or java_ast_audit
+    uses: python_ast_audit          # Or java_ast_audit / php_ast_audit / go_ast_audit / typescript_ast_audit / javascript_ast_audit
 
   # Stage 3: 3-aspect grounded AI architecture recording (verified against AST inventory)
   - id: architecture_map
@@ -83,7 +88,7 @@ steps:
 
   # Stage 5: Test suite, container runtime, supply-chain CVE & dynamic Web pentest (DAST)
   - id: test_health
-    uses: python_test_audit         # Or java_test_audit / php_test_audit
+    uses: python_test_audit         # Or java_test_audit / php_test_audit / go_test_audit / typescript_test_audit / javascript_test_audit
 
   - id: runtime_verification
     uses: container_runtime_audit

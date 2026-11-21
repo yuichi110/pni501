@@ -14,8 +14,6 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-from ast_grep_py import SgRoot
-
 from pni._actions import (
     CategoryScores,
     PrimitiveType,
@@ -26,6 +24,7 @@ from pni._actions import (
     run_project_inspect,
 )
 from pni._actions.ast_analyze import BaseDependencyChecker, ParsedUnit
+from pni._actions.ast_analyze._cst import parse_cst
 from pni._actions.ast_analyze.java import JavaTypingChecker
 from pni._actions.ast_analyze.python import PythonTypingChecker
 from pni._actions.runtime_check.selector import (
@@ -419,7 +418,7 @@ def test_isolated_checker_subclasses_on_parsed_unit() -> None:
         file_path=Path("Demo.java"),
         rel_path="Demo.java",
         source=java_src,
-        root=SgRoot(java_src, "java").root(),
+        root=parse_cst(java_src, "java"),
     )
     java_typing = JavaTypingChecker().check([java_unit])
     assert java_typing.type_safety_coverage_pct == 0.0
@@ -431,7 +430,7 @@ def test_isolated_checker_subclasses_on_parsed_unit() -> None:
         file_path=Path("demo.py"),
         rel_path="demo.py",
         source=py_src,
-        root=SgRoot(py_src, "python").root(),
+        root=parse_cst(py_src, "python"),
     )
     py_typing = PythonTypingChecker().check([py_unit])
     assert py_typing.type_safety_coverage_pct == 0.0

@@ -12,8 +12,13 @@
 import shutil
 from pathlib import Path
 
+import pytest
+from pydantic import ValidationError
+
 from pni._instructions import get_instructions_content
 from pni._rules import (
+    SUPPORTED_LANGUAGES,
+    copy_rule_templates,
     detect_active_language,
     get_rule_content,
     list_rules,
@@ -159,3 +164,67 @@ def test_init_project(tmp_path: Path) -> None:
     assert (tmp_path / ".pni" / "cache" / ".gitignore").is_file()
     assert (tmp_path / ".pni" / "cache" / "CACHEDIR.TAG").is_file()
     assert (tmp_path / ".pni" / "cache" / "workflow_state.db").is_file()
+
+
+def test_rules_manager_edge_cases_and_six_language_parity(tmp_path: Path) -> None:
+    """Verify pruned language detection, direct rule lookup, validation, and 6-language rule parity."""
+    # Ignored vendor/node_modules trees must not cause false JS/TS/Go/PHP language detection
+    ignored_only = tmp_path / "ignored_only"
+    (ignored_only / "node_modules" / "pkg").mkdir(parents=True)
+    (ignored_only / "node_modules" / "pkg" / "index.ts").write_text("export const a = 1;\n", encoding="utf-8")
+    (ignored_only / "vendor" / "lib").mkdir(parents=True)
+    (ignored_only / "vendor" / "lib" / "legacy.php").write_text("<?php echo 1;\n", encoding="utf-8")
+    assert detect_active_language(ignored_only) == "python"
+
+    # Non-standard JS directory (e.g. server/) with package.json detects javascript, not typescript
+    js_custom = tmp_path / "js_custom"
+    (js_custom / "server").mkdir(parents=True)
+    (js_custom / "package.json").write_text('{"name": "api"}\n', encoding="utf-8")
+    (js_custom / "server" / "index.js").write_text("export const ok = true;\n", encoding="utf-8")
+    assert detect_active_language(js_custom) == "javascript"
+
+    # Legacy Python requirements.txt with Python sources takes precedence over companion package.json,
+    # while a docs-only requirements.txt in a Node/Go project does not hijack language detection
+    py_req = tmp_path / "py_req"
+    py_req.mkdir()
+    (py_req / "requirements.txt").write_text("fastapi>=0.115.0\n", encoding="utf-8")
+    (py_req / "app.py").write_text("x = 1\n", encoding="utf-8")
+    (py_req / "package.json").write_text("{}\n", encoding="utf-8")
+    assert detect_active_language(py_req) == "python"
+
+    node_docs_req = tmp_path / "node_docs_req"
+    (node_docs_req / "src").mkdir(parents=True)
+    (node_docs_req / "requirements.txt").write_text("mkdocs>=1.5.0\n", encoding="utf-8")
+    (node_docs_req / "package.json").write_text('{"name": "web"}\n', encoding="utf-8")
+    (node_docs_req / "src" / "app.ts").write_text("export const x: number = 1;\n", encoding="utf-8")
+    assert detect_active_language(node_docs_req) == "typescript"
+
+    # Case-insensitive lang normalization & RuleInfo immutability
+    res = get_rule_content("common/agent-instruction", tmp_path, lang="PYTHON")
+    assert res is not None
+    info, content = res
+    assert info.identifier == "common/agent_instruction"
+    assert "go/workflow_guide" in content
+    assert "typescript/workflow_guide" in content
+    with pytest.raises(ValidationError):
+        setattr(info, "title", "mutated")
+
+    # Local rule override wins on direct lookup
+    local_override = tmp_path / ".pni" / "rules" / "python" / "testing.md"
+    local_override.parent.mkdir(parents=True)
+    local_override.write_text("# Custom Local Testing\nOverride body.\n", encoding="utf-8")
+    overridden = get_rule_content("python/testing", tmp_path)
+    assert overridden is not None
+    assert overridden[0].is_local is True
+    assert overridden[0].title == "Custom Local Testing"
+    assert "Override body." in overridden[1]
+
+    # Unsupported language raises explicit ValueError on copy_rule_templates
+    with pytest.raises(ValueError, match="Unsupported language"):
+        copy_rule_templates(tmp_path / "bad_lang", lang="rust")
+
+    # All 6 supported languages have canonical core + modern_stack + workflow_guide rules
+    all_ids = {r.identifier for r in list_rules(tmp_path, include_all=True)}
+    for lang in SUPPORTED_LANGUAGES:
+        for suffix in ("code_quality", "dependencies", "modern_stack", "testing", "typing", "workflow_guide"):
+            assert f"{lang}/{suffix}" in all_ids

@@ -1,6 +1,6 @@
 id: java_ast_audit
 name: Java AST, Imports, Generics, Javadoc, Quality & Framework Audit
-description: Parse Java AST via ast-grep-py to extract exact import order, Javadoc/@param sync, generics safety, cognitive complexity, bug idioms, JUnit test-AST, and Spring/JDK framework metrics.
+description: Parse Java AST via tree-sitter to extract exact import order, Javadoc/@param sync, generics safety, cognitive complexity, bug idioms, JUnit test-AST, and Spring/JDK framework metrics.
 rules:
   - common/architecture
   - common/maintainability
@@ -8,6 +8,7 @@ rules:
   - common/security_vulnerability
   - java/code_quality
   - java/typing
+  - java/modern_stack
   - java/frameworks/spring_boot
 primitives:
   - type: ast_analyze
