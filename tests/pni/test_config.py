@@ -221,10 +221,11 @@ def test_rules_manager_edge_cases_and_six_language_parity(tmp_path: Path) -> Non
 
     # Unsupported language raises explicit ValueError on copy_rule_templates
     with pytest.raises(ValueError, match="Unsupported language"):
-        copy_rule_templates(tmp_path / "bad_lang", lang="rust")
+        copy_rule_templates(tmp_path / "bad_lang", lang="nonexistent_lang")
 
-    # All 6 supported languages have canonical core + modern_stack + workflow_guide rules
+    # Core 6 languages and generic fallback have canonical core + modern_stack + workflow_guide rules
     all_ids = {r.identifier for r in list_rules(tmp_path, include_all=True)}
-    for lang in SUPPORTED_LANGUAGES:
+    for lang in ("python", "java", "php", "go", "typescript", "javascript", "generic"):
         for suffix in ("code_quality", "dependencies", "modern_stack", "testing", "typing", "workflow_guide"):
             assert f"{lang}/{suffix}" in all_ids
+    assert len(SUPPORTED_LANGUAGES) == 55

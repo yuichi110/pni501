@@ -72,7 +72,7 @@ _NAMESPACE_DIST_PREFIXES: Final[dict[str, tuple[str, ...]]] = {
     "zope": ("zope_",),
     "jaraco": ("jaraco_",),
     "mpl_toolkits": ("matplotlib", "mpl_toolkits_"),
-    "tree_sitter": ("tree_sitter_",),
+    "tree_sitter": ("tree_sitter_", "pni501_extra_grammars"),
 }
 _RUNTIME_DRIVER_ALLOWLIST: Final[frozenset[str]] = frozenset(
     {

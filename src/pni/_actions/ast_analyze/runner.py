@@ -121,19 +121,68 @@ def _is_ignored_path(path: Path, root: Path, exclude_globs: Sequence[str] = ()) 
     return matches_exclude_globs(path, root, exclude_globs)
 
 
+def _matches_filename(path: Path, filenames: tuple[str, ...]) -> bool:
+    """Return True if path matches an exact filename or Dockerfile.* convention."""
+    if not filenames:
+        return False
+    name = path.name
+    low = name.lower()
+    for target_name in filenames:
+        if name == target_name or low == target_name.lower():
+            return True
+        if target_name == "Dockerfile" and low.startswith("dockerfile."):
+            return True
+    return False
+
+
 def _collect_dir_files(
     directory: Path,
     project_root: Path,
     extensions: tuple[str, ...],
     exclude_globs: Sequence[str] = (),
+    filenames: tuple[str, ...] = (),
 ) -> list[Path]:
-    """Return sorted non-ignored files under directory matching any extension."""
+    """Return sorted non-ignored files under directory matching any extension or filename."""
     collected: list[Path] = []
+    seen: set[Path] = set()
     for ext in extensions:
         for match in sorted(directory.rglob(f"*{ext}")):
-            if not _is_ignored_path(match, project_root, exclude_globs) and match not in collected:
+            if match.is_file() and match not in seen and not _is_ignored_path(match, project_root, exclude_globs):
+                seen.add(match)
+                collected.append(match)
+        if ext != ext.upper():
+            for match in sorted(directory.rglob(f"*{ext.upper()}")):
+                if match.is_file() and match not in seen and not _is_ignored_path(match, project_root, exclude_globs):
+                    seen.add(match)
+                    collected.append(match)
+    if filenames:
+        for match in sorted(directory.rglob("*")):
+            if (
+                match.is_file()
+                and match not in seen
+                and _matches_filename(match, filenames)
+                and not _is_ignored_path(match, project_root, exclude_globs)
+            ):
+                seen.add(match)
                 collected.append(match)
     return collected
+
+
+def _collect_root_files(
+    project_root: Path,
+    extensions: tuple[str, ...],
+    exclude_globs: Sequence[str],
+    filenames: tuple[str, ...],
+) -> list[Path]:
+    """Collect matching top-level files directly under project_root."""
+    found: list[Path] = []
+    ext_lower = {e.lower() for e in extensions}
+    for entry in sorted(project_root.iterdir()):
+        if not entry.is_file() or matches_exclude_globs(entry, project_root, exclude_globs):
+            continue
+        if entry.suffix.lower() in ext_lower or _matches_filename(entry, filenames):
+            found.append(entry)
+    return found
 
 
 def discover_source_files(
@@ -144,18 +193,22 @@ def discover_source_files(
     fallback_dirs: tuple[str, ...] = (),
     allow_root_glob: bool = True,
     exclude_globs: Sequence[str] = (),
+    filenames: tuple[str, ...] = (),
 ) -> list[Path]:
-    """Discover non-ignored source files matching extensions across relative target paths."""
+    """Discover non-ignored source files matching extensions or filenames across relative target paths."""
     found: list[Path] = []
+    ext_lower = {e.lower() for e in extensions}
     for tdir in targets:
         candidate = project_root / tdir
         if candidate.is_dir():
             found.extend(
-                f for f in _collect_dir_files(candidate, project_root, extensions, exclude_globs) if f not in found
+                f
+                for f in _collect_dir_files(candidate, project_root, extensions, exclude_globs, filenames)
+                if f not in found
             )
         elif (
             candidate.is_file()
-            and candidate.suffix in extensions
+            and (candidate.suffix.lower() in ext_lower or _matches_filename(candidate, filenames))
             and not matches_exclude_globs(candidate, project_root, exclude_globs)
             and candidate not in found
         ):
@@ -166,15 +219,10 @@ def discover_source_files(
             break
         fb_dir = project_root / fb
         if fb_dir.is_dir():
-            found.extend(_collect_dir_files(fb_dir, project_root, extensions, exclude_globs))
+            found.extend(_collect_dir_files(fb_dir, project_root, extensions, exclude_globs, filenames))
 
     if not found and allow_root_glob:
-        for ext in extensions:
-            found.extend(
-                p
-                for p in sorted(project_root.glob(f"*{ext}"))
-                if not matches_exclude_globs(p, project_root, exclude_globs) and p not in found
-            )
+        found.extend(_collect_root_files(project_root, extensions, exclude_globs, filenames))
 
     return found
 
@@ -201,10 +249,15 @@ class LanguageAnalyzerSuite:
     excluded_source_suffixes: tuple[str, ...] = ()
     framework_checkers: tuple[BaseFrameworkChecker, ...] = ()
     source_preprocessor: Optional[Callable[[str], str]] = None
+    filenames: tuple[str, ...] = ()
+    ext_grammars: tuple[tuple[str, str], ...] = ()
 
     def _resolve_ast_grep_lang(self, src_file: Path) -> str:
-        """Resolve the ast-grep grammar name for src_file based on its extension."""
+        """Resolve the Tree-sitter grammar name for src_file based on its extension."""
         suffix = src_file.suffix.lower()
+        for ext, grammar_id in self.ext_grammars:
+            if suffix == ext:
+                return grammar_id
         if suffix in {".tsx", ".jsx", ".js", ".mjs", ".cjs"}:
             return "tsx"
         if suffix == ".ts":
@@ -379,6 +432,7 @@ class LanguageAnalyzerSuite:
             self.file_extensions,
             allow_root_glob=False,
             exclude_globs=eff_excludes,
+            filenames=self.filenames,
         )
         raw_files = discover_source_files(
             project_root,
@@ -386,6 +440,7 @@ class LanguageAnalyzerSuite:
             self.file_extensions,
             fallback_dirs=self.fallback_dirs,
             exclude_globs=eff_excludes,
+            filenames=self.filenames,
         )
         files, test_files = self._partition_source_and_test_files(
             raw_files, raw_test_files, eff_targets, project_root

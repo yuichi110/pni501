@@ -1,0 +1,27 @@
+id: full_audit
+category: audit
+name: Full Project Health Audit & Report (Multi-Language)
+description: Deterministic Tree-sitter AST and repository inspection, grounded architecture analysis, security audit, score emission, and drawlib report creation for any supported language.
+
+targets:
+  docs:
+    - "README.md"
+
+steps:
+  - id: repo_and_deps
+    uses: repo_structure_audit
+
+  - id: ast_and_quality
+    uses: generic_ast_audit
+
+  - id: arch_recording
+    uses: architecture_analysis
+
+  - id: security_audit
+    uses: security_vulnerability_audit
+
+  - id: output_score
+    uses: emit_score
+
+  - id: create_report
+    uses: write_drawlib_report

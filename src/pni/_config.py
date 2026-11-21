@@ -14,6 +14,7 @@ from __future__ import annotations
 import contextlib
 import fnmatch
 import json
+import os
 import shutil
 import subprocess  # noqa: S404
 import tomllib
@@ -24,6 +25,7 @@ from typing import Final, Optional
 from pydantic import BaseModel, Field, field_validator
 
 from pni._actions._repo_governance import RuntimeArchetype, matches_exclude_globs
+from pni._languages import get_language_spec, resolve_language_id
 
 DEFAULT_PNI_TOML_REL_PATH: Final[str] = ".pni/pni.toml"
 MIN_OPT_OUT_REASON_LEN: Final[int] = 10
@@ -177,38 +179,51 @@ def extract_composer_psr4_dirs(project_root: Path) -> tuple[list[str], list[str]
 
 def _default_source_and_tests_for_lang(project_root: Path, lang: str) -> tuple[list[str], list[str]]:
     """Return sensible default source and test directory lists for initial pni.toml scaffolding."""
-    if lang == "java":
+    norm = resolve_language_id(lang)
+    if norm == "java":
         src = ["src/main/java"] if (project_root / "src" / "main" / "java").is_dir() else ["src"]
         tst = ["src/test/java"] if (project_root / "src" / "test" / "java").is_dir() else ["tests"]
         return src, tst
-    if lang == "php":
+    if norm == "php":
         psr4_src, psr4_tst = extract_composer_psr4_dirs(project_root)
         conv_src = [d for d in ("app", "src", "routes", "public") if (project_root / d).is_dir()]
         src = list(dict.fromkeys([*psr4_src, *conv_src])) or ["src"]
         tst = psr4_tst or (["tests"] if (project_root / "tests").is_dir() else ["tests"])
         return src, tst
-    if lang == "go":
+    if norm == "go":
         go_dirs = [d for d in ("cmd", "internal", "pkg") if (project_root / d).is_dir()]
         has_root_go = any(project_root.glob("*.go"))
-        src = (["."] if has_root_go or not go_dirs else go_dirs)
+        src = ["."] if has_root_go or not go_dirs else go_dirs
         return src, list(src)
-    if lang in {"typescript", "javascript"}:
+    if norm in {"typescript", "javascript"}:
         conv_src = [d for d in ("src", "app", "lib", "pages", "components") if (project_root / d).is_dir()]
         src = conv_src or ["src"]
         conv_tst = [d for d in ("tests", "test", "__tests__") if (project_root / d).is_dir()]
         tst = conv_tst or (["src"] if (project_root / "src").is_dir() else ["tests"])
+        return src, tst
+
+    spec = get_language_spec(norm)
+    if spec is not None:
+        existing_src = [d for d in spec.default_source_dirs if d != "." and (project_root / d).is_dir()]
+        src = existing_src or list(spec.default_source_dirs[:1] or ("src",))
+        existing_tst = [d for d in spec.default_test_dirs if d != "." and (project_root / d).is_dir()]
+        tst = existing_tst or list(spec.default_test_dirs[:1] or ("tests",))
         return src, tst
     return ["src"], ["tests"]
 
 
 def _default_ignored_lock_literal(lang: str) -> str:
     """Return comma-separated TOML array literal of lockfiles to keep scannable even when gitignored."""
-    if lang == "php":
+    norm = resolve_language_id(lang)
+    if norm == "php":
         return '"composer.lock"'
-    if lang == "go":
+    if norm == "go":
         return '"go.sum"'
-    if lang in {"typescript", "javascript"}:
+    if norm in {"typescript", "javascript"}:
         return '"package-lock.json", "pnpm-lock.yaml", "yarn.lock"'
+    spec = get_language_spec(norm)
+    if spec is not None and spec.lockfiles:
+        return ", ".join(f'"{lf}"' for lf in spec.lockfiles)
     return '"uv.lock"'
 
 
@@ -380,6 +395,26 @@ def _parse_gitignore_patterns(target_dir: Path) -> list[str]:
     return patterns
 
 
+def _should_skip_walk_dir(
+    d_rel: str,
+    dir_globs: Sequence[str],
+    file_globs: Sequence[str],
+    include_gitignored: Sequence[str],
+    inc_prefixes: tuple[str, ...],
+    ignored_dirs: set[str],
+) -> bool:
+    """Record d_rel in ignored_dirs if matched and return True when safe to prune traversal."""
+    matched = (
+        d_rel in ignored_dirs
+        or matches_opt_out_scope(d_rel, dir_globs)
+        or matches_opt_out_scope(d_rel, file_globs)
+    )
+    if not matched or _is_included_gitignored(d_rel, include_gitignored):
+        return False
+    ignored_dirs.add(d_rel)
+    return not any(inc.startswith(f"{d_rel}/") for inc in inc_prefixes)
+
+
 def _apply_gitignore_patterns(
     resolved_root: Path,
     patterns: Sequence[str],
@@ -387,25 +422,36 @@ def _apply_gitignore_patterns(
     ignored_files: set[str],
     ignored_dirs: set[str],
 ) -> None:
-    """Walk resolved_root and match files/directories against .gitignore patterns."""
+    """Walk resolved_root and match files/directories against .gitignore patterns, pruning ignored subtrees."""
     dir_globs = [p.rstrip("/") for p in patterns if p.endswith("/")]
     file_globs = [f"**/{p}" if "/" not in p else p for p in patterns if not p.endswith("/")]
-    for candidate in resolved_root.rglob("*"):
-        rel_posix = ""
-        with contextlib.suppress(ValueError):
-            rel_posix = candidate.relative_to(resolved_root).as_posix()
-        if not rel_posix or rel_posix == ".git" or rel_posix.startswith(".git/"):
-            continue
-        if _is_included_gitignored(rel_posix, include_gitignored):
-            continue
-        if candidate.is_dir():
-            if matches_opt_out_scope(rel_posix, dir_globs) or matches_opt_out_scope(rel_posix, file_globs):
-                ignored_dirs.add(rel_posix)
-        elif candidate.is_file() and (
-            matches_exclude_globs(candidate, resolved_root, file_globs)
-            or matches_opt_out_scope(rel_posix, patterns)
-        ):
-            ignored_files.add(rel_posix)
+    inc_prefixes = tuple(inc.strip().replace("\\", "/").lstrip("./") for inc in include_gitignored if inc.strip())
+
+    for current_str, dirnames, filenames in os.walk(resolved_root):
+        current_path = Path(current_str)
+        rel_dir = "" if current_path == resolved_root else current_path.relative_to(resolved_root).as_posix()
+
+        dirnames[:] = [
+            dname
+            for dname in dirnames
+            if dname != ".git"
+            and not _should_skip_walk_dir(
+                f"{rel_dir}/{dname}" if rel_dir else dname,
+                dir_globs,
+                file_globs,
+                include_gitignored,
+                inc_prefixes,
+                ignored_dirs,
+            )
+        ]
+
+        for fname in filenames:
+            f_rel = f"{rel_dir}/{fname}" if rel_dir else fname
+            if _is_included_gitignored(f_rel, include_gitignored):
+                continue
+            candidate = current_path / fname
+            if matches_exclude_globs(candidate, resolved_root, file_globs) or matches_opt_out_scope(f_rel, patterns):
+                ignored_files.add(f_rel)
 
 
 def discover_gitignored_paths(

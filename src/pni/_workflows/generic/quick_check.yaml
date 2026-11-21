@@ -1,0 +1,18 @@
+id: quick_check
+category: audit
+name: Quick Deterministic AST & Repo Health Check (Multi-Language)
+description: Fast deterministic repository inspection and Tree-sitter AST audit for any supported language.
+
+targets:
+  docs:
+    - "README.md"
+
+steps:
+  - id: repo_and_deps
+    uses: repo_structure_audit
+
+  - id: ast_and_quality
+    uses: generic_ast_audit
+
+  - id: output_score
+    uses: emit_score

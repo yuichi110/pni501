@@ -21,6 +21,11 @@ from typing import Final, Optional
 
 from pydantic import BaseModel, Field, model_validator
 
+from pni._actions._extended_manifests import (
+    ExtendedManifestData,
+    detect_extended_tooling_issues,
+    inspect_extended_manifests,
+)
 from pni._actions._repo_governance import (
     RuntimeArchetype,
     infer_runtime_types,
@@ -35,6 +40,7 @@ from pni._config import (
     load_pni_config,
     match_opt_out,
 )
+from pni._languages import get_language_spec, resolve_language_id
 from pni._rules import detect_active_language
 
 LOCKFILE_CANDIDATES: Final[tuple[str, ...]] = (
@@ -50,7 +56,21 @@ LOCKFILE_CANDIDATES: Final[tuple[str, ...]] = (
     "package-lock.json",
     "pnpm-lock.yaml",
     "yarn.lock",
+    "bun.lock",
+    "bun.lockb",
     "go.sum",
+    "Cargo.lock",
+    "Gemfile.lock",
+    "packages.lock.json",
+    "Package.resolved",
+    "pubspec.lock",
+    "mix.lock",
+    "cpanfile.snapshot",
+    "renv.lock",
+    "Podfile.lock",
+    "Manifest.toml",
+    "flake.lock",
+    "buf.lock",
 )
 PYTHON_VERSION_SPECIFIERS: Final[tuple[str, ...]] = ("==", ">=", "<=", "~=", "!=", ">", "<", "@")
 IGNORED_PATH_PARTS: Final[frozenset[str]] = frozenset(
@@ -1277,33 +1297,43 @@ def _detect_node_tooling_issues(
 
 def _resolve_default_dirs(project_root: Path, lang: str) -> tuple[list[str], list[str]]:
     """Return default (source_dirs, test_dirs) appropriate for the target language."""
+    result: tuple[list[str], list[str]] = (["src"], ["tests"])
     if lang == "java":
         src = ["src/main/java"] if (project_root / "src" / "main" / "java").exists() else ["src"]
         tst = ["src/test/java"] if (project_root / "src" / "test" / "java").exists() else ["test", "tests"]
-        return src, tst
-    if lang == "php":
+        result = (src, tst)
+    elif lang == "php":
         psr4_src, psr4_tst = extract_composer_psr4_dirs(project_root)
         tst = psr4_tst or (["tests"] if (project_root / "tests").is_dir() else ["test", "tests"])
         has_root_php = any(
             p.name != "artisan" for p in project_root.glob("*.php")
         ) or any(project_root.glob("*.phtml"))
         if has_root_php and not psr4_src:
-            return ["."], tst
-        modern_dirs = [d for d in ("app", "src", "routes", "includes", "public") if (project_root / d).is_dir()]
-        combined_src = list(dict.fromkeys([*psr4_src, *modern_dirs]))
-        return (combined_src or ["src"]), tst
-    if lang == "go":
+            result = (["."], tst)
+        else:
+            modern_dirs = [d for d in ("app", "src", "routes", "includes", "public") if (project_root / d).is_dir()]
+            combined_src = list(dict.fromkeys([*psr4_src, *modern_dirs]))
+            result = (combined_src or ["src"], tst)
+    elif lang == "go":
         go_dirs = [d for d in ("cmd", "internal", "pkg") if (project_root / d).is_dir()]
         has_root_go = any(project_root.glob("*.go"))
         src = ["."] if has_root_go or not go_dirs else go_dirs
-        return src, list(src)
-    if lang in {"typescript", "javascript"}:
+        result = (src, list(src))
+    elif lang in {"typescript", "javascript"}:
         node_src = [d for d in ("src", "app", "lib", "pages", "components") if (project_root / d).is_dir()]
         src = node_src or ["."]
         node_tst = [d for d in ("tests", "test", "__tests__") if (project_root / d).is_dir()]
         tst = list(dict.fromkeys([*node_tst, *src]))
-        return src, tst
-    return ["src"], ["tests"]
+        result = (src, tst)
+    elif lang != "python":
+        spec = get_language_spec(lang)
+        if spec is not None:
+            existing_src = [d for d in spec.default_source_dirs if d != "." and (project_root / d).is_dir()]
+            src = existing_src or list(spec.default_source_dirs[:1] or (".",))
+            existing_tst = [d for d in spec.default_test_dirs if d != "." and (project_root / d).is_dir()]
+            tst = existing_tst or list(spec.default_test_dirs[:1] or ())
+            result = (src, tst)
+    return result
 
 
 def _inspect_readme(project_root: Path, doc_files: list[str]) -> tuple[bool, int]:
@@ -1318,16 +1348,28 @@ def _inspect_readme(project_root: Path, doc_files: list[str]) -> tuple[bool, int
 
 def _dispatch_manifest_inspect(project_root: Path, active_lang: str) -> _ManifestInspection:
     """Dispatch manifest inspection according to active project language."""
-    if active_lang == "java":
+    if active_lang in {"java", "kotlin"}:
         res = _inspect_java_manifests(project_root)
     elif active_lang == "php":
         res = _inspect_php_manifests(project_root)
     elif active_lang == "go":
         res = _inspect_go_manifests(project_root)
-    elif active_lang in {"typescript", "javascript"}:
+    elif active_lang in {"typescript", "javascript", "vue", "svelte"}:
         res = _inspect_node_manifests(project_root)
-    else:
+    elif active_lang == "python":
         res = _inspect_python_manifests(project_root)
+    else:
+        ext = inspect_extended_manifests(project_root, active_lang)
+        res = _ManifestInspection(
+            project_name=ext.project_name,
+            version=ext.version,
+            build_system=ext.build_system,
+            language_version_constraint=ext.language_version_constraint,
+            manifest_files=ext.manifest_files,
+            dependencies=ext.dependencies,
+            unpinned_dependencies=ext.unpinned_dependencies,
+            dev_dependencies=ext.dev_dependencies,
+        )
     if res.version == "0.0.0":
         git_ver = detect_git_tag_version(project_root)
         if git_ver:
@@ -1335,33 +1377,40 @@ def _dispatch_manifest_inspect(project_root: Path, active_lang: str) -> _Manifes
     return res
 
 
+_CORE_SOURCE_TEST_PATTERNS: Final[dict[str, tuple[tuple[str, ...], tuple[str, ...]]]] = {
+    "java": (("*.java",), ("*Test.java", "*Tests.java", "Test*.java", "*IT.java")),
+    "php": (("*.php", "*.phtml"), ("*Test.php", "Test*.php", "*_test.php")),
+    "go": (("*.go",), ("*_test.go",)),
+    "typescript": (
+        ("*.ts", "*.tsx"),
+        ("*.test.ts", "*.spec.ts", "*.test.tsx", "*.spec.tsx", "*_test.ts", "test_*.ts"),
+    ),
+    "javascript": (
+        ("*.js", "*.jsx", "*.mjs", "*.cjs"),
+        (
+            "*.test.js",
+            "*.spec.js",
+            "*.test.jsx",
+            "*.spec.jsx",
+            "*.test.mjs",
+            "*.spec.mjs",
+            "*_test.js",
+            "test_*.js",
+        ),
+    ),
+    "python": (("*.py",), ("test_*.py", "*_test.py")),
+}
+
+
 def _source_and_test_patterns(active_lang: str) -> tuple[tuple[str, ...], tuple[str, ...]]:
     """Return file glob patterns for source and test files of active_lang."""
-    if active_lang == "java":
-        return ("*.java",), ("*Test.java", "*Tests.java", "Test*.java", "*IT.java")
-    if active_lang == "php":
-        return ("*.php", "*.phtml"), ("*Test.php", "Test*.php", "*_test.php")
-    if active_lang == "go":
-        return ("*.go",), ("*_test.go",)
-    if active_lang == "typescript":
-        return (
-            ("*.ts", "*.tsx"),
-            ("*.test.ts", "*.spec.ts", "*.test.tsx", "*.spec.tsx", "*_test.ts", "test_*.ts"),
-        )
-    if active_lang == "javascript":
-        return (
-            ("*.js", "*.jsx", "*.mjs", "*.cjs"),
-            (
-                "*.test.js",
-                "*.spec.js",
-                "*.test.jsx",
-                "*.spec.jsx",
-                "*.test.mjs",
-                "*.spec.mjs",
-                "*_test.js",
-                "test_*.js",
-            ),
-        )
+    core = _CORE_SOURCE_TEST_PATTERNS.get(active_lang)
+    if core is not None:
+        return core
+    spec = get_language_spec(active_lang)
+    if spec is not None:
+        src_pats = tuple([*(f"*{ext}" for ext in spec.file_extensions), *spec.filenames])
+        return src_pats or ("*",), spec.test_file_patterns
     return ("*.py",), ("test_*.py", "*_test.py")
 
 
@@ -1382,7 +1431,19 @@ def _dispatch_tooling_issues(
         return _detect_go_tooling_issues(project_root, manifest_info, lockfiles)
     if active_lang in {"typescript", "javascript"}:
         return _detect_node_tooling_issues(project_root, active_lang, manifest_info, lockfiles, frameworks)
-    return _detect_python_tooling_issues(manifest_info, lockfiles, runtime_types)
+    if active_lang == "python":
+        return _detect_python_tooling_issues(manifest_info, lockfiles, runtime_types)
+    ext_data = ExtendedManifestData(
+        project_name=manifest_info.project_name,
+        version=manifest_info.version,
+        build_system=manifest_info.build_system,
+        language_version_constraint=manifest_info.language_version_constraint,
+        manifest_files=manifest_info.manifest_files,
+        dependencies=manifest_info.dependencies,
+        unpinned_dependencies=manifest_info.unpinned_dependencies,
+        dev_dependencies=manifest_info.dev_dependencies,
+    )
+    return detect_extended_tooling_issues(active_lang, ext_data, lockfiles)
 
 
 def _filter_project_opt_outs(
@@ -1447,7 +1508,7 @@ def run_project_inspect(
         ProjectFacts: Language-agnostic deterministically extracted project facts.
     """
     pni_cfg = load_pni_config(project_root)
-    active_lang = lang or detect_active_language(project_root)
+    active_lang = resolve_language_id(lang) if lang else detect_active_language(project_root)
     manifest_info = _dispatch_manifest_inspect(project_root, active_lang)
 
     default_src, default_tst = _resolve_default_dirs(project_root, active_lang)

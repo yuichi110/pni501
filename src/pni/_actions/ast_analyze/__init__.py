@@ -7,7 +7,7 @@
 # express or implied, including but not limited to the warranties of
 # merchantability, fitness for a particular purpose and noninfringement.
 
-"""Multi-language deterministic AST analyzer registry and entrypoint."""
+"""Multi-language deterministic AST analyzer registry and entrypoint across all 55 languages."""
 
 from __future__ import annotations
 
@@ -26,6 +26,11 @@ from pni._actions.ast_analyze.base import (
     BaseTestChecker,
     BaseTypingChecker,
 )
+from pni._actions.ast_analyze.companion import (
+    DEFAULT_COMPANION_LANGUAGES,
+    scan_companion_languages,
+)
+from pni._actions.ast_analyze.declarative import DECLARATIVE_SUITES
 from pni._actions.ast_analyze.go import GO_SUITE
 from pni._actions.ast_analyze.java import JAVA_SUITE
 from pni._actions.ast_analyze.models import (
@@ -40,6 +45,7 @@ from pni._actions.ast_analyze.php import PHP_SUITE
 from pni._actions.ast_analyze.python import PYTHON_SUITE
 from pni._actions.ast_analyze.runner import LanguageAnalyzerSuite
 from pni._actions.ast_analyze.ts_js import JAVASCRIPT_SUITE, TYPESCRIPT_SUITE
+from pni._languages import LANGUAGE_REGISTRY, get_language_by_path, resolve_language_id
 from pni._rules import detect_active_language
 
 SUITE_REGISTRY: Final[dict[str, LanguageAnalyzerSuite]] = {
@@ -49,20 +55,19 @@ SUITE_REGISTRY: Final[dict[str, LanguageAnalyzerSuite]] = {
     "go": GO_SUITE,
     "typescript": TYPESCRIPT_SUITE,
     "javascript": JAVASCRIPT_SUITE,
+    **DECLARATIVE_SUITES,
 }
 
-_EXT_TO_LANG: Final[dict[str, str]] = {
-    ".java": "java",
-    ".php": "php",
-    ".phtml": "php",
-    ".go": "go",
-    ".ts": "typescript",
-    ".tsx": "typescript",
-    ".js": "javascript",
-    ".jsx": "javascript",
-    ".mjs": "javascript",
-    ".cjs": "javascript",
-}
+
+def _detect_extended_dir_language(candidate: Path) -> str | None:
+    """Detect non-core Tier A/B language from file extensions inside candidate directory."""
+    core_ids = {"python", "java", "php", "go", "typescript", "javascript"}
+    for spec in LANGUAGE_REGISTRY.values():
+        if spec.language_id in core_ids or spec.tier == "companion_dsl":
+            continue
+        if any(any(candidate.rglob(f"*{ext}")) for ext in spec.file_extensions):
+            return spec.language_id
+    return None
 
 
 def _detect_dir_language(candidate: Path) -> str | None:
@@ -82,18 +87,18 @@ def _detect_dir_language(candidate: Path) -> str | None:
         return "typescript"
     if any(any(candidate.rglob(pat)) for pat in ("*.js", "*.jsx", "*.mjs", "*.cjs")):
         return "javascript"
-    return None
+    return _detect_extended_dir_language(candidate)
 
 
 def _detect_target_language(project_root: Path, targets: Optional[list[str]]) -> str:
-    """Resolve analyzer language from explicit target file extensions or project manifests."""
+    """Resolve analyzer language from explicit target files/directories or project manifests."""
     if targets:
         for target in targets:
             candidate = project_root / target
             if candidate.is_file():
-                mapped = _EXT_TO_LANG.get(candidate.suffix.lower())
-                if mapped is not None:
-                    return mapped
+                spec = get_language_by_path(candidate)
+                if spec is not None:
+                    return spec.language_id
             elif candidate.is_dir():
                 dir_lang = _detect_dir_language(candidate)
                 if dir_lang is not None:
@@ -117,7 +122,7 @@ def run_ast_analyze(
         project_root: Target project root directory.
         targets: Relative source directory or file names inside project_root.
         display_root: Optional workspace root used to format file paths in CodeLocation.
-        lang: Optional explicit language override ('python', 'java', 'php', 'go', 'typescript', 'javascript').
+        lang: Optional explicit language override (any of the 55 registered language IDs or aliases).
         test_targets: Optional relative test directory names inside project_root.
         detected_frameworks: Optional pre-detected framework identifiers.
         declared_lang_version: Optional declared language version constraint from ProjectFacts.
@@ -126,7 +131,7 @@ def run_ast_analyze(
     Returns:
         AstFacts: Language-agnostic deterministic AST metrics and pinpointed code locations.
     """
-    active_lang = (lang or _detect_target_language(project_root, targets)).lower()
+    active_lang = resolve_language_id(lang) if lang else _detect_target_language(project_root, targets)
     suite = SUITE_REGISTRY.get(active_lang, PYTHON_SUITE)
     return suite.analyze(
         project_root,
@@ -140,6 +145,8 @@ def run_ast_analyze(
 
 
 __all__ = [
+    "DECLARATIVE_SUITES",
+    "DEFAULT_COMPANION_LANGUAGES",
     "GO_SUITE",
     "JAVASCRIPT_SUITE",
     "JAVA_SUITE",
@@ -168,4 +175,5 @@ __all__ = [
     "SecuritySinkLocation",
     "parse_cst",
     "run_ast_analyze",
+    "scan_companion_languages",
 ]

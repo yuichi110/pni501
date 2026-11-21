@@ -27,16 +27,23 @@ from pni._languages import (
 
 
 def test_language_registry_core_specs() -> None:
-    """Verify the central LanguageSpec registry covers all active Tier A languages and grammar providers."""
+    """Verify the central LanguageSpec registry covers all 55 languages across Tier A/B/C and grammar providers."""
     langs = list_supported_languages()
-    assert langs == ("python", "java", "php", "go", "typescript", "javascript")
-    assert len(iter_language_specs(tier="full_audit")) == 6
+    assert len(langs) == 55
+    assert langs[:6] == ("python", "java", "php", "go", "typescript", "javascript")
+    assert len(iter_language_specs(tier="full_audit")) == 20
+    assert len(iter_language_specs(tier="static_audit")) == 20
+    assert len(iter_language_specs(tier="companion_dsl")) == 15
 
     py = get_language_spec("PYTHON")
     assert py is not None
     assert py.display_name == "Python"
     assert py.default_grammar == "python"
+    assert get_language_spec("c#") is not None
+    assert get_language_spec("c++") is not None
+    assert get_language_spec("terraform") is not None
     assert get_grammar_provider("tsx") is not None
+    assert get_grammar_provider("cobol") is not None
     assert get_grammar_provider("nonexistent") is None
 
 

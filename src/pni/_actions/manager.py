@@ -23,6 +23,7 @@ from pni._actions.base_model import (
     ParamValue,
     PrimitiveStep,
 )
+from pni._languages import resolve_language_id
 from pni._rules import detect_active_language
 
 BUILTIN_ACTIONS_DIR = Path(__file__).resolve().parent
@@ -40,8 +41,10 @@ def _load_action_yaml(file_path: Path) -> CompositeActionDefinition | None:
 
 def _builtin_scope_dirs(active_lang: str, *, include_all: bool) -> list[tuple[str, Path]]:
     """Return ordered (scope_name, directory_path) pairs for built-in composite actions."""
+    norm_lang = resolve_language_id(active_lang)
+    lang_scope = norm_lang if (BUILTIN_ACTIONS_DIR / norm_lang).is_dir() else "generic"
     scopes: list[tuple[str, Path]] = []
-    for scope_name in (active_lang, "common"):
+    for scope_name in (lang_scope, "common"):
         sdir = BUILTIN_ACTIONS_DIR / scope_name
         if sdir.is_dir():
             scopes.append((scope_name, sdir))
@@ -214,12 +217,13 @@ def copy_action_templates(
     Returns:
         list[Path]: Created or overwritten file paths.
     """
-    target_lang = lang or detect_active_language(project_root)
+    target_lang = resolve_language_id(lang) if lang else detect_active_language(project_root)
+    lang_scope = target_lang if (BUILTIN_ACTIONS_DIR / target_lang).is_dir() else "generic"
     dest_dir = project_root / ".pni" / "actions"
     dest_dir.mkdir(parents=True, exist_ok=True)
 
     created: list[Path] = []
-    for scope_name in ("common", target_lang):
+    for scope_name in ("common", lang_scope):
         src_dir = BUILTIN_ACTIONS_DIR / scope_name
         if not src_dir.is_dir():
             continue

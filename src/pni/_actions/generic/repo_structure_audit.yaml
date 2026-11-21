@@ -1,0 +1,16 @@
+id: repo_structure_audit
+name: Multi-Language Repository Structure, Manifest & Supply-Chain Audit
+description: Inspect project manifests, lockfiles, governance artifacts, CI hygiene, and companion IaC/schema files across any PNI-supported language.
+rules:
+  - common/architecture
+  - common/supply_chain
+  - common/twelve_factor
+  - generic/dependencies
+  - generic/modern_stack
+primitives:
+  - type: project_inspect
+    name: Inspect Project Manifests, Lockfiles & Governance Signals
+  - type: ai_interpret
+    name: Interpret Project Structure & Supply-Chain Facts
+    prompt: |
+      Inspect the deterministic ProjectFacts (`language`, `build_system`, `dependencies`, `dev_dependencies`, `lockfiles`, `tooling_issues`, `container_hygiene_issues`, `ci_configs`, `has_readme`) and evaluate build reproducibility, dependency management, and repository governance.

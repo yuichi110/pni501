@@ -27,6 +27,7 @@ from pni._actions import (
 )
 from pni._cache import default_facts_rel_path
 from pni._config import PniConfig, load_pni_config
+from pni._languages import resolve_language_id
 from pni._reporter import DEFAULT_REPORT_OUTPUT_DIR, DEFAULT_REPORT_SRC_DIR
 from pni._rules import detect_active_language
 from pni._workflows.base_model import (
@@ -470,8 +471,10 @@ def copy_workflow_templates(
     Returns:
         list[Path]: Created or overwritten file paths.
     """
-    target_lang = lang or detect_active_language(project_root)
+    target_lang = resolve_language_id(lang) if lang else detect_active_language(project_root)
     src_dir = BUILTIN_WORKFLOWS_DIR / target_lang
+    if not src_dir.is_dir():
+        src_dir = BUILTIN_WORKFLOWS_DIR / "generic"
     if not src_dir.is_dir():
         src_dir = BUILTIN_WORKFLOWS_DIR / "python"
 

@@ -18,17 +18,78 @@ import shutil
 from pathlib import Path
 from typing import Final
 
-from pni._languages import list_supported_languages
+from pni._languages import LANGUAGE_REGISTRY, list_supported_languages, resolve_language_id
 from pni._rules.base_model import RuleInfo
 
 BUILTIN_RULES_DIR = Path(__file__).resolve().parent
 SUPPORTED_LANGUAGES: Final[tuple[str, ...]] = list_supported_languages()
 
-_MANIFEST_LANGUAGE_RULES: Final[tuple[tuple[str, tuple[str, ...]], ...]] = (
+_CORE_MANIFEST_LANGUAGE_RULES: Final[tuple[tuple[str, tuple[str, ...]], ...]] = (
     ("python", ("pyproject.toml", "setup.py", "setup.cfg", "Pipfile")),
     ("java", ("pom.xml", "build.gradle", "build.gradle.kts", "settings.gradle", "settings.gradle.kts")),
     ("php", ("composer.json", "wp-config.php", "wp-config-sample.php", "artisan", "phpunit.xml", "phpunit.xml.dist")),
     ("go", ("go.mod", "go.work")),
+)
+
+_EXTENDED_MANIFEST_LANGS: Final[tuple[str, ...]] = (
+    "rust",
+    "csharp",
+    "ruby",
+    "swift",
+    "scala",
+    "dart",
+    "elixir",
+    "vue",
+    "perl",
+    "r",
+    "cpp",
+    "svelte",
+    "solidity",
+    "haskell",
+    "fsharp",
+    "ocaml",
+    "zig",
+    "julia",
+    "fortran",
+    "ada",
+    "objc",
+    "lua",
+    "commonlisp",
+)
+
+_EXTENDED_SOURCE_SCAN_LANGS: Final[tuple[str, ...]] = (
+    "rust",
+    "csharp",
+    "ruby",
+    "kotlin",
+    "swift",
+    "scala",
+    "dart",
+    "elixir",
+    "vue",
+    "perl",
+    "cobol",
+    "r",
+    "cpp",
+    "c",
+    "bash",
+    "powershell",
+    "groovy",
+    "lua",
+    "haskell",
+    "fsharp",
+    "ocaml",
+    "zig",
+    "julia",
+    "fortran",
+    "svelte",
+    "solidity",
+    "cuda",
+    "verilog",
+    "vhdl",
+    "ada",
+    "odin",
+    "commonlisp",
 )
 
 _IGNORED_SCAN_DIRS: Final[frozenset[str]] = frozenset(
@@ -59,6 +120,10 @@ _IGNORED_SCAN_DIRS: Final[frozenset[str]] = frozenset(
         ".nuxt",
         ".turbo",
         ".svelte-kit",
+        "bin",
+        "obj",
+        "_build",
+        "deps",
     }
 )
 
@@ -68,10 +133,11 @@ def _matches_source_filename(
     suffixes: tuple[str, ...],
     exclude_suffixes: tuple[str, ...] = (),
 ) -> bool:
-    """Return True if filename matches suffixes and does not match exclude_suffixes."""
-    if exclude_suffixes and filename.endswith(exclude_suffixes):
+    """Return True if filename matches suffixes (case-insensitive) and does not match exclude_suffixes."""
+    low = filename.lower()
+    if exclude_suffixes and low.endswith(exclude_suffixes):
         return False
-    return filename.endswith(suffixes)
+    return low.endswith(suffixes)
 
 
 def _walk_has_source_files(
@@ -139,6 +205,13 @@ def _has_java_sources(project_root: Path) -> bool:
     return _has_source_files(project_root, (".java",), search_dirs=("src",))
 
 
+def _has_kotlin_sources(project_root: Path) -> bool:
+    """Return True if standard Kotlin directories or .kt source files exist."""
+    if (project_root / "src" / "main" / "kotlin").is_dir():
+        return True
+    return _has_source_files(project_root, (".kt",), search_dirs=("src",))
+
+
 def _has_php_sources(project_root: Path) -> bool:
     """Return True if root or standard PHP directories contain .php or .phtml source files."""
     return _has_source_files(project_root, (".php", ".phtml"), search_dirs=("src", "app", "public", "includes"))
@@ -160,48 +233,61 @@ def _has_js_sources(project_root: Path) -> bool:
 
 
 def _detect_node_language(project_root: Path) -> str | None:
-    """Distinguish 'typescript' vs 'javascript' for Node/Frontend projects."""
-    if (project_root / "tsconfig.json").exists() or (project_root / "tsconfig.base.json").exists():
-        return "typescript"
-    if (project_root / "jsconfig.json").exists():
-        return "javascript"
+    """Distinguish 'vue', 'svelte', 'typescript', or 'javascript' for Node/Frontend projects."""
+    config_hits = (
+        (("nuxt.config.ts", "nuxt.config.js", "vue.config.js"), "vue"),
+        (("svelte.config.js", "svelte.config.ts"), "svelte"),
+        (("tsconfig.json", "tsconfig.base.json"), "typescript"),
+        (("jsconfig.json",), "javascript"),
+    )
+    for manifests, lang_id in config_hits:
+        if any((project_root / mf).exists() for mf in manifests):
+            return lang_id
 
     pkg_json = project_root / "package.json"
     if not pkg_json.exists():
         return None
 
+    detected: str | None = None
     with contextlib.suppress(Exception):
         data = json.loads(pkg_json.read_text(encoding="utf-8"))
         if isinstance(data, dict):
             deps = data.get("dependencies") if isinstance(data.get("dependencies"), dict) else {}
             dev_deps = data.get("devDependencies") if isinstance(data.get("devDependencies"), dict) else {}
             if "typescript" in deps or "typescript" in dev_deps:
-                return "typescript"
-    if _has_ts_sources(project_root) or not _has_js_sources(project_root):
-        return "typescript"
-    return "javascript"
+                detected = "typescript"
+            elif ("vue" in deps or "vue" in dev_deps) and _has_source_files(project_root, (".vue",), search_dirs=None):
+                detected = "vue"
+    if detected is not None:
+        return detected
+    return "typescript" if (_has_ts_sources(project_root) or not _has_js_sources(project_root)) else "javascript"
 
 
-def detect_active_language(project_root: Path) -> str:
-    """Detect the primary programming language for the project.
-
-    Args:
-        project_root: Target project directory.
-
-    Returns:
-        str: Language keyword ('python', 'java', 'php', 'go', 'typescript', 'javascript').
-    """
-    for lang, manifests in _MANIFEST_LANGUAGE_RULES:
+def _detect_core_manifest_language(project_root: Path) -> str | None:
+    """Detect Python/Java/Kotlin/PHP/Go from canonical primary manifests."""
+    for lang, manifests in _CORE_MANIFEST_LANGUAGE_RULES:
         if any((project_root / mf).exists() for mf in manifests):
+            if lang == "java" and _has_kotlin_sources(project_root) and not _has_java_sources(project_root):
+                return "kotlin"
             return lang
+    return None
 
-    if (project_root / "requirements.txt").exists() and _has_python_sources(project_root):
-        return "python"
 
-    node_lang = _detect_node_language(project_root)
-    if node_lang is not None:
-        return node_lang
+def _detect_extended_manifest_language(project_root: Path) -> str | None:
+    """Detect non-core Tier A/B primary languages from their canonical build manifests or manifest globs."""
+    for lang_id in _EXTENDED_MANIFEST_LANGS:
+        spec = LANGUAGE_REGISTRY.get(lang_id)
+        if spec is None:
+            continue
+        if any((project_root / mf).exists() for mf in spec.primary_manifests):
+            return lang_id
+        if any(any(project_root.glob(pat)) for pat in spec.manifest_globs):
+            return lang_id
+    return None
 
+
+def _detect_source_file_language(project_root: Path) -> str | None:
+    """Fallback scan of source file extensions when no build manifest is present."""
     for check_fn, detected_lang in (
         (_has_java_sources, "java"),
         (_has_php_sources, "php"),
@@ -212,14 +298,56 @@ def detect_active_language(project_root: Path) -> str:
         if check_fn(project_root):
             return detected_lang
 
+    for lang_id in _EXTENDED_SOURCE_SCAN_LANGS:
+        spec = LANGUAGE_REGISTRY.get(lang_id)
+        if spec is None or not spec.file_extensions:
+            continue
+        if _has_source_files(
+            project_root,
+            spec.file_extensions,
+            search_dirs=None,
+            exclude_suffixes=spec.excluded_source_suffixes,
+            max_depth=4,
+        ):
+            return lang_id
+    return None
+
+
+def detect_active_language(project_root: Path) -> str:
+    """Detect the primary programming language for the project across all registered languages.
+
+    Args:
+        project_root: Target project directory.
+
+    Returns:
+        str: Canonical language_id (defaults to 'python' when no language signals are found).
+    """
+    detectors = (
+        _detect_core_manifest_language,
+        _detect_extended_manifest_language,
+        lambda root: "python" if (root / "requirements.txt").exists() and _has_python_sources(root) else None,
+        _detect_node_language,
+        _detect_source_file_language,
+    )
+    for detect_fn in detectors:
+        detected = detect_fn(project_root)
+        if detected is not None:
+            return detected
     return "python"
 
 
 def _normalize_lang(lang: str | None, project_root: Path) -> str:
-    """Normalize an optional language identifier or fall back to auto-detection."""
+    """Normalize an optional language identifier/alias or fall back to auto-detection."""
     if lang is not None and lang.strip():
-        return lang.strip().lower()
+        return resolve_language_id(lang)
     return detect_active_language(project_root)
+
+
+def _rule_scope_for_lang(active_lang: str) -> str:
+    """Return the built-in rule scope directory for active_lang (falling back to 'generic')."""
+    if (BUILTIN_RULES_DIR / active_lang).is_dir():
+        return active_lang
+    return "generic"
 
 
 def _extract_title_from_text(content: str, fallback_stem: str) -> str:
@@ -248,6 +376,7 @@ def _collect_rule_candidates(
     include_all: bool,
 ) -> set[tuple[str, str]]:
     """Collect (scope, relative_rule_name) pairs across builtin and local rule directories."""
+    allowed_scopes = {"common", active_lang, _rule_scope_for_lang(active_lang)}
     candidates: set[tuple[str, str]] = set()
     for rdir in roots:
         if not rdir.exists():
@@ -255,7 +384,7 @@ def _collect_rule_candidates(
         for scope_dir in rdir.iterdir():
             if not scope_dir.is_dir() or scope_dir.name.startswith(("_", ".")):
                 continue
-            if not include_all and scope_dir.name not in ("common", active_lang):
+            if not include_all and scope_dir.name not in allowed_scopes:
                 continue
             for md_file in scope_dir.rglob("*.md"):
                 rel_parts = md_file.relative_to(scope_dir).parts
@@ -376,6 +505,7 @@ def get_rule_content(
         return direct
 
     active_lang = _normalize_lang(lang, project_root)
+    fallback_scope = _rule_scope_for_lang(active_lang)
     candidates = sorted(
         _collect_rule_candidates((BUILTIN_RULES_DIR, local_rules_dir), active_lang, include_all=True),
         key=lambda item: (0 if item[0] == "common" else 1, item[0], item[1]),
@@ -384,6 +514,7 @@ def get_rule_content(
     tiers: tuple[tuple[tuple[str, str], ...], ...] = (
         tuple(c for c in candidates if _norm_rule_key(f"{c[0]}/{c[1]}") == clean_target),
         tuple(c for c in candidates if _norm_rule_key(c[1]) == clean_target and c[0] == active_lang),
+        tuple(c for c in candidates if _norm_rule_key(c[1]) == clean_target and c[0] == fallback_scope),
         tuple(c for c in candidates if _norm_rule_key(c[1]) == clean_target and c[0] == "common"),
         tuple(c for c in candidates if _norm_rule_key(c[1]) == clean_target),
     )
@@ -451,5 +582,6 @@ def copy_rule_templates(
     rules_dir = project_root / ".pni" / "rules"
     created: list[Path] = []
     created.extend(_copy_dir_templates(BUILTIN_RULES_DIR / "common", rules_dir / "common", "*.md", force))
-    created.extend(_copy_dir_templates(BUILTIN_RULES_DIR / target_lang, rules_dir / target_lang, "*.md", force))
+    lang_scope = _rule_scope_for_lang(target_lang)
+    created.extend(_copy_dir_templates(BUILTIN_RULES_DIR / lang_scope, rules_dir / lang_scope, "*.md", force))
     return created

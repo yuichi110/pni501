@@ -227,3 +227,6 @@ __marimo__/
 docs_html/
 docs_markdown/
 docs_images/
+
+# Companion extra grammars vendored upstream C sources (fetched reproducibly at build time)
+packages/pni501-extra-grammars/vendor/

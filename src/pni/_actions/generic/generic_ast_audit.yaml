@@ -1,0 +1,19 @@
+id: generic_ast_audit
+name: Multi-Language Tree-sitter AST, Quality, Operational & Security Audit
+description: Parse target language source files once via Tree-sitter to extract deterministic complexity, parameter, import, documentation, operational, and CWE security metrics, then have AI interpret them.
+rules:
+  - common/architecture
+  - common/maintainability
+  - common/security
+  - common/security_vulnerability
+  - generic/code_quality
+  - generic/typing
+  - generic/modern_stack
+primitives:
+  - type: ast_analyze
+    name: Extract Deterministic Multi-Language Tree-sitter AST Metrics
+  - type: ai_interpret
+    name: Interpret AST Facts & Evaluate Maintainability, Quality & Security
+    prompt: |
+      Inspect the deterministic AstFacts (`language`, `total_files`, `total_loc`, `total_classes`, `total_functions`, `module_inventory`, `import_hygiene_coverage_pct`, `wildcard_imports`, `type_safety_coverage_pct`, `weak_type_usages`, `docstring_coverage_pct`, `complex_functions`, `excessive_parameters`, `global_state_usages`, `bug_risk_idioms`, `circular_dependencies`, `missing_io_timeouts`, `scattered_env_access`, `unstructured_logging`, `hardcoded_secrets`, `dangerous_sinks`).
+      Read flagged source files to evaluate architecture (`common/architecture`), SIG maintainability (`common/maintainability`), code security & CWE sinks (`common/security`, `common/security_vulnerability`), and language quality (`generic/code_quality`, `generic/modern_stack`).
