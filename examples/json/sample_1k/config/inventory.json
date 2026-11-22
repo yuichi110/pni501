@@ -1,0 +1,109 @@
+{
+  "service": "inventory",
+  "records": [
+    {
+      "id": "stock-1",
+      "domain": "inventory",
+      "tier": 2,
+      "limit": 100,
+      "enabled": true,
+      "tags": ["inventory", "v1"]
+    },
+    {
+      "id": "stock-2",
+      "domain": "inventory",
+      "tier": 3,
+      "limit": 200,
+      "enabled": true,
+      "tags": ["inventory", "v1"]
+    },
+    {
+      "id": "stock-3",
+      "domain": "inventory",
+      "tier": 1,
+      "limit": 300,
+      "enabled": true,
+      "tags": ["inventory", "v1"]
+    },
+    {
+      "id": "stock-4",
+      "domain": "inventory",
+      "tier": 2,
+      "limit": 400,
+      "enabled": true,
+      "tags": ["inventory", "v1"]
+    },
+    {
+      "id": "stock-5",
+      "domain": "inventory",
+      "tier": 3,
+      "limit": 500,
+      "enabled": true,
+      "tags": ["inventory", "v1"]
+    },
+    {
+      "id": "stock-6",
+      "domain": "inventory",
+      "tier": 1,
+      "limit": 600,
+      "enabled": true,
+      "tags": ["inventory", "v1"]
+    },
+    {
+      "id": "stock-7",
+      "domain": "inventory",
+      "tier": 2,
+      "limit": 700,
+      "enabled": true,
+      "tags": ["inventory", "v1"]
+    },
+    {
+      "id": "stock-8",
+      "domain": "inventory",
+      "tier": 3,
+      "limit": 800,
+      "enabled": true,
+      "tags": ["inventory", "v1"]
+    },
+    {
+      "id": "stock-9",
+      "domain": "inventory",
+      "tier": 1,
+      "limit": 900,
+      "enabled": true,
+      "tags": ["inventory", "v1"]
+    },
+    {
+      "id": "stock-10",
+      "domain": "inventory",
+      "tier": 2,
+      "limit": 1000,
+      "enabled": true,
+      "tags": ["inventory", "v1"]
+    },
+    {
+      "id": "stock-11",
+      "domain": "inventory",
+      "tier": 3,
+      "limit": 1100,
+      "enabled": true,
+      "tags": ["inventory", "v1"]
+    },
+    {
+      "id": "stock-12",
+      "domain": "inventory",
+      "tier": 1,
+      "limit": 1200,
+      "enabled": true,
+      "tags": ["inventory", "v1"]
+    },
+    {
+      "id": "stock-13",
+      "domain": "inventory",
+      "tier": 2,
+      "limit": 1300,
+      "enabled": true,
+      "tags": ["inventory", "v1"]
+    }
+  ]
+}

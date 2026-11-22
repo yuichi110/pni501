@@ -1,0 +1,98 @@
+syntax = "proto3";
+
+package sample.pricing.v1;
+
+message PriceRuleRecord1 {
+  string record_id = 1;
+  int32 quantity = 2;
+  double unit_price = 3;
+  int32 tier = 4;
+  string currency_code = 5;
+  int64 created_epoch_ms = 6;
+}
+
+message PriceRuleRecord2 {
+  string record_id = 1;
+  int32 quantity = 2;
+  double unit_price = 3;
+  int32 tier = 4;
+  string currency_code = 5;
+  int64 created_epoch_ms = 6;
+}
+
+message PriceRuleRecord3 {
+  string record_id = 1;
+  int32 quantity = 2;
+  double unit_price = 3;
+  int32 tier = 4;
+  string currency_code = 5;
+  int64 created_epoch_ms = 6;
+}
+
+message PriceRuleRecord4 {
+  string record_id = 1;
+  int32 quantity = 2;
+  double unit_price = 3;
+  int32 tier = 4;
+  string currency_code = 5;
+  int64 created_epoch_ms = 6;
+}
+
+message PriceRuleRecord5 {
+  string record_id = 1;
+  int32 quantity = 2;
+  double unit_price = 3;
+  int32 tier = 4;
+  string currency_code = 5;
+  int64 created_epoch_ms = 6;
+}
+
+message PriceRuleRecord6 {
+  string record_id = 1;
+  int32 quantity = 2;
+  double unit_price = 3;
+  int32 tier = 4;
+  string currency_code = 5;
+  int64 created_epoch_ms = 6;
+}
+
+message PriceRuleRecord7 {
+  string record_id = 1;
+  int32 quantity = 2;
+  double unit_price = 3;
+  int32 tier = 4;
+  string currency_code = 5;
+  int64 created_epoch_ms = 6;
+}
+
+message PriceRuleRecord8 {
+  string record_id = 1;
+  int32 quantity = 2;
+  double unit_price = 3;
+  int32 tier = 4;
+  string currency_code = 5;
+  int64 created_epoch_ms = 6;
+}
+
+message PriceRuleRecord9 {
+  string record_id = 1;
+  int32 quantity = 2;
+  double unit_price = 3;
+  int32 tier = 4;
+  string currency_code = 5;
+  int64 created_epoch_ms = 6;
+}
+
+message PriceRuleRecord10 {
+  string record_id = 1;
+  int32 quantity = 2;
+  double unit_price = 3;
+  int32 tier = 4;
+  string currency_code = 5;
+  int64 created_epoch_ms = 6;
+}
+
+service PriceRuleService {
+  rpc GetPriceRule(PriceRuleRecord1) returns (PriceRuleRecord1);
+  rpc CreatePriceRule(PriceRuleRecord2) returns (PriceRuleRecord2);
+}

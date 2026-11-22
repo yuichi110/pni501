@@ -22,6 +22,7 @@ from typing import Final, Optional
 from pni._actions.project_inspect import ProjectFacts
 from pni._actions.runtime_check.engine_detect import CommandExecResult
 from pni._actions.runtime_check.models import BootFailureKind, SmokeCheckResult
+from pni._actions.runtime_check.polyglot import build_extended_smoke_plan
 
 _JAVA_PACKAGE_RE = re.compile(r"^\s*package\s+([A-Za-z0-9_.]+)\s*;", re.MULTILINE)
 _JAVA_MAIN_RE = re.compile(r"\bpublic\s+static\s+void\s+main\s*\(\s*String")
@@ -46,6 +47,17 @@ _IMPORT_DI_TOKENS: Final[tuple[str, ...]] = (
     "ERR_MODULE_NOT_FOUND",
     "cannot find package",
     "missing go.sum entry",
+    "unresolved import",
+    "can't find crate",
+    "cannot load such file",
+    "LoadError",
+    "CS0246",
+    "FS0039",
+    "No such module",
+    "Can't locate ",
+    "UndefinedFunctionError",
+    "CompileError",
+    "No such file or directory",
 )
 _CONFIG_TOKENS: Final[tuple[str, ...]] = (
     "PlaceholderCouldNotBeResolved",
@@ -447,15 +459,22 @@ def build_smoke_plan(
     archetype_label = "+".join(rtypes)
     if override_cmd.strip():
         return archetype_label, ["sh", "-c", override_cmd.strip()]
+
+    plan: Optional[tuple[str, Optional[list[str]]]] = None
     if pf.language == "java":
-        return _build_java_smoke_plan(target_root, rtypes, archetype_label, source_targets, smoke_port)
-    if pf.language == "php":
-        return _build_php_smoke_plan(target_root, pf, rtypes, archetype_label, smoke_port)
-    if pf.language == "go":
-        return _build_go_smoke_plan(target_root, archetype_label)
-    if pf.language in {"typescript", "javascript"}:
-        return _build_node_smoke_plan(target_root, pf, archetype_label, source_targets)
-    return _build_python_smoke_plan(target_root, rtypes, archetype_label, source_targets)
+        plan = _build_java_smoke_plan(target_root, rtypes, archetype_label, source_targets, smoke_port)
+    elif pf.language == "php":
+        plan = _build_php_smoke_plan(target_root, pf, rtypes, archetype_label, smoke_port)
+    elif pf.language == "go":
+        plan = _build_go_smoke_plan(target_root, archetype_label)
+    elif pf.language in {"typescript", "javascript"}:
+        plan = _build_node_smoke_plan(target_root, pf, archetype_label, source_targets)
+    elif pf.language == "python":
+        plan = _build_python_smoke_plan(target_root, rtypes, archetype_label, source_targets)
+    else:
+        plan = build_extended_smoke_plan(target_root, pf, archetype_label, source_targets)
+
+    return plan if plan is not None else (archetype_label, None)
 
 
 def evaluate_smoke_outcome(

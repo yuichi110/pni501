@@ -1,0 +1,101 @@
+# Production container definition for StockItem service
+FROM python:3.12-slim AS builder
+WORKDIR /build/inventory
+LABEL service="inventory" tier="production"
+ENV APP_MODULE=inventory \
+    PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1
+RUN mkdir -p /build/inventory/layer_1 && echo 'stock-1' > /build/inventory/layer_1/meta.txt
+ENV STOCK_OPT_1=10
+RUN mkdir -p /build/inventory/layer_2 && echo 'stock-2' > /build/inventory/layer_2/meta.txt
+ENV STOCK_OPT_2=20
+RUN mkdir -p /build/inventory/layer_3 && echo 'stock-3' > /build/inventory/layer_3/meta.txt
+ENV STOCK_OPT_3=30
+RUN mkdir -p /build/inventory/layer_4 && echo 'stock-4' > /build/inventory/layer_4/meta.txt
+ENV STOCK_OPT_4=40
+RUN mkdir -p /build/inventory/layer_5 && echo 'stock-5' > /build/inventory/layer_5/meta.txt
+ENV STOCK_OPT_5=50
+RUN mkdir -p /build/inventory/layer_6 && echo 'stock-6' > /build/inventory/layer_6/meta.txt
+ENV STOCK_OPT_6=60
+RUN mkdir -p /build/inventory/layer_7 && echo 'stock-7' > /build/inventory/layer_7/meta.txt
+ENV STOCK_OPT_7=70
+RUN mkdir -p /build/inventory/layer_8 && echo 'stock-8' > /build/inventory/layer_8/meta.txt
+ENV STOCK_OPT_8=80
+RUN mkdir -p /build/inventory/layer_9 && echo 'stock-9' > /build/inventory/layer_9/meta.txt
+ENV STOCK_OPT_9=90
+RUN mkdir -p /build/inventory/layer_10 && echo 'stock-10' > /build/inventory/layer_10/meta.txt
+ENV STOCK_OPT_10=100
+RUN mkdir -p /build/inventory/layer_11 && echo 'stock-11' > /build/inventory/layer_11/meta.txt
+ENV STOCK_OPT_11=110
+RUN mkdir -p /build/inventory/layer_12 && echo 'stock-12' > /build/inventory/layer_12/meta.txt
+ENV STOCK_OPT_12=120
+RUN mkdir -p /build/inventory/layer_13 && echo 'stock-13' > /build/inventory/layer_13/meta.txt
+ENV STOCK_OPT_13=130
+RUN mkdir -p /build/inventory/layer_14 && echo 'stock-14' > /build/inventory/layer_14/meta.txt
+ENV STOCK_OPT_14=140
+RUN mkdir -p /build/inventory/layer_15 && echo 'stock-15' > /build/inventory/layer_15/meta.txt
+ENV STOCK_OPT_15=150
+RUN mkdir -p /build/inventory/layer_16 && echo 'stock-16' > /build/inventory/layer_16/meta.txt
+ENV STOCK_OPT_16=160
+RUN mkdir -p /build/inventory/layer_17 && echo 'stock-17' > /build/inventory/layer_17/meta.txt
+ENV STOCK_OPT_17=170
+RUN mkdir -p /build/inventory/layer_18 && echo 'stock-18' > /build/inventory/layer_18/meta.txt
+ENV STOCK_OPT_18=180
+RUN mkdir -p /build/inventory/layer_19 && echo 'stock-19' > /build/inventory/layer_19/meta.txt
+ENV STOCK_OPT_19=190
+RUN mkdir -p /build/inventory/layer_20 && echo 'stock-20' > /build/inventory/layer_20/meta.txt
+ENV STOCK_OPT_20=200
+RUN mkdir -p /build/inventory/layer_21 && echo 'stock-21' > /build/inventory/layer_21/meta.txt
+ENV STOCK_OPT_21=210
+RUN mkdir -p /build/inventory/layer_22 && echo 'stock-22' > /build/inventory/layer_22/meta.txt
+ENV STOCK_OPT_22=220
+RUN mkdir -p /build/inventory/layer_23 && echo 'stock-23' > /build/inventory/layer_23/meta.txt
+ENV STOCK_OPT_23=230
+RUN mkdir -p /build/inventory/layer_24 && echo 'stock-24' > /build/inventory/layer_24/meta.txt
+ENV STOCK_OPT_24=240
+RUN mkdir -p /build/inventory/layer_25 && echo 'stock-25' > /build/inventory/layer_25/meta.txt
+ENV STOCK_OPT_25=250
+RUN mkdir -p /build/inventory/layer_26 && echo 'stock-26' > /build/inventory/layer_26/meta.txt
+ENV STOCK_OPT_26=260
+RUN mkdir -p /build/inventory/layer_27 && echo 'stock-27' > /build/inventory/layer_27/meta.txt
+ENV STOCK_OPT_27=270
+RUN mkdir -p /build/inventory/layer_28 && echo 'stock-28' > /build/inventory/layer_28/meta.txt
+ENV STOCK_OPT_28=280
+RUN mkdir -p /build/inventory/layer_29 && echo 'stock-29' > /build/inventory/layer_29/meta.txt
+ENV STOCK_OPT_29=290
+RUN mkdir -p /build/inventory/layer_30 && echo 'stock-30' > /build/inventory/layer_30/meta.txt
+ENV STOCK_OPT_30=300
+RUN mkdir -p /build/inventory/layer_31 && echo 'stock-31' > /build/inventory/layer_31/meta.txt
+ENV STOCK_OPT_31=310
+RUN mkdir -p /build/inventory/layer_32 && echo 'stock-32' > /build/inventory/layer_32/meta.txt
+ENV STOCK_OPT_32=320
+RUN mkdir -p /build/inventory/layer_33 && echo 'stock-33' > /build/inventory/layer_33/meta.txt
+ENV STOCK_OPT_33=330
+RUN mkdir -p /build/inventory/layer_34 && echo 'stock-34' > /build/inventory/layer_34/meta.txt
+ENV STOCK_OPT_34=340
+RUN mkdir -p /build/inventory/layer_35 && echo 'stock-35' > /build/inventory/layer_35/meta.txt
+ENV STOCK_OPT_35=350
+RUN mkdir -p /build/inventory/layer_36 && echo 'stock-36' > /build/inventory/layer_36/meta.txt
+ENV STOCK_OPT_36=360
+RUN mkdir -p /build/inventory/layer_37 && echo 'stock-37' > /build/inventory/layer_37/meta.txt
+ENV STOCK_OPT_37=370
+RUN mkdir -p /build/inventory/layer_38 && echo 'stock-38' > /build/inventory/layer_38/meta.txt
+ENV STOCK_OPT_38=380
+RUN mkdir -p /build/inventory/layer_39 && echo 'stock-39' > /build/inventory/layer_39/meta.txt
+ENV STOCK_OPT_39=390
+RUN mkdir -p /build/inventory/layer_40 && echo 'stock-40' > /build/inventory/layer_40/meta.txt
+ENV STOCK_OPT_40=400
+RUN mkdir -p /build/inventory/layer_41 && echo 'stock-41' > /build/inventory/layer_41/meta.txt
+ENV STOCK_OPT_41=410
+RUN mkdir -p /build/inventory/layer_42 && echo 'stock-42' > /build/inventory/layer_42/meta.txt
+ENV STOCK_OPT_42=420
+RUN mkdir -p /build/inventory/layer_43 && echo 'stock-43' > /build/inventory/layer_43/meta.txt
+ENV STOCK_OPT_43=430
+
+FROM python:3.12-slim AS runtime
+WORKDIR /app/inventory
+RUN useradd --create-home appuser
+COPY --from=builder /build/inventory /app/inventory
+USER appuser
+EXPOSE 8003
+CMD ["python", "-m", "inventory"]

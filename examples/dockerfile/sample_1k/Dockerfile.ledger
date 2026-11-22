@@ -1,0 +1,101 @@
+# Production container definition for LedgerEntry service
+FROM python:3.12-slim AS builder
+WORKDIR /build/ledger
+LABEL service="ledger" tier="production"
+ENV APP_MODULE=ledger \
+    PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1
+RUN mkdir -p /build/ledger/layer_1 && echo 'ledger-1' > /build/ledger/layer_1/meta.txt
+ENV LEDGER_OPT_1=10
+RUN mkdir -p /build/ledger/layer_2 && echo 'ledger-2' > /build/ledger/layer_2/meta.txt
+ENV LEDGER_OPT_2=20
+RUN mkdir -p /build/ledger/layer_3 && echo 'ledger-3' > /build/ledger/layer_3/meta.txt
+ENV LEDGER_OPT_3=30
+RUN mkdir -p /build/ledger/layer_4 && echo 'ledger-4' > /build/ledger/layer_4/meta.txt
+ENV LEDGER_OPT_4=40
+RUN mkdir -p /build/ledger/layer_5 && echo 'ledger-5' > /build/ledger/layer_5/meta.txt
+ENV LEDGER_OPT_5=50
+RUN mkdir -p /build/ledger/layer_6 && echo 'ledger-6' > /build/ledger/layer_6/meta.txt
+ENV LEDGER_OPT_6=60
+RUN mkdir -p /build/ledger/layer_7 && echo 'ledger-7' > /build/ledger/layer_7/meta.txt
+ENV LEDGER_OPT_7=70
+RUN mkdir -p /build/ledger/layer_8 && echo 'ledger-8' > /build/ledger/layer_8/meta.txt
+ENV LEDGER_OPT_8=80
+RUN mkdir -p /build/ledger/layer_9 && echo 'ledger-9' > /build/ledger/layer_9/meta.txt
+ENV LEDGER_OPT_9=90
+RUN mkdir -p /build/ledger/layer_10 && echo 'ledger-10' > /build/ledger/layer_10/meta.txt
+ENV LEDGER_OPT_10=100
+RUN mkdir -p /build/ledger/layer_11 && echo 'ledger-11' > /build/ledger/layer_11/meta.txt
+ENV LEDGER_OPT_11=110
+RUN mkdir -p /build/ledger/layer_12 && echo 'ledger-12' > /build/ledger/layer_12/meta.txt
+ENV LEDGER_OPT_12=120
+RUN mkdir -p /build/ledger/layer_13 && echo 'ledger-13' > /build/ledger/layer_13/meta.txt
+ENV LEDGER_OPT_13=130
+RUN mkdir -p /build/ledger/layer_14 && echo 'ledger-14' > /build/ledger/layer_14/meta.txt
+ENV LEDGER_OPT_14=140
+RUN mkdir -p /build/ledger/layer_15 && echo 'ledger-15' > /build/ledger/layer_15/meta.txt
+ENV LEDGER_OPT_15=150
+RUN mkdir -p /build/ledger/layer_16 && echo 'ledger-16' > /build/ledger/layer_16/meta.txt
+ENV LEDGER_OPT_16=160
+RUN mkdir -p /build/ledger/layer_17 && echo 'ledger-17' > /build/ledger/layer_17/meta.txt
+ENV LEDGER_OPT_17=170
+RUN mkdir -p /build/ledger/layer_18 && echo 'ledger-18' > /build/ledger/layer_18/meta.txt
+ENV LEDGER_OPT_18=180
+RUN mkdir -p /build/ledger/layer_19 && echo 'ledger-19' > /build/ledger/layer_19/meta.txt
+ENV LEDGER_OPT_19=190
+RUN mkdir -p /build/ledger/layer_20 && echo 'ledger-20' > /build/ledger/layer_20/meta.txt
+ENV LEDGER_OPT_20=200
+RUN mkdir -p /build/ledger/layer_21 && echo 'ledger-21' > /build/ledger/layer_21/meta.txt
+ENV LEDGER_OPT_21=210
+RUN mkdir -p /build/ledger/layer_22 && echo 'ledger-22' > /build/ledger/layer_22/meta.txt
+ENV LEDGER_OPT_22=220
+RUN mkdir -p /build/ledger/layer_23 && echo 'ledger-23' > /build/ledger/layer_23/meta.txt
+ENV LEDGER_OPT_23=230
+RUN mkdir -p /build/ledger/layer_24 && echo 'ledger-24' > /build/ledger/layer_24/meta.txt
+ENV LEDGER_OPT_24=240
+RUN mkdir -p /build/ledger/layer_25 && echo 'ledger-25' > /build/ledger/layer_25/meta.txt
+ENV LEDGER_OPT_25=250
+RUN mkdir -p /build/ledger/layer_26 && echo 'ledger-26' > /build/ledger/layer_26/meta.txt
+ENV LEDGER_OPT_26=260
+RUN mkdir -p /build/ledger/layer_27 && echo 'ledger-27' > /build/ledger/layer_27/meta.txt
+ENV LEDGER_OPT_27=270
+RUN mkdir -p /build/ledger/layer_28 && echo 'ledger-28' > /build/ledger/layer_28/meta.txt
+ENV LEDGER_OPT_28=280
+RUN mkdir -p /build/ledger/layer_29 && echo 'ledger-29' > /build/ledger/layer_29/meta.txt
+ENV LEDGER_OPT_29=290
+RUN mkdir -p /build/ledger/layer_30 && echo 'ledger-30' > /build/ledger/layer_30/meta.txt
+ENV LEDGER_OPT_30=300
+RUN mkdir -p /build/ledger/layer_31 && echo 'ledger-31' > /build/ledger/layer_31/meta.txt
+ENV LEDGER_OPT_31=310
+RUN mkdir -p /build/ledger/layer_32 && echo 'ledger-32' > /build/ledger/layer_32/meta.txt
+ENV LEDGER_OPT_32=320
+RUN mkdir -p /build/ledger/layer_33 && echo 'ledger-33' > /build/ledger/layer_33/meta.txt
+ENV LEDGER_OPT_33=330
+RUN mkdir -p /build/ledger/layer_34 && echo 'ledger-34' > /build/ledger/layer_34/meta.txt
+ENV LEDGER_OPT_34=340
+RUN mkdir -p /build/ledger/layer_35 && echo 'ledger-35' > /build/ledger/layer_35/meta.txt
+ENV LEDGER_OPT_35=350
+RUN mkdir -p /build/ledger/layer_36 && echo 'ledger-36' > /build/ledger/layer_36/meta.txt
+ENV LEDGER_OPT_36=360
+RUN mkdir -p /build/ledger/layer_37 && echo 'ledger-37' > /build/ledger/layer_37/meta.txt
+ENV LEDGER_OPT_37=370
+RUN mkdir -p /build/ledger/layer_38 && echo 'ledger-38' > /build/ledger/layer_38/meta.txt
+ENV LEDGER_OPT_38=380
+RUN mkdir -p /build/ledger/layer_39 && echo 'ledger-39' > /build/ledger/layer_39/meta.txt
+ENV LEDGER_OPT_39=390
+RUN mkdir -p /build/ledger/layer_40 && echo 'ledger-40' > /build/ledger/layer_40/meta.txt
+ENV LEDGER_OPT_40=400
+RUN mkdir -p /build/ledger/layer_41 && echo 'ledger-41' > /build/ledger/layer_41/meta.txt
+ENV LEDGER_OPT_41=410
+RUN mkdir -p /build/ledger/layer_42 && echo 'ledger-42' > /build/ledger/layer_42/meta.txt
+ENV LEDGER_OPT_42=420
+RUN mkdir -p /build/ledger/layer_43 && echo 'ledger-43' > /build/ledger/layer_43/meta.txt
+ENV LEDGER_OPT_43=430
+
+FROM python:3.12-slim AS runtime
+WORKDIR /app/ledger
+RUN useradd --create-home appuser
+COPY --from=builder /build/ledger /app/ledger
+USER appuser
+EXPOSE 8006
+CMD ["python", "-m", "ledger"]

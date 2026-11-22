@@ -1,0 +1,5 @@
+syntax = "proto2";
+message bad_legacy_msg {
+  optional string BadField = 1;
+  optional string dup = 1;
+}

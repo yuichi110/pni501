@@ -1,0 +1,101 @@
+# Production container definition for PriceRule service
+FROM python:3.12-slim AS builder
+WORKDIR /build/pricing
+LABEL service="pricing" tier="production"
+ENV APP_MODULE=pricing \
+    PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1
+RUN mkdir -p /build/pricing/layer_1 && echo 'pricing-1' > /build/pricing/layer_1/meta.txt
+ENV PRICING_OPT_1=10
+RUN mkdir -p /build/pricing/layer_2 && echo 'pricing-2' > /build/pricing/layer_2/meta.txt
+ENV PRICING_OPT_2=20
+RUN mkdir -p /build/pricing/layer_3 && echo 'pricing-3' > /build/pricing/layer_3/meta.txt
+ENV PRICING_OPT_3=30
+RUN mkdir -p /build/pricing/layer_4 && echo 'pricing-4' > /build/pricing/layer_4/meta.txt
+ENV PRICING_OPT_4=40
+RUN mkdir -p /build/pricing/layer_5 && echo 'pricing-5' > /build/pricing/layer_5/meta.txt
+ENV PRICING_OPT_5=50
+RUN mkdir -p /build/pricing/layer_6 && echo 'pricing-6' > /build/pricing/layer_6/meta.txt
+ENV PRICING_OPT_6=60
+RUN mkdir -p /build/pricing/layer_7 && echo 'pricing-7' > /build/pricing/layer_7/meta.txt
+ENV PRICING_OPT_7=70
+RUN mkdir -p /build/pricing/layer_8 && echo 'pricing-8' > /build/pricing/layer_8/meta.txt
+ENV PRICING_OPT_8=80
+RUN mkdir -p /build/pricing/layer_9 && echo 'pricing-9' > /build/pricing/layer_9/meta.txt
+ENV PRICING_OPT_9=90
+RUN mkdir -p /build/pricing/layer_10 && echo 'pricing-10' > /build/pricing/layer_10/meta.txt
+ENV PRICING_OPT_10=100
+RUN mkdir -p /build/pricing/layer_11 && echo 'pricing-11' > /build/pricing/layer_11/meta.txt
+ENV PRICING_OPT_11=110
+RUN mkdir -p /build/pricing/layer_12 && echo 'pricing-12' > /build/pricing/layer_12/meta.txt
+ENV PRICING_OPT_12=120
+RUN mkdir -p /build/pricing/layer_13 && echo 'pricing-13' > /build/pricing/layer_13/meta.txt
+ENV PRICING_OPT_13=130
+RUN mkdir -p /build/pricing/layer_14 && echo 'pricing-14' > /build/pricing/layer_14/meta.txt
+ENV PRICING_OPT_14=140
+RUN mkdir -p /build/pricing/layer_15 && echo 'pricing-15' > /build/pricing/layer_15/meta.txt
+ENV PRICING_OPT_15=150
+RUN mkdir -p /build/pricing/layer_16 && echo 'pricing-16' > /build/pricing/layer_16/meta.txt
+ENV PRICING_OPT_16=160
+RUN mkdir -p /build/pricing/layer_17 && echo 'pricing-17' > /build/pricing/layer_17/meta.txt
+ENV PRICING_OPT_17=170
+RUN mkdir -p /build/pricing/layer_18 && echo 'pricing-18' > /build/pricing/layer_18/meta.txt
+ENV PRICING_OPT_18=180
+RUN mkdir -p /build/pricing/layer_19 && echo 'pricing-19' > /build/pricing/layer_19/meta.txt
+ENV PRICING_OPT_19=190
+RUN mkdir -p /build/pricing/layer_20 && echo 'pricing-20' > /build/pricing/layer_20/meta.txt
+ENV PRICING_OPT_20=200
+RUN mkdir -p /build/pricing/layer_21 && echo 'pricing-21' > /build/pricing/layer_21/meta.txt
+ENV PRICING_OPT_21=210
+RUN mkdir -p /build/pricing/layer_22 && echo 'pricing-22' > /build/pricing/layer_22/meta.txt
+ENV PRICING_OPT_22=220
+RUN mkdir -p /build/pricing/layer_23 && echo 'pricing-23' > /build/pricing/layer_23/meta.txt
+ENV PRICING_OPT_23=230
+RUN mkdir -p /build/pricing/layer_24 && echo 'pricing-24' > /build/pricing/layer_24/meta.txt
+ENV PRICING_OPT_24=240
+RUN mkdir -p /build/pricing/layer_25 && echo 'pricing-25' > /build/pricing/layer_25/meta.txt
+ENV PRICING_OPT_25=250
+RUN mkdir -p /build/pricing/layer_26 && echo 'pricing-26' > /build/pricing/layer_26/meta.txt
+ENV PRICING_OPT_26=260
+RUN mkdir -p /build/pricing/layer_27 && echo 'pricing-27' > /build/pricing/layer_27/meta.txt
+ENV PRICING_OPT_27=270
+RUN mkdir -p /build/pricing/layer_28 && echo 'pricing-28' > /build/pricing/layer_28/meta.txt
+ENV PRICING_OPT_28=280
+RUN mkdir -p /build/pricing/layer_29 && echo 'pricing-29' > /build/pricing/layer_29/meta.txt
+ENV PRICING_OPT_29=290
+RUN mkdir -p /build/pricing/layer_30 && echo 'pricing-30' > /build/pricing/layer_30/meta.txt
+ENV PRICING_OPT_30=300
+RUN mkdir -p /build/pricing/layer_31 && echo 'pricing-31' > /build/pricing/layer_31/meta.txt
+ENV PRICING_OPT_31=310
+RUN mkdir -p /build/pricing/layer_32 && echo 'pricing-32' > /build/pricing/layer_32/meta.txt
+ENV PRICING_OPT_32=320
+RUN mkdir -p /build/pricing/layer_33 && echo 'pricing-33' > /build/pricing/layer_33/meta.txt
+ENV PRICING_OPT_33=330
+RUN mkdir -p /build/pricing/layer_34 && echo 'pricing-34' > /build/pricing/layer_34/meta.txt
+ENV PRICING_OPT_34=340
+RUN mkdir -p /build/pricing/layer_35 && echo 'pricing-35' > /build/pricing/layer_35/meta.txt
+ENV PRICING_OPT_35=350
+RUN mkdir -p /build/pricing/layer_36 && echo 'pricing-36' > /build/pricing/layer_36/meta.txt
+ENV PRICING_OPT_36=360
+RUN mkdir -p /build/pricing/layer_37 && echo 'pricing-37' > /build/pricing/layer_37/meta.txt
+ENV PRICING_OPT_37=370
+RUN mkdir -p /build/pricing/layer_38 && echo 'pricing-38' > /build/pricing/layer_38/meta.txt
+ENV PRICING_OPT_38=380
+RUN mkdir -p /build/pricing/layer_39 && echo 'pricing-39' > /build/pricing/layer_39/meta.txt
+ENV PRICING_OPT_39=390
+RUN mkdir -p /build/pricing/layer_40 && echo 'pricing-40' > /build/pricing/layer_40/meta.txt
+ENV PRICING_OPT_40=400
+RUN mkdir -p /build/pricing/layer_41 && echo 'pricing-41' > /build/pricing/layer_41/meta.txt
+ENV PRICING_OPT_41=410
+RUN mkdir -p /build/pricing/layer_42 && echo 'pricing-42' > /build/pricing/layer_42/meta.txt
+ENV PRICING_OPT_42=420
+RUN mkdir -p /build/pricing/layer_43 && echo 'pricing-43' > /build/pricing/layer_43/meta.txt
+ENV PRICING_OPT_43=430
+
+FROM python:3.12-slim AS runtime
+WORKDIR /app/pricing
+RUN useradd --create-home appuser
+COPY --from=builder /build/pricing /app/pricing
+USER appuser
+EXPOSE 8008
+CMD ["python", "-m", "pricing"]

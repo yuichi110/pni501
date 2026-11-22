@@ -1,0 +1,109 @@
+{
+  "service": "pricing",
+  "records": [
+    {
+      "id": "pricing-1",
+      "domain": "pricing",
+      "tier": 2,
+      "limit": 100,
+      "enabled": true,
+      "tags": ["pricing", "v1"]
+    },
+    {
+      "id": "pricing-2",
+      "domain": "pricing",
+      "tier": 3,
+      "limit": 200,
+      "enabled": true,
+      "tags": ["pricing", "v1"]
+    },
+    {
+      "id": "pricing-3",
+      "domain": "pricing",
+      "tier": 1,
+      "limit": 300,
+      "enabled": true,
+      "tags": ["pricing", "v1"]
+    },
+    {
+      "id": "pricing-4",
+      "domain": "pricing",
+      "tier": 2,
+      "limit": 400,
+      "enabled": true,
+      "tags": ["pricing", "v1"]
+    },
+    {
+      "id": "pricing-5",
+      "domain": "pricing",
+      "tier": 3,
+      "limit": 500,
+      "enabled": true,
+      "tags": ["pricing", "v1"]
+    },
+    {
+      "id": "pricing-6",
+      "domain": "pricing",
+      "tier": 1,
+      "limit": 600,
+      "enabled": true,
+      "tags": ["pricing", "v1"]
+    },
+    {
+      "id": "pricing-7",
+      "domain": "pricing",
+      "tier": 2,
+      "limit": 700,
+      "enabled": true,
+      "tags": ["pricing", "v1"]
+    },
+    {
+      "id": "pricing-8",
+      "domain": "pricing",
+      "tier": 3,
+      "limit": 800,
+      "enabled": true,
+      "tags": ["pricing", "v1"]
+    },
+    {
+      "id": "pricing-9",
+      "domain": "pricing",
+      "tier": 1,
+      "limit": 900,
+      "enabled": true,
+      "tags": ["pricing", "v1"]
+    },
+    {
+      "id": "pricing-10",
+      "domain": "pricing",
+      "tier": 2,
+      "limit": 1000,
+      "enabled": true,
+      "tags": ["pricing", "v1"]
+    },
+    {
+      "id": "pricing-11",
+      "domain": "pricing",
+      "tier": 3,
+      "limit": 1100,
+      "enabled": true,
+      "tags": ["pricing", "v1"]
+    },
+    {
+      "id": "pricing-12",
+      "domain": "pricing",
+      "tier": 1,
+      "limit": 1200,
+      "enabled": true,
+      "tags": ["pricing", "v1"]
+    },
+    {
+      "id": "pricing-13",
+      "domain": "pricing",
+      "tier": 2,
+      "limit": 1300,
+      "enabled": true,
+      "tags": ["pricing", "v1"]
+    }
+  ]
+}

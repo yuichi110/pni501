@@ -143,12 +143,33 @@ def _iter_macro_declarations(
     return results
 
 
+_C_TYPE_SPECIFIER_KINDS: Final[frozenset[str]] = frozenset(
+    {"struct_specifier", "union_specifier", "enum_specifier", "class_specifier"}
+)
+_C_TYPE_BODY_KINDS: Final[frozenset[str]] = frozenset({"field_declaration_list", "enumerator_list"})
+
+
+def _matches_callable_constraints(node: CstNode, profile: LanguageGrammarProfile) -> bool:
+    """Return True if a candidate callable node satisfies optional parent/child constraints."""
+    if profile.callable_parent_kinds:
+        parent = node.parent()
+        if parent is None or parent.kind() not in profile.callable_parent_kinds:
+            return False
+    if profile.callable_required_child_kinds:
+        child_kinds = {c.kind() for c in node.named_children()}
+        if not any(req in child_kinds for req in profile.callable_required_child_kinds):
+            return False
+    return True
+
+
 def _iter_profile_callables(unit: ParsedUnit, profile: LanguageGrammarProfile) -> list[tuple[str, CstNode]]:
     """Collect (symbol_name, cst_node) pairs for all callable declarations in unit."""
     items: list[tuple[str, CstNode]] = []
     seen_spans: set[tuple[int, int]] = set()
     for ckind in profile.callable_node_kinds:
         for node in unit.root.find_all(kind=ckind):
+            if not _matches_callable_constraints(node, profile):
+                continue
             span = (node.range().start.index, node.range().end.index)
             if span in seen_spans:
                 continue
@@ -168,6 +189,9 @@ def _iter_profile_classes(unit: ParsedUnit, profile: LanguageGrammarProfile) -> 
     seen_spans: set[tuple[int, int]] = set()
     for ckind in profile.class_node_kinds:
         for node in unit.root.find_all(kind=ckind):
+            if ckind in _C_TYPE_SPECIFIER_KINDS:
+                if not any(c.kind() in _C_TYPE_BODY_KINDS for c in node.named_children()):
+                    continue
             span = (node.range().start.index, node.range().end.index)
             if span in seen_spans:
                 continue
@@ -243,12 +267,21 @@ class DeclarativeQualityChecker(BaseQualityChecker):
         self._branch_kinds: frozenset[str] = frozenset(profile.branch_node_kinds)
         self._nesting_kinds: frozenset[str] = frozenset(profile.nesting_node_kinds or profile.branch_node_kinds)
 
+    def _callable_body_node(self, node: CstNode) -> CstNode:
+        """Resolve the CST node owning callable statements (handling Dart sibling function_body)."""
+        if node.kind() in {"method_signature", "function_signature"}:
+            sib = node.next_named()
+            if sib is not None and sib.kind() == "function_body":
+                return sib
+        return node
+
     def compute_cognitive_complexity(self, node: CstNode) -> int:
         """Compute nesting-weighted cognitive complexity using profile branch/nesting CST kinds."""
-        callable_start = node.range().start.index
+        body_node = self._callable_body_node(node)
+        callable_start = body_node.range().start.index
         score = 0
         for bkind in self._branch_kinds:
-            for bnode in node.find_all(kind=bkind):
+            for bnode in body_node.find_all(kind=bkind):
                 depth = 0
                 curr = bnode.parent()
                 while curr is not None and curr.range().start.index > callable_start:
@@ -260,8 +293,10 @@ class DeclarativeQualityChecker(BaseQualityChecker):
 
     def evaluate_complexity(self, node: CstNode, symbol: str, rel_path: str) -> CodeLocation | None:
         """Check whether a callable exceeds line length, McCabe branch, or cognitive thresholds."""
-        func_len = self.effective_callable_lines(node)
-        branches = sum(len(node.find_all(kind=bkind)) for bkind in self._branch_kinds)
+        body_node = self._callable_body_node(node)
+        end_line = max(node.range().end.line, body_node.range().end.line)
+        func_len = end_line - node.range().start.line + 1
+        branches = sum(len(body_node.find_all(kind=bkind)) for bkind in self._branch_kinds)
         cognitive = self.compute_cognitive_complexity(node)
         if (
             func_len > self.max_function_lines
@@ -742,7 +777,8 @@ class DeclarativeOperationalChecker(BaseOperationalChecker):
         found: list[CodeLocation] = list(_run_hook(self._profile, unit).hardcoded_secrets)
         seen_lines = {loc.line for loc in found}
         pat = self._profile.secret_assign_pattern or re.compile(
-            r"""(?i)\b([A-Za-z_][A-Za-z0-9_]*(?:password|passwd|secret|api_?key|token|private_?key)[A-Za-z0-9_]*)\s*(?::?=|<-|:)\s*['"]([^'"]{8,})['"]"""
+            r"""(?i)\b([A-Za-z_][A-Za-z0-9_]*(?:password|passwd|secret|api_?key|token|private_?key)[A-Za-z0-9_]*)"""
+            r"""(?:\s*:\s*[^=\n]{1,40})?\s*(?::?=|<-|:)\s*['"]([^'"]{8,})['"]"""
         )
         for line_no, line in enumerate(unit.source.splitlines(), start=1):
             if line_no in seen_lines:

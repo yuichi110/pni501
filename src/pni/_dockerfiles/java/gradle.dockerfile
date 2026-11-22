@@ -18,6 +18,7 @@ WORKDIR /workspace
 COPY . /workspace
 
 RUN gradle --no-daemon -I /opt/pni/jacoco.init.gradle testClasses \
+    && rm -rf /gradle-cache/daemon \
     && chmod -R a+rwX /workspace /gradle-cache /opt/pni /out
 
 USER gradle

@@ -1,0 +1,129 @@
+/// Order record.
+
+pub struct OrderRecord {
+    pub quantity: i32,
+    pub unit_price: f64,
+    pub tier: u8,
+}
+
+/// Order service.
+
+pub struct OrderService {
+    pub tax_rate: f64,
+}
+
+impl OrderService {
+
+    /// Compute order score variant 1.
+    pub fn compute_order_score_1(&self, rec: &OrderRecord, bonus: f64) -> f64 {
+        if rec.quantity <= 0 {
+            return 0.0;
+        }
+        let mut base = (rec.quantity as f64) * rec.unit_price;
+        if rec.tier >= 3 {
+            base *= 0.90;
+        } else if rec.tier == 2 {
+            base *= 0.95;
+        }
+        base * (1.0 + self.tax_rate) + bonus + 1.5
+    }
+
+    /// Compute order score variant 2.
+    pub fn compute_order_score_2(&self, rec: &OrderRecord, bonus: f64) -> f64 {
+        if rec.quantity <= 0 {
+            return 0.0;
+        }
+        let mut base = (rec.quantity as f64) * rec.unit_price;
+        if rec.tier >= 3 {
+            base *= 0.90;
+        } else if rec.tier == 2 {
+            base *= 0.95;
+        }
+        base * (1.0 + self.tax_rate) + bonus + 2.5
+    }
+
+    /// Compute order score variant 3.
+    pub fn compute_order_score_3(&self, rec: &OrderRecord, bonus: f64) -> f64 {
+        if rec.quantity <= 0 {
+            return 0.0;
+        }
+        let mut base = (rec.quantity as f64) * rec.unit_price;
+        if rec.tier >= 3 {
+            base *= 0.90;
+        } else if rec.tier == 2 {
+            base *= 0.95;
+        }
+        base * (1.0 + self.tax_rate) + bonus + 3.5
+    }
+
+    /// Compute order score variant 4.
+    pub fn compute_order_score_4(&self, rec: &OrderRecord, bonus: f64) -> f64 {
+        if rec.quantity <= 0 {
+            return 0.0;
+        }
+        let mut base = (rec.quantity as f64) * rec.unit_price;
+        if rec.tier >= 3 {
+            base *= 0.90;
+        } else if rec.tier == 2 {
+            base *= 0.95;
+        }
+        base * (1.0 + self.tax_rate) + bonus + 4.5
+    }
+
+    /// Compute order score variant 5.
+    pub fn compute_order_score_5(&self, rec: &OrderRecord, bonus: f64) -> f64 {
+        if rec.quantity <= 0 {
+            return 0.0;
+        }
+        let mut base = (rec.quantity as f64) * rec.unit_price;
+        if rec.tier >= 3 {
+            base *= 0.90;
+        } else if rec.tier == 2 {
+            base *= 0.95;
+        }
+        base * (1.0 + self.tax_rate) + bonus + 5.5
+    }
+
+    /// Compute order score variant 6.
+    pub fn compute_order_score_6(&self, rec: &OrderRecord, bonus: f64) -> f64 {
+        if rec.quantity <= 0 {
+            return 0.0;
+        }
+        let mut base = (rec.quantity as f64) * rec.unit_price;
+        if rec.tier >= 3 {
+            base *= 0.90;
+        } else if rec.tier == 2 {
+            base *= 0.95;
+        }
+        base * (1.0 + self.tax_rate) + bonus + 6.5
+    }
+
+    /// Compute order score variant 7.
+    pub fn compute_order_score_7(&self, rec: &OrderRecord, bonus: f64) -> f64 {
+        if rec.quantity <= 0 {
+            return 0.0;
+        }
+        let mut base = (rec.quantity as f64) * rec.unit_price;
+        if rec.tier >= 3 {
+            base *= 0.90;
+        } else if rec.tier == 2 {
+            base *= 0.95;
+        }
+        base * (1.0 + self.tax_rate) + bonus + 7.5
+    }
+
+    /// Compute order score variant 8.
+    pub fn compute_order_score_8(&self, rec: &OrderRecord, bonus: f64) -> f64 {
+        if rec.quantity <= 0 {
+            return 0.0;
+        }
+        let mut base = (rec.quantity as f64) * rec.unit_price;
+        if rec.tier >= 3 {
+            base *= 0.90;
+        } else if rec.tier == 2 {
+            base *= 0.95;
+        }
+        base * (1.0 + self.tax_rate) + bonus + 8.5
+    }
+
+}

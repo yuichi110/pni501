@@ -1,0 +1,6 @@
+FROM python:latest
+ENV API_SECRET_KEY="sk_live_docker_998877665544"
+ADD https://example.invalid/tool.tar.gz /tmp/tool.tar.gz
+RUN curl -fsSL https://example.invalid/setup.sh | sh
+USER root
+CMD ["python", "app.py"]

@@ -1,0 +1,5 @@
+cmake_minimum_required(VERSION 3.20)
+project(sample_c VERSION 1.0.0 LANGUAGES C)
+enable_testing()
+add_executable(test_orders tests/test_orders.c src/orders.c)
+add_test(NAME order_score COMMAND test_orders)

@@ -1,0 +1,77 @@
+package legacy
+
+import (
+    "crypto/md5"
+    "fmt"
+    "net/http"
+    "os"
+)
+
+var GlobalCounter int
+
+const apiSecretKey = "sk_live_go_998877665544332211"
+
+func ComplexDispatch(a, b, c, d, e, f, g int) int {
+
+    score := 0
+
+    if a > 1 {
+        if b > 1 {
+            score += c + d + e + f + g + 1
+        }
+    }
+
+    if a > 2 {
+        if b > 2 {
+            score += c + d + e + f + g + 2
+        }
+    }
+
+    if a > 3 {
+        if b > 3 {
+            score += c + d + e + f + g + 3
+        }
+    }
+
+    if a > 4 {
+        if b > 4 {
+            score += c + d + e + f + g + 4
+        }
+    }
+
+    if a > 5 {
+        if b > 5 {
+            score += c + d + e + f + g + 5
+        }
+    }
+
+    if a > 6 {
+        if b > 6 {
+            score += c + d + e + f + g + 6
+        }
+    }
+
+    if a > 7 {
+        if b > 7 {
+            score += c + d + e + f + g + 7
+        }
+    }
+
+    if a > 8 {
+        if b > 8 {
+            score += c + d + e + f + g + 8
+        }
+    }
+
+    if a > 9 {
+        if b > 9 {
+            score += c + d + e + f + g + 9
+        }
+    }
+
+    _ = md5.Sum([]byte(apiSecretKey))
+    _, _ = http.Get("https://example.invalid/ping")
+    fmt.Println(os.Getenv("SERVICE_KEY"))
+    GlobalCounter += score
+    return score
+}

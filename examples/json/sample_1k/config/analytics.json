@@ -1,0 +1,109 @@
+{
+  "service": "analytics",
+  "records": [
+    {
+      "id": "metric-1",
+      "domain": "analytics",
+      "tier": 2,
+      "limit": 100,
+      "enabled": true,
+      "tags": ["analytics", "v1"]
+    },
+    {
+      "id": "metric-2",
+      "domain": "analytics",
+      "tier": 3,
+      "limit": 200,
+      "enabled": true,
+      "tags": ["analytics", "v1"]
+    },
+    {
+      "id": "metric-3",
+      "domain": "analytics",
+      "tier": 1,
+      "limit": 300,
+      "enabled": true,
+      "tags": ["analytics", "v1"]
+    },
+    {
+      "id": "metric-4",
+      "domain": "analytics",
+      "tier": 2,
+      "limit": 400,
+      "enabled": true,
+      "tags": ["analytics", "v1"]
+    },
+    {
+      "id": "metric-5",
+      "domain": "analytics",
+      "tier": 3,
+      "limit": 500,
+      "enabled": true,
+      "tags": ["analytics", "v1"]
+    },
+    {
+      "id": "metric-6",
+      "domain": "analytics",
+      "tier": 1,
+      "limit": 600,
+      "enabled": true,
+      "tags": ["analytics", "v1"]
+    },
+    {
+      "id": "metric-7",
+      "domain": "analytics",
+      "tier": 2,
+      "limit": 700,
+      "enabled": true,
+      "tags": ["analytics", "v1"]
+    },
+    {
+      "id": "metric-8",
+      "domain": "analytics",
+      "tier": 3,
+      "limit": 800,
+      "enabled": true,
+      "tags": ["analytics", "v1"]
+    },
+    {
+      "id": "metric-9",
+      "domain": "analytics",
+      "tier": 1,
+      "limit": 900,
+      "enabled": true,
+      "tags": ["analytics", "v1"]
+    },
+    {
+      "id": "metric-10",
+      "domain": "analytics",
+      "tier": 2,
+      "limit": 1000,
+      "enabled": true,
+      "tags": ["analytics", "v1"]
+    },
+    {
+      "id": "metric-11",
+      "domain": "analytics",
+      "tier": 3,
+      "limit": 1100,
+      "enabled": true,
+      "tags": ["analytics", "v1"]
+    },
+    {
+      "id": "metric-12",
+      "domain": "analytics",
+      "tier": 1,
+      "limit": 1200,
+      "enabled": true,
+      "tags": ["analytics", "v1"]
+    },
+    {
+      "id": "metric-13",
+      "domain": "analytics",
+      "tier": 2,
+      "limit": 1300,
+      "enabled": true,
+      "tags": ["analytics", "v1"]
+    }
+  ]
+}

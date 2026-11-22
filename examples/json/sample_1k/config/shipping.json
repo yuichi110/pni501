@@ -1,0 +1,109 @@
+{
+  "service": "shipping",
+  "records": [
+    {
+      "id": "shipment-1",
+      "domain": "shipping",
+      "tier": 2,
+      "limit": 100,
+      "enabled": true,
+      "tags": ["shipping", "v1"]
+    },
+    {
+      "id": "shipment-2",
+      "domain": "shipping",
+      "tier": 3,
+      "limit": 200,
+      "enabled": true,
+      "tags": ["shipping", "v1"]
+    },
+    {
+      "id": "shipment-3",
+      "domain": "shipping",
+      "tier": 1,
+      "limit": 300,
+      "enabled": true,
+      "tags": ["shipping", "v1"]
+    },
+    {
+      "id": "shipment-4",
+      "domain": "shipping",
+      "tier": 2,
+      "limit": 400,
+      "enabled": true,
+      "tags": ["shipping", "v1"]
+    },
+    {
+      "id": "shipment-5",
+      "domain": "shipping",
+      "tier": 3,
+      "limit": 500,
+      "enabled": true,
+      "tags": ["shipping", "v1"]
+    },
+    {
+      "id": "shipment-6",
+      "domain": "shipping",
+      "tier": 1,
+      "limit": 600,
+      "enabled": true,
+      "tags": ["shipping", "v1"]
+    },
+    {
+      "id": "shipment-7",
+      "domain": "shipping",
+      "tier": 2,
+      "limit": 700,
+      "enabled": true,
+      "tags": ["shipping", "v1"]
+    },
+    {
+      "id": "shipment-8",
+      "domain": "shipping",
+      "tier": 3,
+      "limit": 800,
+      "enabled": true,
+      "tags": ["shipping", "v1"]
+    },
+    {
+      "id": "shipment-9",
+      "domain": "shipping",
+      "tier": 1,
+      "limit": 900,
+      "enabled": true,
+      "tags": ["shipping", "v1"]
+    },
+    {
+      "id": "shipment-10",
+      "domain": "shipping",
+      "tier": 2,
+      "limit": 1000,
+      "enabled": true,
+      "tags": ["shipping", "v1"]
+    },
+    {
+      "id": "shipment-11",
+      "domain": "shipping",
+      "tier": 3,
+      "limit": 1100,
+      "enabled": true,
+      "tags": ["shipping", "v1"]
+    },
+    {
+      "id": "shipment-12",
+      "domain": "shipping",
+      "tier": 1,
+      "limit": 1200,
+      "enabled": true,
+      "tags": ["shipping", "v1"]
+    },
+    {
+      "id": "shipment-13",
+      "domain": "shipping",
+      "tier": 2,
+      "limit": 1300,
+      "enabled": true,
+      "tags": ["shipping", "v1"]
+    }
+  ]
+}

@@ -37,16 +37,78 @@ reports_src
 target
 build
 .gradle
+obj
+bin
+.build
+_build
+.dart_tool
+deps
+zig-out
+.zig-cache
+dist-newstyle
 """
 
 _FALLBACK_TOOL_BY_LANG: Final[dict[str, str]] = {
+    # Core 6 languages
     "python": "pip",
     "java": "maven",
     "php": "composer",
     "go": "go",
     "typescript": "node",
     "javascript": "node",
+    # Tier A additions (14 languages -> 20/20 Tier A covered)
+    "rust": "cargo",
+    "csharp": "dotnet",
+    "ruby": "bundler",
+    "kotlin": "gradle",
+    "swift": "swiftpm",
+    "c": "cmake",
+    "cpp": "cmake",
+    "scala": "sbt",
+    "dart": "pub",
+    "elixir": "mix",
+    "vue": "node",
+    "perl": "cpan",
+    "r": "r",
+    "cobol": "gnucobol",
+    # Tier B Linux-native additions (15 languages)
+    "bash": "shell",
+    "powershell": "pwsh",
+    "groovy": "gradle",
+    "lua": "lua",
+    "haskell": "cabal",
+    "fsharp": "dotnet",
+    "ocaml": "dune",
+    "zig": "zig",
+    "julia": "julia",
+    "fortran": "gfortran",
+    "svelte": "node",
+    "ada": "gnat",
+    "commonlisp": "sbcl",
+    "verilog": "iverilog",
+    "vhdl": "ghdl",
 }
+
+
+def has_builtin_dockerfile(lang: str) -> bool:
+    """Return True if a built-in container harness Dockerfile exists for lang."""
+    clean_lang = lang.strip().lower()
+    fallback_tool = _FALLBACK_TOOL_BY_LANG.get(clean_lang)
+    if fallback_tool is None:
+        return False
+    return (BUILTIN_DOCKERFILES_DIR / clean_lang / f"{fallback_tool}.dockerfile").is_file()
+
+
+def has_available_template_dockerfile(workspace_root: Path, lang: str, tool: str) -> bool:
+    """Return True if either a local override or a built-in harness template exists for (lang, tool)."""
+    clean_lang = lang.strip().lower()
+    clean_tool = tool.strip().lower().removesuffix(".dockerfile")
+    local_candidate = workspace_root / DOCKERFILES_REL_DIR / "_templates" / clean_lang / f"{clean_tool}.dockerfile"
+    if local_candidate.is_file():
+        return True
+    if (BUILTIN_DOCKERFILES_DIR / clean_lang / f"{clean_tool}.dockerfile").is_file():
+        return True
+    return has_builtin_dockerfile(clean_lang)
 
 
 def list_builtin_dockerfiles() -> list[str]:

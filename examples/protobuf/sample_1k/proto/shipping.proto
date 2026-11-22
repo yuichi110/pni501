@@ -1,0 +1,98 @@
+syntax = "proto3";
+
+package sample.shipping.v1;
+
+message ShipmentRecord1 {
+  string record_id = 1;
+  int32 quantity = 2;
+  double unit_price = 3;
+  int32 tier = 4;
+  string currency_code = 5;
+  int64 created_epoch_ms = 6;
+}
+
+message ShipmentRecord2 {
+  string record_id = 1;
+  int32 quantity = 2;
+  double unit_price = 3;
+  int32 tier = 4;
+  string currency_code = 5;
+  int64 created_epoch_ms = 6;
+}
+
+message ShipmentRecord3 {
+  string record_id = 1;
+  int32 quantity = 2;
+  double unit_price = 3;
+  int32 tier = 4;
+  string currency_code = 5;
+  int64 created_epoch_ms = 6;
+}
+
+message ShipmentRecord4 {
+  string record_id = 1;
+  int32 quantity = 2;
+  double unit_price = 3;
+  int32 tier = 4;
+  string currency_code = 5;
+  int64 created_epoch_ms = 6;
+}
+
+message ShipmentRecord5 {
+  string record_id = 1;
+  int32 quantity = 2;
+  double unit_price = 3;
+  int32 tier = 4;
+  string currency_code = 5;
+  int64 created_epoch_ms = 6;
+}
+
+message ShipmentRecord6 {
+  string record_id = 1;
+  int32 quantity = 2;
+  double unit_price = 3;
+  int32 tier = 4;
+  string currency_code = 5;
+  int64 created_epoch_ms = 6;
+}
+
+message ShipmentRecord7 {
+  string record_id = 1;
+  int32 quantity = 2;
+  double unit_price = 3;
+  int32 tier = 4;
+  string currency_code = 5;
+  int64 created_epoch_ms = 6;
+}
+
+message ShipmentRecord8 {
+  string record_id = 1;
+  int32 quantity = 2;
+  double unit_price = 3;
+  int32 tier = 4;
+  string currency_code = 5;
+  int64 created_epoch_ms = 6;
+}
+
+message ShipmentRecord9 {
+  string record_id = 1;
+  int32 quantity = 2;
+  double unit_price = 3;
+  int32 tier = 4;
+  string currency_code = 5;
+  int64 created_epoch_ms = 6;
+}
+
+message ShipmentRecord10 {
+  string record_id = 1;
+  int32 quantity = 2;
+  double unit_price = 3;
+  int32 tier = 4;
+  string currency_code = 5;
+  int64 created_epoch_ms = 6;
+}
+
+service ShipmentService {
+  rpc GetShipment(ShipmentRecord1) returns (ShipmentRecord1);
+  rpc CreateShipment(ShipmentRecord2) returns (ShipmentRecord2);
+}

@@ -1,0 +1,98 @@
+syntax = "proto3";
+
+package sample.orders.v1;
+
+message OrderRecord1 {
+  string record_id = 1;
+  int32 quantity = 2;
+  double unit_price = 3;
+  int32 tier = 4;
+  string currency_code = 5;
+  int64 created_epoch_ms = 6;
+}
+
+message OrderRecord2 {
+  string record_id = 1;
+  int32 quantity = 2;
+  double unit_price = 3;
+  int32 tier = 4;
+  string currency_code = 5;
+  int64 created_epoch_ms = 6;
+}
+
+message OrderRecord3 {
+  string record_id = 1;
+  int32 quantity = 2;
+  double unit_price = 3;
+  int32 tier = 4;
+  string currency_code = 5;
+  int64 created_epoch_ms = 6;
+}
+
+message OrderRecord4 {
+  string record_id = 1;
+  int32 quantity = 2;
+  double unit_price = 3;
+  int32 tier = 4;
+  string currency_code = 5;
+  int64 created_epoch_ms = 6;
+}
+
+message OrderRecord5 {
+  string record_id = 1;
+  int32 quantity = 2;
+  double unit_price = 3;
+  int32 tier = 4;
+  string currency_code = 5;
+  int64 created_epoch_ms = 6;
+}
+
+message OrderRecord6 {
+  string record_id = 1;
+  int32 quantity = 2;
+  double unit_price = 3;
+  int32 tier = 4;
+  string currency_code = 5;
+  int64 created_epoch_ms = 6;
+}
+
+message OrderRecord7 {
+  string record_id = 1;
+  int32 quantity = 2;
+  double unit_price = 3;
+  int32 tier = 4;
+  string currency_code = 5;
+  int64 created_epoch_ms = 6;
+}
+
+message OrderRecord8 {
+  string record_id = 1;
+  int32 quantity = 2;
+  double unit_price = 3;
+  int32 tier = 4;
+  string currency_code = 5;
+  int64 created_epoch_ms = 6;
+}
+
+message OrderRecord9 {
+  string record_id = 1;
+  int32 quantity = 2;
+  double unit_price = 3;
+  int32 tier = 4;
+  string currency_code = 5;
+  int64 created_epoch_ms = 6;
+}
+
+message OrderRecord10 {
+  string record_id = 1;
+  int32 quantity = 2;
+  double unit_price = 3;
+  int32 tier = 4;
+  string currency_code = 5;
+  int64 created_epoch_ms = 6;
+}
+
+service OrderService {
+  rpc GetOrder(OrderRecord1) returns (OrderRecord1);
+  rpc CreateOrder(OrderRecord2) returns (OrderRecord2);
+}

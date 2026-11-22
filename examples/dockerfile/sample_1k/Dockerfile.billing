@@ -1,0 +1,101 @@
+# Production container definition for Invoice service
+FROM python:3.12-slim AS builder
+WORKDIR /build/billing
+LABEL service="billing" tier="production"
+ENV APP_MODULE=billing \
+    PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1
+RUN mkdir -p /build/billing/layer_1 && echo 'invoice-1' > /build/billing/layer_1/meta.txt
+ENV INVOICE_OPT_1=10
+RUN mkdir -p /build/billing/layer_2 && echo 'invoice-2' > /build/billing/layer_2/meta.txt
+ENV INVOICE_OPT_2=20
+RUN mkdir -p /build/billing/layer_3 && echo 'invoice-3' > /build/billing/layer_3/meta.txt
+ENV INVOICE_OPT_3=30
+RUN mkdir -p /build/billing/layer_4 && echo 'invoice-4' > /build/billing/layer_4/meta.txt
+ENV INVOICE_OPT_4=40
+RUN mkdir -p /build/billing/layer_5 && echo 'invoice-5' > /build/billing/layer_5/meta.txt
+ENV INVOICE_OPT_5=50
+RUN mkdir -p /build/billing/layer_6 && echo 'invoice-6' > /build/billing/layer_6/meta.txt
+ENV INVOICE_OPT_6=60
+RUN mkdir -p /build/billing/layer_7 && echo 'invoice-7' > /build/billing/layer_7/meta.txt
+ENV INVOICE_OPT_7=70
+RUN mkdir -p /build/billing/layer_8 && echo 'invoice-8' > /build/billing/layer_8/meta.txt
+ENV INVOICE_OPT_8=80
+RUN mkdir -p /build/billing/layer_9 && echo 'invoice-9' > /build/billing/layer_9/meta.txt
+ENV INVOICE_OPT_9=90
+RUN mkdir -p /build/billing/layer_10 && echo 'invoice-10' > /build/billing/layer_10/meta.txt
+ENV INVOICE_OPT_10=100
+RUN mkdir -p /build/billing/layer_11 && echo 'invoice-11' > /build/billing/layer_11/meta.txt
+ENV INVOICE_OPT_11=110
+RUN mkdir -p /build/billing/layer_12 && echo 'invoice-12' > /build/billing/layer_12/meta.txt
+ENV INVOICE_OPT_12=120
+RUN mkdir -p /build/billing/layer_13 && echo 'invoice-13' > /build/billing/layer_13/meta.txt
+ENV INVOICE_OPT_13=130
+RUN mkdir -p /build/billing/layer_14 && echo 'invoice-14' > /build/billing/layer_14/meta.txt
+ENV INVOICE_OPT_14=140
+RUN mkdir -p /build/billing/layer_15 && echo 'invoice-15' > /build/billing/layer_15/meta.txt
+ENV INVOICE_OPT_15=150
+RUN mkdir -p /build/billing/layer_16 && echo 'invoice-16' > /build/billing/layer_16/meta.txt
+ENV INVOICE_OPT_16=160
+RUN mkdir -p /build/billing/layer_17 && echo 'invoice-17' > /build/billing/layer_17/meta.txt
+ENV INVOICE_OPT_17=170
+RUN mkdir -p /build/billing/layer_18 && echo 'invoice-18' > /build/billing/layer_18/meta.txt
+ENV INVOICE_OPT_18=180
+RUN mkdir -p /build/billing/layer_19 && echo 'invoice-19' > /build/billing/layer_19/meta.txt
+ENV INVOICE_OPT_19=190
+RUN mkdir -p /build/billing/layer_20 && echo 'invoice-20' > /build/billing/layer_20/meta.txt
+ENV INVOICE_OPT_20=200
+RUN mkdir -p /build/billing/layer_21 && echo 'invoice-21' > /build/billing/layer_21/meta.txt
+ENV INVOICE_OPT_21=210
+RUN mkdir -p /build/billing/layer_22 && echo 'invoice-22' > /build/billing/layer_22/meta.txt
+ENV INVOICE_OPT_22=220
+RUN mkdir -p /build/billing/layer_23 && echo 'invoice-23' > /build/billing/layer_23/meta.txt
+ENV INVOICE_OPT_23=230
+RUN mkdir -p /build/billing/layer_24 && echo 'invoice-24' > /build/billing/layer_24/meta.txt
+ENV INVOICE_OPT_24=240
+RUN mkdir -p /build/billing/layer_25 && echo 'invoice-25' > /build/billing/layer_25/meta.txt
+ENV INVOICE_OPT_25=250
+RUN mkdir -p /build/billing/layer_26 && echo 'invoice-26' > /build/billing/layer_26/meta.txt
+ENV INVOICE_OPT_26=260
+RUN mkdir -p /build/billing/layer_27 && echo 'invoice-27' > /build/billing/layer_27/meta.txt
+ENV INVOICE_OPT_27=270
+RUN mkdir -p /build/billing/layer_28 && echo 'invoice-28' > /build/billing/layer_28/meta.txt
+ENV INVOICE_OPT_28=280
+RUN mkdir -p /build/billing/layer_29 && echo 'invoice-29' > /build/billing/layer_29/meta.txt
+ENV INVOICE_OPT_29=290
+RUN mkdir -p /build/billing/layer_30 && echo 'invoice-30' > /build/billing/layer_30/meta.txt
+ENV INVOICE_OPT_30=300
+RUN mkdir -p /build/billing/layer_31 && echo 'invoice-31' > /build/billing/layer_31/meta.txt
+ENV INVOICE_OPT_31=310
+RUN mkdir -p /build/billing/layer_32 && echo 'invoice-32' > /build/billing/layer_32/meta.txt
+ENV INVOICE_OPT_32=320
+RUN mkdir -p /build/billing/layer_33 && echo 'invoice-33' > /build/billing/layer_33/meta.txt
+ENV INVOICE_OPT_33=330
+RUN mkdir -p /build/billing/layer_34 && echo 'invoice-34' > /build/billing/layer_34/meta.txt
+ENV INVOICE_OPT_34=340
+RUN mkdir -p /build/billing/layer_35 && echo 'invoice-35' > /build/billing/layer_35/meta.txt
+ENV INVOICE_OPT_35=350
+RUN mkdir -p /build/billing/layer_36 && echo 'invoice-36' > /build/billing/layer_36/meta.txt
+ENV INVOICE_OPT_36=360
+RUN mkdir -p /build/billing/layer_37 && echo 'invoice-37' > /build/billing/layer_37/meta.txt
+ENV INVOICE_OPT_37=370
+RUN mkdir -p /build/billing/layer_38 && echo 'invoice-38' > /build/billing/layer_38/meta.txt
+ENV INVOICE_OPT_38=380
+RUN mkdir -p /build/billing/layer_39 && echo 'invoice-39' > /build/billing/layer_39/meta.txt
+ENV INVOICE_OPT_39=390
+RUN mkdir -p /build/billing/layer_40 && echo 'invoice-40' > /build/billing/layer_40/meta.txt
+ENV INVOICE_OPT_40=400
+RUN mkdir -p /build/billing/layer_41 && echo 'invoice-41' > /build/billing/layer_41/meta.txt
+ENV INVOICE_OPT_41=410
+RUN mkdir -p /build/billing/layer_42 && echo 'invoice-42' > /build/billing/layer_42/meta.txt
+ENV INVOICE_OPT_42=420
+RUN mkdir -p /build/billing/layer_43 && echo 'invoice-43' > /build/billing/layer_43/meta.txt
+ENV INVOICE_OPT_43=430
+
+FROM python:3.12-slim AS runtime
+WORKDIR /app/billing
+RUN useradd --create-home appuser
+COPY --from=builder /build/billing /app/billing
+USER appuser
+EXPOSE 8002
+CMD ["python", "-m", "billing"]

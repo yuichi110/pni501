@@ -1,0 +1,101 @@
+# Production container definition for Metric service
+FROM python:3.12-slim AS builder
+WORKDIR /build/analytics
+LABEL service="analytics" tier="production"
+ENV APP_MODULE=analytics \
+    PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1
+RUN mkdir -p /build/analytics/layer_1 && echo 'metric-1' > /build/analytics/layer_1/meta.txt
+ENV METRIC_OPT_1=10
+RUN mkdir -p /build/analytics/layer_2 && echo 'metric-2' > /build/analytics/layer_2/meta.txt
+ENV METRIC_OPT_2=20
+RUN mkdir -p /build/analytics/layer_3 && echo 'metric-3' > /build/analytics/layer_3/meta.txt
+ENV METRIC_OPT_3=30
+RUN mkdir -p /build/analytics/layer_4 && echo 'metric-4' > /build/analytics/layer_4/meta.txt
+ENV METRIC_OPT_4=40
+RUN mkdir -p /build/analytics/layer_5 && echo 'metric-5' > /build/analytics/layer_5/meta.txt
+ENV METRIC_OPT_5=50
+RUN mkdir -p /build/analytics/layer_6 && echo 'metric-6' > /build/analytics/layer_6/meta.txt
+ENV METRIC_OPT_6=60
+RUN mkdir -p /build/analytics/layer_7 && echo 'metric-7' > /build/analytics/layer_7/meta.txt
+ENV METRIC_OPT_7=70
+RUN mkdir -p /build/analytics/layer_8 && echo 'metric-8' > /build/analytics/layer_8/meta.txt
+ENV METRIC_OPT_8=80
+RUN mkdir -p /build/analytics/layer_9 && echo 'metric-9' > /build/analytics/layer_9/meta.txt
+ENV METRIC_OPT_9=90
+RUN mkdir -p /build/analytics/layer_10 && echo 'metric-10' > /build/analytics/layer_10/meta.txt
+ENV METRIC_OPT_10=100
+RUN mkdir -p /build/analytics/layer_11 && echo 'metric-11' > /build/analytics/layer_11/meta.txt
+ENV METRIC_OPT_11=110
+RUN mkdir -p /build/analytics/layer_12 && echo 'metric-12' > /build/analytics/layer_12/meta.txt
+ENV METRIC_OPT_12=120
+RUN mkdir -p /build/analytics/layer_13 && echo 'metric-13' > /build/analytics/layer_13/meta.txt
+ENV METRIC_OPT_13=130
+RUN mkdir -p /build/analytics/layer_14 && echo 'metric-14' > /build/analytics/layer_14/meta.txt
+ENV METRIC_OPT_14=140
+RUN mkdir -p /build/analytics/layer_15 && echo 'metric-15' > /build/analytics/layer_15/meta.txt
+ENV METRIC_OPT_15=150
+RUN mkdir -p /build/analytics/layer_16 && echo 'metric-16' > /build/analytics/layer_16/meta.txt
+ENV METRIC_OPT_16=160
+RUN mkdir -p /build/analytics/layer_17 && echo 'metric-17' > /build/analytics/layer_17/meta.txt
+ENV METRIC_OPT_17=170
+RUN mkdir -p /build/analytics/layer_18 && echo 'metric-18' > /build/analytics/layer_18/meta.txt
+ENV METRIC_OPT_18=180
+RUN mkdir -p /build/analytics/layer_19 && echo 'metric-19' > /build/analytics/layer_19/meta.txt
+ENV METRIC_OPT_19=190
+RUN mkdir -p /build/analytics/layer_20 && echo 'metric-20' > /build/analytics/layer_20/meta.txt
+ENV METRIC_OPT_20=200
+RUN mkdir -p /build/analytics/layer_21 && echo 'metric-21' > /build/analytics/layer_21/meta.txt
+ENV METRIC_OPT_21=210
+RUN mkdir -p /build/analytics/layer_22 && echo 'metric-22' > /build/analytics/layer_22/meta.txt
+ENV METRIC_OPT_22=220
+RUN mkdir -p /build/analytics/layer_23 && echo 'metric-23' > /build/analytics/layer_23/meta.txt
+ENV METRIC_OPT_23=230
+RUN mkdir -p /build/analytics/layer_24 && echo 'metric-24' > /build/analytics/layer_24/meta.txt
+ENV METRIC_OPT_24=240
+RUN mkdir -p /build/analytics/layer_25 && echo 'metric-25' > /build/analytics/layer_25/meta.txt
+ENV METRIC_OPT_25=250
+RUN mkdir -p /build/analytics/layer_26 && echo 'metric-26' > /build/analytics/layer_26/meta.txt
+ENV METRIC_OPT_26=260
+RUN mkdir -p /build/analytics/layer_27 && echo 'metric-27' > /build/analytics/layer_27/meta.txt
+ENV METRIC_OPT_27=270
+RUN mkdir -p /build/analytics/layer_28 && echo 'metric-28' > /build/analytics/layer_28/meta.txt
+ENV METRIC_OPT_28=280
+RUN mkdir -p /build/analytics/layer_29 && echo 'metric-29' > /build/analytics/layer_29/meta.txt
+ENV METRIC_OPT_29=290
+RUN mkdir -p /build/analytics/layer_30 && echo 'metric-30' > /build/analytics/layer_30/meta.txt
+ENV METRIC_OPT_30=300
+RUN mkdir -p /build/analytics/layer_31 && echo 'metric-31' > /build/analytics/layer_31/meta.txt
+ENV METRIC_OPT_31=310
+RUN mkdir -p /build/analytics/layer_32 && echo 'metric-32' > /build/analytics/layer_32/meta.txt
+ENV METRIC_OPT_32=320
+RUN mkdir -p /build/analytics/layer_33 && echo 'metric-33' > /build/analytics/layer_33/meta.txt
+ENV METRIC_OPT_33=330
+RUN mkdir -p /build/analytics/layer_34 && echo 'metric-34' > /build/analytics/layer_34/meta.txt
+ENV METRIC_OPT_34=340
+RUN mkdir -p /build/analytics/layer_35 && echo 'metric-35' > /build/analytics/layer_35/meta.txt
+ENV METRIC_OPT_35=350
+RUN mkdir -p /build/analytics/layer_36 && echo 'metric-36' > /build/analytics/layer_36/meta.txt
+ENV METRIC_OPT_36=360
+RUN mkdir -p /build/analytics/layer_37 && echo 'metric-37' > /build/analytics/layer_37/meta.txt
+ENV METRIC_OPT_37=370
+RUN mkdir -p /build/analytics/layer_38 && echo 'metric-38' > /build/analytics/layer_38/meta.txt
+ENV METRIC_OPT_38=380
+RUN mkdir -p /build/analytics/layer_39 && echo 'metric-39' > /build/analytics/layer_39/meta.txt
+ENV METRIC_OPT_39=390
+RUN mkdir -p /build/analytics/layer_40 && echo 'metric-40' > /build/analytics/layer_40/meta.txt
+ENV METRIC_OPT_40=400
+RUN mkdir -p /build/analytics/layer_41 && echo 'metric-41' > /build/analytics/layer_41/meta.txt
+ENV METRIC_OPT_41=410
+RUN mkdir -p /build/analytics/layer_42 && echo 'metric-42' > /build/analytics/layer_42/meta.txt
+ENV METRIC_OPT_42=420
+RUN mkdir -p /build/analytics/layer_43 && echo 'metric-43' > /build/analytics/layer_43/meta.txt
+ENV METRIC_OPT_43=430
+
+FROM python:3.12-slim AS runtime
+WORKDIR /app/analytics
+RUN useradd --create-home appuser
+COPY --from=builder /build/analytics /app/analytics
+USER appuser
+EXPOSE 8005
+CMD ["python", "-m", "analytics"]

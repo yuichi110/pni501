@@ -1,0 +1,101 @@
+# Production container definition for AuditEvent service
+FROM python:3.12-slim AS builder
+WORKDIR /build/audit
+LABEL service="audit" tier="production"
+ENV APP_MODULE=audit \
+    PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1
+RUN mkdir -p /build/audit/layer_1 && echo 'audit-1' > /build/audit/layer_1/meta.txt
+ENV AUDIT_OPT_1=10
+RUN mkdir -p /build/audit/layer_2 && echo 'audit-2' > /build/audit/layer_2/meta.txt
+ENV AUDIT_OPT_2=20
+RUN mkdir -p /build/audit/layer_3 && echo 'audit-3' > /build/audit/layer_3/meta.txt
+ENV AUDIT_OPT_3=30
+RUN mkdir -p /build/audit/layer_4 && echo 'audit-4' > /build/audit/layer_4/meta.txt
+ENV AUDIT_OPT_4=40
+RUN mkdir -p /build/audit/layer_5 && echo 'audit-5' > /build/audit/layer_5/meta.txt
+ENV AUDIT_OPT_5=50
+RUN mkdir -p /build/audit/layer_6 && echo 'audit-6' > /build/audit/layer_6/meta.txt
+ENV AUDIT_OPT_6=60
+RUN mkdir -p /build/audit/layer_7 && echo 'audit-7' > /build/audit/layer_7/meta.txt
+ENV AUDIT_OPT_7=70
+RUN mkdir -p /build/audit/layer_8 && echo 'audit-8' > /build/audit/layer_8/meta.txt
+ENV AUDIT_OPT_8=80
+RUN mkdir -p /build/audit/layer_9 && echo 'audit-9' > /build/audit/layer_9/meta.txt
+ENV AUDIT_OPT_9=90
+RUN mkdir -p /build/audit/layer_10 && echo 'audit-10' > /build/audit/layer_10/meta.txt
+ENV AUDIT_OPT_10=100
+RUN mkdir -p /build/audit/layer_11 && echo 'audit-11' > /build/audit/layer_11/meta.txt
+ENV AUDIT_OPT_11=110
+RUN mkdir -p /build/audit/layer_12 && echo 'audit-12' > /build/audit/layer_12/meta.txt
+ENV AUDIT_OPT_12=120
+RUN mkdir -p /build/audit/layer_13 && echo 'audit-13' > /build/audit/layer_13/meta.txt
+ENV AUDIT_OPT_13=130
+RUN mkdir -p /build/audit/layer_14 && echo 'audit-14' > /build/audit/layer_14/meta.txt
+ENV AUDIT_OPT_14=140
+RUN mkdir -p /build/audit/layer_15 && echo 'audit-15' > /build/audit/layer_15/meta.txt
+ENV AUDIT_OPT_15=150
+RUN mkdir -p /build/audit/layer_16 && echo 'audit-16' > /build/audit/layer_16/meta.txt
+ENV AUDIT_OPT_16=160
+RUN mkdir -p /build/audit/layer_17 && echo 'audit-17' > /build/audit/layer_17/meta.txt
+ENV AUDIT_OPT_17=170
+RUN mkdir -p /build/audit/layer_18 && echo 'audit-18' > /build/audit/layer_18/meta.txt
+ENV AUDIT_OPT_18=180
+RUN mkdir -p /build/audit/layer_19 && echo 'audit-19' > /build/audit/layer_19/meta.txt
+ENV AUDIT_OPT_19=190
+RUN mkdir -p /build/audit/layer_20 && echo 'audit-20' > /build/audit/layer_20/meta.txt
+ENV AUDIT_OPT_20=200
+RUN mkdir -p /build/audit/layer_21 && echo 'audit-21' > /build/audit/layer_21/meta.txt
+ENV AUDIT_OPT_21=210
+RUN mkdir -p /build/audit/layer_22 && echo 'audit-22' > /build/audit/layer_22/meta.txt
+ENV AUDIT_OPT_22=220
+RUN mkdir -p /build/audit/layer_23 && echo 'audit-23' > /build/audit/layer_23/meta.txt
+ENV AUDIT_OPT_23=230
+RUN mkdir -p /build/audit/layer_24 && echo 'audit-24' > /build/audit/layer_24/meta.txt
+ENV AUDIT_OPT_24=240
+RUN mkdir -p /build/audit/layer_25 && echo 'audit-25' > /build/audit/layer_25/meta.txt
+ENV AUDIT_OPT_25=250
+RUN mkdir -p /build/audit/layer_26 && echo 'audit-26' > /build/audit/layer_26/meta.txt
+ENV AUDIT_OPT_26=260
+RUN mkdir -p /build/audit/layer_27 && echo 'audit-27' > /build/audit/layer_27/meta.txt
+ENV AUDIT_OPT_27=270
+RUN mkdir -p /build/audit/layer_28 && echo 'audit-28' > /build/audit/layer_28/meta.txt
+ENV AUDIT_OPT_28=280
+RUN mkdir -p /build/audit/layer_29 && echo 'audit-29' > /build/audit/layer_29/meta.txt
+ENV AUDIT_OPT_29=290
+RUN mkdir -p /build/audit/layer_30 && echo 'audit-30' > /build/audit/layer_30/meta.txt
+ENV AUDIT_OPT_30=300
+RUN mkdir -p /build/audit/layer_31 && echo 'audit-31' > /build/audit/layer_31/meta.txt
+ENV AUDIT_OPT_31=310
+RUN mkdir -p /build/audit/layer_32 && echo 'audit-32' > /build/audit/layer_32/meta.txt
+ENV AUDIT_OPT_32=320
+RUN mkdir -p /build/audit/layer_33 && echo 'audit-33' > /build/audit/layer_33/meta.txt
+ENV AUDIT_OPT_33=330
+RUN mkdir -p /build/audit/layer_34 && echo 'audit-34' > /build/audit/layer_34/meta.txt
+ENV AUDIT_OPT_34=340
+RUN mkdir -p /build/audit/layer_35 && echo 'audit-35' > /build/audit/layer_35/meta.txt
+ENV AUDIT_OPT_35=350
+RUN mkdir -p /build/audit/layer_36 && echo 'audit-36' > /build/audit/layer_36/meta.txt
+ENV AUDIT_OPT_36=360
+RUN mkdir -p /build/audit/layer_37 && echo 'audit-37' > /build/audit/layer_37/meta.txt
+ENV AUDIT_OPT_37=370
+RUN mkdir -p /build/audit/layer_38 && echo 'audit-38' > /build/audit/layer_38/meta.txt
+ENV AUDIT_OPT_38=380
+RUN mkdir -p /build/audit/layer_39 && echo 'audit-39' > /build/audit/layer_39/meta.txt
+ENV AUDIT_OPT_39=390
+RUN mkdir -p /build/audit/layer_40 && echo 'audit-40' > /build/audit/layer_40/meta.txt
+ENV AUDIT_OPT_40=400
+RUN mkdir -p /build/audit/layer_41 && echo 'audit-41' > /build/audit/layer_41/meta.txt
+ENV AUDIT_OPT_41=410
+RUN mkdir -p /build/audit/layer_42 && echo 'audit-42' > /build/audit/layer_42/meta.txt
+ENV AUDIT_OPT_42=420
+RUN mkdir -p /build/audit/layer_43 && echo 'audit-43' > /build/audit/layer_43/meta.txt
+ENV AUDIT_OPT_43=430
+
+FROM python:3.12-slim AS runtime
+WORKDIR /app/audit
+RUN useradd --create-home appuser
+COPY --from=builder /build/audit /app/audit
+USER appuser
+EXPOSE 8010
+CMD ["python", "-m", "audit"]

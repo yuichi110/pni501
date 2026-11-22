@@ -1,0 +1,3 @@
+Package: sampler
+Version: 1.0.0
+Imports: dplyr, tidyr

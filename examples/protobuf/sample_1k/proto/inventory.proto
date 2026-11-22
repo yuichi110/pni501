@@ -1,0 +1,98 @@
+syntax = "proto3";
+
+package sample.inventory.v1;
+
+message StockItemRecord1 {
+  string record_id = 1;
+  int32 quantity = 2;
+  double unit_price = 3;
+  int32 tier = 4;
+  string currency_code = 5;
+  int64 created_epoch_ms = 6;
+}
+
+message StockItemRecord2 {
+  string record_id = 1;
+  int32 quantity = 2;
+  double unit_price = 3;
+  int32 tier = 4;
+  string currency_code = 5;
+  int64 created_epoch_ms = 6;
+}
+
+message StockItemRecord3 {
+  string record_id = 1;
+  int32 quantity = 2;
+  double unit_price = 3;
+  int32 tier = 4;
+  string currency_code = 5;
+  int64 created_epoch_ms = 6;
+}
+
+message StockItemRecord4 {
+  string record_id = 1;
+  int32 quantity = 2;
+  double unit_price = 3;
+  int32 tier = 4;
+  string currency_code = 5;
+  int64 created_epoch_ms = 6;
+}
+
+message StockItemRecord5 {
+  string record_id = 1;
+  int32 quantity = 2;
+  double unit_price = 3;
+  int32 tier = 4;
+  string currency_code = 5;
+  int64 created_epoch_ms = 6;
+}
+
+message StockItemRecord6 {
+  string record_id = 1;
+  int32 quantity = 2;
+  double unit_price = 3;
+  int32 tier = 4;
+  string currency_code = 5;
+  int64 created_epoch_ms = 6;
+}
+
+message StockItemRecord7 {
+  string record_id = 1;
+  int32 quantity = 2;
+  double unit_price = 3;
+  int32 tier = 4;
+  string currency_code = 5;
+  int64 created_epoch_ms = 6;
+}
+
+message StockItemRecord8 {
+  string record_id = 1;
+  int32 quantity = 2;
+  double unit_price = 3;
+  int32 tier = 4;
+  string currency_code = 5;
+  int64 created_epoch_ms = 6;
+}
+
+message StockItemRecord9 {
+  string record_id = 1;
+  int32 quantity = 2;
+  double unit_price = 3;
+  int32 tier = 4;
+  string currency_code = 5;
+  int64 created_epoch_ms = 6;
+}
+
+message StockItemRecord10 {
+  string record_id = 1;
+  int32 quantity = 2;
+  double unit_price = 3;
+  int32 tier = 4;
+  string currency_code = 5;
+  int64 created_epoch_ms = 6;
+}
+
+service StockItemService {
+  rpc GetStockItem(StockItemRecord1) returns (StockItemRecord1);
+  rpc CreateStockItem(StockItemRecord2) returns (StockItemRecord2);
+}

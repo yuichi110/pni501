@@ -1,0 +1,115 @@
+service: pricing
+version: '1.0.0'
+pipelines:
+  - id: pricing-job-1
+    owner: pricing-team
+    retries: 3
+    timeout_seconds: 35
+    schedule: '0 1 * * *'
+    tags:
+      - pricing
+      - tier-2
+  - id: pricing-job-2
+    owner: pricing-team
+    retries: 3
+    timeout_seconds: 40
+    schedule: '0 2 * * *'
+    tags:
+      - pricing
+      - tier-3
+  - id: pricing-job-3
+    owner: pricing-team
+    retries: 3
+    timeout_seconds: 45
+    schedule: '0 3 * * *'
+    tags:
+      - pricing
+      - tier-1
+  - id: pricing-job-4
+    owner: pricing-team
+    retries: 3
+    timeout_seconds: 50
+    schedule: '0 4 * * *'
+    tags:
+      - pricing
+      - tier-2
+  - id: pricing-job-5
+    owner: pricing-team
+    retries: 3
+    timeout_seconds: 55
+    schedule: '0 5 * * *'
+    tags:
+      - pricing
+      - tier-3
+  - id: pricing-job-6
+    owner: pricing-team
+    retries: 3
+    timeout_seconds: 60
+    schedule: '0 6 * * *'
+    tags:
+      - pricing
+      - tier-1
+  - id: pricing-job-7
+    owner: pricing-team
+    retries: 3
+    timeout_seconds: 65
+    schedule: '0 7 * * *'
+    tags:
+      - pricing
+      - tier-2
+  - id: pricing-job-8
+    owner: pricing-team
+    retries: 3
+    timeout_seconds: 70
+    schedule: '0 8 * * *'
+    tags:
+      - pricing
+      - tier-3
+  - id: pricing-job-9
+    owner: pricing-team
+    retries: 3
+    timeout_seconds: 75
+    schedule: '0 9 * * *'
+    tags:
+      - pricing
+      - tier-1
+  - id: pricing-job-10
+    owner: pricing-team
+    retries: 3
+    timeout_seconds: 80
+    schedule: '0 10 * * *'
+    tags:
+      - pricing
+      - tier-2
+  - id: pricing-job-11
+    owner: pricing-team
+    retries: 3
+    timeout_seconds: 85
+    schedule: '0 11 * * *'
+    tags:
+      - pricing
+      - tier-3
+  - id: pricing-job-12
+    owner: pricing-team
+    retries: 3
+    timeout_seconds: 90
+    schedule: '0 12 * * *'
+    tags:
+      - pricing
+      - tier-1
+  - id: pricing-job-13
+    owner: pricing-team
+    retries: 3
+    timeout_seconds: 95
+    schedule: '0 13 * * *'
+    tags:
+      - pricing
+      - tier-2
+  - id: pricing-job-14
+    owner: pricing-team
+    retries: 3
+    timeout_seconds: 100
+    schedule: '0 14 * * *'
+    tags:
+      - pricing
+      - tier-3

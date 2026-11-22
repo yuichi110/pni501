@@ -307,7 +307,7 @@ def _detect_source_file_language(project_root: Path) -> str | None:
             spec.file_extensions,
             search_dirs=None,
             exclude_suffixes=spec.excluded_source_suffixes,
-            max_depth=4,
+            max_depth=6,
         ):
             return lang_id
     return None

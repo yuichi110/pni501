@@ -48,7 +48,7 @@ from pni._cache import (
     normalize_target_subpath,
 )
 from pni._config import discover_gitignored_paths, load_pni_config
-from pni._dockerfiles import ensure_target_dockerfile
+from pni._dockerfiles import ensure_target_dockerfile, has_available_template_dockerfile
 
 
 def _security_image_slug(target_root_rel: str) -> str:
@@ -113,6 +113,8 @@ def _resolve_and_build_scan_image(
             return proj_tag, rel_df
 
     tool = select_harness_tool(pf)
+    if not has_available_template_dockerfile(ws_root, pf.language, tool):
+        return None, ""
     build_args = compute_harness_build_args(pf)
     harness_df, _ = ensure_target_dockerfile(ws_root, target_root, pf.language, tool)
     harness_tag = f"pni-sec-harness-{slug}:scan"

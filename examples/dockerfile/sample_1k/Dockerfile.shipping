@@ -1,0 +1,101 @@
+# Production container definition for Shipment service
+FROM python:3.12-slim AS builder
+WORKDIR /build/shipping
+LABEL service="shipping" tier="production"
+ENV APP_MODULE=shipping \
+    PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1
+RUN mkdir -p /build/shipping/layer_1 && echo 'shipment-1' > /build/shipping/layer_1/meta.txt
+ENV SHIPMENT_OPT_1=10
+RUN mkdir -p /build/shipping/layer_2 && echo 'shipment-2' > /build/shipping/layer_2/meta.txt
+ENV SHIPMENT_OPT_2=20
+RUN mkdir -p /build/shipping/layer_3 && echo 'shipment-3' > /build/shipping/layer_3/meta.txt
+ENV SHIPMENT_OPT_3=30
+RUN mkdir -p /build/shipping/layer_4 && echo 'shipment-4' > /build/shipping/layer_4/meta.txt
+ENV SHIPMENT_OPT_4=40
+RUN mkdir -p /build/shipping/layer_5 && echo 'shipment-5' > /build/shipping/layer_5/meta.txt
+ENV SHIPMENT_OPT_5=50
+RUN mkdir -p /build/shipping/layer_6 && echo 'shipment-6' > /build/shipping/layer_6/meta.txt
+ENV SHIPMENT_OPT_6=60
+RUN mkdir -p /build/shipping/layer_7 && echo 'shipment-7' > /build/shipping/layer_7/meta.txt
+ENV SHIPMENT_OPT_7=70
+RUN mkdir -p /build/shipping/layer_8 && echo 'shipment-8' > /build/shipping/layer_8/meta.txt
+ENV SHIPMENT_OPT_8=80
+RUN mkdir -p /build/shipping/layer_9 && echo 'shipment-9' > /build/shipping/layer_9/meta.txt
+ENV SHIPMENT_OPT_9=90
+RUN mkdir -p /build/shipping/layer_10 && echo 'shipment-10' > /build/shipping/layer_10/meta.txt
+ENV SHIPMENT_OPT_10=100
+RUN mkdir -p /build/shipping/layer_11 && echo 'shipment-11' > /build/shipping/layer_11/meta.txt
+ENV SHIPMENT_OPT_11=110
+RUN mkdir -p /build/shipping/layer_12 && echo 'shipment-12' > /build/shipping/layer_12/meta.txt
+ENV SHIPMENT_OPT_12=120
+RUN mkdir -p /build/shipping/layer_13 && echo 'shipment-13' > /build/shipping/layer_13/meta.txt
+ENV SHIPMENT_OPT_13=130
+RUN mkdir -p /build/shipping/layer_14 && echo 'shipment-14' > /build/shipping/layer_14/meta.txt
+ENV SHIPMENT_OPT_14=140
+RUN mkdir -p /build/shipping/layer_15 && echo 'shipment-15' > /build/shipping/layer_15/meta.txt
+ENV SHIPMENT_OPT_15=150
+RUN mkdir -p /build/shipping/layer_16 && echo 'shipment-16' > /build/shipping/layer_16/meta.txt
+ENV SHIPMENT_OPT_16=160
+RUN mkdir -p /build/shipping/layer_17 && echo 'shipment-17' > /build/shipping/layer_17/meta.txt
+ENV SHIPMENT_OPT_17=170
+RUN mkdir -p /build/shipping/layer_18 && echo 'shipment-18' > /build/shipping/layer_18/meta.txt
+ENV SHIPMENT_OPT_18=180
+RUN mkdir -p /build/shipping/layer_19 && echo 'shipment-19' > /build/shipping/layer_19/meta.txt
+ENV SHIPMENT_OPT_19=190
+RUN mkdir -p /build/shipping/layer_20 && echo 'shipment-20' > /build/shipping/layer_20/meta.txt
+ENV SHIPMENT_OPT_20=200
+RUN mkdir -p /build/shipping/layer_21 && echo 'shipment-21' > /build/shipping/layer_21/meta.txt
+ENV SHIPMENT_OPT_21=210
+RUN mkdir -p /build/shipping/layer_22 && echo 'shipment-22' > /build/shipping/layer_22/meta.txt
+ENV SHIPMENT_OPT_22=220
+RUN mkdir -p /build/shipping/layer_23 && echo 'shipment-23' > /build/shipping/layer_23/meta.txt
+ENV SHIPMENT_OPT_23=230
+RUN mkdir -p /build/shipping/layer_24 && echo 'shipment-24' > /build/shipping/layer_24/meta.txt
+ENV SHIPMENT_OPT_24=240
+RUN mkdir -p /build/shipping/layer_25 && echo 'shipment-25' > /build/shipping/layer_25/meta.txt
+ENV SHIPMENT_OPT_25=250
+RUN mkdir -p /build/shipping/layer_26 && echo 'shipment-26' > /build/shipping/layer_26/meta.txt
+ENV SHIPMENT_OPT_26=260
+RUN mkdir -p /build/shipping/layer_27 && echo 'shipment-27' > /build/shipping/layer_27/meta.txt
+ENV SHIPMENT_OPT_27=270
+RUN mkdir -p /build/shipping/layer_28 && echo 'shipment-28' > /build/shipping/layer_28/meta.txt
+ENV SHIPMENT_OPT_28=280
+RUN mkdir -p /build/shipping/layer_29 && echo 'shipment-29' > /build/shipping/layer_29/meta.txt
+ENV SHIPMENT_OPT_29=290
+RUN mkdir -p /build/shipping/layer_30 && echo 'shipment-30' > /build/shipping/layer_30/meta.txt
+ENV SHIPMENT_OPT_30=300
+RUN mkdir -p /build/shipping/layer_31 && echo 'shipment-31' > /build/shipping/layer_31/meta.txt
+ENV SHIPMENT_OPT_31=310
+RUN mkdir -p /build/shipping/layer_32 && echo 'shipment-32' > /build/shipping/layer_32/meta.txt
+ENV SHIPMENT_OPT_32=320
+RUN mkdir -p /build/shipping/layer_33 && echo 'shipment-33' > /build/shipping/layer_33/meta.txt
+ENV SHIPMENT_OPT_33=330
+RUN mkdir -p /build/shipping/layer_34 && echo 'shipment-34' > /build/shipping/layer_34/meta.txt
+ENV SHIPMENT_OPT_34=340
+RUN mkdir -p /build/shipping/layer_35 && echo 'shipment-35' > /build/shipping/layer_35/meta.txt
+ENV SHIPMENT_OPT_35=350
+RUN mkdir -p /build/shipping/layer_36 && echo 'shipment-36' > /build/shipping/layer_36/meta.txt
+ENV SHIPMENT_OPT_36=360
+RUN mkdir -p /build/shipping/layer_37 && echo 'shipment-37' > /build/shipping/layer_37/meta.txt
+ENV SHIPMENT_OPT_37=370
+RUN mkdir -p /build/shipping/layer_38 && echo 'shipment-38' > /build/shipping/layer_38/meta.txt
+ENV SHIPMENT_OPT_38=380
+RUN mkdir -p /build/shipping/layer_39 && echo 'shipment-39' > /build/shipping/layer_39/meta.txt
+ENV SHIPMENT_OPT_39=390
+RUN mkdir -p /build/shipping/layer_40 && echo 'shipment-40' > /build/shipping/layer_40/meta.txt
+ENV SHIPMENT_OPT_40=400
+RUN mkdir -p /build/shipping/layer_41 && echo 'shipment-41' > /build/shipping/layer_41/meta.txt
+ENV SHIPMENT_OPT_41=410
+RUN mkdir -p /build/shipping/layer_42 && echo 'shipment-42' > /build/shipping/layer_42/meta.txt
+ENV SHIPMENT_OPT_42=420
+RUN mkdir -p /build/shipping/layer_43 && echo 'shipment-43' > /build/shipping/layer_43/meta.txt
+ENV SHIPMENT_OPT_43=430
+
+FROM python:3.12-slim AS runtime
+WORKDIR /app/shipping
+RUN useradd --create-home appuser
+COPY --from=builder /build/shipping /app/shipping
+USER appuser
+EXPOSE 8004
+CMD ["python", "-m", "shipping"]

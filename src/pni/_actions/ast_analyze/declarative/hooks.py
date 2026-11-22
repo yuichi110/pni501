@@ -73,7 +73,9 @@ _PROTO_PASCAL_RE: Final[re.Pattern[str]] = re.compile(r"^[A-Z][A-Za-z0-9]*$")
 _PROTO_SNAKE_RE: Final[re.Pattern[str]] = re.compile(r"^[a-z][a-z0-9_]*$")
 _SQL_DROP_RE: Final[re.Pattern[str]] = re.compile(r"(?i)\b(DROP\s+(?:TABLE|DATABASE|SCHEMA)|TRUNCATE\s+TABLE)\b")
 _SQL_SELECT_STAR_RE: Final[re.Pattern[str]] = re.compile(r"(?i)\bSELECT\s+\*\s+FROM\b")
-_SQL_DYNAMIC_EXEC_RE: Final[re.Pattern[str]] = re.compile(r"(?i)\b(?:EXECUTE\s+IMMEDIATE|EXEC\s*\(|sp_executesql)\b")
+_SQL_DYNAMIC_EXEC_RE: Final[re.Pattern[str]] = re.compile(
+    r"(?i)\b(?:EXECUTE\s+IMMEDIATE|EXECUTE\s+[A-Za-z_]\w*|EXEC\s*\(|sp_executesql)\b"
+)
 
 
 def cobol_source_preprocessor(source: str) -> str:

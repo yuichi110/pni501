@@ -1,0 +1,98 @@
+syntax = "proto3";
+
+package sample.billing.v1;
+
+message InvoiceRecord1 {
+  string record_id = 1;
+  int32 quantity = 2;
+  double unit_price = 3;
+  int32 tier = 4;
+  string currency_code = 5;
+  int64 created_epoch_ms = 6;
+}
+
+message InvoiceRecord2 {
+  string record_id = 1;
+  int32 quantity = 2;
+  double unit_price = 3;
+  int32 tier = 4;
+  string currency_code = 5;
+  int64 created_epoch_ms = 6;
+}
+
+message InvoiceRecord3 {
+  string record_id = 1;
+  int32 quantity = 2;
+  double unit_price = 3;
+  int32 tier = 4;
+  string currency_code = 5;
+  int64 created_epoch_ms = 6;
+}
+
+message InvoiceRecord4 {
+  string record_id = 1;
+  int32 quantity = 2;
+  double unit_price = 3;
+  int32 tier = 4;
+  string currency_code = 5;
+  int64 created_epoch_ms = 6;
+}
+
+message InvoiceRecord5 {
+  string record_id = 1;
+  int32 quantity = 2;
+  double unit_price = 3;
+  int32 tier = 4;
+  string currency_code = 5;
+  int64 created_epoch_ms = 6;
+}
+
+message InvoiceRecord6 {
+  string record_id = 1;
+  int32 quantity = 2;
+  double unit_price = 3;
+  int32 tier = 4;
+  string currency_code = 5;
+  int64 created_epoch_ms = 6;
+}
+
+message InvoiceRecord7 {
+  string record_id = 1;
+  int32 quantity = 2;
+  double unit_price = 3;
+  int32 tier = 4;
+  string currency_code = 5;
+  int64 created_epoch_ms = 6;
+}
+
+message InvoiceRecord8 {
+  string record_id = 1;
+  int32 quantity = 2;
+  double unit_price = 3;
+  int32 tier = 4;
+  string currency_code = 5;
+  int64 created_epoch_ms = 6;
+}
+
+message InvoiceRecord9 {
+  string record_id = 1;
+  int32 quantity = 2;
+  double unit_price = 3;
+  int32 tier = 4;
+  string currency_code = 5;
+  int64 created_epoch_ms = 6;
+}
+
+message InvoiceRecord10 {
+  string record_id = 1;
+  int32 quantity = 2;
+  double unit_price = 3;
+  int32 tier = 4;
+  string currency_code = 5;
+  int64 created_epoch_ms = 6;
+}
+
+service InvoiceService {
+  rpc GetInvoice(InvoiceRecord1) returns (InvoiceRecord1);
+  rpc CreateInvoice(InvoiceRecord2) returns (InvoiceRecord2);
+}

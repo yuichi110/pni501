@@ -1,0 +1,115 @@
+service: ledger
+version: '1.0.0'
+pipelines:
+  - id: ledger-job-1
+    owner: ledger-team
+    retries: 3
+    timeout_seconds: 35
+    schedule: '0 1 * * *'
+    tags:
+      - ledger
+      - tier-2
+  - id: ledger-job-2
+    owner: ledger-team
+    retries: 3
+    timeout_seconds: 40
+    schedule: '0 2 * * *'
+    tags:
+      - ledger
+      - tier-3
+  - id: ledger-job-3
+    owner: ledger-team
+    retries: 3
+    timeout_seconds: 45
+    schedule: '0 3 * * *'
+    tags:
+      - ledger
+      - tier-1
+  - id: ledger-job-4
+    owner: ledger-team
+    retries: 3
+    timeout_seconds: 50
+    schedule: '0 4 * * *'
+    tags:
+      - ledger
+      - tier-2
+  - id: ledger-job-5
+    owner: ledger-team
+    retries: 3
+    timeout_seconds: 55
+    schedule: '0 5 * * *'
+    tags:
+      - ledger
+      - tier-3
+  - id: ledger-job-6
+    owner: ledger-team
+    retries: 3
+    timeout_seconds: 60
+    schedule: '0 6 * * *'
+    tags:
+      - ledger
+      - tier-1
+  - id: ledger-job-7
+    owner: ledger-team
+    retries: 3
+    timeout_seconds: 65
+    schedule: '0 7 * * *'
+    tags:
+      - ledger
+      - tier-2
+  - id: ledger-job-8
+    owner: ledger-team
+    retries: 3
+    timeout_seconds: 70
+    schedule: '0 8 * * *'
+    tags:
+      - ledger
+      - tier-3
+  - id: ledger-job-9
+    owner: ledger-team
+    retries: 3
+    timeout_seconds: 75
+    schedule: '0 9 * * *'
+    tags:
+      - ledger
+      - tier-1
+  - id: ledger-job-10
+    owner: ledger-team
+    retries: 3
+    timeout_seconds: 80
+    schedule: '0 10 * * *'
+    tags:
+      - ledger
+      - tier-2
+  - id: ledger-job-11
+    owner: ledger-team
+    retries: 3
+    timeout_seconds: 85
+    schedule: '0 11 * * *'
+    tags:
+      - ledger
+      - tier-3
+  - id: ledger-job-12
+    owner: ledger-team
+    retries: 3
+    timeout_seconds: 90
+    schedule: '0 12 * * *'
+    tags:
+      - ledger
+      - tier-1
+  - id: ledger-job-13
+    owner: ledger-team
+    retries: 3
+    timeout_seconds: 95
+    schedule: '0 13 * * *'
+    tags:
+      - ledger
+      - tier-2
+  - id: ledger-job-14
+    owner: ledger-team
+    retries: 3
+    timeout_seconds: 100
+    schedule: '0 14 * * *'
+    tags:
+      - ledger
+      - tier-3

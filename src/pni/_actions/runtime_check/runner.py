@@ -44,6 +44,10 @@ from pni._actions.runtime_check.parsers import (
     parse_node_test_output,
     parse_pytest_coverage_json,
 )
+from pni._actions.runtime_check.polyglot_parsers import (
+    parse_polyglot_coverage,
+    parse_polyglot_test_results,
+)
 from pni._actions.runtime_check.selector import (
     build_test_and_coverage_command,
     compute_harness_build_args,
@@ -56,7 +60,7 @@ from pni._cache import (
     ensure_cache_parent,
     normalize_target_subpath,
 )
-from pni._dockerfiles import ensure_target_dockerfile
+from pni._dockerfiles import ensure_target_dockerfile, has_available_template_dockerfile
 
 
 @dataclass(frozen=True)
@@ -185,6 +189,8 @@ def _execute_test_and_coverage_stage(
         total, passed, failed, errors, skipped, failures = parse_go_test_output(out_dir / "go_test.txt")
     elif total == 0 and pf.language in {"typescript", "javascript"}:
         total, passed, failed, errors, skipped, failures = parse_node_test_output(out_dir / "node_test.txt")
+    elif total == 0 and pf.language not in {"python", "java", "php"}:
+        total, passed, failed, errors, skipped, failures = parse_polyglot_test_results(pf.language, out_dir)
 
     if res.timed_out:
         t_status: RuntimeStageStatus = "timeout"
@@ -233,7 +239,9 @@ def _parse_stage_coverage(language: str, source_targets: list[str], out_dir: Pat
         return parse_go_coverprofile(out_dir / "coverage.out")
     if language in {"typescript", "javascript"}:
         return _parse_node_stage_coverage(out_dir)
-    return parse_pytest_coverage_json(out_dir / "coverage.json")
+    if language == "python":
+        return parse_pytest_coverage_json(out_dir / "coverage.json")
+    return parse_polyglot_coverage(language, source_targets, out_dir)
 
 
 def _execute_smoke_stage(
@@ -344,6 +352,21 @@ def run_runtime_check(
     )
     tool = select_harness_tool(pf)
     rt_dir, out_dir = _prepare_runtime_dirs(ws_root, workflow_id)
+    rt_rel = default_runtime_rel_dir(workflow_id)
+
+    if not opts.dockerfile.strip() and not has_available_template_dockerfile(ws_root, pf.language, tool):
+        skipped_lang = RuntimeFacts(
+            status="skipped",
+            container_engine=None,
+            engine_available=False,
+            skip_reason=(
+                f"No built-in container harness available for language '{pf.language}' "
+                "(set runtime_check.dockerfile to supply a custom harness)."
+            ),
+            language=pf.language,
+            artifacts_dir=rt_rel,
+        )
+        return _persist_runtime_facts(ws_root, workflow_id, skipped_lang)
 
     harness_df, template_id = ensure_target_dockerfile(
         ws_root,
@@ -359,7 +382,6 @@ def run_runtime_check(
         harness_dockerfile=harness_df,
     )
     harness_df_rel = harness_df.resolve().relative_to(ws_root).as_posix()
-    rt_rel = default_runtime_rel_dir(workflow_id)
 
     engine_name, engine_bin, reason = detect_container_engine(opts.container_engine)
     if engine_name is None or engine_bin is None:

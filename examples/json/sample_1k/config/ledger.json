@@ -1,0 +1,109 @@
+{
+  "service": "ledger",
+  "records": [
+    {
+      "id": "ledger-1",
+      "domain": "ledger",
+      "tier": 2,
+      "limit": 100,
+      "enabled": true,
+      "tags": ["ledger", "v1"]
+    },
+    {
+      "id": "ledger-2",
+      "domain": "ledger",
+      "tier": 3,
+      "limit": 200,
+      "enabled": true,
+      "tags": ["ledger", "v1"]
+    },
+    {
+      "id": "ledger-3",
+      "domain": "ledger",
+      "tier": 1,
+      "limit": 300,
+      "enabled": true,
+      "tags": ["ledger", "v1"]
+    },
+    {
+      "id": "ledger-4",
+      "domain": "ledger",
+      "tier": 2,
+      "limit": 400,
+      "enabled": true,
+      "tags": ["ledger", "v1"]
+    },
+    {
+      "id": "ledger-5",
+      "domain": "ledger",
+      "tier": 3,
+      "limit": 500,
+      "enabled": true,
+      "tags": ["ledger", "v1"]
+    },
+    {
+      "id": "ledger-6",
+      "domain": "ledger",
+      "tier": 1,
+      "limit": 600,
+      "enabled": true,
+      "tags": ["ledger", "v1"]
+    },
+    {
+      "id": "ledger-7",
+      "domain": "ledger",
+      "tier": 2,
+      "limit": 700,
+      "enabled": true,
+      "tags": ["ledger", "v1"]
+    },
+    {
+      "id": "ledger-8",
+      "domain": "ledger",
+      "tier": 3,
+      "limit": 800,
+      "enabled": true,
+      "tags": ["ledger", "v1"]
+    },
+    {
+      "id": "ledger-9",
+      "domain": "ledger",
+      "tier": 1,
+      "limit": 900,
+      "enabled": true,
+      "tags": ["ledger", "v1"]
+    },
+    {
+      "id": "ledger-10",
+      "domain": "ledger",
+      "tier": 2,
+      "limit": 1000,
+      "enabled": true,
+      "tags": ["ledger", "v1"]
+    },
+    {
+      "id": "ledger-11",
+      "domain": "ledger",
+      "tier": 3,
+      "limit": 1100,
+      "enabled": true,
+      "tags": ["ledger", "v1"]
+    },
+    {
+      "id": "ledger-12",
+      "domain": "ledger",
+      "tier": 1,
+      "limit": 1200,
+      "enabled": true,
+      "tags": ["ledger", "v1"]
+    },
+    {
+      "id": "ledger-13",
+      "domain": "ledger",
+      "tier": 2,
+      "limit": 1300,
+      "enabled": true,
+      "tags": ["ledger", "v1"]
+    }
+  ]
+}

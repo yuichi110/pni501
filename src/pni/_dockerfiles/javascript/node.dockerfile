@@ -37,9 +37,9 @@ RUN if [ -f package.json ] && \
     fi
 
 # Auto-provision @vitest/coverage-v8 matching installed vitest major.minor when missing
-RUN if [ -f node_modules/vitest/package.json ] && \
-       [ ! -d node_modules/@vitest/coverage-v8 ] && \
-       [ ! -d node_modules/@vitest/coverage-istanbul ]; then \
+RUN if test -f node_modules/vitest/package.json && \
+       test ! -d node_modules/@vitest/coverage-v8 && \
+       test ! -d node_modules/@vitest/coverage-istanbul; then \
         VITEST_MM=$(node -e 'try{const v=require("./node_modules/vitest/package.json").version.split(".");process.stdout.write(v[0]+"."+v[1]+".0");}catch(_){}'); \
         if [ -n "$VITEST_MM" ]; then \
             if [ -f pnpm-lock.yaml ]; then \

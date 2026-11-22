@@ -238,6 +238,11 @@ class CstNode:
         p = self._node.prev_sibling
         return self._wrap(p) if p is not None else None
 
+    def next_named(self) -> CstNode | None:
+        """Return the immediately following named sibling CST node, if any."""
+        nxt = self._node.next_named_sibling
+        return self._wrap(nxt) if nxt is not None else None
+
     def inside(self, *, kind: str) -> bool:
         """Return True if any strict ancestor node has node type equal to `kind`."""
         curr = self._node.parent

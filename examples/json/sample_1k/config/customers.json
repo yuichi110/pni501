@@ -1,0 +1,109 @@
+{
+  "service": "customers",
+  "records": [
+    {
+      "id": "customer-1",
+      "domain": "customers",
+      "tier": 2,
+      "limit": 100,
+      "enabled": true,
+      "tags": ["customers", "v1"]
+    },
+    {
+      "id": "customer-2",
+      "domain": "customers",
+      "tier": 3,
+      "limit": 200,
+      "enabled": true,
+      "tags": ["customers", "v1"]
+    },
+    {
+      "id": "customer-3",
+      "domain": "customers",
+      "tier": 1,
+      "limit": 300,
+      "enabled": true,
+      "tags": ["customers", "v1"]
+    },
+    {
+      "id": "customer-4",
+      "domain": "customers",
+      "tier": 2,
+      "limit": 400,
+      "enabled": true,
+      "tags": ["customers", "v1"]
+    },
+    {
+      "id": "customer-5",
+      "domain": "customers",
+      "tier": 3,
+      "limit": 500,
+      "enabled": true,
+      "tags": ["customers", "v1"]
+    },
+    {
+      "id": "customer-6",
+      "domain": "customers",
+      "tier": 1,
+      "limit": 600,
+      "enabled": true,
+      "tags": ["customers", "v1"]
+    },
+    {
+      "id": "customer-7",
+      "domain": "customers",
+      "tier": 2,
+      "limit": 700,
+      "enabled": true,
+      "tags": ["customers", "v1"]
+    },
+    {
+      "id": "customer-8",
+      "domain": "customers",
+      "tier": 3,
+      "limit": 800,
+      "enabled": true,
+      "tags": ["customers", "v1"]
+    },
+    {
+      "id": "customer-9",
+      "domain": "customers",
+      "tier": 1,
+      "limit": 900,
+      "enabled": true,
+      "tags": ["customers", "v1"]
+    },
+    {
+      "id": "customer-10",
+      "domain": "customers",
+      "tier": 2,
+      "limit": 1000,
+      "enabled": true,
+      "tags": ["customers", "v1"]
+    },
+    {
+      "id": "customer-11",
+      "domain": "customers",
+      "tier": 3,
+      "limit": 1100,
+      "enabled": true,
+      "tags": ["customers", "v1"]
+    },
+    {
+      "id": "customer-12",
+      "domain": "customers",
+      "tier": 1,
+      "limit": 1200,
+      "enabled": true,
+      "tags": ["customers", "v1"]
+    },
+    {
+      "id": "customer-13",
+      "domain": "customers",
+      "tier": 2,
+      "limit": 1300,
+      "enabled": true,
+      "tags": ["customers", "v1"]
+    }
+  ]
+}

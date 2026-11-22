@@ -92,6 +92,8 @@ class LanguageGrammarProfile:
     # Structural declarations
     class_node_kinds: tuple[str, ...] = ()
     callable_node_kinds: tuple[str, ...] = ()
+    callable_required_child_kinds: tuple[str, ...] = ()
+    callable_parent_kinds: tuple[str, ...] = ()
     callable_name_fields: tuple[str, ...] = ("name", "declarator")
     callable_name_child_kinds: tuple[str, ...] = ("identifier", "simple_identifier", "word", "name", "sym_lit")
     macro_class_names: tuple[str, ...] = ()

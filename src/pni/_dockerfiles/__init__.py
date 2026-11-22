@@ -15,6 +15,8 @@ from pni._dockerfiles.manager import (
     BUILTIN_DOCKERFILES_DIR,
     DOCKERFILES_REL_DIR,
     ensure_target_dockerfile,
+    has_available_template_dockerfile,
+    has_builtin_dockerfile,
     list_builtin_dockerfiles,
     resolve_template_dockerfile,
 )
@@ -23,6 +25,8 @@ __all__ = [
     "BUILTIN_DOCKERFILES_DIR",
     "DOCKERFILES_REL_DIR",
     "ensure_target_dockerfile",
+    "has_available_template_dockerfile",
+    "has_builtin_dockerfile",
     "list_builtin_dockerfiles",
     "resolve_template_dockerfile",
 ]

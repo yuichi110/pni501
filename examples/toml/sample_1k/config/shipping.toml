@@ -1,0 +1,108 @@
+[service]
+name = "shipping"
+version = "1.0.0"
+
+[rules.shipment_1]
+id = "shipment-1"
+tier = 2
+max_items = 50
+tax_rate = 0.10
+enabled = true
+
+[rules.shipment_2]
+id = "shipment-2"
+tier = 3
+max_items = 100
+tax_rate = 0.10
+enabled = true
+
+[rules.shipment_3]
+id = "shipment-3"
+tier = 1
+max_items = 150
+tax_rate = 0.10
+enabled = true
+
+[rules.shipment_4]
+id = "shipment-4"
+tier = 2
+max_items = 200
+tax_rate = 0.10
+enabled = true
+
+[rules.shipment_5]
+id = "shipment-5"
+tier = 3
+max_items = 250
+tax_rate = 0.10
+enabled = true
+
+[rules.shipment_6]
+id = "shipment-6"
+tier = 1
+max_items = 300
+tax_rate = 0.10
+enabled = true
+
+[rules.shipment_7]
+id = "shipment-7"
+tier = 2
+max_items = 350
+tax_rate = 0.10
+enabled = true
+
+[rules.shipment_8]
+id = "shipment-8"
+tier = 3
+max_items = 400
+tax_rate = 0.10
+enabled = true
+
+[rules.shipment_9]
+id = "shipment-9"
+tier = 1
+max_items = 450
+tax_rate = 0.10
+enabled = true
+
+[rules.shipment_10]
+id = "shipment-10"
+tier = 2
+max_items = 500
+tax_rate = 0.10
+enabled = true
+
+[rules.shipment_11]
+id = "shipment-11"
+tier = 3
+max_items = 550
+tax_rate = 0.10
+enabled = true
+
+[rules.shipment_12]
+id = "shipment-12"
+tier = 1
+max_items = 600
+tax_rate = 0.10
+enabled = true
+
+[rules.shipment_13]
+id = "shipment-13"
+tier = 2
+max_items = 650
+tax_rate = 0.10
+enabled = true
+
+[rules.shipment_14]
+id = "shipment-14"
+tier = 3
+max_items = 700
+tax_rate = 0.10
+enabled = true
+
+[rules.shipment_15]
+id = "shipment-15"
+tier = 1
+max_items = 750
+tax_rate = 0.10
+enabled = true

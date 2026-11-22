@@ -1,0 +1,101 @@
+# Production container definition for Customer service
+FROM python:3.12-slim AS builder
+WORKDIR /build/customers
+LABEL service="customers" tier="production"
+ENV APP_MODULE=customers \
+    PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1
+RUN mkdir -p /build/customers/layer_1 && echo 'customer-1' > /build/customers/layer_1/meta.txt
+ENV CUSTOMER_OPT_1=10
+RUN mkdir -p /build/customers/layer_2 && echo 'customer-2' > /build/customers/layer_2/meta.txt
+ENV CUSTOMER_OPT_2=20
+RUN mkdir -p /build/customers/layer_3 && echo 'customer-3' > /build/customers/layer_3/meta.txt
+ENV CUSTOMER_OPT_3=30
+RUN mkdir -p /build/customers/layer_4 && echo 'customer-4' > /build/customers/layer_4/meta.txt
+ENV CUSTOMER_OPT_4=40
+RUN mkdir -p /build/customers/layer_5 && echo 'customer-5' > /build/customers/layer_5/meta.txt
+ENV CUSTOMER_OPT_5=50
+RUN mkdir -p /build/customers/layer_6 && echo 'customer-6' > /build/customers/layer_6/meta.txt
+ENV CUSTOMER_OPT_6=60
+RUN mkdir -p /build/customers/layer_7 && echo 'customer-7' > /build/customers/layer_7/meta.txt
+ENV CUSTOMER_OPT_7=70
+RUN mkdir -p /build/customers/layer_8 && echo 'customer-8' > /build/customers/layer_8/meta.txt
+ENV CUSTOMER_OPT_8=80
+RUN mkdir -p /build/customers/layer_9 && echo 'customer-9' > /build/customers/layer_9/meta.txt
+ENV CUSTOMER_OPT_9=90
+RUN mkdir -p /build/customers/layer_10 && echo 'customer-10' > /build/customers/layer_10/meta.txt
+ENV CUSTOMER_OPT_10=100
+RUN mkdir -p /build/customers/layer_11 && echo 'customer-11' > /build/customers/layer_11/meta.txt
+ENV CUSTOMER_OPT_11=110
+RUN mkdir -p /build/customers/layer_12 && echo 'customer-12' > /build/customers/layer_12/meta.txt
+ENV CUSTOMER_OPT_12=120
+RUN mkdir -p /build/customers/layer_13 && echo 'customer-13' > /build/customers/layer_13/meta.txt
+ENV CUSTOMER_OPT_13=130
+RUN mkdir -p /build/customers/layer_14 && echo 'customer-14' > /build/customers/layer_14/meta.txt
+ENV CUSTOMER_OPT_14=140
+RUN mkdir -p /build/customers/layer_15 && echo 'customer-15' > /build/customers/layer_15/meta.txt
+ENV CUSTOMER_OPT_15=150
+RUN mkdir -p /build/customers/layer_16 && echo 'customer-16' > /build/customers/layer_16/meta.txt
+ENV CUSTOMER_OPT_16=160
+RUN mkdir -p /build/customers/layer_17 && echo 'customer-17' > /build/customers/layer_17/meta.txt
+ENV CUSTOMER_OPT_17=170
+RUN mkdir -p /build/customers/layer_18 && echo 'customer-18' > /build/customers/layer_18/meta.txt
+ENV CUSTOMER_OPT_18=180
+RUN mkdir -p /build/customers/layer_19 && echo 'customer-19' > /build/customers/layer_19/meta.txt
+ENV CUSTOMER_OPT_19=190
+RUN mkdir -p /build/customers/layer_20 && echo 'customer-20' > /build/customers/layer_20/meta.txt
+ENV CUSTOMER_OPT_20=200
+RUN mkdir -p /build/customers/layer_21 && echo 'customer-21' > /build/customers/layer_21/meta.txt
+ENV CUSTOMER_OPT_21=210
+RUN mkdir -p /build/customers/layer_22 && echo 'customer-22' > /build/customers/layer_22/meta.txt
+ENV CUSTOMER_OPT_22=220
+RUN mkdir -p /build/customers/layer_23 && echo 'customer-23' > /build/customers/layer_23/meta.txt
+ENV CUSTOMER_OPT_23=230
+RUN mkdir -p /build/customers/layer_24 && echo 'customer-24' > /build/customers/layer_24/meta.txt
+ENV CUSTOMER_OPT_24=240
+RUN mkdir -p /build/customers/layer_25 && echo 'customer-25' > /build/customers/layer_25/meta.txt
+ENV CUSTOMER_OPT_25=250
+RUN mkdir -p /build/customers/layer_26 && echo 'customer-26' > /build/customers/layer_26/meta.txt
+ENV CUSTOMER_OPT_26=260
+RUN mkdir -p /build/customers/layer_27 && echo 'customer-27' > /build/customers/layer_27/meta.txt
+ENV CUSTOMER_OPT_27=270
+RUN mkdir -p /build/customers/layer_28 && echo 'customer-28' > /build/customers/layer_28/meta.txt
+ENV CUSTOMER_OPT_28=280
+RUN mkdir -p /build/customers/layer_29 && echo 'customer-29' > /build/customers/layer_29/meta.txt
+ENV CUSTOMER_OPT_29=290
+RUN mkdir -p /build/customers/layer_30 && echo 'customer-30' > /build/customers/layer_30/meta.txt
+ENV CUSTOMER_OPT_30=300
+RUN mkdir -p /build/customers/layer_31 && echo 'customer-31' > /build/customers/layer_31/meta.txt
+ENV CUSTOMER_OPT_31=310
+RUN mkdir -p /build/customers/layer_32 && echo 'customer-32' > /build/customers/layer_32/meta.txt
+ENV CUSTOMER_OPT_32=320
+RUN mkdir -p /build/customers/layer_33 && echo 'customer-33' > /build/customers/layer_33/meta.txt
+ENV CUSTOMER_OPT_33=330
+RUN mkdir -p /build/customers/layer_34 && echo 'customer-34' > /build/customers/layer_34/meta.txt
+ENV CUSTOMER_OPT_34=340
+RUN mkdir -p /build/customers/layer_35 && echo 'customer-35' > /build/customers/layer_35/meta.txt
+ENV CUSTOMER_OPT_35=350
+RUN mkdir -p /build/customers/layer_36 && echo 'customer-36' > /build/customers/layer_36/meta.txt
+ENV CUSTOMER_OPT_36=360
+RUN mkdir -p /build/customers/layer_37 && echo 'customer-37' > /build/customers/layer_37/meta.txt
+ENV CUSTOMER_OPT_37=370
+RUN mkdir -p /build/customers/layer_38 && echo 'customer-38' > /build/customers/layer_38/meta.txt
+ENV CUSTOMER_OPT_38=380
+RUN mkdir -p /build/customers/layer_39 && echo 'customer-39' > /build/customers/layer_39/meta.txt
+ENV CUSTOMER_OPT_39=390
+RUN mkdir -p /build/customers/layer_40 && echo 'customer-40' > /build/customers/layer_40/meta.txt
+ENV CUSTOMER_OPT_40=400
+RUN mkdir -p /build/customers/layer_41 && echo 'customer-41' > /build/customers/layer_41/meta.txt
+ENV CUSTOMER_OPT_41=410
+RUN mkdir -p /build/customers/layer_42 && echo 'customer-42' > /build/customers/layer_42/meta.txt
+ENV CUSTOMER_OPT_42=420
+RUN mkdir -p /build/customers/layer_43 && echo 'customer-43' > /build/customers/layer_43/meta.txt
+ENV CUSTOMER_OPT_43=430
+
+FROM python:3.12-slim AS runtime
+WORKDIR /app/customers
+RUN useradd --create-home appuser
+COPY --from=builder /build/customers /app/customers
+USER appuser
+EXPOSE 8007
+CMD ["python", "-m", "customers"]

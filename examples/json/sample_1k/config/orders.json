@@ -1,0 +1,109 @@
+{
+  "service": "orders",
+  "records": [
+    {
+      "id": "order-1",
+      "domain": "orders",
+      "tier": 2,
+      "limit": 100,
+      "enabled": true,
+      "tags": ["orders", "v1"]
+    },
+    {
+      "id": "order-2",
+      "domain": "orders",
+      "tier": 3,
+      "limit": 200,
+      "enabled": true,
+      "tags": ["orders", "v1"]
+    },
+    {
+      "id": "order-3",
+      "domain": "orders",
+      "tier": 1,
+      "limit": 300,
+      "enabled": true,
+      "tags": ["orders", "v1"]
+    },
+    {
+      "id": "order-4",
+      "domain": "orders",
+      "tier": 2,
+      "limit": 400,
+      "enabled": true,
+      "tags": ["orders", "v1"]
+    },
+    {
+      "id": "order-5",
+      "domain": "orders",
+      "tier": 3,
+      "limit": 500,
+      "enabled": true,
+      "tags": ["orders", "v1"]
+    },
+    {
+      "id": "order-6",
+      "domain": "orders",
+      "tier": 1,
+      "limit": 600,
+      "enabled": true,
+      "tags": ["orders", "v1"]
+    },
+    {
+      "id": "order-7",
+      "domain": "orders",
+      "tier": 2,
+      "limit": 700,
+      "enabled": true,
+      "tags": ["orders", "v1"]
+    },
+    {
+      "id": "order-8",
+      "domain": "orders",
+      "tier": 3,
+      "limit": 800,
+      "enabled": true,
+      "tags": ["orders", "v1"]
+    },
+    {
+      "id": "order-9",
+      "domain": "orders",
+      "tier": 1,
+      "limit": 900,
+      "enabled": true,
+      "tags": ["orders", "v1"]
+    },
+    {
+      "id": "order-10",
+      "domain": "orders",
+      "tier": 2,
+      "limit": 1000,
+      "enabled": true,
+      "tags": ["orders", "v1"]
+    },
+    {
+      "id": "order-11",
+      "domain": "orders",
+      "tier": 3,
+      "limit": 1100,
+      "enabled": true,
+      "tags": ["orders", "v1"]
+    },
+    {
+      "id": "order-12",
+      "domain": "orders",
+      "tier": 1,
+      "limit": 1200,
+      "enabled": true,
+      "tags": ["orders", "v1"]
+    },
+    {
+      "id": "order-13",
+      "domain": "orders",
+      "tier": 2,
+      "limit": 1300,
+      "enabled": true,
+      "tags": ["orders", "v1"]
+    }
+  ]
+}

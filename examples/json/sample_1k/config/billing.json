@@ -1,0 +1,109 @@
+{
+  "service": "billing",
+  "records": [
+    {
+      "id": "invoice-1",
+      "domain": "billing",
+      "tier": 2,
+      "limit": 100,
+      "enabled": true,
+      "tags": ["billing", "v1"]
+    },
+    {
+      "id": "invoice-2",
+      "domain": "billing",
+      "tier": 3,
+      "limit": 200,
+      "enabled": true,
+      "tags": ["billing", "v1"]
+    },
+    {
+      "id": "invoice-3",
+      "domain": "billing",
+      "tier": 1,
+      "limit": 300,
+      "enabled": true,
+      "tags": ["billing", "v1"]
+    },
+    {
+      "id": "invoice-4",
+      "domain": "billing",
+      "tier": 2,
+      "limit": 400,
+      "enabled": true,
+      "tags": ["billing", "v1"]
+    },
+    {
+      "id": "invoice-5",
+      "domain": "billing",
+      "tier": 3,
+      "limit": 500,
+      "enabled": true,
+      "tags": ["billing", "v1"]
+    },
+    {
+      "id": "invoice-6",
+      "domain": "billing",
+      "tier": 1,
+      "limit": 600,
+      "enabled": true,
+      "tags": ["billing", "v1"]
+    },
+    {
+      "id": "invoice-7",
+      "domain": "billing",
+      "tier": 2,
+      "limit": 700,
+      "enabled": true,
+      "tags": ["billing", "v1"]
+    },
+    {
+      "id": "invoice-8",
+      "domain": "billing",
+      "tier": 3,
+      "limit": 800,
+      "enabled": true,
+      "tags": ["billing", "v1"]
+    },
+    {
+      "id": "invoice-9",
+      "domain": "billing",
+      "tier": 1,
+      "limit": 900,
+      "enabled": true,
+      "tags": ["billing", "v1"]
+    },
+    {
+      "id": "invoice-10",
+      "domain": "billing",
+      "tier": 2,
+      "limit": 1000,
+      "enabled": true,
+      "tags": ["billing", "v1"]
+    },
+    {
+      "id": "invoice-11",
+      "domain": "billing",
+      "tier": 3,
+      "limit": 1100,
+      "enabled": true,
+      "tags": ["billing", "v1"]
+    },
+    {
+      "id": "invoice-12",
+      "domain": "billing",
+      "tier": 1,
+      "limit": 1200,
+      "enabled": true,
+      "tags": ["billing", "v1"]
+    },
+    {
+      "id": "invoice-13",
+      "domain": "billing",
+      "tier": 2,
+      "limit": 1300,
+      "enabled": true,
+      "tags": ["billing", "v1"]
+    }
+  ]
+}

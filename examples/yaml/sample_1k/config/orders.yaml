@@ -1,0 +1,115 @@
+service: orders
+version: '1.0.0'
+pipelines:
+  - id: order-job-1
+    owner: orders-team
+    retries: 3
+    timeout_seconds: 35
+    schedule: '0 1 * * *'
+    tags:
+      - orders
+      - tier-2
+  - id: order-job-2
+    owner: orders-team
+    retries: 3
+    timeout_seconds: 40
+    schedule: '0 2 * * *'
+    tags:
+      - orders
+      - tier-3
+  - id: order-job-3
+    owner: orders-team
+    retries: 3
+    timeout_seconds: 45
+    schedule: '0 3 * * *'
+    tags:
+      - orders
+      - tier-1
+  - id: order-job-4
+    owner: orders-team
+    retries: 3
+    timeout_seconds: 50
+    schedule: '0 4 * * *'
+    tags:
+      - orders
+      - tier-2
+  - id: order-job-5
+    owner: orders-team
+    retries: 3
+    timeout_seconds: 55
+    schedule: '0 5 * * *'
+    tags:
+      - orders
+      - tier-3
+  - id: order-job-6
+    owner: orders-team
+    retries: 3
+    timeout_seconds: 60
+    schedule: '0 6 * * *'
+    tags:
+      - orders
+      - tier-1
+  - id: order-job-7
+    owner: orders-team
+    retries: 3
+    timeout_seconds: 65
+    schedule: '0 7 * * *'
+    tags:
+      - orders
+      - tier-2
+  - id: order-job-8
+    owner: orders-team
+    retries: 3
+    timeout_seconds: 70
+    schedule: '0 8 * * *'
+    tags:
+      - orders
+      - tier-3
+  - id: order-job-9
+    owner: orders-team
+    retries: 3
+    timeout_seconds: 75
+    schedule: '0 9 * * *'
+    tags:
+      - orders
+      - tier-1
+  - id: order-job-10
+    owner: orders-team
+    retries: 3
+    timeout_seconds: 80
+    schedule: '0 10 * * *'
+    tags:
+      - orders
+      - tier-2
+  - id: order-job-11
+    owner: orders-team
+    retries: 3
+    timeout_seconds: 85
+    schedule: '0 11 * * *'
+    tags:
+      - orders
+      - tier-3
+  - id: order-job-12
+    owner: orders-team
+    retries: 3
+    timeout_seconds: 90
+    schedule: '0 12 * * *'
+    tags:
+      - orders
+      - tier-1
+  - id: order-job-13
+    owner: orders-team
+    retries: 3
+    timeout_seconds: 95
+    schedule: '0 13 * * *'
+    tags:
+      - orders
+      - tier-2
+  - id: order-job-14
+    owner: orders-team
+    retries: 3
+    timeout_seconds: 100
+    schedule: '0 14 * * *'
+    tags:
+      - orders
+      - tier-3

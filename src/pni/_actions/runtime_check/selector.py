@@ -19,6 +19,11 @@ from pathlib import Path
 from typing import Final, Optional
 
 from pni._actions.project_inspect import ProjectFacts
+from pni._actions.runtime_check.polyglot import (
+    build_extended_test_command,
+    compute_extended_build_args,
+    select_extended_harness_tool,
+)
 
 _PY_VER_RE = re.compile(r"3\.(\d+)")
 _PHP_VER_RE = re.compile(r"8\.(\d+)")
@@ -126,16 +131,23 @@ def select_node_image_version(constraint: Optional[str]) -> str:
 
 
 def select_harness_tool(pf: ProjectFacts) -> str:
-    """Determine built-in harness Dockerfile tool ('uv', 'poetry', 'pip', 'maven', 'composer', 'go', 'node')."""
+    """Determine built-in harness Dockerfile tool for core and extended polyglot languages."""
+    tool: Optional[str] = None
     if pf.language == "java":
         is_gradle = pf.build_system == "gradle" or any("gradle" in m for m in pf.manifest_files)
-        return "gradle" if is_gradle else "maven"
-    if pf.language == "php":
+        tool = "gradle" if is_gradle else "maven"
+    elif pf.language == "php":
         is_composer = pf.build_system == "composer" or "composer.json" in pf.manifest_files
-        return "composer" if is_composer else "raw"
-    if pf.language in {"go", "typescript", "javascript"}:
-        return "go" if pf.language == "go" else "node"
+        tool = "composer" if is_composer else "raw"
+    elif pf.language in {"go", "typescript", "javascript"}:
+        tool = "go" if pf.language == "go" else "node"
+    else:
+        tool = select_extended_harness_tool(pf)
 
+    if tool is not None:
+        return tool
+    if pf.language != "python":
+        return pf.build_system or "default"
     if pf.build_system == "uv" or "uv.lock" in pf.lockfiles_found:
         return "uv"
     return "poetry" if (pf.build_system == "poetry" or "poetry.lock" in pf.lockfiles_found) else "pip"
@@ -160,31 +172,37 @@ def compute_harness_build_args(
     harness_dockerfile: Optional[Path] = None,
 ) -> dict[str, str]:
     """Build --build-arg key-value dictionary for the selected language harness."""
+    ext_args = compute_extended_build_args(
+        pf,
+        extra_apt_packages=extra_apt_packages,
+        harness_dockerfile=harness_dockerfile,
+    )
+    if ext_args is not None:
+        return ext_args
+
+    args: dict[str, str]
     if pf.language == "java":
         df_java = _extract_dockerfile_arg_default(harness_dockerfile, "JAVA_VERSION")
         raw_java = df_java if (df_java and df_java != "21") else pf.language_version_constraint
-        return {"JAVA_VERSION": select_java_image_version(raw_java)}
-    if pf.language == "php":
-        php_args: dict[str, str] = {
-            "PHP_VERSION": select_php_image_version(pf.language_version_constraint),
-        }
+        args = {"JAVA_VERSION": select_java_image_version(raw_java)}
+    elif pf.language == "php":
+        args = {"PHP_VERSION": select_php_image_version(pf.language_version_constraint)}
         if extra_apt_packages.strip():
-            php_args["EXTRA_APT_PACKAGES"] = extra_apt_packages.strip()
-        return php_args
-    if pf.language == "go":
+            args["EXTRA_APT_PACKAGES"] = extra_apt_packages.strip()
+    elif pf.language == "go":
         df_go = _extract_dockerfile_arg_default(harness_dockerfile, "GO_VERSION")
         raw_go = df_go if (df_go and df_go != "1.22") else pf.language_version_constraint
-        return {"GO_VERSION": select_go_image_version(raw_go)}
-    if pf.language in {"typescript", "javascript"}:
+        args = {"GO_VERSION": select_go_image_version(raw_go)}
+    elif pf.language in {"typescript", "javascript"}:
         df_node = _extract_dockerfile_arg_default(harness_dockerfile, "NODE_VERSION")
         raw_node = df_node if (df_node and df_node != "20") else pf.language_version_constraint
-        return {"NODE_VERSION": select_node_image_version(raw_node)}
-
-    args: dict[str, str] = {
-        "PYTHON_VERSION": select_python_image_version(pf.language_version_constraint),
-    }
-    if extra_apt_packages.strip():
-        args["EXTRA_APT_PACKAGES"] = extra_apt_packages.strip()
+        args = {"NODE_VERSION": select_node_image_version(raw_node)}
+    elif pf.language == "python":
+        args = {"PYTHON_VERSION": select_python_image_version(pf.language_version_constraint)}
+        if extra_apt_packages.strip():
+            args["EXTRA_APT_PACKAGES"] = extra_apt_packages.strip()
+    else:
+        args = {"EXTRA_APT_PACKAGES": extra_apt_packages.strip()} if extra_apt_packages.strip() else {}
     return args
 
 
@@ -193,12 +211,6 @@ def _build_php_test_and_lint_script(source_targets: list[str], test_targets: lis
     eff_srcs = source_targets or ["."]
     eff_src = " ".join(eff_srcs)
     eff_tst = " ".join(test_targets or ["tests"])
-    dirs_xml = "".join(f"<directory>{s}</directory>" for s in eff_srcs)
-    fallback_xml = (
-        f"<phpunit><source><include>{dirs_xml}</include>"
-        "<exclude><directory>vendor</directory><directory>tests</directory></exclude>"
-        "</source></phpunit>"
-    )
     return (
         "lint_fail=0; "
         f"for p in $(find {eff_src} -path '*/vendor' -prune "
@@ -218,7 +230,14 @@ def _build_php_test_and_lint_script(source_targets: list[str], test_targets: lis
         '  cfg_flag=""; '
         '  tst_arg=""; '
         "  if [ ! -f phpunit.xml ] && [ ! -f phpunit.xml.dist ] && [ ! -f phpunit.dist.xml ]; then "
-        f"    printf '%s' '{fallback_xml}' >/tmp/pni_phpunit.xml; "
+        '    dirs_xml=""; ws_pwd=$(pwd); '
+        f"    for sd in {eff_src}; do "
+        '      if [ -d "$sd" ]; then dirs_xml="${dirs_xml}<directory>${ws_pwd}/${sd}</directory>"; fi; '
+        "    done; "
+        '    if [ -z "$dirs_xml" ]; then dirs_xml="<directory>${ws_pwd}</directory>"; fi; '
+        '    printf \'<phpunit><source><include>%s</include>'
+        "<exclude><directory>%s/vendor</directory><directory>%s/tests</directory></exclude>"
+        '</source></phpunit>\' "$dirs_xml" "$ws_pwd" "$ws_pwd" >/tmp/pni_phpunit.xml; '
         '    cfg_flag="-c /tmp/pni_phpunit.xml"; '
         f'    tst_arg="{eff_tst}"; '
         "  fi; "
@@ -339,21 +358,22 @@ def build_test_and_coverage_command(
     pre_test_cmd: str = "",
 ) -> list[str]:
     """Construct the offline Stage 2 command executing unit tests and emitting coverage artifacts."""
+    cmd: Optional[list[str]] = None
     if override_cmd.strip():
-        return _prepend_pre_test_cmd(["sh", "-c", override_cmd.strip()], pre_test_cmd)
+        cmd = ["sh", "-c", override_cmd.strip()]
+    elif pf.language == "php":
+        cmd = ["sh", "-c", _build_php_test_and_lint_script(source_targets, test_targets)]
+    elif pf.language == "java":
+        cmd = _build_java_test_command(tool)
+    elif pf.language == "go":
+        cmd = ["sh", "-c", _build_go_test_and_vet_script()]
+    elif pf.language in {"typescript", "javascript"}:
+        cmd = ["sh", "-c", _build_node_test_and_lint_script(pf.language)]
+    else:
+        cmd = build_extended_test_command(pf, tool, source_targets, test_targets)
 
-    if pf.language == "php":
-        php_cmd = ["sh", "-c", _build_php_test_and_lint_script(source_targets, test_targets)]
-        return _prepend_pre_test_cmd(php_cmd, pre_test_cmd)
-
-    if pf.language == "java":
-        return _prepend_pre_test_cmd(_build_java_test_command(tool), pre_test_cmd)
-
-    if pf.language == "go":
-        return _prepend_pre_test_cmd(["sh", "-c", _build_go_test_and_vet_script()], pre_test_cmd)
-
-    if pf.language in {"typescript", "javascript"}:
-        return _prepend_pre_test_cmd(["sh", "-c", _build_node_test_and_lint_script(pf.language)], pre_test_cmd)
+    if cmd is not None:
+        return _prepend_pre_test_cmd(cmd, pre_test_cmd)
 
     eff_sources = source_targets or ["src"]
     eff_tests = test_targets or ["tests"]

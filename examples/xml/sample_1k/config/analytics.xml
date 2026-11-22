@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<catalog domain="analytics">
+  <entry id="metric-1" tier="2">
+    <name>Metric Item 1</name>
+    <quantity>10</quantity>
+    <unitPrice>12.50</unitPrice>
+    <currency>USD</currency>
+    <active>true</active>
+  </entry>
+  <entry id="metric-2" tier="3">
+    <name>Metric Item 2</name>
+    <quantity>20</quantity>
+    <unitPrice>24.50</unitPrice>
+    <currency>USD</currency>
+    <active>true</active>
+  </entry>
+  <entry id="metric-3" tier="1">
+    <name>Metric Item 3</name>
+    <quantity>30</quantity>
+    <unitPrice>36.50</unitPrice>
+    <currency>USD</currency>
+    <active>true</active>
+  </entry>
+  <entry id="metric-4" tier="2">
+    <name>Metric Item 4</name>
+    <quantity>40</quantity>
+    <unitPrice>48.50</unitPrice>
+    <currency>USD</currency>
+    <active>true</active>
+  </entry>
+  <entry id="metric-5" tier="3">
+    <name>Metric Item 5</name>
+    <quantity>50</quantity>
+    <unitPrice>60.50</unitPrice>
+    <currency>USD</currency>
+    <active>true</active>
+  </entry>
+  <entry id="metric-6" tier="1">
+    <name>Metric Item 6</name>
+    <quantity>60</quantity>
+    <unitPrice>72.50</unitPrice>
+    <currency>USD</currency>
+    <active>true</active>
+  </entry>
+  <entry id="metric-7" tier="2">
+    <name>Metric Item 7</name>
+    <quantity>70</quantity>
+    <unitPrice>84.50</unitPrice>
+    <currency>USD</currency>
+    <active>true</active>
+  </entry>
+  <entry id="metric-8" tier="3">
+    <name>Metric Item 8</name>
+    <quantity>80</quantity>
+    <unitPrice>96.50</unitPrice>
+    <currency>USD</currency>
+    <active>true</active>
+  </entry>
+  <entry id="metric-9" tier="1">
+    <name>Metric Item 9</name>
+    <quantity>90</quantity>
+    <unitPrice>108.50</unitPrice>
+    <currency>USD</currency>
+    <active>true</active>
+  </entry>
+  <entry id="metric-10" tier="2">
+    <name>Metric Item 10</name>
+    <quantity>100</quantity>
+    <unitPrice>120.50</unitPrice>
+    <currency>USD</currency>
+    <active>true</active>
+  </entry>
+  <entry id="metric-11" tier="3">
+    <name>Metric Item 11</name>
+    <quantity>110</quantity>
+    <unitPrice>132.50</unitPrice>
+    <currency>USD</currency>
+    <active>true</active>
+  </entry>
+  <entry id="metric-12" tier="1">
+    <name>Metric Item 12</name>
+    <quantity>120</quantity>
+    <unitPrice>144.50</unitPrice>
+    <currency>USD</currency>
+    <active>true</active>
+  </entry>
+  <entry id="metric-13" tier="2">
+    <name>Metric Item 13</name>
+    <quantity>130</quantity>
+    <unitPrice>156.50</unitPrice>
+    <currency>USD</currency>
+    <active>true</active>
+  </entry>
+  <entry id="metric-14" tier="3">
+    <name>Metric Item 14</name>
+    <quantity>140</quantity>
+    <unitPrice>168.50</unitPrice>
+    <currency>USD</currency>
+    <active>true</active>
+  </entry>
+  <entry id="metric-15" tier="1">
+    <name>Metric Item 15</name>
+    <quantity>150</quantity>
+    <unitPrice>180.50</unitPrice>
+    <currency>USD</currency>
+    <active>true</active>
+  </entry>
+</catalog>

@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Version>1.0.0</Version>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="src/CustomerService.fs" />
+    <Compile Include="src/InvoiceService.fs" />
+    <Compile Include="src/LedgerEntryService.fs" />
+    <Compile Include="src/LegacyBridge.fs" />
+    <Compile Include="src/MetricService.fs" />
+    <Compile Include="src/OrderService.fs" />
+    <Compile Include="src/PriceRuleService.fs" />
+    <Compile Include="src/ShipmentService.fs" />
+    <Compile Include="src/StockItemService.fs" />
+  </ItemGroup>
+</Project>

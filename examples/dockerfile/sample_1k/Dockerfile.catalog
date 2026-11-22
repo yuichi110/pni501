@@ -1,0 +1,101 @@
+# Production container definition for Product service
+FROM python:3.12-slim AS builder
+WORKDIR /build/catalog
+LABEL service="catalog" tier="production"
+ENV APP_MODULE=catalog \
+    PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1
+RUN mkdir -p /build/catalog/layer_1 && echo 'product-1' > /build/catalog/layer_1/meta.txt
+ENV PRODUCT_OPT_1=10
+RUN mkdir -p /build/catalog/layer_2 && echo 'product-2' > /build/catalog/layer_2/meta.txt
+ENV PRODUCT_OPT_2=20
+RUN mkdir -p /build/catalog/layer_3 && echo 'product-3' > /build/catalog/layer_3/meta.txt
+ENV PRODUCT_OPT_3=30
+RUN mkdir -p /build/catalog/layer_4 && echo 'product-4' > /build/catalog/layer_4/meta.txt
+ENV PRODUCT_OPT_4=40
+RUN mkdir -p /build/catalog/layer_5 && echo 'product-5' > /build/catalog/layer_5/meta.txt
+ENV PRODUCT_OPT_5=50
+RUN mkdir -p /build/catalog/layer_6 && echo 'product-6' > /build/catalog/layer_6/meta.txt
+ENV PRODUCT_OPT_6=60
+RUN mkdir -p /build/catalog/layer_7 && echo 'product-7' > /build/catalog/layer_7/meta.txt
+ENV PRODUCT_OPT_7=70
+RUN mkdir -p /build/catalog/layer_8 && echo 'product-8' > /build/catalog/layer_8/meta.txt
+ENV PRODUCT_OPT_8=80
+RUN mkdir -p /build/catalog/layer_9 && echo 'product-9' > /build/catalog/layer_9/meta.txt
+ENV PRODUCT_OPT_9=90
+RUN mkdir -p /build/catalog/layer_10 && echo 'product-10' > /build/catalog/layer_10/meta.txt
+ENV PRODUCT_OPT_10=100
+RUN mkdir -p /build/catalog/layer_11 && echo 'product-11' > /build/catalog/layer_11/meta.txt
+ENV PRODUCT_OPT_11=110
+RUN mkdir -p /build/catalog/layer_12 && echo 'product-12' > /build/catalog/layer_12/meta.txt
+ENV PRODUCT_OPT_12=120
+RUN mkdir -p /build/catalog/layer_13 && echo 'product-13' > /build/catalog/layer_13/meta.txt
+ENV PRODUCT_OPT_13=130
+RUN mkdir -p /build/catalog/layer_14 && echo 'product-14' > /build/catalog/layer_14/meta.txt
+ENV PRODUCT_OPT_14=140
+RUN mkdir -p /build/catalog/layer_15 && echo 'product-15' > /build/catalog/layer_15/meta.txt
+ENV PRODUCT_OPT_15=150
+RUN mkdir -p /build/catalog/layer_16 && echo 'product-16' > /build/catalog/layer_16/meta.txt
+ENV PRODUCT_OPT_16=160
+RUN mkdir -p /build/catalog/layer_17 && echo 'product-17' > /build/catalog/layer_17/meta.txt
+ENV PRODUCT_OPT_17=170
+RUN mkdir -p /build/catalog/layer_18 && echo 'product-18' > /build/catalog/layer_18/meta.txt
+ENV PRODUCT_OPT_18=180
+RUN mkdir -p /build/catalog/layer_19 && echo 'product-19' > /build/catalog/layer_19/meta.txt
+ENV PRODUCT_OPT_19=190
+RUN mkdir -p /build/catalog/layer_20 && echo 'product-20' > /build/catalog/layer_20/meta.txt
+ENV PRODUCT_OPT_20=200
+RUN mkdir -p /build/catalog/layer_21 && echo 'product-21' > /build/catalog/layer_21/meta.txt
+ENV PRODUCT_OPT_21=210
+RUN mkdir -p /build/catalog/layer_22 && echo 'product-22' > /build/catalog/layer_22/meta.txt
+ENV PRODUCT_OPT_22=220
+RUN mkdir -p /build/catalog/layer_23 && echo 'product-23' > /build/catalog/layer_23/meta.txt
+ENV PRODUCT_OPT_23=230
+RUN mkdir -p /build/catalog/layer_24 && echo 'product-24' > /build/catalog/layer_24/meta.txt
+ENV PRODUCT_OPT_24=240
+RUN mkdir -p /build/catalog/layer_25 && echo 'product-25' > /build/catalog/layer_25/meta.txt
+ENV PRODUCT_OPT_25=250
+RUN mkdir -p /build/catalog/layer_26 && echo 'product-26' > /build/catalog/layer_26/meta.txt
+ENV PRODUCT_OPT_26=260
+RUN mkdir -p /build/catalog/layer_27 && echo 'product-27' > /build/catalog/layer_27/meta.txt
+ENV PRODUCT_OPT_27=270
+RUN mkdir -p /build/catalog/layer_28 && echo 'product-28' > /build/catalog/layer_28/meta.txt
+ENV PRODUCT_OPT_28=280
+RUN mkdir -p /build/catalog/layer_29 && echo 'product-29' > /build/catalog/layer_29/meta.txt
+ENV PRODUCT_OPT_29=290
+RUN mkdir -p /build/catalog/layer_30 && echo 'product-30' > /build/catalog/layer_30/meta.txt
+ENV PRODUCT_OPT_30=300
+RUN mkdir -p /build/catalog/layer_31 && echo 'product-31' > /build/catalog/layer_31/meta.txt
+ENV PRODUCT_OPT_31=310
+RUN mkdir -p /build/catalog/layer_32 && echo 'product-32' > /build/catalog/layer_32/meta.txt
+ENV PRODUCT_OPT_32=320
+RUN mkdir -p /build/catalog/layer_33 && echo 'product-33' > /build/catalog/layer_33/meta.txt
+ENV PRODUCT_OPT_33=330
+RUN mkdir -p /build/catalog/layer_34 && echo 'product-34' > /build/catalog/layer_34/meta.txt
+ENV PRODUCT_OPT_34=340
+RUN mkdir -p /build/catalog/layer_35 && echo 'product-35' > /build/catalog/layer_35/meta.txt
+ENV PRODUCT_OPT_35=350
+RUN mkdir -p /build/catalog/layer_36 && echo 'product-36' > /build/catalog/layer_36/meta.txt
+ENV PRODUCT_OPT_36=360
+RUN mkdir -p /build/catalog/layer_37 && echo 'product-37' > /build/catalog/layer_37/meta.txt
+ENV PRODUCT_OPT_37=370
+RUN mkdir -p /build/catalog/layer_38 && echo 'product-38' > /build/catalog/layer_38/meta.txt
+ENV PRODUCT_OPT_38=380
+RUN mkdir -p /build/catalog/layer_39 && echo 'product-39' > /build/catalog/layer_39/meta.txt
+ENV PRODUCT_OPT_39=390
+RUN mkdir -p /build/catalog/layer_40 && echo 'product-40' > /build/catalog/layer_40/meta.txt
+ENV PRODUCT_OPT_40=400
+RUN mkdir -p /build/catalog/layer_41 && echo 'product-41' > /build/catalog/layer_41/meta.txt
+ENV PRODUCT_OPT_41=410
+RUN mkdir -p /build/catalog/layer_42 && echo 'product-42' > /build/catalog/layer_42/meta.txt
+ENV PRODUCT_OPT_42=420
+RUN mkdir -p /build/catalog/layer_43 && echo 'product-43' > /build/catalog/layer_43/meta.txt
+ENV PRODUCT_OPT_43=430
+
+FROM python:3.12-slim AS runtime
+WORKDIR /app/catalog
+RUN useradd --create-home appuser
+COPY --from=builder /build/catalog /app/catalog
+USER appuser
+EXPOSE 8009
+CMD ["python", "-m", "catalog"]

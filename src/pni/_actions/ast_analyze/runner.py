@@ -114,9 +114,9 @@ def _filter_sinks_by_opt_out(
 
 
 def _is_ignored_path(path: Path, root: Path, exclude_globs: Sequence[str] = ()) -> bool:
-    """Return True if path is inside an ignored/hidden directory or matches exclude_globs."""
+    """Return True if path is inside an ignored/hidden directory (except .github) or matches exclude_globs."""
     rel_parts = path.relative_to(root).parts
-    if any(part in IGNORED_DIR_NAMES or part.startswith(".") for part in rel_parts[:-1]):
+    if any(part in IGNORED_DIR_NAMES or (part.startswith(".") and part != ".github") for part in rel_parts[:-1]):
         return True
     return matches_exclude_globs(path, root, exclude_globs)
 

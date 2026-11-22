@@ -420,7 +420,7 @@ LANGUAGE_REGISTRY: dict[str, LanguageSpec] = {
         default_test_dirs=("tests", "test"),
         test_file_patterns=("test_*.cob", "test_*.cbl", "*_test.cbl"),
         aliases=("cob", "cbl"),
-        has_runtime_harness=False,
+        has_runtime_harness=True,
     ),
     "r": LanguageSpec(
         language_id="r",
@@ -452,6 +452,7 @@ LANGUAGE_REGISTRY: dict[str, LanguageSpec] = {
         default_test_dirs=("tests", "test"),
         test_file_patterns=("*_test.sh", "test_*.sh", "*.bats"),
         aliases=("sh", "shell", "zsh"),
+        has_runtime_harness=True,
     ),
     "powershell": LanguageSpec(
         language_id="powershell",
@@ -464,6 +465,7 @@ LANGUAGE_REGISTRY: dict[str, LanguageSpec] = {
         default_test_dirs=("tests", "Tests"),
         test_file_patterns=("*.Tests.ps1", "*.tests.ps1"),
         aliases=("ps1", "pwsh"),
+        has_runtime_harness=True,
     ),
     "groovy": LanguageSpec(
         language_id="groovy",
@@ -475,6 +477,7 @@ LANGUAGE_REGISTRY: dict[str, LanguageSpec] = {
         default_source_dirs=("src/main/groovy", "src", "vars", "."),
         default_test_dirs=("src/test/groovy", "test", "tests"),
         test_file_patterns=("*Spec.groovy", "*Test.groovy"),
+        has_runtime_harness=True,
     ),
     "objc": LanguageSpec(
         language_id="objc",
@@ -501,6 +504,7 @@ LANGUAGE_REGISTRY: dict[str, LanguageSpec] = {
         default_source_dirs=("lua", "src", "lib", "."),
         default_test_dirs=("spec", "tests", "test"),
         test_file_patterns=("*_spec.lua", "*_test.lua", "test_*.lua"),
+        has_runtime_harness=True,
     ),
     "haskell": LanguageSpec(
         language_id="haskell",
@@ -515,6 +519,7 @@ LANGUAGE_REGISTRY: dict[str, LanguageSpec] = {
         default_test_dirs=("test", "tests"),
         test_file_patterns=("*Spec.hs", "*Test.hs"),
         aliases=("hs",),
+        has_runtime_harness=True,
     ),
     "fsharp": LanguageSpec(
         language_id="fsharp",
@@ -528,6 +533,7 @@ LANGUAGE_REGISTRY: dict[str, LanguageSpec] = {
         default_test_dirs=("tests", "test"),
         test_file_patterns=("*Tests.fs", "*Test.fs"),
         aliases=("f#", "fs", "f-sharp"),
+        has_runtime_harness=True,
     ),
     "ocaml": LanguageSpec(
         language_id="ocaml",
@@ -542,6 +548,7 @@ LANGUAGE_REGISTRY: dict[str, LanguageSpec] = {
         default_test_dirs=("test", "tests"),
         test_file_patterns=("test_*.ml", "*_test.ml"),
         aliases=("ml",),
+        has_runtime_harness=True,
     ),
     "zig": LanguageSpec(
         language_id="zig",
@@ -554,6 +561,7 @@ LANGUAGE_REGISTRY: dict[str, LanguageSpec] = {
         default_source_dirs=("src", "."),
         default_test_dirs=("tests", "src"),
         test_file_patterns=("*_test.zig", "test_*.zig"),
+        has_runtime_harness=True,
     ),
     "julia": LanguageSpec(
         language_id="julia",
@@ -568,6 +576,7 @@ LANGUAGE_REGISTRY: dict[str, LanguageSpec] = {
         default_test_dirs=("test", "tests"),
         test_file_patterns=("runtests.jl", "test_*.jl", "*_test.jl"),
         aliases=("jl",),
+        has_runtime_harness=True,
     ),
     "fortran": LanguageSpec(
         language_id="fortran",
@@ -581,6 +590,7 @@ LANGUAGE_REGISTRY: dict[str, LanguageSpec] = {
         default_test_dirs=("test", "tests"),
         test_file_patterns=("test_*.f90", "*_test.f90"),
         aliases=("f90",),
+        has_runtime_harness=True,
     ),
     "matlab": LanguageSpec(
         language_id="matlab",
@@ -605,6 +615,7 @@ LANGUAGE_REGISTRY: dict[str, LanguageSpec] = {
         default_source_dirs=("src",),
         default_test_dirs=("tests", "src"),
         test_file_patterns=("*.test.ts", "*.spec.ts", "*.test.js"),
+        has_runtime_harness=True,
     ),
     "solidity": LanguageSpec(
         language_id="solidity",
@@ -641,6 +652,7 @@ LANGUAGE_REGISTRY: dict[str, LanguageSpec] = {
         default_test_dirs=("tb", "sim", "tests"),
         test_file_patterns=("tb_*.sv", "tb_*.v", "*_tb.sv", "*_tb.v"),
         aliases=("sv", "systemverilog"),
+        has_runtime_harness=True,
     ),
     "vhdl": LanguageSpec(
         language_id="vhdl",
@@ -652,6 +664,7 @@ LANGUAGE_REGISTRY: dict[str, LanguageSpec] = {
         default_source_dirs=("rtl", "src", "hdl", "."),
         default_test_dirs=("tb", "sim", "tests"),
         test_file_patterns=("tb_*.vhd", "*_tb.vhd", "*_tb.vhdl"),
+        has_runtime_harness=True,
     ),
     "ada": LanguageSpec(
         language_id="ada",
@@ -665,6 +678,7 @@ LANGUAGE_REGISTRY: dict[str, LanguageSpec] = {
         default_source_dirs=("src", "."),
         default_test_dirs=("tests", "test"),
         test_file_patterns=("*_test.adb", "test_*.adb"),
+        has_runtime_harness=True,
     ),
     "odin": LanguageSpec(
         language_id="odin",
@@ -689,6 +703,7 @@ LANGUAGE_REGISTRY: dict[str, LanguageSpec] = {
         default_test_dirs=("tests", "t"),
         test_file_patterns=("*-test.lisp", "test-*.lisp"),
         aliases=("lisp", "cl"),
+        has_runtime_harness=True,
     ),
     # =========================================================================
     # Tier C: Polyglot Companion / IaC / Schema / Config (15 languages)

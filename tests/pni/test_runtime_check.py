@@ -100,8 +100,10 @@ def test_target_dockerfile_paths_and_manager(tmp_path: Path) -> None:
 
     _, fb_id = resolve_template_dockerfile(tmp_path, "python", "unknown_tool")
     assert fb_id == "python/pip.dockerfile"
+    _, cob_id = resolve_template_dockerfile(tmp_path, "cobol", "none")
+    assert cob_id == "cobol/gnucobol.dockerfile"
     with pytest.raises(FileNotFoundError):
-        resolve_template_dockerfile(tmp_path, "cobol", "none")
+        resolve_template_dockerfile(tmp_path, "hcl", "none")
 
     # Reuse preserves user/AI customization unless force_regenerate=True
     root_df.write_text("# custom tweak\nFROM python:3.12-slim\n", encoding="utf-8")
