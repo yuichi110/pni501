@@ -1,0 +1,205 @@
+{
+  "workflow_id": "py_api_fastapi_clean",
+  "workflow_run_id": "wf-f819234f",
+  "recorded_at": "2026-11-22T11:27:44.171485+00:00",
+  "target_root": "examples/python/api_fastapi_clean",
+  "system_profile": {
+    "system_purpose": "order-dispatch is an async FastAPI + Pydantic v2 microservice that prices multi-line customer orders in integer cents, persists fulfillment records via a repository Protocol port, and dispatches non-blocking outbound partner webhooks with bounded timeouts.",
+    "domain_context": "E-commerce order intake, loyalty-tier pricing (Standard vs. VIP), order persistence, and asynchronous fulfillment webhook notification.",
+    "runtime_types": [
+      "web_api",
+      "library"
+    ],
+    "tech_stack": [
+      "Python >=3.11 (uv_build + uv.lock)",
+      "FastAPI >=0.115.0 + Uvicorn >=0.30.0",
+      "Pydantic v2 >=2.8.0 + pydantic-settings >=2.4.0",
+      "httpx >=0.27.0 (AsyncClient)",
+      "pytest + pytest-cov + Ruff + Ty"
+    ],
+    "external_integrations": [
+      "Partner fulfillment webhook HTTP endpoint configured via ORDER_DISPATCH_WEBHOOK_URL (default https://partner-gateway.internal/v1/events)"
+    ]
+  },
+  "structure_map": {
+    "architecture_pattern": "Strict 4-Layer Acyclic Clean/Hexagonal Microservice (api -> services -> domain + infra)",
+    "layers": [
+      {
+        "name": "Composition & Config Root",
+        "responsibility": "FastAPI application factory, asynccontextmanager lifespan wiring, and centralized pydantic-settings configuration.",
+        "paths": [
+          "src/order_dispatch/main.py",
+          "src/order_dispatch/settings.py"
+        ],
+        "allowed_dependencies": [
+          "API Layer",
+          "Application Service Layer",
+          "Infrastructure Layer"
+        ]
+      },
+      {
+        "name": "API Layer",
+        "responsibility": "HTTP routing, dependency injection, and strict Pydantic v2 request/response DTO serialization.",
+        "paths": [
+          "src/order_dispatch/api/routes.py",
+          "src/order_dispatch/api/schemas.py"
+        ],
+        "allowed_dependencies": [
+          "Application Service Layer",
+          "Domain Layer",
+          "Composition & Config Root"
+        ]
+      },
+      {
+        "name": "Application Service Layer",
+        "responsibility": "Stateless orchestration of order pricing, async webhook dispatch, and repository persistence.",
+        "paths": [
+          "src/order_dispatch/services/dispatcher.py"
+        ],
+        "allowed_dependencies": [
+          "Domain Layer",
+          "Infrastructure Layer"
+        ]
+      },
+      {
+        "name": "Domain Layer",
+        "responsibility": "Pure immutable order value objects, enums, and integer-cents pricing/VIP discount invariants with zero external dependencies.",
+        "paths": [
+          "src/order_dispatch/domain/models.py",
+          "src/order_dispatch/domain/pricing.py"
+        ],
+        "allowed_dependencies": []
+      },
+      {
+        "name": "Infrastructure Layer",
+        "responsibility": "OrderRepository Protocol + in-memory adapter and timeout-bounded async httpx webhook notifier.",
+        "paths": [
+          "src/order_dispatch/infra/repository.py",
+          "src/order_dispatch/infra/webhook_client.py"
+        ],
+        "allowed_dependencies": [
+          "Domain Layer"
+        ]
+      }
+    ],
+    "modules": [
+      {
+        "path": "src/order_dispatch/main.py",
+        "role": "FastAPI factory and async lifespan dependency composition",
+        "key_symbols": [
+          "lifespan",
+          "create_app"
+        ],
+        "depends_on": [
+          "src/order_dispatch/api/routes.py",
+          "src/order_dispatch/services/dispatcher.py",
+          "src/order_dispatch/infra/repository.py",
+          "src/order_dispatch/infra/webhook_client.py",
+          "src/order_dispatch/settings.py"
+        ],
+        "health_note": "Clean wiring; defaults to InMemoryOrderRepository in lifespan."
+      },
+      {
+        "path": "src/order_dispatch/api/routes.py",
+        "role": "FastAPI HTTP endpoints (/healthz, POST /v1/orders, GET /v1/orders/{order_id})",
+        "key_symbols": [
+          "health_check",
+          "create_order",
+          "get_order"
+        ],
+        "depends_on": [
+          "src/order_dispatch/api/schemas.py",
+          "src/order_dispatch/services/dispatcher.py",
+          "src/order_dispatch/settings.py"
+        ],
+        "health_note": "Typed response_model and Depends(); /v1/orders lacks auth dependency."
+      },
+      {
+        "path": "src/order_dispatch/services/dispatcher.py",
+        "role": "OrderDispatcherService application orchestrator",
+        "key_symbols": [
+          "OrderDispatcherService"
+        ],
+        "depends_on": [
+          "src/order_dispatch/domain/models.py",
+          "src/order_dispatch/domain/pricing.py",
+          "src/order_dispatch/infra/repository.py",
+          "src/order_dispatch/infra/webhook_client.py"
+        ],
+        "health_note": "100% line coverage; pure constructor DI."
+      },
+      {
+        "path": "src/order_dispatch/domain/pricing.py",
+        "role": "Pure integer-cents subtotal and VIP discount calculator",
+        "key_symbols": [
+          "PricingError",
+          "calculate_subtotal_cents",
+          "compute_order_total_cents"
+        ],
+        "depends_on": [
+          "src/order_dispatch/domain/models.py"
+        ],
+        "health_note": "Zero framework or I/O imports; 95.2% line / 90.0% branch coverage."
+      },
+      {
+        "path": "src/order_dispatch/infra/webhook_client.py",
+        "role": "Async httpx webhook client with bounded timeout and graceful fallback",
+        "key_symbols": [
+          "AsyncWebhookClient"
+        ],
+        "depends_on": [
+          "src/order_dispatch/domain/models.py"
+        ],
+        "health_note": "Explicit timeout_sec=5.0; needs MockTransport branch tests (55.6% line cov)."
+      }
+    ],
+    "boundary_assessment": "Exemplary downward-only acyclic layering with 0 circular dependencies and 0 boundary violations; domain package is completely free of FastAPI/httpx/Pydantic imports."
+  },
+  "execution_flow_map": {
+    "entry_points": [
+      "src/order_dispatch/main.py:create_app",
+      "src/order_dispatch/api/routes.py:health_check",
+      "src/order_dispatch/api/routes.py:create_order",
+      "src/order_dispatch/api/routes.py:get_order"
+    ],
+    "execution_flows": [
+      {
+        "name": "Order Creation & Async Webhook Dispatch",
+        "trigger": "HTTP POST /v1/orders",
+        "steps": [
+          "FastAPI validates inbound JSON via CreateOrderRequest (extra='forbid', normalized uppercase SKU).",
+          "create_order() resolves OrderDispatcherService via Depends(get_dispatcher) and converts lines via to_domain_lines().",
+          "OrderDispatcherService.place_order() calls compute_order_total_cents() for integer-cent subtotal and VIP discount.",
+          "AsyncWebhookClient.notify_order_accepted() posts event with explicit timeout_sec=5.0, degrading to WEBHOOK_DEFERRED on httpx.HTTPError.",
+          "OrderRepository.save() persists finalized OrderRecord and to_order_response() returns HTTP 201 JSON."
+        ],
+        "involved_files": [
+          "src/order_dispatch/api/routes.py",
+          "src/order_dispatch/api/schemas.py",
+          "src/order_dispatch/services/dispatcher.py",
+          "src/order_dispatch/domain/pricing.py",
+          "src/order_dispatch/infra/webhook_client.py",
+          "src/order_dispatch/infra/repository.py"
+        ]
+      },
+      {
+        "name": "Readiness Probe & Order Lookup",
+        "trigger": "HTTP GET /healthz or GET /v1/orders/{order_id}",
+        "steps": [
+          "GET /healthz returns ServiceSettings metadata as frozen HealthResponse (HTTP 200).",
+          "GET /v1/orders/{order_id} queries OrderDispatcherService.find_order() -> OrderRepository.get() and raises HTTP 404 when absent."
+        ],
+        "involved_files": [
+          "src/order_dispatch/api/routes.py",
+          "src/order_dispatch/services/dispatcher.py",
+          "src/order_dispatch/infra/repository.py"
+        ]
+      }
+    ],
+    "state_and_storage": [
+      "Application-scoped dependencies stored on FastAPI app.state during asynccontextmanager lifespan (src/order_dispatch/main.py).",
+      "Default persistence adapter is process-local InMemoryOrderRepository behind OrderRepository Protocol (src/order_dispatch/infra/repository.py)."
+    ],
+    "error_and_concurrency_model": "Asyncio event loop via Uvicorn + FastAPI with non-blocking httpx.AsyncClient; domain invariant violations raise PricingError, missing lookups raise HTTPException(404), and outbound webhook httpx.HTTPError failures degrade gracefully to OrderStatus.WEBHOOK_DEFERRED with warning logs."
+  }
+}

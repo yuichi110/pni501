@@ -43,14 +43,17 @@ steps:
   - id: output_score
     uses: emit_score
     with:
-      output_dir: "reports/java"
-      target: "api_spring_clean"
+      output_dir: "docs/reports/java_api_spring_clean"
+      target: "java_api_spring_clean"
 
   - id: create_report
     uses: write_drawlib_report
     with:
-      src_dir: "reports_src/java"
-      output_dir: "reports/java"
-      target: "api_spring_clean"
-      lang: "ja"
+      src_dir: "docs_src/reports/java_api_spring_clean"
+      output_dir: "docs/reports/java_api_spring_clean"
+      target: "java_api_spring_clean"
+      lang: "en,ja"
       style: "google"
+      formats:
+        - "pdf"
+        - "html"

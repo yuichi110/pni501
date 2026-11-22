@@ -1,0 +1,44 @@
+{
+  "schema_version": "2.0",
+  "project_name": "legacy-billing",
+  "workflow_id": "java_api_spring_messy",
+  "workflow_run_id": "wf-8177454c",
+  "evaluated_at": "2026-11-22T11:29:02.337544+00:00",
+  "language": "java",
+  "target_root": "examples/java/api_spring_messy",
+  "overall_score": 66,
+  "grade": "C",
+  "category_scores": {
+    "architecture": 80,
+    "code_quality": 86,
+    "typing": 77,
+    "testing": 51,
+    "dependencies": 72,
+    "security": 50,
+    "documentation": 44
+  },
+  "baseline_scores": {
+    "architecture": 90,
+    "code_quality": 96,
+    "typing": 87,
+    "testing": 61,
+    "dependencies": 82,
+    "security": 60,
+    "documentation": 54
+  },
+  "total_loc": 187,
+  "measured_line_coverage_pct": null,
+  "passed_rules": 0,
+  "applicable_rules": 16,
+  "finding_counts": {
+    "critical": 6,
+    "high": 8,
+    "medium": 4,
+    "low": 1,
+    "info": 0
+  },
+  "components": [],
+  "score_file": "docs/reports/java_api_spring_messy/java_api_spring_messy_score.json",
+  "sarif_file": "docs/reports/java_api_spring_messy/java_api_spring_messy_findings.sarif",
+  "summary": "legacy-billing scores 66/100 (Grade C, with -10pt qualitative deductions across all 7 axes relative to the 76 deterministic AST baseline) due to compounding build, architectural, and security debt. Live Docker runtime verification proved an immediate causal chain: pom.xml's unpinned spring-boot-starter-web:LATEST resolves Spring Boot 4.2.0 (JDK 17+ bytecode 61.0) against a Java 1.8 target (52.0), crashing Maven builds and blocking JaCoCo coverage and DAST pentesting, while Dockerfile fails on deprecated openjdk:latest. Inside the codebase, defects concentrate in BillingManager.java (circular BillingController dependency, cognitive=56, 8 params, static INVOICE_CACHE, String == bugs, empty catch, broken private @Transactional), GatewayClient.java (hardcoded GATEWAY_SECRET, Java 11 API mismatch, missing HTTP timeout), and BillingController.java (mutable singleton channel race condition, unauthenticated ANY /charge)."
+}

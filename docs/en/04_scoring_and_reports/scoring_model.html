@@ -35,19 +35,19 @@
     
     
     
-    <meta name="description" content="Once pni501 completes its deterministic static AST, container runtime, supply-chain security, and live HTTP penetration analyzers alongside schema-enforced…">
+    <meta name="description" content="Once pni501 (v0.2.0) completes its deterministic static Tree-sitter CST, container runtime, supply-chain security, and live HTTP penetration analyzers…">
     <link rel="canonical" href="https://www.pni501.com/en/04_scoring_and_reports/scoring_model.html">
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="pni501 Documentation">
     <meta property="og:title" content="7-Axis Scoring Model &amp; Deterministic Aggregation — pni501 Documentation">
-    <meta property="og:description" content="Once pni501 completes its deterministic static AST, container runtime, supply-chain security, and live HTTP penetration analyzers alongside schema-enforced…">
+    <meta property="og:description" content="Once pni501 (v0.2.0) completes its deterministic static Tree-sitter CST, container runtime, supply-chain security, and live HTTP penetration analyzers…">
     <meta property="og:url" content="https://www.pni501.com/en/04_scoring_and_reports/scoring_model.html">
     <meta property="og:image" content="https://www.pni501.com/_assets/logo.png">
     <meta property="og:locale" content="en_US">
     <meta property="og:locale:alternate" content="ja_JP">
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="7-Axis Scoring Model &amp; Deterministic Aggregation — pni501 Documentation">
-    <meta name="twitter:description" content="Once pni501 completes its deterministic static AST, container runtime, supply-chain security, and live HTTP penetration analyzers alongside schema-enforced…">
+    <meta name="twitter:description" content="Once pni501 (v0.2.0) completes its deterministic static Tree-sitter CST, container runtime, supply-chain security, and live HTTP penetration analyzers…">
     <meta name="twitter:image" content="https://www.pni501.com/_assets/logo.png">
     
     
@@ -85,7 +85,7 @@
                 
                 <a href="../01_getting_started/release_notes.html" class="sidebar-version-badge" title="View Release Notes">
                     <span class="sidebar-version-dot" aria-hidden="true"></span>
-                    <span class="sidebar-version-text">v0.1.4</span>
+                    <span class="sidebar-version-text">v0.2.0</span>
                 </a>
                 <a href="https://github.com/yuichi110/pni501" target="_blank" rel="noopener noreferrer" class="sidebar-github-link" aria-label="GitHub Repository" title="GitHub Repository">
                     <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg>
@@ -151,7 +151,7 @@
                             </li>
                             
                             <li class="nav-item ">
-                                <a href="../03_workflows_and_actions/actions_pipeline.html" >15 Actions &amp; 12 Primitives</a>
+                                <a href="../03_workflows_and_actions/actions_pipeline.html" >182 Actions &amp; 16 Primitives</a>
                             </li>
                             
                             <li class="nav-item ">
@@ -173,6 +173,10 @@
                                 <a href="drawlib_reporter.html" >Drawlib Visual Reporter</a>
                             </li>
                             
+                            <li class="nav-item ">
+                                <a href="sample_reports.html" >Sample Reports Gallery</a>
+                            </li>
+                            
                         </ul>
                     
                         
@@ -181,7 +185,7 @@
                         <ul class="nav-list">
                             
                             <li class="nav-item ">
-                                <a href="../05_languages_and_reference/supported_languages.html" >Supported 6 Languages</a>
+                                <a href="../05_languages_and_reference/supported_languages.html" >Supported 55 Languages</a>
                             </li>
                             
                             <li class="nav-item ">
@@ -244,10 +248,10 @@
             </header>
             <main class="main-content">
                 <h1>7-Axis Scoring Model &amp; Deterministic Aggregation</h1>
-<p>Once <code>pni501</code> completes its deterministic static AST, container runtime, supply-chain security, and live HTTP penetration analyzers alongside schema-enforced AI evaluations, it synthesizes all diagnostic evidence into canonical JSON artifacts (<code>ScoreResult</code> and <code>MigrationPlanResult</code>). Rather than trusting raw LLM ordering or unverified file paths, <code>aggregator.py</code> and <code>engine.py</code> deterministically verify repository paths, apply <code>pni.toml</code> opt-out waivers, compute module hotspot risk densities, and pre-sort every finding, rule verdict, and remediation item.</p>
+<p>Once <code>pni501</code> (<code>v0.2.0</code>) completes its deterministic static Tree-sitter CST, container runtime, supply-chain security, and live HTTP penetration analyzers alongside schema-enforced AI evaluations, it synthesizes all diagnostic evidence into canonical JSON and SARIF artifacts (<code>ScoreResult</code> v2.0, lightweight <code>ScoreSummary</code>, <code>SARIF 2.1.0</code>, and <code>MigrationPlanResult</code>). Rather than trusting raw LLM ordering, unconstrained score swings, or unverified file paths, <code>baseline.py</code>, <code>aggregator.py</code>, <code>provenance.py</code>, and <code>engine.py</code> compute an objective 7-axis baseline, enforce bounded <code>±10 pt</code> AI deltas, record transparent false-positive triage (<code>finding_adjustments</code>), stamp an action-level <strong>Executed Audit DAG</strong>, verify repository paths, apply <code>pni.toml</code> opt-out waivers, and compute module hotspot risk densities deterministically.</p>
 <figure class="drawlib-image" style="text-align: center;">
   <img src="../../images/04_scoring_and_reports/scoring_model/seven_axes_scoring_hero.png" alt="scoring_model_1" />
-  <figcaption class="drawlib-caption">7-Axis Engineering Health Scoring Model (700-Point Pool), Deterministic aggregator.py Pipeline, and Roadmap 8th Axis</figcaption>
+  <figcaption class="drawlib-caption">7-Axis Engineering Health Scoring Model (700-Point Pool), v0.2.0 Deterministic Baseline/Triage/DAG Pipeline, and Progress/Rollup Tracks</figcaption>
 </figure>
 <details class="drawlib-code-details">
 <summary>Source Code</summary>
@@ -328,14 +332,14 @@
 <span class="n">axes_cards</span><span class="o">.</span><span class="n">draw</span><span class="p">(</span><span class="n">xy</span><span class="o">=</span><span class="p">(</span><span class="mf">5.5</span><span class="p">,</span> <span class="mf">5.5</span><span class="p">),</span> <span class="n">width</span><span class="o">=</span><span class="mf">76.0</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mf">73.0</span><span class="p">)</span>
 
 <span class="n">agg_panel</span> <span class="o">=</span> <span class="n">Panel</span><span class="p">(</span>
-    <span class="s2">"2. Deterministic aggregator.py &amp; ScoreResult Output"</span><span class="p">,</span>
+    <span class="s2">"2. v0.2.0 Anchoring, FP Triage &amp; Provenance"</span><span class="p">,</span>
     <span class="n">header_variant</span><span class="o">=</span><span class="s2">"filled"</span><span class="p">,</span>
     <span class="n">header_height</span><span class="o">=</span><span class="mf">8.0</span><span class="p">,</span>
     <span class="n">style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">PrimaryNeutral</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">shape_r</span><span class="o">=</span><span class="mf">2.0</span><span class="p">),</span>
     <span class="n">header_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">PrimaryFlat</span><span class="p">,</span>
     <span class="n">text_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">WhiteBold</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">text_size</span><span class="o">=</span><span class="mf">11.0</span><span class="p">),</span>
 <span class="p">)</span>
-<span class="n">agg_panel</span><span class="o">.</span><span class="n">draw</span><span class="p">(</span><span class="n">xy</span><span class="o">=</span><span class="p">(</span><span class="mf">88.0</span><span class="p">,</span> <span class="mf">44.0</span><span class="p">),</span> <span class="n">width</span><span class="o">=</span><span class="mf">81.0</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mf">45.0</span><span class="p">)</span>
+<span class="n">agg_panel</span><span class="o">.</span><span class="n">draw</span><span class="p">(</span><span class="n">xy</span><span class="o">=</span><span class="p">(</span><span class="mf">88.0</span><span class="p">,</span> <span class="mf">41.0</span><span class="p">),</span> <span class="n">width</span><span class="o">=</span><span class="mf">81.0</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mf">48.0</span><span class="p">)</span>
 
 <span class="n">agg_cards</span> <span class="o">=</span> <span class="n">CardList</span><span class="p">(</span>
     <span class="n">style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">WhiteBordered</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">shape_r</span><span class="o">=</span><span class="mf">1.4</span><span class="p">),</span>
@@ -346,38 +350,38 @@
     <span class="n">badge_text_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">PrimaryBold</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">text_size</span><span class="o">=</span><span class="mf">10.0</span><span class="p">),</span>
     <span class="n">icon_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">PrimaryBold</span><span class="p">,</span>
     <span class="n">direction</span><span class="o">=</span><span class="s2">"vertical"</span><span class="p">,</span>
-    <span class="n">spacing</span><span class="o">=</span><span class="mf">1.8</span><span class="p">,</span>
+    <span class="n">spacing</span><span class="o">=</span><span class="mf">1.6</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="n">agg_cards</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
-    <span class="s2">"compile_workflow_digest()"</span><span class="p">,</span>
-    <span class="s2">"Weakest-first steps, merged rules &amp; P0-P2 plan"</span><span class="p">,</span>
-    <span class="n">badge_text</span><span class="o">=</span><span class="s2">"AGG"</span><span class="p">,</span>
+    <span class="s2">"7-Axis Baseline vs. AI Delta (±10pt)"</span><span class="p">,</span>
+    <span class="s2">"baseline.py anchors scores; delta bounded to [-10, +10]"</span><span class="p">,</span>
+    <span class="n">badge_text</span><span class="o">=</span><span class="s2">"Δ10"</span><span class="p">,</span>
     <span class="n">icon</span><span class="o">=</span><span class="n">phosphor</span><span class="o">.</span><span class="n">sliders_horizontal</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="n">agg_cards</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
-    <span class="s2">"Hotspot Risk Density (0.00 - 1.00)"</span><span class="p">,</span>
-    <span class="s2">"Severity weights + AST sinks + coverage + CVEs"</span><span class="p">,</span>
+    <span class="s2">"FP Triage &amp; Hotspots (0.00 - 1.00)"</span><span class="p">,</span>
+    <span class="s2">"finding_adjustments + AST sinks + coverage + CVEs"</span><span class="p">,</span>
     <span class="n">badge_text</span><span class="o">=</span><span class="s2">"RISK"</span><span class="p">,</span>
     <span class="n">icon</span><span class="o">=</span><span class="n">phosphor</span><span class="o">.</span><span class="n">fire</span><span class="p">,</span>
     <span class="n">style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">Neutral</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">shape_r</span><span class="o">=</span><span class="mf">1.4</span><span class="p">),</span>
 <span class="p">)</span>
 <span class="n">agg_cards</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
-    <span class="s2">"ScoreResult (0-100 &amp; Grade S/A/B/C/D)"</span><span class="p">,</span>
-    <span class="s2">"Path check + pni.toml opt-outs -&gt; *_score.json"</span><span class="p">,</span>
-    <span class="n">badge_text</span><span class="o">=</span><span class="s2">"JSON"</span><span class="p">,</span>
+    <span class="s2">"Executed DAG &amp; ScoreResult v2.0"</span><span class="p">,</span>
+    <span class="s2">"ExecutionDagSummary + ScoreSummary + SARIF 2.1.0"</span><span class="p">,</span>
+    <span class="n">badge_text</span><span class="o">=</span><span class="s2">"DAG"</span><span class="p">,</span>
     <span class="n">icon</span><span class="o">=</span><span class="n">phosphor</span><span class="o">.</span><span class="n">medal</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="n">agg_cards</span><span class="o">.</span><span class="n">draw</span><span class="p">(</span><span class="n">xy</span><span class="o">=</span><span class="p">(</span><span class="mf">90.5</span><span class="p">,</span> <span class="mf">46.5</span><span class="p">),</span> <span class="n">width</span><span class="o">=</span><span class="mf">76.0</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mf">32.5</span><span class="p">)</span>
+<span class="n">agg_cards</span><span class="o">.</span><span class="n">draw</span><span class="p">(</span><span class="n">xy</span><span class="o">=</span><span class="p">(</span><span class="mf">90.5</span><span class="p">,</span> <span class="mf">43.5</span><span class="p">),</span> <span class="n">width</span><span class="o">=</span><span class="mf">76.0</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mf">35.5</span><span class="p">)</span>
 
 <span class="n">future_panel</span> <span class="o">=</span> <span class="n">Panel</span><span class="p">(</span>
-    <span class="s2">"3. Planned 8th Axis: Development Status (Roadmap)"</span><span class="p">,</span>
+    <span class="s2">"3. Progress Track &amp; Unified 8th Axis Roadmap"</span><span class="p">,</span>
     <span class="n">header_variant</span><span class="o">=</span><span class="s2">"filled"</span><span class="p">,</span>
     <span class="n">header_height</span><span class="o">=</span><span class="mf">8.0</span><span class="p">,</span>
     <span class="n">style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">SecondaryNeutral</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">shape_r</span><span class="o">=</span><span class="mf">2.0</span><span class="p">),</span>
     <span class="n">header_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">SecondaryFlat</span><span class="p">,</span>
     <span class="n">text_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">WhiteBold</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">text_size</span><span class="o">=</span><span class="mf">11.0</span><span class="p">),</span>
 <span class="p">)</span>
-<span class="n">future_panel</span><span class="o">.</span><span class="n">draw</span><span class="p">(</span><span class="n">xy</span><span class="o">=</span><span class="p">(</span><span class="mf">88.0</span><span class="p">,</span> <span class="mf">3.0</span><span class="p">),</span> <span class="n">width</span><span class="o">=</span><span class="mf">81.0</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mf">37.5</span><span class="p">)</span>
+<span class="n">future_panel</span><span class="o">.</span><span class="n">draw</span><span class="p">(</span><span class="n">xy</span><span class="o">=</span><span class="p">(</span><span class="mf">88.0</span><span class="p">,</span> <span class="mf">3.0</span><span class="p">),</span> <span class="n">width</span><span class="o">=</span><span class="mf">81.0</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mf">35.0</span><span class="p">)</span>
 
 <span class="n">future_cards</span> <span class="o">=</span> <span class="n">CardList</span><span class="p">(</span>
     <span class="n">style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">WhiteBordered</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">shape_r</span><span class="o">=</span><span class="mf">1.4</span><span class="p">),</span>
@@ -388,22 +392,22 @@
     <span class="n">badge_text_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">SecondaryBold</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">text_size</span><span class="o">=</span><span class="mf">10.0</span><span class="p">),</span>
     <span class="n">icon_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">SecondaryBold</span><span class="p">,</span>
     <span class="n">direction</span><span class="o">=</span><span class="s2">"vertical"</span><span class="p">,</span>
-    <span class="n">spacing</span><span class="o">=</span><span class="mf">1.8</span><span class="p">,</span>
+    <span class="n">spacing</span><span class="o">=</span><span class="mf">1.6</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="n">future_cards</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
-    <span class="s2">"Git Commit Dynamics &amp; Churn Analysis"</span><span class="p">,</span>
-    <span class="s2">"Detects code churn spikes and stalled modules"</span><span class="p">,</span>
+    <span class="s2">"Progress Track (Git &amp; Milestones)"</span><span class="p">,</span>
+    <span class="s2">"git merge-tree conflicts, LOC churn &amp; task DAGs"</span><span class="p">,</span>
     <span class="n">badge_text</span><span class="o">=</span><span class="s2">"GIT"</span><span class="p">,</span>
     <span class="n">icon</span><span class="o">=</span><span class="n">phosphor</span><span class="o">.</span><span class="n">git_commit</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="n">future_cards</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
-    <span class="s2">"Gantt Milestone Variance &amp; Warning"</span><span class="p">,</span>
-    <span class="s2">"Schedule delay vs. pre-deadline quality risk"</span><span class="p">,</span>
+    <span class="s2">"Polyglot Rollup &amp; 8th Axis Integration"</span><span class="p">,</span>
+    <span class="s2">"Weighted multi-component rollup + schedule axis"</span><span class="p">,</span>
     <span class="n">badge_text</span><span class="o">=</span><span class="s2">"PLAN"</span><span class="p">,</span>
     <span class="n">icon</span><span class="o">=</span><span class="n">phosphor</span><span class="o">.</span><span class="n">calendar_check</span><span class="p">,</span>
     <span class="n">style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">Neutral</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">shape_r</span><span class="o">=</span><span class="mf">1.4</span><span class="p">),</span>
 <span class="p">)</span>
-<span class="n">future_cards</span><span class="o">.</span><span class="n">draw</span><span class="p">(</span><span class="n">xy</span><span class="o">=</span><span class="p">(</span><span class="mf">90.5</span><span class="p">,</span> <span class="mf">5.5</span><span class="p">),</span> <span class="n">width</span><span class="o">=</span><span class="mf">76.0</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mf">25.0</span><span class="p">)</span>
+<span class="n">future_cards</span><span class="o">.</span><span class="n">draw</span><span class="p">(</span><span class="n">xy</span><span class="o">=</span><span class="p">(</span><span class="mf">90.5</span><span class="p">,</span> <span class="mf">5.5</span><span class="p">),</span> <span class="n">width</span><span class="o">=</span><span class="mf">76.0</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mf">22.5</span><span class="p">)</span>
 
 <span class="n">save</span><span class="p">()</span>
 </code></pre>
@@ -455,7 +459,7 @@
 <td style="text-align:left"><strong>6</strong></td>
 <td style="text-align:left"><strong><code>security</code></strong></td>
 <td style="text-align:left"><code>0..100</code></td>
-<td style="text-align:left">Application and OS container CVE posture (<code>security_scan</code> via Trivy), secret hygiene, IaC/Dockerfile hardening, CWE-classified AST sinks (<code>dangerous_sinks</code>), and live HTTP penetration test verdicts (<code>web_pentest</code>).</td>
+<td style="text-align:left">Application and OS container CVE posture (<code>security_scan</code> via Trivy), secret hygiene, IaC/Dockerfile hardening, CWE-classified CST sinks (<code>dangerous_sinks</code>), and live HTTP penetration test verdicts (<code>web_pentest</code>).</td>
 </tr>
 <tr>
 <td style="text-align:left"><strong>7</strong></td>
@@ -503,25 +507,47 @@
 </tr>
 </tbody>
 </table>
-<h3>1.2 Future Roadmap: 8th Axis (Development Status &amp; Schedule Variance)</h3>
-<p>Beyond the seven implemented code and runtime axes, the <code>pni501</code> roadmap defines an eighth evaluation axis—<strong>Development Status (<code>development_status</code>)</strong>—to combine static engineering health with delivery trajectory monitoring:</p>
+<h3>1.2 Progress Track &amp; Future 8th Axis (<code>development_status</code>)</h3>
+<p>Alongside the 7-axis health score (<code>ScoreResult</code>), <code>pni501</code> provides a dedicated <strong>Progress &amp; Git Governance track</strong> (<code>category: progress</code>, <code>ProgressResult</code>) validated via <code>pni progress init</code> / <code>pni progress validate</code> that inspects milestone adherence, <code>git merge-tree</code> branch conflicts, LOC/test trajectories, and commit churn. On the roadmap, these delivery-velocity signals will also unify directly into an eighth score axis (<strong>Development Status (<code>development_status</code>)</strong>), raising early warnings whenever schedule slippage coincides with pre-deadline churn spikes or test regressions.</p>
+<hr />
+<h2>2. v0.2.0 Evidence Anchoring, FP Triage &amp; Executed Audit DAG</h2>
+<p>To make every diagnostic score reproducible, auditable, and resistant to LLM drift, <code>pni501 v0.2.0</code> introduces three structural guarantees across <code>baseline.py</code>, <code>aggregator.py</code>, <code>provenance.py</code>, and <code>ScoreResult</code> (<code>schema_version = &quot;2.0&quot;</code>).</p>
+<h3>2.1 7-Axis Evidence Delta (Deterministic Baseline vs. Adjusted Δ)</h3>
+<p>Before any AI judgment is accepted, <code>compute_baseline_evaluation()</code> (<code>src/pni/_workflows/baseline.py</code>) derives objective 7-axis <code>baseline_scores</code> (<code>0..100</code>), deterministic <code>pre_findings</code> (each assigned a stable content-addressed <code>det-&lt;8-hex&gt;</code> ID), and <code>pre_rule_checks</code> directly from <code>ProjectFacts</code>, <code>AstFacts</code>, <code>RuntimeFacts</code>, and <code>SecurityFacts</code>:</p>
 <ul>
-<li><strong>Git Commit Velocity &amp; Churn Dynamics</strong>: Analyzes commit history to identify sudden code-churn spikes, hotfix clusters, or stalled core modules.</li>
-<li><strong>Gantt Milestone Variance Cross-Check</strong>: Compares planned milestone schedules against actual repository implementation progress across features and subsystems.</li>
-<li><strong>Crunch-Time Quality Degradation Early Warning</strong>: Detects when schedule slippage coincides with rapid pre-deadline commit churn, alerting engineering leads before test coverage or architectural boundaries are bypassed.</li>
+<li><strong>Deterministic Deductions</strong>: Deductions are computed deterministically from missing lockfiles or unpinned dependencies, circular imports, complex functions, hardcoded secrets, CWE dangerous sinks, typing/docstring coverage shortfalls, failing container builds/tests, low line coverage, and <code>runtime_core</code> Trivy CVEs.</li>
+<li><strong>Bounded Qualitative Adjustment (<code>±10 pt</code>)</strong>: During <code>ai_interpret</code> steps (<code>InterpretationInput</code>), the AI agent evaluates architectural nuance, contextual risk, and code readability by supplying <code>baseline_delta</code> per axis. Pydantic's <code>_validate_baseline_delta_bounds()</code> strictly enforces <code>MAX_BASELINE_AI_DELTA = 10</code> (<code>-10 &lt;= delta &lt;= +10</code>), preventing arbitrary score inflation or collapse.</li>
+<li><strong>Transparent Delta Reporting</strong>: Both <code>ScoreResult</code> and lightweight <code>ScoreSummary</code> (<code>*_summary.json</code>) persist <code>baseline_scores</code> alongside final <code>category_scores</code>. Downstream Drawlib reports render an explicit <strong>7-Axis Deterministic Baseline vs. Final Score (<code>Baseline | AI Δ | Final | Rationale</code>)</strong> comparison table in Chapter 4 (<code>format_baseline_vs_final_lines()</code>).</li>
+</ul>
+<h3>2.2 Finding False-Positive Triage (<code>finding_adjustments</code>)</h3>
+<p>Deterministic scanners inevitably surface context-dependent hits — for example, build-time <code>pip@24.2</code> toolchain CVEs bundled inside a Python base image that are unreachable at application runtime, or static unpinned version range alerts already neutralized by runtime constraints. Rather than silently dropping findings or polluting scores, <code>pni501 v0.2.0</code> provides an auditable <strong>False-Positive Triage</strong> mechanism (<code>FindingAdjustment</code> in <code>src/pni/_actions/base_model.py</code>):</p>
+<ul>
+<li><strong>Targeted Adjustments by <code>finding_id</code></strong>: Both <code>InterpretationInput</code> and <code>ScoreSubmissionInput</code> accept <code>finding_adjustments: list[FindingAdjustment]</code>, where each entry targets a specific deterministic <code>det-xxxxxxxx</code> ID with:
+<ul>
+<li><code>action</code>: <code>&quot;waive&quot;</code> (exclude verified false positive from active findings) or <code>&quot;reclassify&quot;</code> (adjust <code>new_severity</code>, appending <code>[AI reclassified: &lt;reason&gt;]</code> to evidence).</li>
+<li><code>reason</code>: Mandatory technical justification (<code>min_length=10</code>).</li>
+</ul>
+</li>
+<li><strong>Auditable Triage Trail (<code>triaged_adjustments</code>)</strong>: <code>apply_finding_adjustments()</code> (<code>src/pni/_workflows/baseline.py</code>) applies all adjustments deterministically during <code>compile_workflow_digest()</code> and records every waived or reclassified item in <code>ScoreResult.triaged_adjustments</code>. Reports display both the <strong>Finding Source Split (<code>deterministic</code> vs. <code>ai</code>)</strong> and the complete <strong>AI False-Positive Triage Log</strong> in Chapter 4 so human reviewers can verify every single decision.</li>
+</ul>
+<h3>2.3 Executed Audit DAG (<code>ExecutionDagSummary</code> &amp; <code>AuditScopeMetadata</code>)</h3>
+<p>Every completed <code>ScoreResult</code>, <code>MigrationPlanResult</code>, <code>ProgressResult</code>, and polyglot Rollup artifact embeds an immutable <strong>Executed Audit DAG</strong> built by <code>build_execution_dag_summary()</code> (<code>src/pni/_workflows/provenance.py</code>):</p>
+<ul>
+<li><strong>Action-Level Stage Graph (<code>ExecutionStageNode</code>)</strong>: Records each logical workflow stage with its <code>stage_id</code>, <code>label</code>, execution <code>mode</code> (<code>AUTO</code>, <code>AI</code>, <code>HYBRID</code>, <code>ASK</code>, or <code>SKIP</code>), final <code>status</code> (<code>completed</code>, <code>skipped</code>, <code>pending</code>, <code>in_progress</code>), upstream <code>needs</code> dependencies, <code>rules_count</code>, quantitative stage <code>highlight</code> (e.g., <code>14 files, 435 LOC, 0 sinks</code>, <code>build=passed, tests=4/4, cov 85.2%</code>), and explicit <code>skip_reason</code> whenever a conditional stage or optional probe was skipped.</li>
+<li><strong>Immutable Inspection Provenance (<code>AuditScopeMetadata</code>)</strong>: Stamps exact <code>target_root</code>, <code>source_targets</code>, <code>test_targets</code>, <code>doc_targets</code>, <code>exclude_globs</code>, primary <code>language</code>, detected <code>companion_languages</code> and <code>detected_frameworks</code>, live Git HEAD state (<code>git_branch</code>, <code>git_sha</code>, <code>git_dirty</code>), exact <code>tools_used</code> (e.g., Tree-sitter CST, Docker harness, Trivy <code>fs+image</code>, <code>web_pentest</code>), and a normalized <code>artifact_manifest</code> pointing to <code>*_score.json</code>, <code>*_summary.json</code>, <code>*_findings.sarif</code>, and synced <code>_facts/</code> JSON files.</li>
 </ul>
 <hr />
-<h2>2. Deterministic Enrichment &amp; Pre-Sorting in aggregator.py</h2>
-<p>When an AI agent submits <code>ScoreResult</code> during the terminal <code>emit_score</code> action, <code>src/pni/_workflows/engine.py:_enrich_score_result()</code> never trusts raw LLM sorting or unverified file references. Instead, it re-assembles the <code>WorkflowFactsBundle</code> from <code>.pni/cache/workflow_state.db</code>, verifies every referenced <code>file_path</code> and <code>target_files</code> entry against the real repository and <code>AstFacts.module_inventory</code>, stamps immutable provenance (<code>workflow_id</code>, <code>workflow_run_id</code>, UTC <code>evaluated_at</code>, <code>target_root</code>, <code>facts_file</code>, recomputed <code>grade</code>, and <code>metrics_snapshot</code>), and replaces list fields with the canonical output of <code>aggregator.py:compile_workflow_digest()</code>.</p>
-<h3>2.1 Weakest-First Dimensions, Rule Compliance &amp; Consolidated Findings</h3>
+<h2>3. Deterministic Enrichment &amp; Pre-Sorting in aggregator.py</h2>
+<p>When an AI agent submits a compact <code>ScoreSubmissionInput</code> during the terminal <code>emit_score</code> action, <code>src/pni/_workflows/engine.py</code> never trusts raw LLM sorting or unverified file references. Instead, it re-assembles the <code>WorkflowFactsBundle</code> from <code>.pni/cache/workflow_state.db</code>, verifies every referenced <code>file_path</code> and <code>target_files</code> entry against the real repository and <code>AstFacts.module_inventory</code>, stamps immutable provenance (<code>workflow_id</code>, <code>workflow_run_id</code>, UTC <code>evaluated_at</code>, <code>target_root</code>, <code>facts_file</code>, recomputed <code>grade</code>, <code>execution_dag</code>, and <code>metrics_snapshot</code>), emits <code>*_score.json</code>, <code>*_summary.json</code>, and <code>*_findings.sarif</code>, and populates list fields from <code>aggregator.py:compile_workflow_digest()</code>:</p>
+<h3>3.1 Weakest-First Dimensions, Rule Compliance &amp; Consolidated Findings</h3>
 <ul>
 <li><strong><code>audit_dimensions</code> (Weakest-First Step Scorecards)</strong>: Aggregates every completed <code>ai_interpret</code> action into an <code>AuditDimensionScore</code> (<code>pass_count</code>, <code>warn_count</code>, <code>fail_count</code>, <code>score</code>, <code>grade</code>) sorted ascending by <code>(score, -fail_count, -warn_count, seq)</code> so the weakest engineering dimensions appear first. If <code>step_score</code> is omitted, <code>_compute_step_score()</code> deterministically falls back to the mean of <code>suggested_scores</code> or <code>100 - sum(SEVERITY_DEDUCTION)</code> (<code>critical=35</code>, <code>high=20</code>, <code>medium=10</code>, <code>low=3</code>, <code>info=1</code>).</li>
-<li><strong><code>rule_compliance</code> (<code>fail -&gt; warn -&gt; pass -&gt; not_applicable</code>)</strong>: <code>normalize_step_rule_checks()</code> guarantees every active rule on every step receives a stamped <code>RuleCheckResult</code> (inferring verdicts from step findings when omitted). <code>merge_and_sort_rule_compliance()</code> deduplicates rules across steps—retaining the strictest status while concatenating unique evidence—and sorts by <code>(STATUS_RANK[status], rule_id)</code>.</li>
-<li><strong><code>findings</code> &amp; Location-Grouped <code>consolidated_findings</code></strong>: <code>deduplicate_and_sort_findings()</code> orders raw findings by <code>critical -&gt; high -&gt; medium -&gt; low -&gt; info</code>. Next, <code>consolidate_findings_by_location()</code> (<code>src/pni/_actions/base_model.py</code>) buckets overlapping violations sharing the exact same <code>(file_path, line)</code> into a single multi-rule <code>ConsolidatedFinding</code> (<code>rule_ids</code>, <code>combined_evidence</code>, <code>merged_recommendation</code>), preventing duplicate table rows in downstream PDF reports.</li>
+<li><strong><code>rule_compliance</code> (<code>fail -&gt; warn -&gt; pass -&gt; not_applicable</code>)</strong>: <code>normalize_step_rule_checks()</code> guarantees every active rule on every step receives a stamped <code>RuleCheckResult</code> (inferring verdicts from step findings when omitted). <code>merge_and_sort_rule_compliance()</code> merges deterministic <code>pre_rule_checks</code> with step verdicts — retaining the strictest status while concatenating unique evidence — and sorts by <code>(STATUS_RANK[status], rule_id)</code>.</li>
+<li><strong><code>findings</code> &amp; Location-Grouped <code>consolidated_findings</code></strong>: After <code>apply_finding_adjustments()</code> and <code>[[opt_out]]</code> filtering, <code>deduplicate_and_sort_findings()</code> orders findings by <code>critical -&gt; high -&gt; medium -&gt; low -&gt; info</code>. Next, <code>consolidate_findings_by_location()</code> (<code>src/pni/_actions/base_model.py</code>) buckets overlapping violations sharing the exact same <code>(file_path, line)</code> into a single multi-rule <code>ConsolidatedFinding</code> (<code>rule_ids</code>, <code>combined_evidence</code>, <code>merged_recommendation</code>), preventing duplicate table rows in downstream PDF/HTML reports.</li>
 <li><strong><code>action_plan</code> (<code>P0 -&gt; P1 -&gt; P2</code>)</strong>: <code>deduplicate_and_sort_actions()</code> deduplicates remediation items by <code>(priority, title.lower())</code> and sorts deterministically by <code>(PRIORITY_RANK[priority], category, title)</code>.</li>
 <li><strong>Declarative <code>pni.toml</code> Opt-Out Waivers (<code>opt_outs</code>)</strong>: <code>_filter_findings_by_opt_out()</code> and <code>normalize_step_rule_checks()</code> honor <code>[[opt_out]]</code> entries declared in <code>pni.toml</code> (matching by rule/check <code>id</code> and optional file <code>scope</code> globs), waiving matching findings, marking repo-wide opted-out rules as <code>not_applicable</code>, and recording transparent <code>AppliedOptOut</code> audit trails in <code>ScoreResult.opt_outs</code>.</li>
 </ul>
-<h3>2.2 Module Hotspot Risk Density Formula (0.00 to 1.00)</h3>
+<h3>3.2 Module Hotspot Risk Density Formula (0.00 to 1.00)</h3>
 <p><code>compute_module_hotspots()</code> scores every discovered source module and flagged infrastructure file on a bounded <code>[0.00, 1.00]</code> scale sorted descending by <code>(-risk_score, -loc, file_path)</code>. Clean modules with zero findings and zero structural/runtime/security bonuses receive a baseline healthy score of <code>0.06</code> (<code>_BASE_HEALTHY_RISK</code>), whereas flagged modules combine four deterministic signal sources:</p>
 <pre><code class="language-python"><span class="n">SEVERITY_RISK_WEIGHT</span> <span class="o">=</span> <span class="p">{</span>
     <span class="s2">"critical"</span><span class="p">:</span> <span class="mf">0.45</span><span class="p">,</span>
@@ -541,17 +567,17 @@
 <span class="n">risk_score</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="nb">min</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">raw_weight</span> <span class="o">+</span> <span class="n">ast_bonus</span> <span class="o">+</span> <span class="n">cov_bonus</span> <span class="o">+</span> <span class="n">sec_bonus</span><span class="p">),</span> <span class="mi">2</span><span class="p">)</span>
 </code></pre>
 <hr />
-<h2>3. Path-Grounded MigrationPlanResult Schema</h2>
+<h2>4. Path-Grounded MigrationPlanResult Schema</h2>
 <p>For repositories requiring structured modernization (<code>category: migration</code>, <code>based_on: &lt;audit_workflow_id&gt;</code>), the <code>emit_migration_plan</code> action validates and persists <code>MigrationPlanResult</code> (<code>src/pni/_actions/migration_analyze/models.py</code>), verifiable via <code>pni validate-migration-plan &lt;path&gt;</code>:</p>
 <ul>
 <li><strong>Execution Guardrails</strong>: Pins <code>transformation_mode</code> (<code>same_lang_upgrade</code>, <code>architectural_restructure</code>, or <code>cross_stack_replacement</code>), <code>migration_strategy</code> (<code>phased_pr</code>, <code>strangler_fig</code>, or <code>rewrite</code>), <code>api_compatibility</code> (<code>strict</code>, <code>versioned_v2</code>, or <code>flexible</code>), and <code>bug_handling_policy</code> (<code>ask_human</code>, <code>preserve_behavior</code>, or <code>fix_in_phase3</code>), alongside <code>confirmed_assumptions</code> and explicit <code>non_goals</code>.</li>
 <li><strong><code>target_axes</code> (<code>MigrationAxis</code>) &amp; <code>target_architecture</code></strong>: Captures each As-Is to To-Be transformation vector (<code>language_runtime</code>, <code>framework</code>, <code>architecture_pattern</code>, <code>database_persistence</code>, <code>cache_state</code>, <code>auth_security</code>, <code>messaging_async</code>, <code>container_cicd</code>, <code>custom</code>) with grounded <code>affected_files</code>, plus <code>target_layers</code> (<code>allowed_dependencies</code>, <code>forbidden_imports</code>) and file-level <code>component_mappings</code>.</li>
 <li><strong><code>decision_log</code> (<code>DecisionLogItem</code>, <code>DEC-01..NN</code>)</strong>: Isolates ambiguous legacy behaviors (&quot;Spec vs. Bug&quot; under Hyrum's Law) with <code>current_behavior</code>, <code>impact_if_changed</code>, and <code>recommended_option</code> for Product Owner sign-off prior to Phase 3 business-logic changes.</li>
-<li><strong><code>phase_gates</code> (<code>Phases 0..4</code>) &amp; <code>pr_wbs</code> (<code>PR-01..NN</code>)</strong>: Enforces a 5-stage gated roadmap—<strong>Phase 0</strong> (Characterization &amp; Harness Recovery), <strong>Phase 1</strong> (Cycle Cutting &amp; Port Extraction), <strong>Phase 2</strong> (Mechanical Codemods &amp; DB/Cache Adapters), <strong>Phase 3</strong> (Typed DTOs &amp; Approved Fixes), and <strong>Phase 4</strong> (Cutover &amp; CI/Container Hardening)—paired with topologically ordered PR tickets enriched with deterministic <code>MigrationFacts</code> (<code>refactoring_waves</code>, <code>cycle_cuts</code>, <code>implicit_contracts</code>, <code>boundary_touchpoints</code>, and <code>mechanical_codemods</code>).</li>
+<li><strong><code>phase_gates</code> (<code>Phases 0..4</code>) &amp; <code>pr_wbs</code> (<code>PR-01..NN</code>)</strong>: Enforces a 5-stage gated roadmap — <strong>Phase 0</strong> (Characterization &amp; Harness Recovery), <strong>Phase 1</strong> (Cycle Cutting &amp; Port Extraction), <strong>Phase 2</strong> (Mechanical Codemods &amp; DB/Cache Adapters), <strong>Phase 3</strong> (Typed DTOs &amp; Approved Fixes), and <strong>Phase 4</strong> (Cutover &amp; CI/Container Hardening) — paired with topologically ordered PR tickets enriched with deterministic <code>MigrationFacts</code> (<code>refactoring_waves</code>, <code>cycle_cuts</code>, <code>implicit_contracts</code>, <code>boundary_touchpoints</code>, and <code>mechanical_codemods</code>).</li>
 </ul>
 <hr />
-<h2>4. 9-Target Multi-Language Benchmark Matrix</h2>
-<p>To validate scoring calibration across clean production architectures, mid-tier services, and severely degraded legacy codebases, <code>pni501</code> maintains nine end-to-end benchmark repositories under <code>examples/{python,java,php}/</code> along with their committed <code>ScoreResult</code> JSONs and compiled A4 PDF reports under <code>reports/{python,java,php}/</code>.</p>
+<h2>5. Multi-Language Benchmark Calibration Matrix</h2>
+<p>To validate scoring calibration across clean production architectures, mid-tier services, and severely degraded legacy codebases, <code>pni501</code> maintains nine end-to-end benchmark repositories under <code>examples/{python,java,php}/</code> (and live v0.2.0 bilingual sample reports in the <a href="sample_reports.html">Sample Reports Gallery</a>).</p>
 <figure class="drawlib-image" style="text-align: center;">
   <img src="../../images/04_scoring_and_reports/scoring_model/benchmark_score_heatmap.png" alt="scoring_model_2" />
   <figcaption class="drawlib-caption">Ground-Truth 7-Axis Health Scores Across All 9 Python, Java, and PHP Benchmark Targets</figcaption>
@@ -614,8 +640,8 @@
 <span class="n">save</span><span class="p">()</span>
 </code></pre>
 </details>
-<h3>4.1 Ground-Truth Audit Scores Across Clean, Mid-Tier, and Legacy Targets</h3>
-<p>The nine benchmark targets span three Grade <code>S</code>/<code>A</code> reference implementations, two realistic mid-tier Grade <code>B</code> repositories (where <code>pni501</code> surfaces container base-image CVEs, unauthenticated Actuator/API routes, or branch-coverage gaps despite clean code structure), and four severely degraded Grade <code>D</code> legacy applications:</p>
+<h3>5.1 Reference Calibration Targets Across Clean, Mid-Tier, and Legacy Codebases</h3>
+<p>The nine benchmark targets span three Grade <code>S</code>/<code>A</code> reference implementations, two realistic mid-tier Grade <code>B</code> repositories (where <code>pni501</code> surfaces container base-image CVEs, unauthenticated Actuator/API routes, or branch-coverage gaps despite clean code structure), and four severely degraded legacy applications:</p>
 <table>
 <thead>
 <tr>
@@ -630,7 +656,7 @@
 <th style="text-align:left">Deps</th>
 <th style="text-align:left">Sec</th>
 <th style="text-align:left">Docs</th>
-<th style="text-align:left">Emitted Artifacts (<code>reports/...</code>)</th>
+<th style="text-align:left">Reference Target (<code>examples/...</code>)</th>
 </tr>
 </thead>
 <tbody>
@@ -646,7 +672,7 @@
 <td style="text-align:left">95</td>
 <td style="text-align:left">94</td>
 <td style="text-align:left">91</td>
-<td style="text-align:left"><code>python/lib_clean{_score.json,.pdf}</code></td>
+<td style="text-align:left"><code>examples/python/lib_clean</code></td>
 </tr>
 <tr>
 <td style="text-align:left"><code>php_api_laravel_clean</code></td>
@@ -660,7 +686,7 @@
 <td style="text-align:left">92</td>
 <td style="text-align:left">91</td>
 <td style="text-align:left">93</td>
-<td style="text-align:left"><code>php/api_laravel_clean{_score.json,.pdf}</code></td>
+<td style="text-align:left"><code>examples/php/api_laravel_clean</code></td>
 </tr>
 <tr>
 <td style="text-align:left"><code>py_api_fastapi_clean</code></td>
@@ -674,7 +700,7 @@
 <td style="text-align:left">88</td>
 <td style="text-align:left">78</td>
 <td style="text-align:left">90</td>
-<td style="text-align:left"><code>python/api_fastapi_clean{_score.json,.pdf}</code></td>
+<td style="text-align:left"><code>examples/python/api_fastapi_clean</code></td>
 </tr>
 <tr>
 <td style="text-align:left"><code>java_api_spring_clean</code></td>
@@ -688,7 +714,7 @@
 <td style="text-align:left">74</td>
 <td style="text-align:left">58</td>
 <td style="text-align:left">86</td>
-<td style="text-align:left"><code>java/api_spring_clean{_score.json,.pdf}</code></td>
+<td style="text-align:left"><code>examples/java/api_spring_clean</code></td>
 </tr>
 <tr>
 <td style="text-align:left"><code>py_cli_audit_tool</code></td>
@@ -702,7 +728,7 @@
 <td style="text-align:left">68</td>
 <td style="text-align:left">78</td>
 <td style="text-align:left">72</td>
-<td style="text-align:left"><code>python/cli_audit_tool{_score.json,.pdf}</code></td>
+<td style="text-align:left"><code>examples/python/cli_audit_tool</code></td>
 </tr>
 <tr>
 <td style="text-align:left"><code>java_api_spring_messy</code></td>
@@ -716,7 +742,7 @@
 <td style="text-align:left">18</td>
 <td style="text-align:left">17</td>
 <td style="text-align:left">26</td>
-<td style="text-align:left"><code>java/api_spring_messy{_score.json,.pdf}</code></td>
+<td style="text-align:left"><code>examples/java/api_spring_messy</code></td>
 </tr>
 <tr>
 <td style="text-align:left"><code>py_api_legacy_messy</code></td>
@@ -730,7 +756,7 @@
 <td style="text-align:left">18</td>
 <td style="text-align:left">12</td>
 <td style="text-align:left">28</td>
-<td style="text-align:left"><code>python/api_legacy_messy{_score.json,.pdf}</code></td>
+<td style="text-align:left"><code>examples/python/api_legacy_messy</code></td>
 </tr>
 <tr>
 <td style="text-align:left"><code>php_wp_plugin_messy</code></td>
@@ -744,7 +770,7 @@
 <td style="text-align:left">22</td>
 <td style="text-align:left">10</td>
 <td style="text-align:left">22</td>
-<td style="text-align:left"><code>php/wp_plugin_messy{_score.json,.pdf}</code></td>
+<td style="text-align:left"><code>examples/php/wp_plugin_messy</code></td>
 </tr>
 <tr>
 <td style="text-align:left"><code>php_legacy_shop_messy</code></td>
@@ -758,11 +784,11 @@
 <td style="text-align:left">18</td>
 <td style="text-align:left">5</td>
 <td style="text-align:left">24</td>
-<td style="text-align:left"><code>php/legacy_shop_messy{_score.json,.pdf}</code></td>
+<td style="text-align:left"><code>examples/php/legacy_shop_messy</code></td>
 </tr>
 </tbody>
 </table>
-<p>Next, see <a href="drawlib_reporter.html">Drawlib Visual Reporter</a> for how <code>pni501</code> compiles <code>ScoreResult</code> and <code>MigrationPlanResult</code> into 7-chapter vector PDF reports, or <a href="../05_languages_and_reference/supported_languages.html">Supported 6 Languages</a> for language-specific analyzer details.</p>
+<p>Next, see <a href="drawlib_reporter.html">Drawlib Visual Reporter</a> for how <code>pni501</code> compiles <code>ScoreResult</code> and <code>MigrationPlanResult</code> into self-contained flat Drawlib reports, explore live v0.2.0 interactive outputs in the <a href="sample_reports.html">Sample Reports Gallery</a>, or view <a href="../05_languages_and_reference/supported_languages.html">Supported 55 Languages</a> for Tree-sitter CST analyzer details.</p>
 
             </main>
         </div>

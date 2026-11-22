@@ -35,19 +35,19 @@
     
     
     
-    <meta name="description" content="Rather than asking an LLM to sort tables or invent document layouts from scratch, pni501 deterministically enriches, deduplicates, and pre-sorts every…">
+    <meta name="description" content="Rather than asking an LLM to sort tables or invent document layouts from scratch, pni501 (v0.2.0) deterministically enriches, deduplicates, and pre-sorts…">
     <link rel="canonical" href="https://www.pni501.com/en/04_scoring_and_reports/drawlib_reporter.html">
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="pni501 Documentation">
     <meta property="og:title" content="Drawlib Visual Reporter &amp; 7-Chapter Blueprints — pni501 Documentation">
-    <meta property="og:description" content="Rather than asking an LLM to sort tables or invent document layouts from scratch, pni501 deterministically enriches, deduplicates, and pre-sorts every…">
+    <meta property="og:description" content="Rather than asking an LLM to sort tables or invent document layouts from scratch, pni501 (v0.2.0) deterministically enriches, deduplicates, and pre-sorts…">
     <meta property="og:url" content="https://www.pni501.com/en/04_scoring_and_reports/drawlib_reporter.html">
     <meta property="og:image" content="https://www.pni501.com/_assets/logo.png">
     <meta property="og:locale" content="en_US">
     <meta property="og:locale:alternate" content="ja_JP">
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="Drawlib Visual Reporter &amp; 7-Chapter Blueprints — pni501 Documentation">
-    <meta name="twitter:description" content="Rather than asking an LLM to sort tables or invent document layouts from scratch, pni501 deterministically enriches, deduplicates, and pre-sorts every…">
+    <meta name="twitter:description" content="Rather than asking an LLM to sort tables or invent document layouts from scratch, pni501 (v0.2.0) deterministically enriches, deduplicates, and pre-sorts…">
     <meta name="twitter:image" content="https://www.pni501.com/_assets/logo.png">
     
     
@@ -85,7 +85,7 @@
                 
                 <a href="../01_getting_started/release_notes.html" class="sidebar-version-badge" title="View Release Notes">
                     <span class="sidebar-version-dot" aria-hidden="true"></span>
-                    <span class="sidebar-version-text">v0.1.4</span>
+                    <span class="sidebar-version-text">v0.2.0</span>
                 </a>
                 <a href="https://github.com/yuichi110/pni501" target="_blank" rel="noopener noreferrer" class="sidebar-github-link" aria-label="GitHub Repository" title="GitHub Repository">
                     <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg>
@@ -151,7 +151,7 @@
                             </li>
                             
                             <li class="nav-item ">
-                                <a href="../03_workflows_and_actions/actions_pipeline.html" >15 Actions &amp; 12 Primitives</a>
+                                <a href="../03_workflows_and_actions/actions_pipeline.html" >182 Actions &amp; 16 Primitives</a>
                             </li>
                             
                             <li class="nav-item ">
@@ -173,6 +173,10 @@
                                 <a href="drawlib_reporter.html" >Drawlib Visual Reporter</a>
                             </li>
                             
+                            <li class="nav-item ">
+                                <a href="sample_reports.html" >Sample Reports Gallery</a>
+                            </li>
+                            
                         </ul>
                     
                         
@@ -181,7 +185,7 @@
                         <ul class="nav-list">
                             
                             <li class="nav-item ">
-                                <a href="../05_languages_and_reference/supported_languages.html" >Supported 6 Languages</a>
+                                <a href="../05_languages_and_reference/supported_languages.html" >Supported 55 Languages</a>
                             </li>
                             
                             <li class="nav-item ">
@@ -244,10 +248,10 @@
             </header>
             <main class="main-content">
                 <h1>Drawlib Visual Reporter &amp; 7-Chapter Blueprints</h1>
-<p>Rather than asking an LLM to sort tables or invent document layouts from scratch, <code>pni501</code> deterministically enriches, deduplicates, and pre-sorts every diagnostic metric into a cached 7-chapter <code>ReportBlueprint</code> (<code>blueprint.py</code> and <code>migration_blueprint.py</code>) before <code>compiler.py</code> compiles vector A4 PDFs (<code>reports/&lt;target&gt;.pdf</code>) and multi-format deliverables via <code>drawlib</code>.</p>
+<p>Rather than asking an LLM to sort tables or invent document layouts from scratch, <code>pni501</code> (<code>v0.2.0</code>) deterministically enriches, deduplicates, and pre-sorts every diagnostic metric into a cached <code>ReportBlueprint</code> (<code>blueprint.py</code>, <code>migration_blueprint.py</code>, <code>progress_blueprint.py</code>, and <code>rollup_blueprint.py</code>), synchronizes structured evidence JSONs directly into <code>&lt;src_dir&gt;/_facts/</code>, and compiles a <strong>flat, self-contained Drawlib report project</strong> (<code>pni_report_src -&gt; pni_report</code>) into vector A4 PDFs, bilingual HTML portals, Markdown, and PNG deliverables via <code>compiler.py</code>.</p>
 <figure class="drawlib-image" style="text-align: center;">
   <img src="../../images/04_scoring_and_reports/drawlib_reporter/reporter_compilation_pipeline.png" alt="drawlib_reporter_1" />
-  <figcaption class="drawlib-caption">Blueprint-Driven Drawlib Report Pipeline Across Health Audit and Migration Execution Tracks</figcaption>
+  <figcaption class="drawlib-caption">v0.2.0 Flat Self-Contained Drawlib Report Pipeline (pni_report_src -> pni_report & Unified Portal Deployment)</figcaption>
 </figure>
 <details class="drawlib-code-details">
 <summary>Source Code</summary>
@@ -277,7 +281,7 @@
 <span class="p">)</span>
 <span class="n">n_score</span> <span class="o">=</span> <span class="n">g_inputs</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
     <span class="n">Node</span><span class="p">(</span>
-        <span class="s2">"ScoreResult + agg</span><span class="se">\n</span><span class="s2">(*_score.json)"</span><span class="p">,</span>
+        <span class="s2">"ScoreResult v2.0</span><span class="se">\n</span><span class="s2">(JSON + SARIF 2.1.0)"</span><span class="p">,</span>
         <span class="n">width</span><span class="o">=</span><span class="mf">30.0</span><span class="p">,</span>
         <span class="n">height</span><span class="o">=</span><span class="mf">16.0</span><span class="p">,</span>
         <span class="n">icon</span><span class="o">=</span><span class="n">PhosphorIcon</span><span class="o">.</span><span class="n">MEDAL</span><span class="p">,</span>
@@ -288,7 +292,7 @@
 <span class="p">)</span>
 <span class="n">n_plan</span> <span class="o">=</span> <span class="n">g_inputs</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
     <span class="n">Node</span><span class="p">(</span>
-        <span class="s2">"MigrationPlanResult</span><span class="se">\n</span><span class="s2">(*_migration_plan.json)"</span><span class="p">,</span>
+        <span class="s2">"Migration / Progress</span><span class="se">\n</span><span class="s2">&amp; Rollup Artifacts"</span><span class="p">,</span>
         <span class="n">width</span><span class="o">=</span><span class="mf">30.0</span><span class="p">,</span>
         <span class="n">height</span><span class="o">=</span><span class="mf">16.0</span><span class="p">,</span>
         <span class="n">icon</span><span class="o">=</span><span class="n">PhosphorIcon</span><span class="o">.</span><span class="n">GIT_PULL_REQUEST</span><span class="p">,</span>
@@ -298,7 +302,7 @@
 <span class="p">)</span>
 <span class="n">n_cache</span> <span class="o">=</span> <span class="n">g_inputs</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
     <span class="n">Node</span><span class="p">(</span>
-        <span class="s2">"facts.json +</span><span class="se">\n</span><span class="s2">architecture.json"</span><span class="p">,</span>
+        <span class="s2">"_facts/ Evidence Sync</span><span class="se">\n</span><span class="s2">(facts + arch + plan)"</span><span class="p">,</span>
         <span class="n">width</span><span class="o">=</span><span class="mf">30.0</span><span class="p">,</span>
         <span class="n">height</span><span class="o">=</span><span class="mf">16.0</span><span class="p">,</span>
         <span class="n">icon</span><span class="o">=</span><span class="n">PhosphorIcon</span><span class="o">.</span><span class="n">DATABASE</span><span class="p">,</span>
@@ -321,7 +325,7 @@
 <span class="p">)</span>
 <span class="n">n_bp_eng</span> <span class="o">=</span> <span class="n">g_bp</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
     <span class="n">Node</span><span class="p">(</span>
-        <span class="s2">"blueprint.py /</span><span class="se">\n</span><span class="s2">migration_blueprint.py"</span><span class="p">,</span>
+        <span class="s2">"blueprint.py /</span><span class="se">\n</span><span class="s2">mig / prog / rollup"</span><span class="p">,</span>
         <span class="n">width</span><span class="o">=</span><span class="mf">30.0</span><span class="p">,</span>
         <span class="n">height</span><span class="o">=</span><span class="mf">18.5</span><span class="p">,</span>
         <span class="n">icon</span><span class="o">=</span><span class="n">PhosphorIcon</span><span class="o">.</span><span class="n">SLIDERS_HORIZONTAL</span><span class="p">,</span>
@@ -334,7 +338,7 @@
 <span class="p">)</span>
 <span class="n">n_bp_json</span> <span class="o">=</span> <span class="n">g_bp</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
     <span class="n">Node</span><span class="p">(</span>
-        <span class="s2">"Blueprint JSON Cache</span><span class="se">\n</span><span class="s2">(00_cover + 01..06)"</span><span class="p">,</span>
+        <span class="s2">"_facts/blueprint.json</span><span class="se">\n</span><span class="s2">(00_cover + 01..06)"</span><span class="p">,</span>
         <span class="n">width</span><span class="o">=</span><span class="mf">30.0</span><span class="p">,</span>
         <span class="n">height</span><span class="o">=</span><span class="mf">18.5</span><span class="p">,</span>
         <span class="n">icon</span><span class="o">=</span><span class="n">PhosphorIcon</span><span class="o">.</span><span class="n">LIST_NUMBERS</span><span class="p">,</span>
@@ -346,7 +350,7 @@
 
 <span class="n">g_author</span> <span class="o">=</span> <span class="n">diag</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
     <span class="n">NodeGroup</span><span class="p">(</span>
-        <span class="n">title</span><span class="o">=</span><span class="s2">"3. AI Authoring &amp; QA"</span><span class="p">,</span>
+        <span class="n">title</span><span class="o">=</span><span class="s2">"3. Flat Source &amp; QA"</span><span class="p">,</span>
         <span class="n">width</span><span class="o">=</span><span class="mf">34.5</span><span class="p">,</span>
         <span class="n">height</span><span class="o">=</span><span class="mf">70.0</span><span class="p">,</span>
         <span class="n">style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">Neutral</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">shape_r</span><span class="o">=</span><span class="mf">2.0</span><span class="p">),</span>
@@ -356,7 +360,7 @@
 <span class="p">)</span>
 <span class="n">n_src</span> <span class="o">=</span> <span class="n">g_author</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
     <span class="n">Node</span><span class="p">(</span>
-        <span class="s2">"reports_src/</span><span class="se">\n</span><span class="s2">&lt;target&gt;_src/00..06.md"</span><span class="p">,</span>
+        <span class="s2">"pni_report_src/</span><span class="se">\n</span><span class="s2">en/ja + _assets/_facts"</span><span class="p">,</span>
         <span class="n">width</span><span class="o">=</span><span class="mf">30.0</span><span class="p">,</span>
         <span class="n">height</span><span class="o">=</span><span class="mf">18.5</span><span class="p">,</span>
         <span class="n">icon</span><span class="o">=</span><span class="n">PhosphorIcon</span><span class="o">.</span><span class="n">FILE_CODE</span><span class="p">,</span>
@@ -402,7 +406,7 @@
 <span class="p">)</span>
 <span class="n">n_pdf</span> <span class="o">=</span> <span class="n">g_compile</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
     <span class="n">Node</span><span class="p">(</span>
-        <span class="s2">"reports/&lt;target&gt;.pdf</span><span class="se">\n</span><span class="s2">(A4 Vector + ToC)"</span><span class="p">,</span>
+        <span class="s2">"pni_report/&lt;t&gt;.pdf</span><span class="se">\n</span><span class="s2">(A4 Vector + ToC)"</span><span class="p">,</span>
         <span class="n">width</span><span class="o">=</span><span class="mf">30.0</span><span class="p">,</span>
         <span class="n">height</span><span class="o">=</span><span class="mf">16.0</span><span class="p">,</span>
         <span class="n">icon</span><span class="o">=</span><span class="n">PhosphorIcon</span><span class="o">.</span><span class="n">FILE_PDF</span><span class="p">,</span>
@@ -414,7 +418,7 @@
 <span class="p">)</span>
 <span class="n">n_opt</span> <span class="o">=</span> <span class="n">g_compile</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
     <span class="n">Node</span><span class="p">(</span>
-        <span class="s2">"HTML / MD / PNG</span><span class="se">\n</span><span class="s2">(scan_broken_links)"</span><span class="p">,</span>
+        <span class="s2">"HTML / Portal Build</span><span class="se">\n</span><span class="s2">(docs/reports/&lt;slug&gt;)"</span><span class="p">,</span>
         <span class="n">width</span><span class="o">=</span><span class="mf">30.0</span><span class="p">,</span>
         <span class="n">height</span><span class="o">=</span><span class="mf">16.0</span><span class="p">,</span>
         <span class="n">icon</span><span class="o">=</span><span class="n">PhosphorIcon</span><span class="o">.</span><span class="n">BROWSER</span><span class="p">,</span>
@@ -437,16 +441,33 @@
 </code></pre>
 </details>
 <hr />
-<h2>1. Why Blueprint-Driven Illustration-as-Code?</h2>
-<p>When generating executive audit deliverables or multi-phase migration specifications, unguided LLM document generation frequently suffers from dropped findings, inconsistent table ordering, and fragile chart code. <code>pni501</code> eliminates these failure modes by separating <strong>deterministic blueprint synthesis</strong> from <strong>visual Markdown authoring</strong>:</p>
+<h2>1. Flat Self-Contained Layout &amp; <code>_facts/</code> Evidence Synchronization</h2>
+<p>In <code>pni501 v0.2.0</code>, Drawlib reports adopt a <strong>flat, self-contained directory layout</strong> defaulting to <code>pni_report_src -&gt; pni_report</code> (<code>DEFAULT_REPORT_SRC_DIR = &quot;pni_report_src&quot;</code>, <code>DEFAULT_REPORT_OUTPUT_DIR = &quot;pni_report&quot;</code>). There is <strong>no extra <code>&lt;target&gt;_src/</code> sub-nesting</strong>: <code>src_dir</code> directly owns every configuration file, shared Drawlib style helper, localized chapter folder, brand asset, and synchronized evidence JSON:</p>
+<pre><code class="language-text">pni_report_src/                     # Exact src_dir (no nested &lt;target&gt;_src/ folder)
+├── drawlib.toml                    # [i18n] (en / ja / en,ja), title, theme metadata
+├── styles.py                       # Drawlib Colors &amp; Styles preset tokens
+├── utils.py                        # Shared helpers + injected draw_pni_logo()
+├── _assets/                        # Brand logos (logo.png, logo_dark.png, favicon.png, ogp.png)
+├── _facts/                         # Auto-synchronized structured evidence JSONs (Git-friendly)
+│   ├── project_facts.json          # Project manifests, lockfiles &amp; dependency metadata
+│   ├── ast_facts.json              # Tree-sitter CST module inventory, sinks &amp; endpoints
+│   ├── runtime_facts.json          # Container build, offline unit tests, coverage &amp; smoke
+│   ├── security_facts.json         # Trivy FS/image CVEs, IaC misconfigs &amp; redacted secrets
+│   ├── pentest_facts.json          # Live HTTP DAST probe results &amp; confirmed findings
+│   ├── architecture.json           # 3-aspect ArchitectureRecord (profile, layers, flows)
+│   ├── score.json                  # Canonical ScoreResult v2.0 (baseline, Δ, FP triage, DAG)
+│   ├── plan.json                   # Pre-flight execution plan &amp; validated Mermaid DAG
+│   └── blueprint.json              # Pre-sorted chapter blueprint payload (00..06)
+├── en/                             # English chapters (00_cover.md .. 06_*.md)
+└── ja/                             # Optional Japanese chapters (00_cover.md .. 06_*.md)
+</code></pre>
 <ul>
-<li><strong>Pre-Computed Chapter Payloads (<code>blueprint.json</code> / <code>migration_blueprint.json</code>)</strong>: During <code>write_drawlib_report</code> and <code>write_migration_report</code>, <code>src/pni/_reporter/blueprint.py</code> and <code>src/pni/_reporter/migration_blueprint.py</code> transform the enriched <code>ScoreResult</code> or <code>MigrationPlanResult</code> into a 7-chapter <code>ReportBlueprint</code> containing pre-sorted tables, chart series, KPI card values, and chapter-by-chapter Drawlib component recommendations.</li>
-<li><strong>Version-Controlled <code>doc</code> Archetype (<code>reports_src/&lt;target&gt;_src/</code>)</strong>: Every report is scaffolded as a self-contained Drawlib <code>doc</code> project (<code>drawlib.toml</code>, <code>styles.py</code>, <code>utils.py</code>, and <code>&lt;lang&gt;/00_cover.md .. 06_*.md</code>), keeping narrative prose and declarative Python diagrams in Git alongside the repository.</li>
-<li><strong>Automated Preflight Linting &amp; Multimodal Grid Verification</strong>: Before invoking <code>drawlib.tools.build_pdf()</code>, <code>compiler.py</code> runs <code>lint_drawlib_chapters()</code> to catch missing chart legends and UML heatmap contour collisions, while agents inspect <code>-g</code> coordinate-grid renders to ensure zero text clipping.</li>
+<li><strong>Why Sync <code>_facts/</code>?</strong> When <code>pni report init</code>, workflow report synthesis, or <code>pni report build</code> runs (<code>src/pni/_reporter/facts_sync.py</code>), structured JSON evidence (<code>project_facts.json</code>, <code>ast_facts.json</code>, <code>runtime_facts.json</code>, <code>security_facts.json</code>, <code>pentest_facts.json</code>, <code>architecture.json</code>, <code>score.json</code>, <code>plan.json</code>, plus bundled <code>facts.json</code> and <code>blueprint.json</code>) is synchronized automatically into <code>&lt;src_dir&gt;/_facts/</code>. Ephemeral SQLite state databases (<code>workflow_state.db</code>), Trivy caches, and raw container logs remain strictly inside <code>.pni/cache/</code>. Every Drawlib report source tree can therefore be committed to Git, reviewed, and rebuilt anywhere with zero external cache dependencies.</li>
+<li><strong>Pre-Computed Chapter Payloads</strong>: Rather than asking an LLM to sort tables or invent layouts, <code>blueprint.py</code>, <code>migration_blueprint.py</code>, <code>progress_blueprint.py</code>, and <code>rollup_blueprint.py</code> emit pre-sorted tables, chart series, KPI card values, and Drawlib component recommendations straight into <code>&lt;src_dir&gt;/_facts/</code>.</li>
 </ul>
 <hr />
 <h2>2. Dual 7-Chapter ReportBlueprint Architecture</h2>
-<p>Both health audit workflows (<code>category: audit</code>) and modernization workflows (<code>category: migration</code>) standardize on an identical <strong>7-file linear <code>doc</code> layout (<code>00_cover.md</code> + <code>01..06.md</code>)</strong>, localized in English (<code>en</code>) or Japanese (<code>ja</code>). Drawlib automatically injects a hyperlinked Table of Contents immediately after <code>00_cover.md</code>.</p>
+<p>Both health audit workflows (<code>category: audit</code>) and modernization workflows (<code>category: migration</code>) standardize on an identical <strong>7-file linear <code>doc</code> layout (<code>00_cover.md</code> + <code>01..06.md</code>)</strong>, localized in English (<code>en</code>), Japanese (<code>ja</code>), or bilingual (<code>en,ja</code>). Drawlib automatically injects a hyperlinked Table of Contents immediately after <code>00_cover.md</code>. (Progress workflows use a streamlined 5-file layout <code>00_cover.md</code> + <code>01..04.md</code> via <code>progress_blueprint.py</code>, and polyglot Rollup workflows use a 6-file layout <code>00_cover.md</code> + <code>01..05.md</code> via <code>rollup_blueprint.py</code>.)</p>
 <figure class="drawlib-image" style="text-align: center;">
   <img src="../../images/04_scoring_and_reports/drawlib_reporter/blueprint_chapter_comparison.png" alt="drawlib_reporter_2" />
   <figcaption class="drawlib-caption">Side-by-Side 7-Chapter ReportBlueprint Architecture for Health Audits and Migration Execution Plans</figcaption>
@@ -510,7 +531,7 @@
 <span class="p">)</span>
 <span class="n">audit_cards</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
     <span class="s2">"04_standards_and_findings.md"</span><span class="p">,</span>
-    <span class="s2">"Weakest-First BarChart + Consolidated Findings Table"</span><span class="p">,</span>
+    <span class="s2">"Executed DAG + Baseline Δ + FP Triage + Findings"</span><span class="p">,</span>
     <span class="n">badge_text</span><span class="o">=</span><span class="s2">"04"</span><span class="p">,</span>
     <span class="n">icon</span><span class="o">=</span><span class="n">phosphor</span><span class="o">.</span><span class="n">list_checks</span><span class="p">,</span>
 <span class="p">)</span>
@@ -599,8 +620,8 @@
 <span class="n">save</span><span class="p">()</span>
 </code></pre>
 </details>
-<h3>2.1 Health Audit 7-Chapter Blueprint (blueprint.py)</h3>
-<p><code>src/pni/_reporter/blueprint.py</code> maps <code>ScoreResult</code>, <code>WorkflowFactsBundle</code>, and <code>ArchitectureRecord</code> into seven structured chapters:</p>
+<h3>2.1 Health Audit 7-Chapter Blueprint (<code>blueprint.py</code>)</h3>
+<p><code>src/pni/_reporter/blueprint.py</code> maps <code>ScoreResult</code> v2.0, <code>WorkflowFactsBundle</code>, and <code>ArchitectureRecord</code> into seven structured chapters:</p>
 <table>
 <thead>
 <tr>
@@ -617,7 +638,7 @@
 </tr>
 <tr>
 <td style="text-align:left"><strong><code>01_executive_summary.md</code></strong></td>
-<td style="text-align:left"><code>category_scores</code> (<code>7</code> axes), <code>category_rationales</code>, <code>strengths</code>, top critical/high risks, <code>opt_outs</code></td>
+<td style="text-align:left"><code>category_scores</code> (<code>7</code> axes), <code>category_rationales</code>, <code>strengths</code>, top critical/high risks, <code>approved_plan_summary</code></td>
 <td style="text-align:left">7-Axis <code>RadarChart</code> + <code>KpiCards</code> + <code>CardList</code> / summary tables</td>
 </tr>
 <tr>
@@ -632,8 +653,8 @@
 </tr>
 <tr>
 <td style="text-align:left"><strong><code>04_standards_and_findings.md</code></strong></td>
-<td style="text-align:left"><code>audit_dimensions</code> (weakest-first), <code>rule_compliance</code>, <code>consolidated_findings</code> (location-grouped)</td>
-<td style="text-align:left">Weakest-first horizontal <code>BarChart</code> + location-consolidated findings <code>Table</code></td>
+<td style="text-align:left"><code>execution_dag</code> (<code>AUTO</code>/<code>AI</code>/<code>HYBRID</code>/<code>SKIP</code> + <code>audit_scope</code>), 7-axis <code>baseline_scores</code> vs. AI Δ (<code>±10 pt</code>), <code>audit_dimensions</code>, <code>rule_compliance</code>, <code>consolidated_findings</code>, <code>triaged_adjustments</code>, <code>opt_outs</code>, compact <code>artifact_manifest</code></td>
+<td style="text-align:left">Executed Audit DAG (<code>drawlib.graph</code> / <code>flow</code>) + Baseline vs. Final <code>Table</code> + weakest-first <code>BarChart</code> + consolidated findings &amp; FP triage <code>Table</code></td>
 </tr>
 <tr>
 <td style="text-align:left"><strong><code>05_code_and_runtime_analysis.md</code></strong></td>
@@ -647,7 +668,7 @@
 </tr>
 </tbody>
 </table>
-<h3>2.2 Migration Execution Plan 7-Chapter Blueprint (migration_blueprint.py)</h3>
+<h3>2.2 Migration Execution Plan 7-Chapter Blueprint (<code>migration_blueprint.py</code>)</h3>
 <p>For modernization workflows (<code>based_on</code> a completed health audit run), <code>src/pni/_reporter/migration_blueprint.py</code> synthesizes <code>MigrationPlanResult</code> and <code>MigrationFacts</code> into a parallel 7-chapter execution blueprint:</p>
 <table>
 <thead>
@@ -696,35 +717,52 @@
 </tbody>
 </table>
 <hr />
-<h2>3. Non-Destructive Scaffolding, Preflight Linter &amp; Grid QA</h2>
-<p><code>src/pni/_reporter/compiler.py</code> and <code>src/pni/_reporter/drawlib_guide.py</code> enforce deterministic quality gates across scaffolding, authoring, and multi-format compilation.</p>
-<h3>3.1 Non-Destructive pni report init &amp; On-Demand Rules</h3>
-<p>To prevent bloated system prompts during early AST and rule-interpretation steps, agents load Drawlib documentation dynamically right before authoring <code>reports_src/&lt;target&gt;_src/&lt;lang&gt;/*.md</code>, verify each diagram with the <code>-g</code> coordinate grid, and compile the final A4 vector PDF:</p>
-<pre><code class="language-bash"><span class="c1"># 1. Non-destructively scaffold reports_src/&lt;target&gt;_src/ (preserves existing *.md chapters)</span>
-pni<span class="w"> </span>report<span class="w"> </span>init<span class="w"> </span>&lt;target&gt;<span class="w"> </span>--src-dir<span class="w"> </span>reports_src<span class="w"> </span>--lang<span class="w"> </span>en<span class="w"> </span>--style<span class="w"> </span>google
+<h2>3. Non-Destructive Scaffolding, Built-in Preflight Linter &amp; Unified Portal Deployment</h2>
+<p><code>src/pni/_reporter/compiler.py</code> and <code>src/pni/_reporter/drawlib_guide.py</code> enforce deterministic quality gates via the two <code>pni report</code> subcommands (<code>pni report init</code> and <code>pni report build</code>).</p>
+<h3>3.1 Non-Destructive <code>pni report init</code> &amp; <code>pni report build</code></h3>
+<p>To prevent bloated system prompts during early CST and rule-interpretation steps, agents load Drawlib documentation dynamically right before authoring <code>pni_report_src/&lt;lang&gt;/*.md</code>, verify each diagram with the <code>-g</code> coordinate grid, and compile deliverables directly into <code>pni_report/</code>:</p>
+<pre><code class="language-bash"><span class="c1"># 1. Non-destructively scaffold pni_report_src/ (preserves existing *.md chapters; syncs _assets/)</span>
+pni<span class="w"> </span>report<span class="w"> </span>init<span class="w"> </span>full_audit<span class="w"> </span>--src-dir<span class="w"> </span>pni_report_src<span class="w"> </span>--lang<span class="w"> </span>en<span class="w"> </span>--style<span class="w"> </span>google
 
 <span class="c1"># 2. Query Drawlib API &amp; component rules on-demand (never guess constructor arguments)</span>
 uv<span class="w"> </span>run<span class="w"> </span>drawlib<span class="w"> </span>rules<span class="w"> </span>show<span class="w"> </span>overview
 uv<span class="w"> </span>run<span class="w"> </span>drawlib<span class="w"> </span>rules<span class="w"> </span>show<span class="w"> </span>project-doc
 uv<span class="w"> </span>run<span class="w"> </span>drawlib<span class="w"> </span>rules<span class="w"> </span>show<span class="w"> </span>api
 
-<span class="c1"># 3. Stage 2 visual grid verification (-g) before full PDF compilation</span>
-uv<span class="w"> </span>run<span class="w"> </span>drawlib<span class="w"> </span>show<span class="w"> </span>reports_src/&lt;target&gt;_src/en/01_executive_summary.md<span class="w"> </span><span class="se">\</span>
-<span class="w">  </span>-s<span class="w"> </span>reports_src/&lt;target&gt;_src/styles.py<span class="w"> </span>-u<span class="w"> </span>reports_src/&lt;target&gt;_src/utils.py<span class="w"> </span><span class="se">\</span>
+<span class="c1"># 3. Stage 2 visual grid verification (-g) before full compilation</span>
+uv<span class="w"> </span>run<span class="w"> </span>drawlib<span class="w"> </span>show<span class="w"> </span>pni_report_src/en/01_executive_summary.md<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-s<span class="w"> </span>pni_report_src/styles.py<span class="w"> </span>-u<span class="w"> </span>pni_report_src/utils.py<span class="w"> </span><span class="se">\</span>
 <span class="w">  </span>-g<span class="w"> </span>-o<span class="w"> </span>.drawlib/scratch/exec_summary_grid.png
 
-<span class="c1"># 4. Run preflight linter and compile reports/&lt;target&gt;.pdf (default A4 vector PDF + ToC)</span>
-pni<span class="w"> </span>report<span class="w"> </span>build<span class="w"> </span>&lt;target&gt;<span class="w"> </span>--src-dir<span class="w"> </span>reports_src<span class="w"> </span>--output-dir<span class="w"> </span>reports
+<span class="c1"># 4. Run built-in lint_drawlib_chapters() preflight and compile pni_report/full_audit.pdf</span>
+pni<span class="w"> </span>report<span class="w"> </span>build<span class="w"> </span>full_audit<span class="w"> </span>--src-dir<span class="w"> </span>pni_report_src<span class="w"> </span>--output-dir<span class="w"> </span>pni_report
 </code></pre>
-<h3>3.2 Preflight Visual Linter (lint_drawlib_chapters) &amp; Link Verification</h3>
-<p>Before invoking <code>drawlib.tools</code>, <code>compiler.py</code> executes four automated verification guardrails:</p>
+<h3>3.2 Built-in Preflight Visual Linter (<code>lint_drawlib_chapters</code>) &amp; Link Verification</h3>
+<p><code>pni report build</code> automatically runs <code>lint_drawlib_chapters()</code> and post-build verification inside <code>compiler.py</code> (no separate check command is needed):</p>
 <ul>
-<li><strong>Non-Destructive Re-Scaffolding &amp; Brand Assets (<code>scaffold_report_project</code>)</strong>: On initial creation, <code>pni report init</code> removes starter sample files (<code>00_cover.md</code>, <code>01_overview.md</code>, <code>02_design.md</code>), copies official brand assets (<code>_assets/{logo.png,logo_dark.png,favicon.png}</code>), and injects <code>draw_pni_logo()</code> into <code>utils.py</code>. When re-run on an existing report directory—even with <code>--force</code> to refresh <code>drawlib.toml</code>, <code>styles.py</code>, or <code>utils.py</code>—all authored <code>&lt;lang&gt;/*.md</code> chapters are preserved intact so incremental re-audits produce clean <code>git diff</code> histories.</li>
-<li><strong>Multi-Series Chart Legend Check</strong>: <code>lint_drawlib_chapters()</code> scans every <code>```drawlib</code> fence and verifies that any <code>BarChart</code> or <code>LineChart</code> calling <code>.add_series(...)</code> two or more times also calls <code>.draw_legend(...)</code>.</li>
-<li><strong>UML ClassDiagram Contour &amp; <code>Styles.White</code> Guards</strong>: Combining <code>ClassDiagram</code> with <code>HeatmapOverlay(..., show_contour_lines=True)</code> or styling <code>ClassDiagram</code> / <code>ClassNode</code> with <code>Styles.White</code> (which renders white text on a white fill; use <code>Styles.Neutral</code> instead) triggers a preflight warning (or raises <code>ValueError</code> when <code>strict_preflight=True</code>).</li>
-<li><strong>Output Normalization &amp; Broken-Link Scanning (<code>_verify_links</code>)</strong>: <code>pni report build</code> normalizes <code>&lt;target&gt;_&lt;default_lang&gt;.pdf</code> to <code>reports/&lt;target&gt;.pdf</code> (<code>page_break=True</code>, <code>generate_index=True</code>). When <code>-f html</code> is included, <code>_verify_links()</code> runs <code>drawlib.tools.scan_broken_links()</code> (supporting <code>--link-check-root &lt;dir&gt;</code> for multi-portal relative links) and fails closed (<code>strict_links=True</code>) if any broken link or missing image asset is detected.</li>
+<li><strong>Non-Destructive Re-Scaffolding &amp; Brand Assets (<code>scaffold_report_project</code>)</strong>: On initial creation, <code>pni report init</code> removes starter sample files (<code>00_cover.md</code>, <code>01_overview.md</code>, <code>02_design.md</code>), appends print wide-table CSS (<code>@media print</code>), copies official brand assets (<code>_assets/{logo.png,logo_dark.png,favicon.png,ogp.png}</code>), and injects <code>draw_pni_logo()</code> into <code>utils.py</code>. When re-run — even with <code>--force</code> — all authored <code>&lt;lang&gt;/*.md</code> chapters are preserved intact.</li>
+<li><strong>Unmasked Token Guard</strong>: <code>lint_drawlib_chapters()</code> scans chapter Markdown for raw GitHub/AWS/Slack/OpenAI token prefixes (<code>ghp_</code>, <code>github_pat_</code>, <code>AKIA</code>, <code>xox*</code>, <code>sk-live-</code>, etc.) so reports never trigger GitHub Push Protection blocks.</li>
+<li><strong>Multi-Series Chart Legend &amp; UML Contour/Contrast Guards</strong>: Verifies every multi-series <code>BarChart</code> or <code>LineChart</code> (<code>&gt;= 2</code> <code>.add_series(...)</code> calls) includes <code>.draw_legend(...)</code>, flags <code>ClassDiagram</code> + <code>HeatmapOverlay(..., show_contour_lines=True)</code> collisions, and rejects <code>ClassDiagram</code> / <code>ClassNode</code> styled with <code>Styles.White</code> (invisible white text on white fill; use <code>Styles.Neutral</code>).</li>
+<li><strong>Output Normalization &amp; Broken-Link Scanning (<code>_verify_links</code>)</strong>: <code>pni report build</code> normalizes <code>&lt;target&gt;_&lt;default_lang&gt;.pdf</code> to <code>&lt;output_dir&gt;/&lt;target&gt;.pdf</code> (<code>page_break=True</code>, <code>generate_index=True</code>, while retaining localized <code>&lt;target&gt;_en.pdf</code> / <code>&lt;target&gt;_ja.pdf</code> on bilingual builds). When <code>-f html</code> is included, <code>_verify_links()</code> runs <code>drawlib.tools.scan_broken_links()</code> (supporting <code>--link-check-root &lt;dir&gt;</code> for multi-portal relative links) and fails closed (<code>strict_links=True</code>) on any broken link or missing image.</li>
 </ul>
-<p>For details on the upstream JSON schemas and deterministic hotspot scoring formulas, see <a href="scoring_model.html">7-Axis Scoring Model</a>, or consult <a href="../05_languages_and_reference/rules_and_cli.html">Rules &amp; CLI Reference</a> for all <code>pni report</code> flags.</p>
+<h3>3.3 Unified Portal Deployment (<code>docs_src/</code> -&gt; <code>docs/</code>)</h3>
+<p>Because <code>pni report build</code> operates directly on any flat <code>src_dir</code> and supports <code>--html-output-dir</code> plus <code>--link-check-root</code>, teams can publish an entire documentation website and multiple bilingual audit/migration reports into a single static GitHub Pages portal (<code>docs/</code>):</p>
+<ul>
+<li><strong>Main Documentation Site</strong>: <code>docs_src/site/</code> builds into <code>docs/</code> (<code>docs/{en,ja}/</code> + root <code>index.html</code>).</li>
+<li><strong>Embedded Project Reports</strong>: Each self-contained report under <code>docs_src/reports/&lt;slug&gt;/</code> compiles both bilingual HTML and A4 PDFs straight into <code>docs/reports/&lt;slug&gt;/</code> while checking cross-portal relative links against <code>docs/</code>:</li>
+</ul>
+<pre><code class="language-bash"><span class="c1"># Compile a bilingual sample/project report into the unified portal</span>
+pni<span class="w"> </span>report<span class="w"> </span>build<span class="w"> </span>my_service<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--src-dir<span class="w"> </span>docs_src/reports/my_service<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--output-dir<span class="w"> </span>docs/reports/my_service<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--html-output-dir<span class="w"> </span>docs/reports/my_service<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--link-check-root<span class="w"> </span>docs<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-f<span class="w"> </span>pdf<span class="w"> </span>-f<span class="w"> </span>html
+
+<span class="c1"># Verify all site + report cross-links from the portal root</span>
+uv<span class="w"> </span>run<span class="w"> </span>drawlib<span class="w"> </span>serve<span class="w"> </span>docs/<span class="w"> </span>--check
+</code></pre>
+<p>For details on the upstream JSON schemas, deterministic baseline anchoring, and FP triage rules, see <a href="scoring_model.html">7-Axis Scoring Model</a>, browse compiled bilingual examples in the <a href="sample_reports.html">Sample Reports Gallery</a>, or consult <a href="../05_languages_and_reference/rules_and_cli.html">Rules &amp; CLI Reference</a> for all <code>pni report</code> flags.</p>
 
             </main>
         </div>

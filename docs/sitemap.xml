@@ -73,6 +73,12 @@
     <xhtml:link rel="alternate" hreflang="x-default" href="https://www.pni501.com/en/04_scoring_and_reports/drawlib_reporter.html" />
   </url>
   <url>
+    <loc>https://www.pni501.com/en/04_scoring_and_reports/sample_reports.html</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.pni501.com/en/04_scoring_and_reports/sample_reports.html" />
+    <xhtml:link rel="alternate" hreflang="ja" href="https://www.pni501.com/ja/04_scoring_and_reports/sample_reports.html" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.pni501.com/en/04_scoring_and_reports/sample_reports.html" />
+  </url>
+  <url>
     <loc>https://www.pni501.com/en/04_scoring_and_reports/scoring_model.html</loc>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.pni501.com/en/04_scoring_and_reports/scoring_model.html" />
     <xhtml:link rel="alternate" hreflang="ja" href="https://www.pni501.com/ja/04_scoring_and_reports/scoring_model.html" />
@@ -155,6 +161,12 @@
     <xhtml:link rel="alternate" hreflang="en" href="https://www.pni501.com/en/04_scoring_and_reports/drawlib_reporter.html" />
     <xhtml:link rel="alternate" hreflang="ja" href="https://www.pni501.com/ja/04_scoring_and_reports/drawlib_reporter.html" />
     <xhtml:link rel="alternate" hreflang="x-default" href="https://www.pni501.com/en/04_scoring_and_reports/drawlib_reporter.html" />
+  </url>
+  <url>
+    <loc>https://www.pni501.com/ja/04_scoring_and_reports/sample_reports.html</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.pni501.com/en/04_scoring_and_reports/sample_reports.html" />
+    <xhtml:link rel="alternate" hreflang="ja" href="https://www.pni501.com/ja/04_scoring_and_reports/sample_reports.html" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.pni501.com/en/04_scoring_and_reports/sample_reports.html" />
   </url>
   <url>
     <loc>https://www.pni501.com/ja/04_scoring_and_reports/scoring_model.html</loc>

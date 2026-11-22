@@ -85,7 +85,7 @@
                 
                 <a href="../01_getting_started/release_notes.html" class="sidebar-version-badge" title="View Release Notes">
                     <span class="sidebar-version-dot" aria-hidden="true"></span>
-                    <span class="sidebar-version-text">v0.1.4</span>
+                    <span class="sidebar-version-text">v0.2.0</span>
                 </a>
                 <a href="https://github.com/yuichi110/pni501" target="_blank" rel="noopener noreferrer" class="sidebar-github-link" aria-label="GitHub Repository" title="GitHub Repository">
                     <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg>
@@ -151,7 +151,7 @@
                             </li>
                             
                             <li class="nav-item ">
-                                <a href="../03_workflows_and_actions/actions_pipeline.html" >15 Actions &amp; 12 Primitives</a>
+                                <a href="../03_workflows_and_actions/actions_pipeline.html" >182 Actions &amp; 16 Primitives</a>
                             </li>
                             
                             <li class="nav-item ">
@@ -173,6 +173,10 @@
                                 <a href="../04_scoring_and_reports/drawlib_reporter.html" >Drawlib Visual Reporter</a>
                             </li>
                             
+                            <li class="nav-item ">
+                                <a href="../04_scoring_and_reports/sample_reports.html" >Sample Reports Gallery</a>
+                            </li>
+                            
                         </ul>
                     
                         
@@ -181,7 +185,7 @@
                         <ul class="nav-list">
                             
                             <li class="nav-item ">
-                                <a href="../05_languages_and_reference/supported_languages.html" >Supported 6 Languages</a>
+                                <a href="../05_languages_and_reference/supported_languages.html" >Supported 55 Languages</a>
                             </li>
                             
                             <li class="nav-item ">
@@ -245,6 +249,71 @@
             <main class="main-content">
                 <h1>Release Notes</h1>
 <p>Complete release history, key architectural additions, and feature highlights for <strong>Project Nemesis Index (<code>pni501</code>)</strong>.</p>
+<hr />
+<h2>Version 0.2.0</h2>
+<p><em>Release Date: 2026/11/22</em></p>
+<p>Version <code>0.2.0</code> is a major architectural milestone that expands <strong>pni501</strong> from 6 to <strong>55 supported programming languages</strong> (57 native <code>tree-sitter</code> CST grammars, replacing <code>ast-grep-py</code>), introduces the <strong>Workflow v2 Conditional DAG Engine</strong> (<code>needs:</code>, <code>when:</code>, <code>pni workflows plan</code>, <code>confirm_plan</code>, and <code>pni validate-mermaid</code>), adds <strong>Executed Audit DAG &amp; 7-Axis Evidence Δ / False-Positive Triage</strong>, adopts a <strong>flat, self-contained Drawlib report layout</strong> (<code>pni_report_src -&gt; pni_report</code> with synced <code>_facts/</code>), and distributes extra MIT-licensed <code>abi3</code> grammars on demand via <strong>GitHub Releases</strong> (<code>pni grammars</code>).</p>
+<h3>1. 55-Language Polyglot Expansion &amp; Native Tree-sitter CST Engine</h3>
+<ul>
+<li><strong>Three-Tier 55-Language Registry (<code>src/pni/_languages/registry.py</code>)</strong>:
+<ul>
+<li><strong>Tier A — Full Audit (<code>20</code> languages)</strong>: <code>Python</code>, <code>Java</code>, <code>PHP</code>, <code>Go</code>, <code>TypeScript</code>, <code>JavaScript</code>, <code>C#</code>, <code>Rust</code>, <code>Ruby</code>, <code>Kotlin</code>, <code>Swift</code>, <code>C</code>, <code>C++</code>, <code>Scala</code>, <code>Dart</code>, <code>Elixir</code>, <code>Vue</code>, <code>Perl</code>, <code>COBOL</code>, <code>R</code>.</li>
+<li><strong>Tier B — Declarative Static Audit (<code>20</code> languages)</strong>: <code>Bash/Shell</code>, <code>PowerShell</code>, <code>Groovy</code>, <code>Objective-C</code>, <code>Lua</code>, <code>Haskell</code>, <code>F#</code>, <code>OCaml</code>, <code>Zig</code>, <code>Julia</code>, <code>Fortran</code>, <code>MATLAB</code>, <code>Svelte</code>, <code>Solidity</code>, <code>CUDA</code>, <code>Verilog/SystemVerilog</code>, <code>VHDL</code>, <code>Ada</code>, <code>Odin</code>, <code>Common Lisp</code>.</li>
+<li><strong>Tier C — Companion IaC, Schema, Build &amp; Config (<code>15</code> languages)</strong>: <code>Dockerfile</code>, <code>HCL/Terraform</code>, <code>Bicep</code>, <code>Nix</code>, <code>Makefile</code>, <code>Starlark/Bazel</code>, <code>Protocol Buffers</code>, <code>SQL</code>, <code>HTML</code>, <code>CSS</code>, <code>SCSS</code>, <code>YAML</code>, <code>JSON</code>, <code>TOML</code>, <code>XML</code>.</li>
+<li>Ships <strong>356 built-in rule files</strong>, <strong>182 action templates</strong>, and <strong>112 workflow templates</strong> across the cascading rule system.</li>
+</ul>
+</li>
+<li><strong>Native <code>tree-sitter&gt;=0.25.0</code> Parse-Once Engine</strong>:
+<ul>
+<li>Replaced <code>ast-grep-py</code> with a unified parse-once <code>tree-sitter</code> CST wrapper (<code>src/pni/_actions/ast_analyze/_cst.py</code>) backed by 52 official PyPI <code>abi3</code> grammar wheels plus 5 on-demand GitHub Releases grammars.</li>
+</ul>
+</li>
+<li><strong>On-Demand GitHub Releases Grammar Caching (<code>pni grammars</code>)</strong>:
+<ul>
+<li>Keeps <code>pni501</code> a lightweight pure-Python (<code>py3-none-any</code>) wheel on PyPI while prebuilt <code>cp310-abi3</code> binaries for <code>COBOL</code>, <code>R</code>, <code>Vue</code>, <code>Protocol Buffers</code>, and <code>Dockerfile</code> (all MIT-licensed) are built via GitHub Actions across 5 targets (<code>linux_x86_64</code>, <code>linux_aarch64</code>, <code>macos_arm64</code>, <code>macos_x86_64</code>, <code>windows_amd64</code>) and downloaded lazily on first use with pinned SHA-256 verification and read-only cache fallback (<code>pni/_cached_grammars</code> -&gt; <code>~/.cache/pni501/grammars</code>).</li>
+<li>Added <code>pni grammars status</code>, <code>pni grammars prefetch [LANG ...] [--all] [--force]</code>, and <code>pni grammars clear</code>.</li>
+</ul>
+</li>
+</ul>
+<h3>2. Workflow v2 Conditional DAG Engine &amp; Single-Command CLI Ergonomics</h3>
+<ul>
+<li><strong>DAG Dependencies &amp; Guarded Execution (<code>needs:</code> / <code>when:</code>)</strong>:
+<ul>
+<li>Workflows now support parallelizable DAG steps (<code>needs: [...]</code>), deterministic conditional guards (<code>when:</code>), Phase 0 lightweight reconnaissance + Mermaid DAG planning (<code>pni workflows plan &lt;id&gt;</code>), optional interactive approval (<code>confirm_plan</code>), parallel frontier retrieval (<code>pni workflows get-actions &lt;run_id&gt;</code>), and monorepo rollup workflows (<code>category: rollup</code>).</li>
+</ul>
+</li>
+<li><strong>2-Layer Mermaid Syntax Validator (<code>pni validate-mermaid</code>)</strong>:
+<ul>
+<li>Validates AI-authored Mermaid diagrams via Layer 1 static syntax checks plus optional Layer 2 Playwright <code>mermaid.parse()</code> (<code>--browser</code>).</li>
+</ul>
+</li>
+<li><strong>Zero-Chain Single-Command CLI Flags</strong>:
+<ul>
+<li>Added <code>--pull</code> (<code>-p</code>) on <code>pni workflows start</code>, <code>--file</code> (<code>-f</code>) and <code>--next</code> (<code>-n</code>) on <code>pni workflows push-action</code>, and <code>-o</code> / <code>--output</code> across <code>plan</code>, <code>start</code>, <code>get-action</code>, <code>get-actions</code>, <code>push-action</code>, <code>status</code>, <code>inspect-action</code>, and <code>rules show</code> to eliminate shell redirects and <code>&amp;&amp;</code> chaining.</li>
+</ul>
+</li>
+</ul>
+<h3>3. Executed Audit DAG, 7-Axis Evidence Δ &amp; False-Positive Triage</h3>
+<ul>
+<li><strong>Executed Audit DAG &amp; Evidence Δ</strong>:
+<ul>
+<li><code>ScoreResult</code> now records the exact executed workflow DAG, baseline vs. adjusted per-axis Δ metrics, and explicit <code>finding_adjustments</code> (marking verified false positives such as build-time container toolchain CVEs with auditable rationale rather than silent overrides).</li>
+</ul>
+</li>
+</ul>
+<h3>4. Flat Self-Contained Report Layout &amp; Bilingual Sample Reports Portal</h3>
+<ul>
+<li><strong>Flat <code>pni_report_src -&gt; pni_report</code> &amp; Synced <code>_facts/</code></strong>:
+<ul>
+<li>Removed nested <code>&lt;src_dir&gt;/&lt;target&gt;_src/</code> indirection: <code>--src-dir</code> (<code>pni_report_src</code> by default) now directly holds <code>drawlib.toml</code>, <code>styles.py</code>, <code>utils.py</code>, <code>&lt;lang&gt;/00..06.md</code>, and <code>_facts/</code> (automatically synced with verified <code>project_facts.json</code>, <code>ast_facts.json</code>, <code>runtime_facts.json</code>, <code>security_facts.json</code>, <code>pentest_facts.json</code>, <code>architecture.json</code>, <code>score.json</code>, and <code>plan.json</code> for high cohesion).</li>
+</ul>
+</li>
+<li><strong>Unified Portal &amp; 4 Bilingual Workflow v2 Sample Reports</strong>:
+<ul>
+<li>Migrated the official documentation portal to <code>docs_src/site -&gt; docs/</code> with nested bilingual (EN + JA) HTML &amp; A4 PDF sample reports under <code>docs_src/reports/&lt;slug&gt; -&gt; docs/reports/&lt;slug&gt;</code> (accessible directly from the <a href="../04_scoring_and_reports/sample_reports.html">Sample Reports Gallery</a>).</li>
+</ul>
+</li>
+</ul>
 <hr />
 <h2>Version 0.1.4</h2>
 <p><em>Release Date: 2026/11/10</em></p>

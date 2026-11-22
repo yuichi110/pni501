@@ -1,7 +1,7 @@
 id: py_api_fastapi_clean
 category: audit
 name: Sample Audit - Python Clean FastAPI Service (order-dispatch)
-description: Evaluate examples/python/api_fastapi_clean against FastAPI idioms, 12-Factor config, SRE PRR readiness, hardened Docker, and OpenSSF supply chain.
+description: Workflow v2 DAG audit of examples/python/api_fastapi_clean against FastAPI idioms, 12-Factor config, SRE PRR readiness, hardened Docker, Trivy, live DAST pentest, and OpenSSF supply chain.
 
 targets:
   root: "examples/python/api_fastapi_clean"
@@ -18,41 +18,55 @@ steps:
 
   - id: supply_chain
     uses: supply_chain_audit
+    needs: [repo_and_deps]
 
   - id: ast_and_quality
     uses: python_ast_audit
+    needs: [repo_and_deps]
     rules:
       - python/frameworks/fastapi
 
-  - id: arch_recording
-    uses: architecture_analysis
-
-  - id: service_readiness
-    uses: service_readiness_audit
-
-  - id: test_health
-    uses: python_test_audit
-
   - id: runtime_verification
     uses: container_runtime_audit
+    needs: [repo_and_deps]
+    when: "has_runtime_harness"
 
   - id: security_audit
     uses: security_vulnerability_audit
+    needs: [repo_and_deps]
 
   - id: web_pentest
     uses: web_penetration_audit
+    needs: [repo_and_deps]
+
+  - id: arch_recording
+    uses: architecture_analysis
+    needs: [ast_and_quality]
+
+  - id: service_readiness
+    uses: service_readiness_audit
+    needs: [ast_and_quality]
+
+  - id: test_health
+    uses: python_test_audit
+    needs: [ast_and_quality]
 
   - id: output_score
     uses: emit_score
+    needs: [supply_chain, arch_recording, service_readiness, test_health, runtime_verification, security_audit, web_pentest]
     with:
-      output_dir: "reports/python"
-      target: "api_fastapi_clean"
+      output_dir: "docs/reports/py_api_fastapi_clean"
+      target: "py_api_fastapi_clean"
 
   - id: create_report
     uses: write_drawlib_report
+    needs: [output_score]
     with:
-      src_dir: "reports_src/python"
-      output_dir: "reports/python"
-      target: "api_fastapi_clean"
-      lang: "ja"
+      src_dir: "docs_src/reports/py_api_fastapi_clean"
+      output_dir: "docs/reports/py_api_fastapi_clean"
+      target: "py_api_fastapi_clean"
+      lang: "en,ja"
       style: "google"
+      formats:
+        - "pdf"
+        - "html"

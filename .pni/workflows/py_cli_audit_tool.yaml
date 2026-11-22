@@ -37,14 +37,17 @@ steps:
   - id: output_score
     uses: emit_score
     with:
-      output_dir: "reports/python"
-      target: "cli_audit_tool"
+      output_dir: "docs/reports/py_cli_audit_tool"
+      target: "py_cli_audit_tool"
 
   - id: create_report
     uses: write_drawlib_report
     with:
-      src_dir: "reports_src/python"
-      output_dir: "reports/python"
-      target: "cli_audit_tool"
-      lang: "ja"
+      src_dir: "docs_src/reports/py_cli_audit_tool"
+      output_dir: "docs/reports/py_cli_audit_tool"
+      target: "py_cli_audit_tool"
+      lang: "en,ja"
       style: "google"
+      formats:
+        - "pdf"
+        - "html"

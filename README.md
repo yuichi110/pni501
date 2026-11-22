@@ -8,9 +8,10 @@
 
 Software projects naturally accumulate friction—technical debt, uneven test coverage, stagnant dependencies, architectural drift, and workflow bottlenecks. **PNI (Project Nemesis Index)** analyzes software repositories to produce quantifiable health scores and actionable reports.
 
-- **Package Name (PyPI)**: `pni501`
+- **Package Name (PyPI)**: `pni501` (pure-Python `py3-none-any` wheel)
 - **Import Module**: `pni`
 - **CLI Command**: `pni`
+- **Supported Languages**: **55 languages** (57 native `tree-sitter` CST grammars; 5 extra MIT `abi3` grammars cached on demand from GitHub Releases via `pni grammars`)
 - **Developer Management Tool**: `./pcli`
 
 ---
@@ -55,13 +56,13 @@ pni workflows start full_audit
 
 ---
 
-## Documentation (`docs_src/` & `docs/`)
+## Documentation & Sample Reports (`docs_src/` & `docs/`)
 
-Official bilingual (`en` / `ja`) architectural and user documentation for `pni501` is maintained as a **Drawlib `site` project** inside [`docs_src/`](docs_src/README.md) and compiled into [`docs/`](docs/) for GitHub Pages (**[https://www.pni501.com](https://www.pni501.com)**):
+Official bilingual (`en` / `ja`) architectural documentation and live Workflow v2 sample audit / migration reports for `pni501` are maintained under [`docs_src/`](docs_src/README.md) (`docs_src/site/` + `docs_src/reports/*`) and compiled into [`docs/`](docs/) for GitHub Pages (**[https://www.pni501.com](https://www.pni501.com)**):
 
-- **Source of Truth**: `docs_src/en/` and `docs_src/ja/` (configured via `docs_src/drawlib.toml`)
-- **Compiled Website (GitHub Pages)**: `docs/index.html` (`docs/en/`, `docs/ja/`, `docs/sitemap.xml`, `docs/llms.txt`)
-- **Rebuild & Link Check**: `./docs_src/build.sh && uv run drawlib serve docs/ --check`
+- **Official Site Source**: `docs_src/site/en/` and `docs_src/site/ja/` (`docs_src/site/drawlib.toml`) -> `docs/`
+- **Sample Reports Source**: `docs_src/reports/<slug>/` (`_facts/` + `en/` + `ja/`) -> `docs/reports/<slug>/` (HTML, PDF, JSON, SARIF)
+- **Rebuild All & Link Check**: `./docs_src/build.sh`
 - **Local Preview Server**: `./docs_src/serve.sh`
 
 ---
@@ -85,6 +86,7 @@ source ./pcli             # Register 'pcli' shell alias & autocompletion
 | :--- | :--- | :--- |
 | **`code-check`** | `./pcli code-check all [--fix]` | Ruff linting & formatting, Ty static type checking |
 | **`test`** | `./pcli test all [--cov]` | Run pytest unit tests with coverage |
+| **`release-assets`** | `./pcli release-assets remote` | Inspect, trigger CI builds & sync SHA-256 digests for extra grammar assets |
 | **`pypi`** | `./pcli pypi check-version` | Verify versions, inspect dependencies & publish |
 
 ```bash

@@ -1,0 +1,438 @@
+# 2. アーキテクチャとソースコード構造
+
+`legacy-billing` は、本番 Java コード 6 ファイル（`187 LOC`）と JUnit 4 スモークテスト 1 ファイルから成る**「共有可変グローバル／シングルトン状態を抱える循環型レガシー Spring Boot レイヤードモノリス」**です。`InvoiceRecord.java` にはクリーンな不変 DTO パターンが存在する一方、中核の課金処理と HTTP 受付層は実行時循環依存（`BillingController <-> BillingManager`）およびスレッド非安全な共有状態に陥っています。
+
+```drawlib align=center code=hide file=arch_module_tree.png caption="物理リポジトリのディレクトリ構成（左）と検出された 5 層モノリス構造および境界違反（右）"
+from drawlib.canvas import save, setup
+from drawlib.smartarts import CardList, Panel, TreeNode
+from drawlib.styles import Styles
+
+setup(width=146, height=74, dpi=150)
+
+# Left Panel: Source & Config Tree
+p_tree = Panel(
+    "Repository & Source Module Tree (187 Production LOC)",
+    style=Styles.Neutral.patch(shape_r=2.0),
+    header_style=Styles.PrimaryNeutral,
+    text_style=Styles.DarkBold.patch(text_size=10.5),
+    header_variant="filled",
+    header_height=7.5,
+)
+p_tree.draw((4.0, 4.0), width=68.0, height=66.0)
+
+tree_style = Styles.Dark.patch(text_size=9.5)
+tree_bold = Styles.DarkBold.patch(text_size=9.5)
+tree_danger = Styles.DangerBold.patch(text_size=9.5)
+tree_ok = Styles.SuccessBold.patch(text_size=9.5)
+line_st = Styles.Muted
+
+root = TreeNode(
+    "examples/java/api_spring_messy/",
+    text_style=tree_bold,
+    line_style=line_st,
+    line_horizontal_margin=1.5,
+    line_horizontal_length=3.0,
+    line_vertical_margin=4.2,
+)
+root.add("pom.xml  [RISK 1.00 | LATEST, Java 1.8]", text_style=tree_danger)
+root.add("Dockerfile  [RISK 0.58 | openjdk:latest]", text_style=tree_danger)
+root.add(".github/workflows/build.yml  [RISK 0.45]", text_style=tree_danger)
+root.add("README.md  [2 lines]", text_style=tree_style)
+src_pkg = root.add("src/main/java/com/example/billing/", text_style=tree_bold)
+src_pkg.add("BillingApp.java (9 LOC)", text_style=tree_style)
+src_pkg.add("controller/BillingController.java (38 LOC)", text_style=tree_danger)
+src_pkg.add("service/BillingManager.java (78 LOC)", text_style=tree_danger)
+src_pkg.add("client/GatewayClient.java (32 LOC)", text_style=tree_danger)
+src_pkg.add("model/InvoiceRecord.java (15 LOC, CLEAN)", text_style=tree_ok)
+src_pkg.add("util/LegacyDateHelper.java (15 LOC)", text_style=tree_style)
+root.add("src/test/.../BillingManagerTest.java (0 asserts)", text_style=tree_style)
+root.draw((8.0, 58.5))
+
+# Right Panel: 5-Layer Architecture Profile
+p_layers = Panel(
+    "Discovered 5-Layer Profile & Boundary Violations",
+    style=Styles.Neutral.patch(shape_r=2.0),
+    header_style=Styles.PrimaryFlat,
+    text_style=Styles.WhiteBold.patch(text_size=10.5),
+    header_variant="filled",
+    header_height=7.5,
+)
+p_layers.draw((76.0, 4.0), width=66.0, height=66.0)
+
+layers = CardList(
+    style=Styles.Neutral.patch(shape_r=1.8),
+    text_style=Styles.DarkBold.patch(text_size=9.8),
+    description_style=Styles.Dark.patch(text_size=9.5),
+    badge_shape="rounded_rect",
+    badge_style=Styles.PrimaryNeutral,
+    badge_text_style=Styles.PrimaryBold.patch(text_size=9.5),
+    direction="vertical",
+    spacing=2.2,
+)
+layers.add(
+    "Bootstrap Layer (BillingApp)",
+    "Spring Boot entrypoint; clean 9 LOC bootstrap.",
+    badge_text="L1",
+)
+layers.add(
+    "Controller Layer (BillingController)",
+    "ANY /charge, raw Map, @Autowired, mutable 'channel'.",
+    badge_text="L2",
+    style=Styles.DangerNeutral.patch(shape_r=1.8),
+    badge_style=Styles.DangerFlat,
+    badge_text_style=Styles.WhiteBold.patch(text_size=9.5),
+)
+layers.add(
+    "Service Layer (BillingManager)",
+    "God method (cog=56), static cache, UPWARD cycle to L2.",
+    badge_text="L3",
+    style=Styles.DangerNeutral.patch(shape_r=1.8),
+    badge_style=Styles.DangerFlat,
+    badge_text_style=Styles.WhiteBold.patch(text_size=9.5),
+)
+layers.add(
+    "External Client (GatewayClient)",
+    "Java 11 HttpClient (no timeout) + hardcoded secret.",
+    badge_text="L4",
+    style=Styles.WarningNeutral.patch(shape_r=1.8),
+    badge_style=Styles.WarningFlat,
+    badge_text_style=Styles.WhiteBold.patch(text_size=9.5),
+)
+layers.add(
+    "Model & Utility (InvoiceRecord, DateHelper)",
+    "Immutable DTO (0 issues) vs legacy Date/Vector.",
+    badge_text="L5",
+    style=Styles.SuccessNeutral.patch(shape_r=1.8),
+    badge_style=Styles.SuccessFlat,
+    badge_text_style=Styles.WhiteBold.patch(text_size=9.5),
+)
+layers.draw((79.0, 7.0), width=60.0, height=52.5)
+
+save()
+```
+
+---
+
+## システムプロファイルとソースモジュール棚卸し
+
+- **ランタイム種別とスタック**: `web_api`。`pom.xml` は Java `1.8` を宣言（`GatewayClient.java` の Java 11 `java.net.http` と矛盾）、未固定 `spring-boot-starter-web:LATEST`、`javax.servlet-api:4.0.1`、`junit:4.13.2`、およびラッパー（`mvnw`）なしの Maven 構成。
+- **外部連携**: 実行時に `System.getenv("LEGACY_PAYMENT_URL")`（既定値 `https://billing.example.invalid/charge`）を参照して外部決済ゲートウェイへ HTTP `POST` 送信。
+- **エントリポイント**: `src/main/java/com/example/billing/BillingApp.java:main` および `src/main/java/com/example/billing/controller/BillingController.java:chargeCustomer`。
+
+| ソースファイル | LOC | レイヤー | 公開型 | 公開メソッド／コンストラクタ | 健全性評価 |
+| :--- | :---: | :--- | :--- | :--- | :--- |
+| `src/main/java/com/example/billing/BillingApp.java` | 9 | Bootstrap | `BillingApp` | `main` | 簡潔な Spring Boot 起動クラス（クラス Javadoc のみ欠落） |
+| `src/main/java/com/example/billing/controller/BillingController.java` | 38 | Controller | `BillingController` | `chargeCustomer`, `lastChannel` | 循環依存、可変シングルトン `channel`、生 `Map`、未認証 `ANY /charge` |
+| `src/main/java/com/example/billing/service/BillingManager.java` | 78 | Service | `BillingManager` | `processBatchBilling` | 最大コードホットスポット: 上向き循環依存、`cognitive=56`、引数 8 個、静的 `INVOICE_CACHE`、`String ==`、空 catch |
+| `src/main/java/com/example/billing/client/GatewayClient.java` | 32 | External Client | `GatewayClient` | `sendCharge` | ハードコード `<REDACTED_SECRET>`、Java 1.8 上での Java 11 `HttpClient`、タイムアウト欠如、`System.getenv` |
+| `src/main/java/com/example/billing/model/InvoiceRecord.java` | 15 | Model & Utility | `InvoiceRecord` | `InvoiceRecord`, `getAmountCents`, `getInvoiceId` | **リポジトリ内で最も健全なモジュール**: 不変 DTO、完全 Javadoc、AST 違反 0 件 |
+| `src/main/java/com/example/billing/util/LegacyDateHelper.java` | 15 | Model & Utility | `LegacyDateHelper` | `collectAuditTags`, `formatTimestamp` | 非推奨 `SimpleDateFormat`・`java.util.Date`・生 `Vector` を使用、Javadoc 欠落 |
+
+---
+
+## 循環依存とサーマル・リスク・ホットスポット分析
+
+以下のクラス依存関係図＋サーマルヒートマップは、リスクが集中するホットスポット（`GatewayClient` `0.70`、`BillingManager` `0.56`、`BillingController` `0.56`）と、クリーンな不変ベースライン（`InvoiceRecord` `0.06`）の対比を可視化したものです。`BillingManager` から `BillingController` へ向かう赤色の上向き依存（`circularController`）が、Spring Boot 2.6+ / 3.x で既定禁止される DI 循環を引き起こしています。
+
+```drawlib align=center code=hide file=arch_class_heatmap.png caption="UML クラス依存構造とサーマル・リスク・オーバーレイ（ホットスポット BillingManager / Controller / GatewayClient とクリーンな InvoiceRecord の対比）"
+from drawlib.canvas import save, setup
+from drawlib.charts.heatmap import HeatmapOverlay
+from drawlib.diagrams.class_diagram import ClassDiagram, ClassNode
+from drawlib.styles import Styles
+from drawlib.text import text
+
+setup(width=146, height=92, dpi=150)
+
+text(
+    (73.0, 88.0),
+    "Java Component Dependency Graph & Thermal Risk Overlay (show_contour_lines=False)",
+    style=Styles.DarkBold.patch(text_size=11.5),
+)
+
+# 1. Define ClassDiagram using Styles.Neutral (dark readable text on light fill)
+diag = ClassDiagram(
+    node_style=Styles.Neutral,
+    header_style=Styles.PrimaryNeutral,
+    edge_style=Styles.DarkBold,
+    edge_text_style=Styles.DarkBold.patch(text_size=9.5),
+    width=136.0,
+    height=74.0,
+)
+
+n_app = ClassNode(
+    "BillingApp",
+    stereotype="bootstrap",
+    width=27.0,
+    row_height=3.4,
+    style=Styles.Neutral,
+    header_style=Styles.PrimaryNeutral,
+)
+n_app.add_method("main", params="args", return_type="void", visibility="+", is_static=True)
+
+n_ctrl = ClassNode(
+    "BillingController",
+    stereotype="RestController",
+    width=36.0,
+    row_height=3.4,
+    style=Styles.Neutral,
+    header_style=Styles.DangerNeutral,
+)
+n_ctrl.add_attribute("billingManager", type="BillingManager", visibility="-")
+n_ctrl.add_attribute("channel", type="String [MUTABLE]", visibility="-")
+n_ctrl.add_method("chargeCustomer", params="Map", return_type="Map", visibility="+")
+n_ctrl.add_method("lastChannel", params="", return_type="String", visibility="+")
+
+n_mgr = ClassNode(
+    "BillingManager",
+    stereotype="Service",
+    width=38.0,
+    row_height=3.4,
+    style=Styles.Neutral,
+    header_style=Styles.DangerNeutral,
+)
+n_mgr.add_attribute("INVOICE_CACHE", type="Map [STATIC]", visibility="+", is_static=True)
+n_mgr.add_attribute("circularController", type="BillingController", visibility="-")
+n_mgr.add_method("processBatchBilling", params="8 args", return_type="Map", visibility="+")
+n_mgr.add_method("saveAuditTrail", params="id, total", return_type="void", visibility="-")
+
+n_gw = ClassNode(
+    "GatewayClient",
+    stereotype="Component",
+    width=35.0,
+    row_height=3.4,
+    style=Styles.Neutral,
+    header_style=Styles.DangerNeutral,
+)
+n_gw.add_attribute("GATEWAY_SECRET", type="String [REDACTED]", visibility="-", is_static=True)
+n_gw.add_method("sendCharge", params="id, cents", return_type="boolean", visibility="+")
+
+n_inv = ClassNode(
+    "InvoiceRecord",
+    stereotype="CLEAN DTO",
+    width=29.0,
+    row_height=3.4,
+    style=Styles.Neutral,
+    header_style=Styles.SuccessNeutral,
+)
+n_inv.add_attribute("invoiceId", type="final String", visibility="-")
+n_inv.add_attribute("amountCents", type="final long", visibility="-")
+n_inv.add_method("getAmountCents", params="", return_type="long", visibility="+")
+
+n_date = ClassNode(
+    "LegacyDateHelper",
+    stereotype="util",
+    width=33.0,
+    row_height=3.4,
+    style=Styles.Neutral,
+    header_style=Styles.WarningNeutral,
+)
+n_date.add_method("formatTimestamp", params="Date", return_type="String", visibility="+", is_static=True)
+n_date.add_method("collectAuditTags", params="str", return_type="Vector", visibility="+", is_static=True)
+
+# Position nodes cleanly with generous routing corridors
+diag.add(n_app, (16.0, 62.0))
+diag.add(n_ctrl, (65.0, 58.0))
+diag.add(n_gw, (117.0, 58.0))
+diag.add(n_inv, (17.0, 18.0))
+diag.add(n_mgr, (65.0, 18.0))
+diag.add(n_date, (117.0, 18.0))
+
+# Valid & cyclic relationships (zero crossing behind class boxes)
+diag.connect(
+    n_app,
+    n_ctrl,
+    relationship_type="dependency",
+    label="boots",
+    start_side="right",
+    end_side="left",
+    padding=1.2,
+)
+diag.connect(
+    n_ctrl,
+    n_mgr,
+    relationship_type="association",
+    directed=True,
+    label="@Autowired",
+    start_side="bottom",
+    end_side="top",
+    padding=1.2,
+)
+diag.connect(
+    n_mgr,
+    n_ctrl,
+    relationship_type="association",
+    directed=True,
+    label="CYCLE",
+    start_side="right",
+    end_side="right",
+    routing="orthogonal",
+    style=Styles.DangerBold,
+    text_style=Styles.DangerBold.patch(text_size=9.5),
+    padding=1.2,
+)
+diag.connect(
+    n_ctrl,
+    n_inv,
+    relationship_type="dependency",
+    label="creates",
+    start_side="left",
+    end_side="top",
+    routing="direct",
+    padding=1.2,
+)
+diag.connect(
+    n_mgr,
+    n_inv,
+    relationship_type="dependency",
+    label="uses",
+    start_side="left",
+    end_side="right",
+    padding=1.2,
+)
+diag.connect(
+    n_mgr,
+    n_gw,
+    relationship_type="association",
+    directed=True,
+    label="sendCharge",
+    start_side="right",
+    end_side="bottom",
+    routing="direct",
+    padding=1.2,
+)
+diag.connect(
+    n_mgr,
+    n_date,
+    relationship_type="composition",
+    label="dateHelper",
+    start_side="right",
+    end_side="left",
+    padding=1.2,
+)
+
+# 2. Draw UML diagram first, then translucent Thermal Risk Overlay on top (show_contour_lines=False)
+diag.draw(xy=(5.0, 10.0))
+
+overlay = HeatmapOverlay(
+    styles=[Styles.SuccessFlat, Styles.WarningFlat, Styles.DangerFlat],
+    width=136.0,
+    height=74.0,
+    mode="smooth",
+    blend_mode="max",
+    min_value=0.0,
+    max_value=0.72,
+    default_radius=20.0,
+    max_alpha=0.32,
+    show_contour_lines=False,
+)
+overlay.add_spot((117.0, 58.0), value=0.70, radius=22.0)  # GatewayClient.java
+overlay.add_spot((65.0, 18.0), value=0.56, radius=23.0)   # BillingManager.java
+overlay.add_spot((65.0, 58.0), value=0.56, radius=21.0)   # BillingController.java
+overlay.add_spot((117.0, 18.0), value=0.06, radius=14.0)  # LegacyDateHelper.java
+overlay.add_spot((16.0, 62.0), value=0.06, radius=14.0)   # BillingApp.java
+overlay.add_spot((17.0, 18.0), value=0.06, radius=14.0)   # InvoiceRecord.java (clean baseline)
+
+overlay.draw(xy=(5.0, 10.0))
+
+overlay.draw_legend(
+    xy=(6.0, 3.2),
+    text_style=Styles.DarkBold.patch(text_size=9.5),
+    orientation="horizontal",
+    num_steps=4,
+    labels=["0.06 Clean", "0.35 Med", "0.56 High", "0.70+ Crit"],
+)
+text(
+    (140.0, 3.8),
+    "Build/CI Hotspots: pom.xml (1.00) | Dockerfile (0.58) | build.yml (0.45)",
+    style=Styles.MutedBold.patch(text_size=9.5, halign="right"),
+)
+
+save()
+```
+
+### 事前ソート済みモジュール・リスク・ホットスポット一覧
+
+| ファイルパス | LOC | リスクスコア | 重要度別検出数 | 該当ルール |
+| :--- | :---: | :---: | :--- | :--- |
+| `pom.xml` | — | **`1.00`** | `2 CRIT`, `1 HIGH` | `common/security_vulnerability`, `common/runtime_verification`, `java/dependencies` |
+| `examples/java/api_spring_messy/src/main/java/com/example/billing/client/GatewayClient.java` | 32 | **`0.70`** | `1 CRIT` | `common/security` |
+| `src/main/java/com/example/billing/client/GatewayClient.java` | — | **`0.60`** | `1 CRIT`, `1 MED` | `common/security`, `java/modern_stack` |
+| `Dockerfile` | — | **`0.58`** | `1 HIGH` | `common/supply_chain` |
+| `src/main/java/com/example/billing/controller/BillingController.java` | — | **`0.56`** | `2 HIGH` | `common/security_vulnerability`, `java/frameworks/spring_boot` |
+| `src/main/java/com/example/billing/service/BillingManager.java` | — | **`0.56`** | `2 HIGH` | `common/architecture`, `java/code_quality` |
+| `.github/workflows/build.yml` | — | **`0.45`** | `1 CRIT` | `common/supply_chain` |
+| `examples/java/api_spring_messy/src/main/java/com/example/billing/service/BillingManager.java` | 78 | **`0.41`** | `1 MED` | `common/maintainability` |
+
+---
+
+## `/charge` 実行フローと並行性・エラーモデル
+
+`/charge` への各 HTTP リクエストは、共有可変状態への競合と無音例外握りつぶしを伴う 4 段階の処理を通過します。
+
+```drawlib align=center code=hide file=arch_charge_flow.png caption="顧客課金・バッチ請求処理の実行フロー（トリガー: 制限なしの HTTP ANY /charge）"
+from drawlib.canvas import save, setup
+from drawlib.smartarts import CardList
+from drawlib.styles import Styles
+from drawlib.text import text
+
+setup(width=146, height=54, dpi=150)
+
+text(
+    (73.0, 49.0),
+    "Execution Flow: Customer Charge & Batch Billing (Trigger: HTTP ANY /charge)",
+    style=Styles.DarkBold.patch(text_size=11.5),
+)
+
+flow_cards = CardList(
+    style=Styles.Neutral.patch(shape_r=2.0),
+    text_style=Styles.DarkBold.patch(text_size=10.0),
+    description_style=Styles.Dark.patch(text_size=9.5),
+    badge_shape="rounded_rect",
+    badge_style=Styles.PrimaryFlat,
+    badge_text_style=Styles.WhiteBold.patch(text_size=9.5),
+    direction="horizontal",
+    spacing=3.5,
+    show_arrows=True,
+    arrow_style=Styles.DarkBold,
+)
+flow_cards.add(
+    "ANY /charge Intake",
+    "BillingController:\nmutates singleton\n'channel'; parses\nraw Map payload.",
+    badge_text="01",
+    style=Styles.DangerNeutral.patch(shape_r=2.0),
+    badge_style=Styles.DangerFlat,
+)
+flow_cards.add(
+    "8-Arg Raw Handoff",
+    "Wraps 1 record in\nraw ArrayList and\ncalls 8-parameter\nprocessBatchBilling.",
+    badge_text="02",
+    style=Styles.Neutral.patch(shape_r=2.0),
+    badge_style=Styles.PrimaryNeutral,
+    badge_text_style=Styles.PrimaryBold.patch(text_size=9.5),
+)
+flow_cards.add(
+    "Tax == & Retry IO",
+    "String == checks\n(PAID/USD/JPY);\nGatewayClient POST\nwith zero timeout.",
+    badge_text="03",
+    style=Styles.WarningNeutral.patch(shape_r=2.0),
+    badge_style=Styles.WarningFlat,
+)
+flow_cards.add(
+    "Silent Cache & Cycle",
+    "Private @Transactional\nbypassed; static Map\nINVOICE_CACHE;\nempty catch {}.",
+    badge_text="04",
+    style=Styles.DangerNeutral.patch(shape_r=2.0),
+    badge_style=Styles.DangerFlat,
+)
+flow_cards.draw((4.0, 6.0), width=138.0, height=38.0)
+
+save()
+```
+
+### 状態管理・境界違反・並行性評価
+
+- **深刻な境界違反**: `BillingManager` が `BillingController` を import し `@Autowired` フィールド注入（`circularController`, 23 行目）しているため、`lastChannel()` 参照のためだけに実行時循環（`BillingController -> BillingManager -> BillingController`）が発生しています。
+- **共有可変状態**:
+  - `BillingManager.INVOICE_CACHE`（`src/main/java/com/example/billing/service/BillingManager.java:17`）: 同期化・サイズ上限なしのプロセス内静的生 `HashMap`。
+  - `BillingController.channel`（`src/main/java/com/example/billing/controller/BillingController.java:20`）: HTTP リクエストごとに `servletRequest.getMethod()` で上書きされる可変シングルトンフィールド。
+- **エラー・並行性モデル**: 複数リクエストが同時到着する Servlet コンテナ環境では `BillingController.channel` と `INVOICE_CACHE` でデータ競合が発生します。さらに `BillingManager` は空の `catch (Exception e) {}`（83 行目）で監査・キャッシュ例外を無音で握りつぶし、`GatewayClient` はタイムアウト未設定の `HttpClient.newHttpClient()` でワーカースレッドを無期限ブロックしつつ標準エラーへ `printStackTrace()` を出力します。

@@ -37,19 +37,19 @@
     
     
     
-    <meta name="description" content="LLM にテーブルのソートやドキュメント構成の考案をゼロから任せるのではなく、pni501 はすべての診断メトリクスを決定論的にエンリッチ・重複排除・事前ソートしてキャッシュ済みの 7 章構成 ReportBlueprint（blueprint.py および…">
+    <meta name="description" content="LLM にテーブルのソートやドキュメント構成の考案をゼロから任せるのではなく、pni501（v0.2.0）はすべての診断メトリクスを決定論的にエンリッチ・重複排除・事前ソートして ReportBlueprint（blueprint.py・migration_blueprint.py・progress_blueprin…">
     <link rel="canonical" href="https://www.pni501.com/ja/04_scoring_and_reports/drawlib_reporter.html">
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="pni501 ドキュメント">
     <meta property="og:title" content="Drawlib ビジュアルレポーターと7章ブループリント — pni501 ドキュメント">
-    <meta property="og:description" content="LLM にテーブルのソートやドキュメント構成の考案をゼロから任せるのではなく、pni501 はすべての診断メトリクスを決定論的にエンリッチ・重複排除・事前ソートしてキャッシュ済みの 7 章構成 ReportBlueprint（blueprint.py および…">
+    <meta property="og:description" content="LLM にテーブルのソートやドキュメント構成の考案をゼロから任せるのではなく、pni501（v0.2.0）はすべての診断メトリクスを決定論的にエンリッチ・重複排除・事前ソートして ReportBlueprint（blueprint.py・migration_blueprint.py・progress_blueprin…">
     <meta property="og:url" content="https://www.pni501.com/ja/04_scoring_and_reports/drawlib_reporter.html">
     <meta property="og:image" content="https://www.pni501.com/_assets/logo.png">
     <meta property="og:locale" content="ja_JP">
     <meta property="og:locale:alternate" content="en_US">
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="Drawlib ビジュアルレポーターと7章ブループリント — pni501 ドキュメント">
-    <meta name="twitter:description" content="LLM にテーブルのソートやドキュメント構成の考案をゼロから任せるのではなく、pni501 はすべての診断メトリクスを決定論的にエンリッチ・重複排除・事前ソートしてキャッシュ済みの 7 章構成 ReportBlueprint（blueprint.py および…">
+    <meta name="twitter:description" content="LLM にテーブルのソートやドキュメント構成の考案をゼロから任せるのではなく、pni501（v0.2.0）はすべての診断メトリクスを決定論的にエンリッチ・重複排除・事前ソートして ReportBlueprint（blueprint.py・migration_blueprint.py・progress_blueprin…">
     <meta name="twitter:image" content="https://www.pni501.com/_assets/logo.png">
     
     
@@ -87,7 +87,7 @@
                 
                 <a href="../01_getting_started/release_notes.html" class="sidebar-version-badge" title="View Release Notes">
                     <span class="sidebar-version-dot" aria-hidden="true"></span>
-                    <span class="sidebar-version-text">v0.1.4</span>
+                    <span class="sidebar-version-text">v0.2.0</span>
                 </a>
                 <a href="https://github.com/yuichi110/pni501" target="_blank" rel="noopener noreferrer" class="sidebar-github-link" aria-label="GitHub Repository" title="GitHub Repository">
                     <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg>
@@ -153,7 +153,7 @@
                             </li>
                             
                             <li class="nav-item ">
-                                <a href="../03_workflows_and_actions/actions_pipeline.html" >15 アクションと 12 プリミティブ</a>
+                                <a href="../03_workflows_and_actions/actions_pipeline.html" >182 アクションと 16 プリミティブ</a>
                             </li>
                             
                             <li class="nav-item ">
@@ -175,6 +175,10 @@
                                 <a href="drawlib_reporter.html" >Drawlib ビジュアルレポーター</a>
                             </li>
                             
+                            <li class="nav-item ">
+                                <a href="sample_reports.html" >サンプルレポートギャラリー</a>
+                            </li>
+                            
                         </ul>
                     
                         
@@ -183,7 +187,7 @@
                         <ul class="nav-list">
                             
                             <li class="nav-item ">
-                                <a href="../05_languages_and_reference/supported_languages.html" >対応 6 言語マトリクス</a>
+                                <a href="../05_languages_and_reference/supported_languages.html" >対応55言語マトリクス</a>
                             </li>
                             
                             <li class="nav-item ">
@@ -246,10 +250,10 @@
             </header>
             <main class="main-content">
                 <h1>Drawlib ビジュアルレポーターと7章ブループリント</h1>
-<p>LLM にテーブルのソートやドキュメント構成の考案をゼロから任せるのではなく、<code>pni501</code> はすべての診断メトリクスを決定論的にエンリッチ・重複排除・事前ソートしてキャッシュ済みの 7 章構成 <code>ReportBlueprint</code>（<code>blueprint.py</code> および <code>migration_blueprint.py</code>）へ変換したうえで、<code>compiler.py</code> から <code>drawlib</code> を通じてベクター A4 PDF（<code>reports/&lt;target&gt;.pdf</code>）およびマルチフォーマット成果物をコンパイルします。</p>
+<p>LLM にテーブルのソートやドキュメント構成の考案をゼロから任せるのではなく、<code>pni501</code>（<code>v0.2.0</code>）はすべての診断メトリクスを決定論的にエンリッチ・重複排除・事前ソートして <code>ReportBlueprint</code>（<code>blueprint.py</code>・<code>migration_blueprint.py</code>・<code>progress_blueprint.py</code>・<code>rollup_blueprint.py</code>）へ変換し、構造化エビデンス JSON を <code>&lt;src_dir&gt;/_facts/</code> へ自動同期したうえで、<strong>フラットな自己完結型 Drawlib レポートプロジェクト</strong>（<code>pni_report_src -&gt; pni_report</code>）を <code>compiler.py</code> からベクター A4 PDF・バイリンガル HTML ポータル・Markdown・PNG へコンパイルします。</p>
 <figure class="drawlib-image" style="text-align: center;">
   <img src="../../images/04_scoring_and_reports/drawlib_reporter/reporter_compilation_pipeline.png" alt="drawlib_reporter_1" />
-  <figcaption class="drawlib-caption">健全性監査トラックとマイグレーション実行計画トラックを統合するブループリント駆動 Drawlib レポートパイプライン</figcaption>
+  <figcaption class="drawlib-caption">v0.2.0 フラット自己完結型 Drawlib レポートパイプライン（pni_report_src -> pni_report と統合ポータルデプロイ）</figcaption>
 </figure>
 <details class="drawlib-code-details">
 <summary>Source Code</summary>
@@ -279,7 +283,7 @@
 <span class="p">)</span>
 <span class="n">n_score</span> <span class="o">=</span> <span class="n">g_inputs</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
     <span class="n">Node</span><span class="p">(</span>
-        <span class="s2">"ScoreResult + agg</span><span class="se">\n</span><span class="s2">(*_score.json)"</span><span class="p">,</span>
+        <span class="s2">"ScoreResult v2.0</span><span class="se">\n</span><span class="s2">(JSON + SARIF 2.1.0)"</span><span class="p">,</span>
         <span class="n">width</span><span class="o">=</span><span class="mf">30.0</span><span class="p">,</span>
         <span class="n">height</span><span class="o">=</span><span class="mf">16.0</span><span class="p">,</span>
         <span class="n">icon</span><span class="o">=</span><span class="n">PhosphorIcon</span><span class="o">.</span><span class="n">MEDAL</span><span class="p">,</span>
@@ -290,7 +294,7 @@
 <span class="p">)</span>
 <span class="n">n_plan</span> <span class="o">=</span> <span class="n">g_inputs</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
     <span class="n">Node</span><span class="p">(</span>
-        <span class="s2">"MigrationPlanResult</span><span class="se">\n</span><span class="s2">(*_migration_plan.json)"</span><span class="p">,</span>
+        <span class="s2">"Migration / Progress</span><span class="se">\n</span><span class="s2">&amp; Rollup Artifacts"</span><span class="p">,</span>
         <span class="n">width</span><span class="o">=</span><span class="mf">30.0</span><span class="p">,</span>
         <span class="n">height</span><span class="o">=</span><span class="mf">16.0</span><span class="p">,</span>
         <span class="n">icon</span><span class="o">=</span><span class="n">PhosphorIcon</span><span class="o">.</span><span class="n">GIT_PULL_REQUEST</span><span class="p">,</span>
@@ -300,7 +304,7 @@
 <span class="p">)</span>
 <span class="n">n_cache</span> <span class="o">=</span> <span class="n">g_inputs</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
     <span class="n">Node</span><span class="p">(</span>
-        <span class="s2">"facts.json +</span><span class="se">\n</span><span class="s2">architecture.json"</span><span class="p">,</span>
+        <span class="s2">"_facts/ Evidence Sync</span><span class="se">\n</span><span class="s2">(facts + arch + plan)"</span><span class="p">,</span>
         <span class="n">width</span><span class="o">=</span><span class="mf">30.0</span><span class="p">,</span>
         <span class="n">height</span><span class="o">=</span><span class="mf">16.0</span><span class="p">,</span>
         <span class="n">icon</span><span class="o">=</span><span class="n">PhosphorIcon</span><span class="o">.</span><span class="n">DATABASE</span><span class="p">,</span>
@@ -323,7 +327,7 @@
 <span class="p">)</span>
 <span class="n">n_bp_eng</span> <span class="o">=</span> <span class="n">g_bp</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
     <span class="n">Node</span><span class="p">(</span>
-        <span class="s2">"blueprint.py /</span><span class="se">\n</span><span class="s2">migration_blueprint.py"</span><span class="p">,</span>
+        <span class="s2">"blueprint.py /</span><span class="se">\n</span><span class="s2">mig / prog / rollup"</span><span class="p">,</span>
         <span class="n">width</span><span class="o">=</span><span class="mf">30.0</span><span class="p">,</span>
         <span class="n">height</span><span class="o">=</span><span class="mf">18.5</span><span class="p">,</span>
         <span class="n">icon</span><span class="o">=</span><span class="n">PhosphorIcon</span><span class="o">.</span><span class="n">SLIDERS_HORIZONTAL</span><span class="p">,</span>
@@ -336,7 +340,7 @@
 <span class="p">)</span>
 <span class="n">n_bp_json</span> <span class="o">=</span> <span class="n">g_bp</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
     <span class="n">Node</span><span class="p">(</span>
-        <span class="s2">"Blueprint JSON Cache</span><span class="se">\n</span><span class="s2">(00_cover + 01..06)"</span><span class="p">,</span>
+        <span class="s2">"_facts/blueprint.json</span><span class="se">\n</span><span class="s2">(00_cover + 01..06)"</span><span class="p">,</span>
         <span class="n">width</span><span class="o">=</span><span class="mf">30.0</span><span class="p">,</span>
         <span class="n">height</span><span class="o">=</span><span class="mf">18.5</span><span class="p">,</span>
         <span class="n">icon</span><span class="o">=</span><span class="n">PhosphorIcon</span><span class="o">.</span><span class="n">LIST_NUMBERS</span><span class="p">,</span>
@@ -348,7 +352,7 @@
 
 <span class="n">g_author</span> <span class="o">=</span> <span class="n">diag</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
     <span class="n">NodeGroup</span><span class="p">(</span>
-        <span class="n">title</span><span class="o">=</span><span class="s2">"3. AI Authoring &amp; QA"</span><span class="p">,</span>
+        <span class="n">title</span><span class="o">=</span><span class="s2">"3. Flat Source &amp; QA"</span><span class="p">,</span>
         <span class="n">width</span><span class="o">=</span><span class="mf">34.5</span><span class="p">,</span>
         <span class="n">height</span><span class="o">=</span><span class="mf">70.0</span><span class="p">,</span>
         <span class="n">style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">Neutral</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">shape_r</span><span class="o">=</span><span class="mf">2.0</span><span class="p">),</span>
@@ -358,7 +362,7 @@
 <span class="p">)</span>
 <span class="n">n_src</span> <span class="o">=</span> <span class="n">g_author</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
     <span class="n">Node</span><span class="p">(</span>
-        <span class="s2">"reports_src/</span><span class="se">\n</span><span class="s2">&lt;target&gt;_src/00..06.md"</span><span class="p">,</span>
+        <span class="s2">"pni_report_src/</span><span class="se">\n</span><span class="s2">en/ja + _assets/_facts"</span><span class="p">,</span>
         <span class="n">width</span><span class="o">=</span><span class="mf">30.0</span><span class="p">,</span>
         <span class="n">height</span><span class="o">=</span><span class="mf">18.5</span><span class="p">,</span>
         <span class="n">icon</span><span class="o">=</span><span class="n">PhosphorIcon</span><span class="o">.</span><span class="n">FILE_CODE</span><span class="p">,</span>
@@ -404,7 +408,7 @@
 <span class="p">)</span>
 <span class="n">n_pdf</span> <span class="o">=</span> <span class="n">g_compile</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
     <span class="n">Node</span><span class="p">(</span>
-        <span class="s2">"reports/&lt;target&gt;.pdf</span><span class="se">\n</span><span class="s2">(A4 Vector + ToC)"</span><span class="p">,</span>
+        <span class="s2">"pni_report/&lt;t&gt;.pdf</span><span class="se">\n</span><span class="s2">(A4 Vector + ToC)"</span><span class="p">,</span>
         <span class="n">width</span><span class="o">=</span><span class="mf">30.0</span><span class="p">,</span>
         <span class="n">height</span><span class="o">=</span><span class="mf">16.0</span><span class="p">,</span>
         <span class="n">icon</span><span class="o">=</span><span class="n">PhosphorIcon</span><span class="o">.</span><span class="n">FILE_PDF</span><span class="p">,</span>
@@ -416,7 +420,7 @@
 <span class="p">)</span>
 <span class="n">n_opt</span> <span class="o">=</span> <span class="n">g_compile</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
     <span class="n">Node</span><span class="p">(</span>
-        <span class="s2">"HTML / MD / PNG</span><span class="se">\n</span><span class="s2">(scan_broken_links)"</span><span class="p">,</span>
+        <span class="s2">"HTML / Portal Build</span><span class="se">\n</span><span class="s2">(docs/reports/&lt;slug&gt;)"</span><span class="p">,</span>
         <span class="n">width</span><span class="o">=</span><span class="mf">30.0</span><span class="p">,</span>
         <span class="n">height</span><span class="o">=</span><span class="mf">16.0</span><span class="p">,</span>
         <span class="n">icon</span><span class="o">=</span><span class="n">PhosphorIcon</span><span class="o">.</span><span class="n">BROWSER</span><span class="p">,</span>
@@ -439,16 +443,33 @@
 </code></pre>
 </details>
 <hr />
-<h2>1. なぜブループリント駆動の Illustration-as-Code なのか？</h2>
-<p>エグゼクティブ向け監査レポートや多段階マイグレーション仕様書を生成する際、ガイドなしの LLM ドキュメント生成では、ファインディングの抜け漏れ、テーブル順序の不整合、壊れやすいチャート描画コードが頻発します。<code>pni501</code> は <strong>決定論的なブループリント合成</strong> と <strong>ビジュアル Markdown オーサリング</strong> を分離することで、これらの失敗モードを排除します。</p>
+<h2>1. フラットな自己完結型レイアウトと <code>_facts/</code> エビデンス自動同期</h2>
+<p><code>pni501 v0.2.0</code> では、Drawlib レポートのディレクトリ構造をデフォルト <code>pni_report_src -&gt; pni_report</code>（<code>DEFAULT_REPORT_SRC_DIR = &quot;pni_report_src&quot;</code>、<code>DEFAULT_REPORT_OUTPUT_DIR = &quot;pni_report&quot;</code>）とする <strong>フラットな自己完結型レイアウト</strong> に刷新しました。従来のような <code>&lt;target&gt;_src/</code> の二重ネストは廃止され、<code>src_dir</code> 直下に設定ファイル・共通スタイル・言語別チャプター・ブランドアセット・同期済みエビデンス JSON がすべて配置されます。</p>
+<pre><code class="language-text">pni_report_src/                     # src_dir 直下にフラット配置（&lt;target&gt;_src/ ネストなし）
+├── drawlib.toml                    # [i18n] (en / ja / en,ja)・タイトル・テーマ設定
+├── styles.py                       # Drawlib Colors &amp; Styles プリセットトークン
+├── utils.py                        # 共通ヘルパー + 自動注入された draw_pni_logo()
+├── _assets/                        # 公式ロゴ (logo.png, logo_dark.png, favicon.png, ogp.png)
+├── _facts/                         # 自動同期された構造化エビデンス JSON（Git 管理可能）
+│   ├── project_facts.json          # マニフェスト・ロックファイル・依存メタデータ
+│   ├── ast_facts.json              # Tree-sitter CST モジュール棚卸し・危険シンク・API 境界
+│   ├── runtime_facts.json          # コンテナビルド・オフラインテスト・カバレッジ・スモーク検証
+│   ├── security_facts.json         # Trivy FS/イメージ CVE・IaC 設定不備・マスク済み秘匿情報
+│   ├── pentest_facts.json          # 動的 HTTP DAST プローブ結果・確認済み脆弱性
+│   ├── architecture.json           # 3側面 ArchitectureRecord（プロファイル・層構造・実行フロー）
+│   ├── score.json                  # 正規 ScoreResult v2.0（ベースライン・Δ・FPトリアージ・DAG）
+│   ├── plan.json                   # Pre-Flight 実行計画・検証済み Mermaid DAG
+│   └── blueprint.json              # 章別事前ソート済みブループリント（00..06）
+├── en/                             # 英語チャプター (00_cover.md .. 06_*.md)
+└── ja/                             # 任意の日本語チャプター (00_cover.md .. 06_*.md)
+</code></pre>
 <ul>
-<li><strong>事前計算された章別ペイロード（<code>blueprint.json</code> / <code>migration_blueprint.json</code>）</strong>: <code>write_drawlib_report</code> および <code>write_migration_report</code> ステップにおいて、<code>src/pni/_reporter/blueprint.py</code> と <code>src/pni/_reporter/migration_blueprint.py</code> がエンリッチ済みの <code>ScoreResult</code> または <code>MigrationPlanResult</code> を 7 章構成の <code>ReportBlueprint</code> へ変換し、事前ソート済みテーブル、チャート系列、KPI カード値、および章ごとの推奨 Drawlib コンポーネントを提供します。</li>
-<li><strong>Git バージョン管理された <code>doc</code> アーキタイプ（<code>reports_src/&lt;target&gt;_src/</code>）</strong>: すべてのレポートは自己完結した Drawlib <code>doc</code> プロジェクト（<code>drawlib.toml</code>、<code>styles.py</code>、<code>utils.py</code>、および <code>&lt;lang&gt;/00_cover.md .. 06_*.md</code>）としてスキャフォールドされ、散文解説と宣言的 Python ダイアグラムをリポジトリとともに Git 管理できます。</li>
-<li><strong>自動プリフライトリンティングとマルチモーダル・グリッド検証</strong>: <code>drawlib.tools.build_pdf()</code> を呼び出す前に、<code>compiler.py</code> が <code>lint_drawlib_chapters()</code> を実行して複数系列チャートの凡例漏れや UML ヒートマップの等高線衝突を検出し、さらにエージェントが <code>-g</code> 座標グリッド画像を視覚検査してテキスト切れをゼロに抑えます。</li>
+<li><strong><code>_facts/</code> 自動同期の意義</strong>: <code>pni report init</code>・ワークフローレポート合成・<code>pni report build</code> の実行時に（<code>src/pni/_reporter/facts_sync.py</code>）、構造化エビデンス JSON（<code>project_facts.json</code>、<code>ast_facts.json</code>、<code>runtime_facts.json</code>、<code>security_facts.json</code>、<code>pentest_facts.json</code>、<code>architecture.json</code>、<code>score.json</code>、<code>plan.json</code>、および統合 <code>facts.json</code>・<code>blueprint.json</code>）が <code>&lt;src_dir&gt;/_facts/</code> へ自動同期されます。一方、一時的な SQLite ステート DB（<code>workflow_state.db</code>）や Trivy キャッシュ、生コンテナログは <code>.pni/cache/</code> に厳格に留められるため、レポートソース一式をそのまま Git コミットして別環境でも完全に再現ビルドできます。</li>
+<li><strong>事前計算された章別ペイロード</strong>: <code>blueprint.py</code>・<code>migration_blueprint.py</code>・<code>progress_blueprint.py</code>・<code>rollup_blueprint.py</code> が事前ソート済みテーブル・チャート系列・KPI カード値・推奨 Drawlib コンポーネントを <code>&lt;src_dir&gt;/_facts/</code> に書き出すため、ファインディングの抜け漏れやソート崩れが発生しません。</li>
 </ul>
 <hr />
 <h2>2. 2系統の7章構成 ReportBlueprint アーキテクチャ</h2>
-<p>健全性監査ワークフロー（<code>category: audit</code>）とモダナイゼーションワークフロー（<code>category: migration</code>）はいずれも、英語（<code>en</code>）または日本語（<code>ja</code>）にローカライズされた同一の <strong>7ファイル線形 <code>doc</code> レイアウト（<code>00_cover.md</code> + <code>01..06.md</code>）</strong> に標準化されています。Drawlib は <code>00_cover.md</code> の直後にハイパーリンク付き目次（Table of Contents）を自動挿入します。</p>
+<p>健全性監査ワークフロー（<code>category: audit</code>）とモダナイゼーションワークフロー（<code>category: migration</code>）はいずれも、英語（<code>en</code>）・日本語（<code>ja</code>）・バイリンガル（<code>en,ja</code>）に対応した同一の <strong>7ファイル線形 <code>doc</code> レイアウト（<code>00_cover.md</code> + <code>01..06.md</code>）</strong> に標準化されています。Drawlib は <code>00_cover.md</code> の直後にハイパーリンク付き目次（Table of Contents）を自動挿入します。（なお、進捗ワークフローは <code>progress_blueprint.py</code> による 5 ファイル構成 <code>00_cover.md</code> + <code>01..04.md</code>、マルチ言語ロールアップは <code>rollup_blueprint.py</code> による 6 ファイル構成 <code>00_cover.md</code> + <code>01..05.md</code> を採用します。）</p>
 <figure class="drawlib-image" style="text-align: center;">
   <img src="../../images/04_scoring_and_reports/drawlib_reporter/blueprint_chapter_comparison.png" alt="drawlib_reporter_2" />
   <figcaption class="drawlib-caption">健全性監査レポートとマイグレーション実行計画の7章構成 ReportBlueprint アーキテクチャ比較</figcaption>
@@ -512,7 +533,7 @@
 <span class="p">)</span>
 <span class="n">audit_cards</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
     <span class="s2">"04_standards_and_findings.md"</span><span class="p">,</span>
-    <span class="s2">"Weakest-First BarChart + Consolidated Findings Table"</span><span class="p">,</span>
+    <span class="s2">"Executed DAG + Baseline Δ + FP Triage + Findings"</span><span class="p">,</span>
     <span class="n">badge_text</span><span class="o">=</span><span class="s2">"04"</span><span class="p">,</span>
     <span class="n">icon</span><span class="o">=</span><span class="n">phosphor</span><span class="o">.</span><span class="n">list_checks</span><span class="p">,</span>
 <span class="p">)</span>
@@ -601,8 +622,8 @@
 <span class="n">save</span><span class="p">()</span>
 </code></pre>
 </details>
-<h3>2.1 健全性監査 7章ブループリント（blueprint.py）</h3>
-<p><code>src/pni/_reporter/blueprint.py</code> は、<code>ScoreResult</code>、<code>WorkflowFactsBundle</code>、および <code>ArchitectureRecord</code> を以下の 7 章へマッピングします。</p>
+<h3>2.1 健全性監査 7章ブループリント（<code>blueprint.py</code>）</h3>
+<p><code>src/pni/_reporter/blueprint.py</code> は、<code>ScoreResult</code> v2.0、<code>WorkflowFactsBundle</code>、および <code>ArchitectureRecord</code> を以下の 7 章へマッピングします。</p>
 <table>
 <thead>
 <tr>
@@ -619,7 +640,7 @@
 </tr>
 <tr>
 <td style="text-align:left"><strong><code>01_executive_summary.md</code></strong></td>
-<td style="text-align:left"><code>category_scores</code>（<code>7</code> 軸）、<code>category_rationales</code>、<code>strengths</code>、主要 Critical/High リスク、<code>opt_outs</code></td>
+<td style="text-align:left"><code>category_scores</code>（<code>7</code> 軸）、<code>category_rationales</code>、<code>strengths</code>、主要 Critical/High リスク、<code>approved_plan_summary</code></td>
 <td style="text-align:left">7軸 <code>RadarChart</code> + <code>KpiCards</code> + <code>CardList</code> / サマリテーブル</td>
 </tr>
 <tr>
@@ -634,8 +655,8 @@
 </tr>
 <tr>
 <td style="text-align:left"><strong><code>04_standards_and_findings.md</code></strong></td>
-<td style="text-align:left"><code>audit_dimensions</code>（弱点順）、<code>rule_compliance</code>、<code>consolidated_findings</code>（ファイル・行番号統合）</td>
-<td style="text-align:left">弱点順の水平 <code>BarChart</code> + 位置統合ファインディング <code>Table</code></td>
+<td style="text-align:left"><code>execution_dag</code>（<code>AUTO</code>/<code>AI</code>/<code>HYBRID</code>/<code>SKIP</code> + <code>audit_scope</code>）、7軸 <code>baseline_scores</code> 対 AI Δ（<code>±10 pt</code>）、<code>audit_dimensions</code>、<code>rule_compliance</code>、<code>consolidated_findings</code>、<code>triaged_adjustments</code>、<code>opt_outs</code>、軽量 <code>artifact_manifest</code></td>
+<td style="text-align:left">実行済み監査 DAG（<code>drawlib.graph</code> / <code>flow</code>）+ ベースライン対最終 <code>Table</code> + 弱点順 <code>BarChart</code> + 位置統合ファインディング &amp; FP トリアージ <code>Table</code></td>
 </tr>
 <tr>
 <td style="text-align:left"><strong><code>05_code_and_runtime_analysis.md</code></strong></td>
@@ -649,7 +670,7 @@
 </tr>
 </tbody>
 </table>
-<h3>2.2 マイグレーション実行計画 7章ブループリント（migration_blueprint.py）</h3>
+<h3>2.2 マイグレーション実行計画 7章ブループリント（<code>migration_blueprint.py</code>）</h3>
 <p>完了した健全性監査実行を起点とするモダナイゼーションワークフロー（<code>based_on</code> 指定）では、<code>src/pni/_reporter/migration_blueprint.py</code> が <code>MigrationPlanResult</code> と <code>MigrationFacts</code> を並列の 7 章構成実行ブループリントへ合成します。</p>
 <table>
 <thead>
@@ -698,35 +719,52 @@
 </tbody>
 </table>
 <hr />
-<h2>3. 非破壊スキャフォールディング・プリフライトリンター・グリッドQA</h2>
-<p><code>src/pni/_reporter/compiler.py</code> と <code>src/pni/_reporter/drawlib_guide.py</code> は、スキャフォールディング、章オーサリング、およびマルチフォーマットビルドにわたって決定論的な品質ゲートを強制します。</p>
-<h3>3.1 非破壊 pni report init とオンデマンドルール参照</h3>
-<p>前半の AST 解析やルール解釈ステップでシステムプロンプトが肥大化するのを防ぐため、エージェントは <code>reports_src/&lt;target&gt;_src/&lt;lang&gt;/*.md</code> を執筆する直前に Drawlib ルールをオンデマンドで読み込み、<code>-g</code> 座標グリッドで各図を検証したうえで最終的な A4 ベクター PDF をコンパイルします。</p>
-<pre><code class="language-bash"><span class="c1"># 1. Non-destructively scaffold reports_src/&lt;target&gt;_src/ (preserves existing *.md chapters)</span>
-pni<span class="w"> </span>report<span class="w"> </span>init<span class="w"> </span>&lt;target&gt;<span class="w"> </span>--src-dir<span class="w"> </span>reports_src<span class="w"> </span>--lang<span class="w"> </span>en<span class="w"> </span>--style<span class="w"> </span>google
+<h2>3. 非破壊スキャフォールディング・組み込みプリフライト・統合ポータル運用</h2>
+<p><code>src/pni/_reporter/compiler.py</code> と <code>src/pni/_reporter/drawlib_guide.py</code> は、<code>pni report</code> 配下の 2 つのサブコマンド（<code>pni report init</code> と <code>pni report build</code>）を通じて、スキャフォールディングからビルド・リンク検証まで一貫した品質ゲートを提供します。</p>
+<h3>3.1 非破壊 <code>pni report init</code> と <code>pni report build</code></h3>
+<p>前半の CST 解析やルール解釈ステップでシステムプロンプトが肥大化するのを防ぐため、エージェントは <code>pni_report_src/&lt;lang&gt;/*.md</code> を執筆する直前に Drawlib ルールをオンデマンドで読み込み、<code>-g</code> 座標グリッドで各図を検証したうえで <code>pni_report/</code> へ最終成果物をコンパイルします。</p>
+<pre><code class="language-bash"><span class="c1"># 1. 非破壊で pni_report_src/ を初期化（既存 *.md を保持しつつ _assets/ を配置）</span>
+pni<span class="w"> </span>report<span class="w"> </span>init<span class="w"> </span>full_audit<span class="w"> </span>--src-dir<span class="w"> </span>pni_report_src<span class="w"> </span>--lang<span class="w"> </span>en<span class="w"> </span>--style<span class="w"> </span>google
 
-<span class="c1"># 2. Query Drawlib API &amp; component rules on-demand (never guess constructor arguments)</span>
+<span class="c1"># 2. Drawlib API・コンポーネント仕様をオンデマンド参照（引数推測を防止）</span>
 uv<span class="w"> </span>run<span class="w"> </span>drawlib<span class="w"> </span>rules<span class="w"> </span>show<span class="w"> </span>overview
 uv<span class="w"> </span>run<span class="w"> </span>drawlib<span class="w"> </span>rules<span class="w"> </span>show<span class="w"> </span>project-doc
 uv<span class="w"> </span>run<span class="w"> </span>drawlib<span class="w"> </span>rules<span class="w"> </span>show<span class="w"> </span>api
 
-<span class="c1"># 3. Stage 2 visual grid verification (-g) before full PDF compilation</span>
-uv<span class="w"> </span>run<span class="w"> </span>drawlib<span class="w"> </span>show<span class="w"> </span>reports_src/&lt;target&gt;_src/en/01_executive_summary.md<span class="w"> </span><span class="se">\</span>
-<span class="w">  </span>-s<span class="w"> </span>reports_src/&lt;target&gt;_src/styles.py<span class="w"> </span>-u<span class="w"> </span>reports_src/&lt;target&gt;_src/utils.py<span class="w"> </span><span class="se">\</span>
+<span class="c1"># 3. ビルド前に Stage 2 座標グリッド視覚検査（-g）を実施</span>
+uv<span class="w"> </span>run<span class="w"> </span>drawlib<span class="w"> </span>show<span class="w"> </span>pni_report_src/en/01_executive_summary.md<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-s<span class="w"> </span>pni_report_src/styles.py<span class="w"> </span>-u<span class="w"> </span>pni_report_src/utils.py<span class="w"> </span><span class="se">\</span>
 <span class="w">  </span>-g<span class="w"> </span>-o<span class="w"> </span>.drawlib/scratch/exec_summary_grid.png
 
-<span class="c1"># 4. Run preflight linter and compile reports/&lt;target&gt;.pdf (default A4 vector PDF + ToC)</span>
-pni<span class="w"> </span>report<span class="w"> </span>build<span class="w"> </span>&lt;target&gt;<span class="w"> </span>--src-dir<span class="w"> </span>reports_src<span class="w"> </span>--output-dir<span class="w"> </span>reports
+<span class="c1"># 4. 組み込み lint_drawlib_chapters() を自動実行し pni_report/full_audit.pdf を生成</span>
+pni<span class="w"> </span>report<span class="w"> </span>build<span class="w"> </span>full_audit<span class="w"> </span>--src-dir<span class="w"> </span>pni_report_src<span class="w"> </span>--output-dir<span class="w"> </span>pni_report
 </code></pre>
-<h3>3.2 プリフライトビジュアルリンター（lint_drawlib_chapters）とリンク検証</h3>
-<p><code>drawlib.tools</code> を呼び出す前に、<code>compiler.py</code> は 4 つの自動検証ガードレールを実行します。</p>
+<h3>3.2 組み込みプリフライトリンター（<code>lint_drawlib_chapters</code>）とリンク検証</h3>
+<p><code>pni report build</code> はビルド直前に <code>lint_drawlib_chapters()</code> と各種品質ガードレールを自動実行します（個別のチェックコマンドを実行する必要はありません）。</p>
 <ul>
-<li><strong>非破壊的な再スキャフォールディングとブランドアセット（<code>scaffold_report_project</code>）</strong>: 初回作成時、<code>pni report init</code> はスターターサンプル（<code>00_cover.md</code>、<code>01_overview.md</code>、<code>02_design.md</code>）を削除し、公式ブランドアセット（<code>_assets/{logo.png,logo_dark.png,favicon.png}</code>）をコピーしたうえで <code>utils.py</code> に <code>draw_pni_logo()</code> を注入します。既存レポートディレクトリに対して再実行された場合は、<code>--force</code> で <code>drawlib.toml</code>、<code>styles.py</code>、<code>utils.py</code> を更新する際にも執筆済みの <code>&lt;lang&gt;/*.md</code> 章ファイルをすべて無傷で保持し、再監査時の <code>git diff</code> をクリーンに保ちます。</li>
-<li><strong>複数系列チャートの凡例チェック</strong>: <code>lint_drawlib_chapters()</code> がすべての <code>```drawlib</code> フェンスを走査し、<code>.add_series(...)</code> を 2 回以上呼び出す <code>BarChart</code> または <code>LineChart</code> が <code>.draw_legend(...)</code> を呼び出していることを検証します。</li>
-<li><strong>UML ClassDiagram の等高線衝突・<code>Styles.White</code> ガード</strong>: <code>ClassDiagram</code> と <code>HeatmapOverlay(..., show_contour_lines=True)</code> の併用、または <code>ClassDiagram</code> / <code>ClassNode</code> での <code>Styles.White</code> の使用（白背景に白文字となり視認不能になるため <code>Styles.Neutral</code> を推奨）に対してプリフライト警告（<code>strict_preflight=True</code> 時は <code>ValueError</code>）を発行します。</li>
-<li><strong>出力ファイル正規化とリンク切れスキャン（<code>_verify_links</code>）</strong>: <code>pni report build</code> は <code>&lt;target&gt;_&lt;default_lang&gt;.pdf</code> を <code>reports/&lt;target&gt;.pdf</code>（<code>page_break=True</code>、<code>generate_index=True</code>）へ正規化します。また <code>-f html</code> 指定時には <code>_verify_links()</code> が <code>drawlib.tools.scan_broken_links()</code>（マルチポータル相対リンク検証用の <code>--link-check-root &lt;dir&gt;</code> 対応）を実行し、リンク切れや画像アセット欠損があればフェイルクローズ（<code>strict_links=True</code>）で検出します。</li>
+<li><strong>非破壊な再スキャフォールディングとブランドアセット（<code>scaffold_report_project</code>）</strong>: 初回作成時にスターターサンプル（<code>00_cover.md</code>・<code>01_overview.md</code>・<code>02_design.md</code>）を削除し、印刷向けワイドテーブル CSS（<code>@media print</code>）を追記し、公式ブランドアセット（<code>_assets/{logo.png,logo_dark.png,favicon.png,ogp.png}</code>）をコピーして <code>utils.py</code> に <code>draw_pni_logo()</code> を注入します。<code>--force</code> を指定した再実行でも執筆済みの <code>&lt;lang&gt;/*.md</code> はすべて保護されます。</li>
+<li><strong>未マスクトークン検出ガード</strong>: Markdown 本文中の生 GitHub/AWS/Slack/OpenAI トークン文字列（<code>ghp_</code>、<code>github_pat_</code>、<code>AKIA</code>、<code>xox*</code>、<code>sk-live-</code> 等）を検出し、GitHub Push Protection によるプッシュ遮断を未然に防ぎます。</li>
+<li><strong>複数系列チャート凡例・UML 等高線/コントラストガード</strong>: <code>.add_series(...)</code> を 2 回以上呼ぶ <code>BarChart</code> / <code>LineChart</code> の <code>.draw_legend(...)</code> 漏れ、<code>ClassDiagram</code> と <code>HeatmapOverlay(..., show_contour_lines=True)</code> の等高線衝突、および <code>ClassDiagram</code> / <code>ClassNode</code> での <code>Styles.White</code> 使用（白背景に白文字で視認不能になるため <code>Styles.Neutral</code> を使用）をプリフライト検出します。</li>
+<li><strong>出力正規化とリンク切れスキャン（<code>_verify_links</code>）</strong>: <code>pni report build</code> は <code>&lt;target&gt;_&lt;default_lang&gt;.pdf</code> を <code>&lt;output_dir&gt;/&lt;target&gt;.pdf</code>（<code>page_break=True</code>、<code>generate_index=True</code>）へ正規化します（多言語ビルド時は <code>&lt;target&gt;_en.pdf</code> / <code>&lt;target&gt;_ja.pdf</code> も保持）。<code>-f html</code> 指定時は <code>_verify_links()</code> が <code>drawlib.tools.scan_broken_links()</code>（マルチポータル相対リンク検証用 <code>--link-check-root &lt;dir&gt;</code> 対応）を実行し、リンク切れや画像欠損があればフェイルクローズ（<code>strict_links=True</code>）で停止します。</li>
 </ul>
-<p>上流の JSON スキーマや決定論的ホットスポット計算式の詳細は <a href="scoring_model.html">7軸品質スコアリングモデル</a> を、<code>pni report</code> の全 CLI オプションについては <a href="../05_languages_and_reference/rules_and_cli.html">ルール拡張と CLI リファレンス</a> を参照してください。</p>
+<h3>3.3 統合ポータルデプロイ（<code>docs_src/</code> -&gt; <code>docs/</code>）</h3>
+<p><code>pni report build</code> はフラットな <code>src_dir</code> をそのままビルドし、<code>--html-output-dir</code> と <code>--link-check-root</code> に対応しているため、公式サイトと複数のバイリンガル監査・移行レポートを単一の静的 GitHub Pages ポータル（<code>docs/</code>）へ統合デプロイできます。</p>
+<ul>
+<li><strong>公式ドキュメントサイト</strong>: <code>docs_src/site/</code> を <code>docs/</code>（<code>docs/{en,ja}/</code> + ルート <code>index.html</code>）へビルド。</li>
+<li><strong>埋め込みプロジェクトレポート</strong>: <code>docs_src/reports/&lt;slug&gt;/</code> 配下の各自己完結型レポートを <code>docs/reports/&lt;slug&gt;/</code> へ HTML + A4 PDF 出力し、<code>docs/</code> ルート基準でポータル横断の相対リンクを検証。</li>
+</ul>
+<pre><code class="language-bash"><span class="c1"># バイリンガルレポートを統合ポータル配下へコンパイル</span>
+pni<span class="w"> </span>report<span class="w"> </span>build<span class="w"> </span>my_service<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--src-dir<span class="w"> </span>docs_src/reports/my_service<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--output-dir<span class="w"> </span>docs/reports/my_service<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--html-output-dir<span class="w"> </span>docs/reports/my_service<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--link-check-root<span class="w"> </span>docs<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-f<span class="w"> </span>pdf<span class="w"> </span>-f<span class="w"> </span>html
+
+<span class="c1"># ポータル全体（サイト + 全レポート）のリンク整合性を一括検証</span>
+uv<span class="w"> </span>run<span class="w"> </span>drawlib<span class="w"> </span>serve<span class="w"> </span>docs/<span class="w"> </span>--check
+</code></pre>
+<p>上流の JSON スキーマ・ベースラインアンカリング・FP トリアージの詳細は <a href="scoring_model.html">7軸品質スコアリングモデル</a> を、実際のバイリンガル生成例は <a href="sample_reports.html">サンプルレポートギャラリー</a> を、<code>pni report</code> の全 CLI フラグは <a href="../05_languages_and_reference/rules_and_cli.html">ルール拡張と CLI リファレンス</a> を参照してください。</p>
 
             </main>
         </div>

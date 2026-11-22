@@ -1,0 +1,1226 @@
+<!--
+ Copyright (c) 2026 Yuichi Ito (yuichi@yuichi.com)
+
+ This software is licensed under the Apache License, Version 2.0.
+ For more information, please visit: https://github.com/yuichi110/drawlib
+
+ This software is provided "as is", without warranty of any kind,
+ express or implied, including but not limited to the warranties of
+ merchantability, fitness for a particular purpose and noninfringement.
+-->
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PNI Software Health Diagnostic Report: `legacy-billing`</title>
+    
+    
+    
+    <link rel="alternate" hreflang="en" href="index.html">
+    
+    <link rel="alternate" hreflang="ja" href="../ja/index.html">
+    
+    <link rel="alternate" hreflang="x-default" href="../index.html">
+    
+    
+    
+    
+    <link rel="icon" type="image/png" href="../_assets/favicon.png">
+    
+    
+    <link rel="stylesheet" href="style.css">
+    
+    
+</head>
+<body class="doc-body">
+    <main class="main-container">
+        
+        <div class="doc-topbar">
+            <div class="lang-switcher">
+                <details class="lang-dropdown">
+                    <summary class="lang-dropdown-btn" aria-label="Select language">
+                        <svg class="lang-globe-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+                        <span class="lang-current-label">English</span>
+                        <svg class="lang-caret-icon" viewBox="0 0 24 24" aria-hidden="true"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                    </summary>
+                    <div class="lang-dropdown-menu" role="menu">
+                        
+                        <a href="index.html" class="lang-option active" lang="en" hreflang="en" aria-current="page">
+                            <span>English</span>
+                            
+                            <svg class="lang-check-icon" viewBox="0 0 24 24" aria-hidden="true"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                            
+                        </a>
+                        
+                        <a href="../ja/index.html" class="lang-option" lang="ja" hreflang="ja" >
+                            <span>日本語</span>
+                            
+                        </a>
+                        
+                    </div>
+                </details>
+            </div>
+        </div>
+        
+        <section id="chapter-1-00_cover" class="doc-chapter pdf-chapter">
+<h1>PNI Software Health Diagnostic Report: <code>legacy-billing</code></h1>
+<p><strong>Target Repository</strong>: <code>examples/java/api_spring_messy</code> (<code>java_api_spring_messy</code>)<br />
+<strong>Language &amp; Stack</strong>: Java 1.8 (declared) / Spring Boot Web Starter (<code>LATEST</code>) / <code>javax.servlet-api</code> 4.0.1 / JUnit 4.13.2 / Maven</p>
+<figure class="drawlib-image" style="text-align: center;">
+  <img src="../images/00_cover/cover_scorecard.png" alt="00_cover_1" />
+  <figcaption class="drawlib-caption">PNI501 Software Health Diagnostic Scorecard for legacy-billing (Grade C, 66/100)</figcaption>
+</figure>
+<hr />
+<h2>Audit Identification &amp; Provenance</h2>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">Attribute</th>
+<th style="text-align:left">Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left"><strong>Project Name</strong></td>
+<td style="text-align:left"><code>legacy-billing</code> (<code>com.example:legacy-billing:0.0.1-SNAPSHOT</code>)</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>Target Root</strong></td>
+<td style="text-align:left"><code>examples/java/api_spring_messy</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>Primary Language</strong></td>
+<td style="text-align:left"><code>java</code> (Maven, 6 production files / 187 LOC, 1 test file)</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>Workflow ID &amp; Scope</strong></td>
+<td style="text-align:left"><code>java_api_spring_messy</code> (<code>category=audit</code>, <code>scope=repo</code>)</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>Workflow Run ID</strong></td>
+<td style="text-align:left"><code>wf-8177454c</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>Evaluated At (UTC)</strong></td>
+<td style="text-align:left"><code>2026-11-22T11:29:02.337544+00:00</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>Git Provenance</strong></td>
+<td style="text-align:left"><code>main@d1e02277 (dirty)</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>Overall Score &amp; Grade</strong></td>
+<td style="text-align:left"><strong>66 / 100 (Grade C)</strong> <em>(Deterministic Baseline: 76, AI Qualitative Adjustment: -10)</em></td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>Rule Compliance</strong></td>
+<td style="text-align:left"><code>0 / 16</code> rules passed (<code>15 FAIL</code>, <code>1 WARN</code>, <code>0 PASS</code>)</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>Findings Summary</strong></td>
+<td style="text-align:left"><code>19</code> total (<code>7</code> deterministic, <code>12</code> AI qualitative) across <code>14</code> unique locations (<code>6 CRITICAL</code>, <code>8 HIGH</code>, <code>4 MEDIUM</code>, <code>1 LOW</code>)</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>Downstream Linkage</strong></td>
+<td style="text-align:left">Feeds directly into the <code>java_api_spring_messy_migration</code> Clean Architecture modernization plan</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p><strong>Scope &amp; Audit Notice</strong>: This report synthesizes deterministic AST parsing (<code>tree-sitter</code>), project manifest inspection, containerized Maven/Docker build and runtime verification, Trivy filesystem SCA/IaC scanning, and dynamic HTTP penetration readiness checks executed under PNI501 Workflow v2. All credentials referenced from source analysis are redacted (<code>&lt;REDACTED_SECRET&gt;</code>).</p>
+</blockquote>
+
+</section>
+
+<nav class="doc-toc pdf-toc">
+  <h2>Table of Contents</h2>
+  <ul>
+    <li><a href="#chapter-2-01_executive_summary">1. Executive Summary</a></li>
+    <li><a href="#chapter-3-02_architecture_and_structure">2. Architecture & Source Code Structure</a></li>
+    <li><a href="#chapter-4-03_remediation_roadmap">3. Recommended Remediation Roadmap</a></li>
+    <li><a href="#chapter-5-04_standards_and_findings">4. Audit Pipeline (DAG), Standards & Findings</a></li>
+    <li><a href="#chapter-6-05_code_and_runtime_analysis">5. Deep Dive: Code Quality, Testing & Runtime</a></li>
+    <li><a href="#chapter-7-06_security_and_supply_chain">6. Deep Dive: Security, Supply Chain & API Surface</a></li>
+  </ul>
+</nav>
+
+<section id="chapter-2-01_executive_summary" class="doc-chapter pdf-chapter">
+<h1>1. Executive Summary</h1>
+<p><code>legacy-billing</code> (<code>examples/java/api_spring_messy</code>) scores <strong>66/100 (Grade C)</strong> with <strong><code>0/16</code> rules passing</strong> (<code>15 FAIL</code>, <code>1 WARN</code>), reflecting a <code>-10pt</code> qualitative deduction across all seven engineering dimensions relative to its deterministic AST baseline of <strong>76/100</strong>. Live Docker verification, tree-sitter AST analysis, and Trivy SCA proved a single compounding causal chain: unpinned <code>spring-boot-starter-web:LATEST</code> in <code>pom.xml</code> simultaneously breaks Maven compilation on Java 1.8, triggers a CRITICAL static Spring4Shell range alert, and blocks both JaCoCo coverage and dynamic HTTP penetration testing.</p>
+<figure class="drawlib-image" style="text-align: center;">
+  <img src="../images/01_executive_summary/exec_7axis_radar.png" alt="01_executive_summary_1" />
+  <figcaption class="drawlib-caption">7-Axis Engineering Health Radar (Deterministic Baseline vs. Final Audited Score) and Executive KPIs</figcaption>
+</figure>
+<hr />
+<h2>Live AST × Docker × Trivy Causal Chain &amp; Key Findings</h2>
+<p>The central operational insight of this audit is that build instability, unverified runtime behavior, and critical supply-chain exposure all originate from the same unpinned dependency and deprecated container baseline:</p>
+<ol>
+<li><strong>Unpinned Manifest (<code>pom.xml</code>)</strong>: <code>org.springframework.boot:spring-boot-starter-web</code> specifies <code>&lt;version&gt;LATEST&lt;/version&gt;</code> alongside an end-of-life Java <code>1.8</code> compiler target (<code>52.0</code> bytecode) and no Maven Wrapper (<code>mvnw</code>).</li>
+<li><strong>Live Compiler Crash (<code>harness_build</code>)</strong>: During containerized build verification (<code>java/maven.dockerfile</code>, <code>JAVA_VERSION=8</code>), Maven resolved <code>spring-boot-4.2.0.jar</code> (<code>SpringApplication.class</code>, bytecode <code>61.0</code> / JDK 17+), aborting compilation immediately with <code>class file has wrong version 61.0, should be 52.0</code>. Meanwhile, the project <code>Dockerfile</code> failed in <code>1.21s</code> because <code>docker.io/library/openjdk:latest</code> is no longer published on Docker Hub.</li>
+<li><strong>Compounding Verification Blindness &amp; Static SCA Risk</strong>: Because neither the project image nor the Maven harness could compile, offline JUnit execution (<code>0/0</code> tests), JaCoCo line coverage (<code>N/A</code>), Spring Boot startup smoke checks (<code>blocked</code>), and live HTTP penetration testing (<code>web_pentest</code>, <code>0/0</code> probes) were all blocked. Simultaneously, Trivy filesystem SCA evaluated the unpinned <code>LATEST</code> specifier against the full historical CVE range (<code>is_unpinned_specifier=True</code>), raising <strong>CRITICAL <code>CVE-2022-22965</code></strong> (Spring4Shell, CVSS 9.8).</li>
+<li><strong>Concentrated Source Hotspots</strong>: Inside the 187-LOC codebase, architectural and security debt concentrates in three classes—<code>BillingManager.java</code> (circular <code>BillingController</code> dependency, <code>cognitive=56</code>, 8 parameters, static <code>INVOICE_CACHE</code>, <code>String ==</code> bugs, empty <code>catch</code>, broken private <code>@Transactional</code>), <code>GatewayClient.java</code> (hardcoded <code>GATEWAY_SECRET</code> redacted as <code>&lt;REDACTED_SECRET&gt;</code>, Java 11 <code>java.net.http</code> mismatch on Java 1.8 target, missing HTTP timeout), and <code>BillingController.java</code> (mutable singleton <code>channel</code> race condition, unauthenticated catch-all <code>ANY /charge</code>).</li>
+</ol>
+<figure class="drawlib-image" style="text-align: center;">
+  <img src="../images/01_executive_summary/exec_causal_chain_risks.png" alt="01_executive_summary_2" />
+  <figcaption class="drawlib-caption">AST × Docker × Trivy Failure Causal Chain (Top) and Strengths vs. Top Critical Risks (Bottom)</figcaption>
+</figure>
+<hr />
+<h2>Executive Scorecard Summary</h2>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">Verification Gate</th>
+<th style="text-align:left">Status</th>
+<th style="text-align:left">Key Observed Evidence</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left"><strong>Overall Health Score</strong></td>
+<td style="text-align:left"><strong>66 / 100 (Grade C)</strong></td>
+<td style="text-align:left">7-axis scores: <code>architecture=80</code>, <code>code_quality=86</code>, <code>typing=77</code>, <code>testing=51</code>, <code>dependencies=72</code>, <code>security=50</code>, <code>documentation=44</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>Lowest-Scoring Audit Steps</strong></td>
+<td style="text-align:left"><strong>10 – 15 / 100 (Grade D)</strong></td>
+<td style="text-align:left"><code>container_runtime_audit=10 (D)</code>, <code>supply_chain_audit=15 (D)</code>, <code>java_test_audit=15 (D)</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>Container Runtime (<code>RV-01..04</code>)</strong></td>
+<td style="text-align:left"><strong><code>failed</code></strong></td>
+<td style="text-align:left"><code>build=failed</code>, <code>tests=0/0 (blocked)</code>, <code>line_cov=N/A</code>, <code>smoke=blocked (web_api)</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>Trivy SCA &amp; IaC (<code>SEC-01..03</code>)</strong></td>
+<td style="text-align:left"><strong><code>failed</code></strong></td>
+<td style="text-align:left"><code>app_cves=1</code> (<code>CRITICAL=1</code>, <code>HIGH=0</code>), Dockerfile misconfigs=<code>3</code> (<code>HIGH=1</code>, <code>MED=1</code>, <code>LOW=1</code>), Trivy secrets=<code>0</code> (AST hardcoded secret=<code>1</code>)</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>Dynamic Web Pentest (<code>SEC-06</code>)</strong></td>
+<td style="text-align:left"><strong><code>error</code> (blocked)</strong></td>
+<td style="text-align:left"><code>probes=0/0</code> passed, <code>findings=0</code>; suite materialized at <code>.pni/pentests/examples/java/api_spring_messy</code> but target container failed to build</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>Approved Audit Plan &amp; Scope</strong></td>
+<td style="text-align:left"><strong>Full Repository</strong></td>
+<td style="text-align:left">Auto-approved via <code>--auto-approve</code> (<code>plan_gate=false</code>); 6 source files (<code>src/main/java</code>), 1 test file (<code>src/test/java</code>), <code>README.md</code></td>
+</tr>
+</tbody>
+</table>
+
+</section>
+
+<section id="chapter-3-02_architecture_and_structure" class="doc-chapter pdf-chapter">
+<h1>2. Architecture &amp; Source Code Structure</h1>
+<p><code>legacy-billing</code> is a <strong>Cyclic Legacy Spring Boot Layered Monolith with Shared Mutable Global/Singleton State</strong> comprising 6 Java production files (<code>187 LOC</code>) and 1 JUnit 4 smoke test. While the repository contains a clean immutable DTO pattern in <code>InvoiceRecord.java</code>, core business logic and HTTP routing collapse into a runtime circular dependency (<code>BillingController &lt;-&gt; BillingManager</code>) combined with thread-unsafe global caches and singleton request fields.</p>
+<figure class="drawlib-image" style="text-align: center;">
+  <img src="../images/02_architecture_and_structure/arch_module_tree.png" alt="02_architecture_and_structure_1" />
+  <figcaption class="drawlib-caption">Physical Repository Directory Tree (Left) and 5-Layer Monolith Architecture Assessment (Right)</figcaption>
+</figure>
+<hr />
+<h2>System Profile &amp; Source Module Inventory</h2>
+<ul>
+<li><strong>Runtime Archetype &amp; Stack</strong>: <code>web_api</code> declaring Java <code>1.8</code> in <code>pom.xml</code> (colliding with Java 11 <code>java.net.http</code> in <code>GatewayClient.java</code>), unpinned <code>spring-boot-starter-web:LATEST</code>, <code>javax.servlet-api:4.0.1</code>, <code>junit:4.13.2</code>, and Maven without a committed wrapper (<code>mvnw</code>).</li>
+<li><strong>External Integrations</strong>: Outbound HTTP <code>POST</code> payment gateway resolved at runtime via <code>System.getenv(&quot;LEGACY_PAYMENT_URL&quot;)</code> (fallback <code>https://billing.example.invalid/charge</code>).</li>
+<li><strong>Entry Points</strong>: <code>src/main/java/com/example/billing/BillingApp.java:main</code> and <code>src/main/java/com/example/billing/controller/BillingController.java:chargeCustomer</code>.</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">Source File</th>
+<th style="text-align:center">LOC</th>
+<th style="text-align:left">Layer</th>
+<th style="text-align:left">Public Types</th>
+<th style="text-align:left">Public Callables</th>
+<th style="text-align:left">Health Assessment</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left"><code>src/main/java/com/example/billing/BillingApp.java</code></td>
+<td style="text-align:center">9</td>
+<td style="text-align:left">Bootstrap</td>
+<td style="text-align:left"><code>BillingApp</code></td>
+<td style="text-align:left"><code>main</code></td>
+<td style="text-align:left">Clean Spring Boot entrypoint; missing class Javadoc</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>src/main/java/com/example/billing/controller/BillingController.java</code></td>
+<td style="text-align:center">38</td>
+<td style="text-align:left">Controller</td>
+<td style="text-align:left"><code>BillingController</code></td>
+<td style="text-align:left"><code>chargeCustomer</code>, <code>lastChannel</code></td>
+<td style="text-align:left">Cyclic dependency, mutable singleton <code>channel</code>, raw <code>Map</code>, unauthenticated <code>ANY /charge</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>src/main/java/com/example/billing/service/BillingManager.java</code></td>
+<td style="text-align:center">78</td>
+<td style="text-align:left">Service</td>
+<td style="text-align:left"><code>BillingManager</code></td>
+<td style="text-align:left"><code>processBatchBilling</code></td>
+<td style="text-align:left">Primary code hotspot: upward cycle, <code>cognitive=56</code>, 8 params, static <code>INVOICE_CACHE</code>, <code>String ==</code>, empty catch</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>src/main/java/com/example/billing/client/GatewayClient.java</code></td>
+<td style="text-align:center">32</td>
+<td style="text-align:left">External Client</td>
+<td style="text-align:left"><code>GatewayClient</code></td>
+<td style="text-align:left"><code>sendCharge</code></td>
+<td style="text-align:left">Hardcoded <code>&lt;REDACTED_SECRET&gt;</code>, Java 11 <code>HttpClient</code> on Java 1.8 target, missing timeouts, <code>System.getenv</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>src/main/java/com/example/billing/model/InvoiceRecord.java</code></td>
+<td style="text-align:center">15</td>
+<td style="text-align:left">Model &amp; Utility</td>
+<td style="text-align:left"><code>InvoiceRecord</code></td>
+<td style="text-align:left"><code>InvoiceRecord</code>, <code>getAmountCents</code>, <code>getInvoiceId</code></td>
+<td style="text-align:left"><strong>Cleanest module in repository</strong>: immutable DTO, complete Javadocs, 0 AST issues</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>src/main/java/com/example/billing/util/LegacyDateHelper.java</code></td>
+<td style="text-align:center">15</td>
+<td style="text-align:left">Model &amp; Utility</td>
+<td style="text-align:left"><code>LegacyDateHelper</code></td>
+<td style="text-align:left"><code>collectAuditTags</code>, <code>formatTimestamp</code></td>
+<td style="text-align:left">Legacy <code>SimpleDateFormat</code>, <code>java.util.Date</code>, and raw <code>Vector</code>; missing Javadocs</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2>Cyclic Dependency &amp; Thermal Hotspot Analysis</h2>
+<p>The class dependency and thermal risk overlay below contrasts the concentrated risk hotspots (<code>GatewayClient</code> <code>0.70</code>, <code>BillingManager</code> <code>0.56</code>, <code>BillingController</code> <code>0.56</code>) against the clean immutable baseline (<code>InvoiceRecord</code> <code>0.06</code>). Notice the upward injection arrow (<code>circularController</code>) from <code>BillingManager</code> back to <code>BillingController</code>, which creates a runtime Spring DI cycle prohibited by default in Spring Boot 2.6+ and 3.x.</p>
+<figure class="drawlib-image" style="text-align: center;">
+  <img src="../images/02_architecture_and_structure/arch_class_heatmap.png" alt="02_architecture_and_structure_2" />
+  <figcaption class="drawlib-caption">UML Class Dependency Structure with Thermal Risk Overlay (Hotspot BillingManager/Controller/GatewayClient vs. Clean InvoiceRecord)</figcaption>
+</figure>
+<h3>Pre-Sorted Module Risk Hotspots</h3>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">File Path</th>
+<th style="text-align:center">LOC</th>
+<th style="text-align:center">Risk Score</th>
+<th style="text-align:left">Findings by Severity</th>
+<th style="text-align:left">Triggered Rules</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left"><code>pom.xml</code></td>
+<td style="text-align:center">—</td>
+<td style="text-align:center"><strong><code>1.00</code></strong></td>
+<td style="text-align:left"><code>2 CRIT</code>, <code>1 HIGH</code></td>
+<td style="text-align:left"><code>common/security_vulnerability</code>, <code>common/runtime_verification</code>, <code>java/dependencies</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>examples/java/api_spring_messy/src/main/java/com/example/billing/client/GatewayClient.java</code></td>
+<td style="text-align:center">32</td>
+<td style="text-align:center"><strong><code>0.70</code></strong></td>
+<td style="text-align:left"><code>1 CRIT</code></td>
+<td style="text-align:left"><code>common/security</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>src/main/java/com/example/billing/client/GatewayClient.java</code></td>
+<td style="text-align:center">—</td>
+<td style="text-align:center"><strong><code>0.60</code></strong></td>
+<td style="text-align:left"><code>1 CRIT</code>, <code>1 MED</code></td>
+<td style="text-align:left"><code>common/security</code>, <code>java/modern_stack</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>Dockerfile</code></td>
+<td style="text-align:center">—</td>
+<td style="text-align:center"><strong><code>0.58</code></strong></td>
+<td style="text-align:left"><code>1 HIGH</code></td>
+<td style="text-align:left"><code>common/supply_chain</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>src/main/java/com/example/billing/controller/BillingController.java</code></td>
+<td style="text-align:center">—</td>
+<td style="text-align:center"><strong><code>0.56</code></strong></td>
+<td style="text-align:left"><code>2 HIGH</code></td>
+<td style="text-align:left"><code>common/security_vulnerability</code>, <code>java/frameworks/spring_boot</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>src/main/java/com/example/billing/service/BillingManager.java</code></td>
+<td style="text-align:center">—</td>
+<td style="text-align:center"><strong><code>0.56</code></strong></td>
+<td style="text-align:left"><code>2 HIGH</code></td>
+<td style="text-align:left"><code>common/architecture</code>, <code>java/code_quality</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>.github/workflows/build.yml</code></td>
+<td style="text-align:center">—</td>
+<td style="text-align:center"><strong><code>0.45</code></strong></td>
+<td style="text-align:left"><code>1 CRIT</code></td>
+<td style="text-align:left"><code>common/supply_chain</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>examples/java/api_spring_messy/src/main/java/com/example/billing/service/BillingManager.java</code></td>
+<td style="text-align:center">78</td>
+<td style="text-align:center"><strong><code>0.41</code></strong></td>
+<td style="text-align:left"><code>1 MED</code></td>
+<td style="text-align:left"><code>common/maintainability</code></td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2>Customer Charge Execution Flow &amp; Concurrency Model</h2>
+<p>Every incoming HTTP request to <code>/charge</code> traverses four tightly coupled stages with shared mutable state and silent error handling:</p>
+<figure class="drawlib-image" style="text-align: center;">
+  <img src="../images/02_architecture_and_structure/arch_charge_flow.png" alt="02_architecture_and_structure_3" />
+  <figcaption class="drawlib-caption">Customer Charge & Batch Billing Runtime Execution Flow (Trigger: Unrestricted HTTP ANY /charge)</figcaption>
+</figure>
+<h3>State Storage, Boundary &amp; Concurrency Assessment</h3>
+<ul>
+<li><strong>Boundary Violation</strong>: <code>BillingManager</code> imports and <code>@Autowired</code>-injects <code>BillingController</code> (<code>circularController</code>, line 23), creating a runtime cycle (<code>BillingController -&gt; BillingManager -&gt; BillingController</code>) solely to read <code>lastChannel()</code>.</li>
+<li><strong>Shared Mutable State</strong>:
+<ul>
+<li><code>BillingManager.INVOICE_CACHE</code> (<code>src/main/java/com/example/billing/service/BillingManager.java:17</code>): unsynchronized process-local static raw <code>HashMap</code> mutated without bounds or eviction.</li>
+<li><code>BillingController.channel</code> (<code>src/main/java/com/example/billing/controller/BillingController.java:20</code>): mutable singleton instance field overwritten with <code>servletRequest.getMethod()</code> on every incoming HTTP request.</li>
+</ul>
+</li>
+<li><strong>Error &amp; Concurrency Model</strong>: Under concurrent Servlet execution, threads race on <code>BillingController.channel</code> and corrupt <code>INVOICE_CACHE</code>. <code>BillingManager</code> swallows all audit/cache exceptions in an empty <code>catch (Exception e) {}</code> block (line 83), while <code>GatewayClient</code> invokes <code>e.printStackTrace()</code> and blocks Servlet worker threads indefinitely because <code>HttpClient.newHttpClient()</code> configures no connect or read timeout.</li>
+</ul>
+
+</section>
+
+<section id="chapter-4-03_remediation_roadmap" class="doc-chapter pdf-chapter">
+<h1>3. Recommended Remediation Roadmap</h1>
+<p>Remediation of <code>legacy-billing</code> is sequenced into <strong>11 prioritized actions (<code>5 P0</code>, <code>5 P1</code>, <code>1 P2</code>)</strong> designed to restore deterministic Java 21 / Spring Boot 3.4 buildability and eliminate critical security exposure first, before establishing a JUnit 5 characterization harness and refactoring the cyclic monolith into a clean, thread-safe architecture.</p>
+<figure class="drawlib-image" style="text-align: center;">
+  <img src="../images/03_remediation_roadmap/remediation_roadmap.png" alt="03_remediation_roadmap_1" />
+  <figcaption class="drawlib-caption">Phased Remediation Roadmap (P0 -> P1 -> P2) Feeding Directly into the java_api_spring_messy_migration Execution Plan</figcaption>
+</figure>
+<hr />
+<h2>Remediation Effort &amp; Domain Distribution</h2>
+<p>Security and dependency stabilization account for <strong>55% (6 of 11)</strong> of the backlog, with every <code>P0</code> action directly unblocking either Maven/Docker compilation (<code>RV-01</code>), critical SCA/secret findings (<code>SEC-01..03</code>), or Spring Boot 3.x startup (which prohibits bean cycles by default).</p>
+<figure class="drawlib-image" style="text-align: center;">
+  <img src="../images/03_remediation_roadmap/remediation_priority_breakdown.png" alt="03_remediation_roadmap_2" />
+  <figcaption class="drawlib-caption">Remediation Action Distribution by Engineering Domain (Left) and Phase Gate Targets (Right)</figcaption>
+</figure>
+<hr />
+<h2>Action Plan Traceability Matrix (<code>P0 -&gt; P1 -&gt; P2</code>)</h2>
+<p>Every action below preserves the exact pre-sorted priority sequence from <code>java_api_spring_messy_score.json</code> and maps directly to concrete target files, measurable engineering impact, and audited rule/CVE identifiers:</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:center">#</th>
+<th style="text-align:center">Priority</th>
+<th style="text-align:left">Category</th>
+<th style="text-align:left">Action Title &amp; Concrete Work</th>
+<th style="text-align:left">Target Files</th>
+<th style="text-align:left">Expected Impact</th>
+<th style="text-align:left">Related Rules / CVEs</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">1</td>
+<td style="text-align:center"><strong><code>P0</code></strong></td>
+<td style="text-align:left"><code>architecture</code></td>
+<td style="text-align:left"><strong>Break <code>BillingController&lt;-&gt;BillingManager</code> cycle and eliminate mutable singleton/static state</strong>: Remove <code>circularController</code> and <code>BillingController.channel</code>, switch to constructor injection, and externalize <code>INVOICE_CACHE</code>.</td>
+<td style="text-align:left"><code>src/main/java/com/example/billing/controller/BillingController.java</code>, <code>src/main/java/com/example/billing/service/BillingManager.java</code></td>
+<td style="text-align:left">Eliminates Spring DI circularity and concurrent cross-request data races.</td>
+<td style="text-align:left"><code>common/architecture</code>, <code>java/frameworks/spring_boot</code></td>
+</tr>
+<tr>
+<td style="text-align:center">2</td>
+<td style="text-align:center"><strong><code>P0</code></strong></td>
+<td style="text-align:left"><code>dependencies</code></td>
+<td style="text-align:left"><strong>Fix broken Maven &amp; Docker build by pinning Java 21 LTS + Spring Boot 3.4 BOM + <code>eclipse-temurin:21</code></strong>: Replace Java 1.8 + <code>spring-boot-starter-web:LATEST</code> with Java 21 + pinned Spring Boot 3.4.x parent/BOM and replace deprecated <code>openjdk:latest</code> with <code>eclipse-temurin:21-jdk/jre</code>.</td>
+<td style="text-align:left"><code>pom.xml</code>, <code>Dockerfile</code></td>
+<td style="text-align:left">Restores deterministic compilation, JaCoCo test coverage, and runtime boot verification.</td>
+<td style="text-align:left"><code>common/runtime_verification</code>, <code>java/dependencies</code></td>
+</tr>
+<tr>
+<td style="text-align:center">3</td>
+<td style="text-align:center"><strong><code>P0</code></strong></td>
+<td style="text-align:left"><code>security</code></td>
+<td style="text-align:left"><strong>Harden GitHub Actions CI trigger and root Dockerfile</strong>: Replace <code>pull_request_target</code> with <code>pull_request</code> + minimal permissions + SHA-pinned actions, and migrate <code>Dockerfile</code> to pinned non-root <code>eclipse-temurin:21-jre</code> with <code>.dockerignore</code>.</td>
+<td style="text-align:left"><code>.github/workflows/build.yml</code>, <code>Dockerfile</code></td>
+<td style="text-align:left">Eliminates CI token hijacking and mutable root container exposure.</td>
+<td style="text-align:left"><code>common/supply_chain</code>, <code>common/security</code></td>
+</tr>
+<tr>
+<td style="text-align:center">4</td>
+<td style="text-align:center"><strong><code>P0</code></strong></td>
+<td style="text-align:left"><code>security</code></td>
+<td style="text-align:left"><strong>Pin Spring Boot 3.4.x BOM and eliminate Dockerfile root/<code>:latest</code> misconfigurations</strong>: Lock Spring Boot 3.4.x via parent/BOM (resolving static <code>CVE-2022-22965</code> unpinned range matching) and harden <code>Dockerfile</code> to resolve <code>DS-0001</code>, <code>DS-0002</code>, and <code>DS-0026</code>.</td>
+<td style="text-align:left"><code>pom.xml</code>, <code>Dockerfile</code></td>
+<td style="text-align:left">Eliminates CRITICAL unpinned SCA exposure and HIGH root-container misconfiguration.</td>
+<td style="text-align:left"><code>common/security_vulnerability</code>, <code>SEC-01</code>, <code>SEC-02</code>, <code>CVE-2022-22965</code></td>
+</tr>
+<tr>
+<td style="text-align:center">5</td>
+<td style="text-align:center"><strong><code>P0</code></strong></td>
+<td style="text-align:left"><code>security</code></td>
+<td style="text-align:left"><strong>Remove hardcoded <code>GATEWAY_SECRET</code> and inject via <code>@ConfigurationProperties</code></strong>: Delete the <code>GATEWAY_SECRET</code> string constant at line 13, rotate credentials, and bind secrets via Spring <code>@ConfigurationProperties</code> from externalized environment/vault config.</td>
+<td style="text-align:left"><code>src/main/java/com/example/billing/client/GatewayClient.java</code></td>
+<td style="text-align:left">Eliminates CRITICAL credential exposure in source control.</td>
+<td style="text-align:left"><code>common/security</code>, <code>common/supply_chain</code></td>
+</tr>
+<tr>
+<td style="text-align:center">6</td>
+<td style="text-align:center"><strong><code>P1</code></strong></td>
+<td style="text-align:left"><code>code_quality</code></td>
+<td style="text-align:left"><strong>Configure <code>RestClient</code> timeouts, <code>@ConfigurationProperties</code>, SLF4J logging, and Actuator <code>/healthz</code></strong>: Replace <code>System.getenv</code> and <code>HttpClient.newHttpClient()</code> with <code>@ConfigurationProperties</code> + timeout-bounded <code>RestClient</code>, replace <code>System.out</code>/<code>printStackTrace</code> and empty catch with SLF4J error logging, and enable Spring Boot Actuator health probes.</td>
+<td style="text-align:left"><code>src/main/java/com/example/billing/client/GatewayClient.java</code>, <code>src/main/java/com/example/billing/service/BillingManager.java</code></td>
+<td style="text-align:left">Prevents thread exhaustion from hung gateway calls and restores 12-Factor observability.</td>
+<td style="text-align:left"><code>common/twelve_factor</code>, <code>common/production_readiness</code></td>
+</tr>
+<tr>
+<td style="text-align:center">7</td>
+<td style="text-align:center"><strong><code>P1</code></strong></td>
+<td style="text-align:left"><code>code_quality</code></td>
+<td style="text-align:left"><strong>Refactor <code>processBatchBilling</code>, fix <code>String ==</code> / empty catch / private <code>@Transactional</code>, and replace legacy <code>Date</code>/<code>Vector</code></strong>: Replace raw <code>Map</code>/<code>List</code> with typed DTO records, decompose <code>processBatchBilling</code> (<code>cognitive &lt;=15</code>, <code>params &lt;=6</code>), use <code>.equals()</code> + SLF4J, and replace <code>SimpleDateFormat</code>/<code>Date</code>/<code>Vector</code> with <code>java.time</code> and <code>List</code>.</td>
+<td style="text-align:left"><code>src/main/java/com/example/billing/service/BillingManager.java</code>, <code>src/main/java/com/example/billing/util/LegacyDateHelper.java</code></td>
+<td style="text-align:left">Drastically reduces defect risk and restores type safety and readability.</td>
+<td style="text-align:left"><code>common/maintainability</code>, <code>java/code_quality</code>, <code>java/typing</code>, <code>java/modern_stack</code></td>
+</tr>
+<tr>
+<td style="text-align:center">8</td>
+<td style="text-align:center"><strong><code>P1</code></strong></td>
+<td style="text-align:left"><code>dependencies</code></td>
+<td style="text-align:left"><strong>Upgrade Maven build to Java 21 LTS, Spring Boot 3.4 BOM, and <code>mvnw</code></strong>: Migrate <code>pom.xml</code> from Java 1.8 / <code>LATEST</code> / <code>javax</code> / JUnit 4 to Java 21 LTS + Spring Boot 3.4 BOM + JUnit 5 and commit <code>mvnw</code>.</td>
+<td style="text-align:left"><code>pom.xml</code></td>
+<td style="text-align:left">Restores deterministic reproducible builds and supported LTS security updates.</td>
+<td style="text-align:left"><code>java/dependencies</code>, <code>common/supply_chain</code></td>
+</tr>
+<tr>
+<td style="text-align:center">9</td>
+<td style="text-align:center"><strong><code>P1</code></strong></td>
+<td style="text-align:left"><code>security</code></td>
+<td style="text-align:left"><strong>Re-run <code>web_pentest</code> after restoring Java 21 + Spring Boot 3.4 container build</strong>: After fixing <code>pom.xml</code> and <code>Dockerfile</code> buildability, execute <code>.pni/pentests/examples/java/api_spring_messy</code> to verify POST-only enforcement, validation, and security headers.</td>
+<td style="text-align:left"><code>pom.xml</code>, <code>src/main/java/com/example/billing/controller/BillingController.java</code></td>
+<td style="text-align:left">Restores continuous dynamic security verification (<code>SEC-06</code>).</td>
+<td style="text-align:left"><code>common/security_vulnerability</code>, <code>SEC-06</code></td>
+</tr>
+<tr>
+<td style="text-align:center">10</td>
+<td style="text-align:center"><strong><code>P1</code></strong></td>
+<td style="text-align:left"><code>testing</code></td>
+<td style="text-align:left"><strong>Replace assertion-free JUnit 4 smoke test with JUnit 5 + <code>MockMvc</code> characterization suite</strong>: Migrate to JUnit 5 Jupiter and add characterization tests with real assertions for <code>BillingController</code>, <code>BillingManager</code>, and <code>GatewayClient</code> before refactoring.</td>
+<td style="text-align:left"><code>src/test/java/com/example/billing/BillingManagerTest.java</code></td>
+<td style="text-align:left">Creates a safety harness for Java 21 / Clean Architecture migration and lifts coverage to <code>&gt;=80%</code>.</td>
+<td style="text-align:left"><code>java/testing</code></td>
+</tr>
+<tr>
+<td style="text-align:center">11</td>
+<td style="text-align:center"><strong><code>P2</code></strong></td>
+<td style="text-align:left"><code>documentation</code></td>
+<td style="text-align:left"><strong>Expand README and add core repository governance files</strong>: Expand <code>README.md</code> with setup, environment config, API endpoints, and test commands, and add <code>LICENSE</code>, <code>SECURITY.md</code>, and <code>.gitignore</code>.</td>
+<td style="text-align:left"><code>README.md</code></td>
+<td style="text-align:left">Improves onboarding and repository governance compliance.</td>
+<td style="text-align:left"><code>common/documentation</code>, <code>common/git_workflow</code></td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2>Handoff to Chained Migration Plan (<code>java_api_spring_messy_migration</code>)</h2>
+<p>This diagnostic roadmap links directly into the chained <strong><code>java_api_spring_messy_migration</code></strong> execution workflow, which operationalizes the 11 items above into verified migration waves:</p>
+<ol>
+<li><strong>Wave 1 (Stabilize &amp; Lock — Actions #2, #3, #4, #5)</strong>: Pin Java 21 LTS + Spring Boot 3.4.x BOM + <code>mvnw</code>, harden <code>.github/workflows/build.yml</code> and <code>Dockerfile</code>, and externalize <code>GATEWAY_SECRET</code>.</li>
+<li><strong>Wave 2 (Safety Harness &amp; Behavioral Contract — Actions #10, #7)</strong>: Establish JUnit 5 + <code>MockMvc</code> characterization tests and log stakeholder confirmation on <code>String ==</code> tax-branch behavior (<code>PAID</code>, <code>USD</code>, <code>JPY</code>) before altering business semantics.</li>
+<li><strong>Wave 3 (Clean Architecture &amp; PRR — Actions #1, #6, #7, #8, #9, #11)</strong>: Eliminate the <code>BillingController &lt;-&gt; BillingManager</code> cycle, extract typed Java <code>record</code> DTOs and repository/gateway ports, enforce <code>@PostMapping(&quot;/charge&quot;)</code> with <code>@Valid</code> and auth, re-run <code>web_pentest</code> + JaCoCo (<code>&gt;=80%</code>), and finalize governance documentation.</li>
+</ol>
+
+</section>
+
+<section id="chapter-5-04_standards_and_findings" class="doc-chapter pdf-chapter">
+<h1>4. Audit Pipeline (DAG), Standards &amp; Findings</h1>
+<p>This chapter establishes end-to-end audit provenance and reproducibility: the action-level <strong>Executed Audit Pipeline DAG</strong>, inspection targets and deterministic tools, the <strong>7-Axis Deterministic Baseline vs. AI Adjustment (<code>±10pt</code>)</strong> audit trail, weakest-first audit step scores, the complete <code>FAIL -&gt; WARN</code> rule compliance matrix, consolidated findings by unique location, and a compact machine-readable artifact reference index.</p>
+<figure class="drawlib-image" style="text-align: center;">
+  <img src="../images/04_standards_and_findings/audit_pipeline_dag.png" alt="04_standards_and_findings_1" />
+  <figcaption class="drawlib-caption">Executed PNI Workflow v2 Audit Pipeline DAG (9 Logical Stages with ASK/HYBRID/AI Mode Badges and Live Failure Highlights)</figcaption>
+</figure>
+<hr />
+<h2>Inspection Scope &amp; Deterministic Tools Executed</h2>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">Scope Dimension</th>
+<th style="text-align:left">Recorded Audit Configuration &amp; Executed Evidence</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left"><strong>Target Root &amp; Paths</strong></td>
+<td style="text-align:left">Root: <code>examples/java/api_spring_messy</code> | Source: <code>['src/main/java']</code> | Tests: <code>['src/test/java']</code> | Docs: <code>['README.md']</code> | Exclusions: <code>['none']</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>Languages &amp; Frameworks</strong></td>
+<td style="text-align:left">Primary: <code>java</code> | Companions: <code>['none']</code> | Detected Frameworks: <code>spring-boot</code>, <code>spring-framework</code>, <code>javax-ee</code>, <code>junit4</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>Repository Provenance</strong></td>
+<td style="text-align:left">Git branch &amp; commit: <code>main@d1e02277 (dirty)</code> | Run ID: <code>wf-8177454c</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>Deterministic Tools Executed</strong></td>
+<td style="text-align:left"><code>project_inspect (java)</code>, <code>tree-sitter AST (java)</code>, <code>container runtime harness (docker: java/maven.dockerfile)</code>, <code>Trivy (docker: fs, ghcr.io/aquasecurity/trivy:0.69.3)</code>, <code>web_pentest (httpx, 0 probes — blocked by build failure)</code></td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2>7-Axis Deterministic Baseline vs. AI Adjustment (<code>±10pt</code>)</h2>
+<p>PNI Workflow v2 anchors all seven engineering scores to deterministic static/runtime baselines before applying bounded <code>±10pt</code> qualitative AI adjustments. Across <code>legacy-billing</code>, every axis incurred the maximum <code>-10pt</code> qualitative penalty—moving the overall score from <strong>76</strong> to <strong>66 (Grade C)</strong>—because critical runtime, architectural, and security defects compound beyond raw static AST ratios.</p>
+<figure class="drawlib-image" style="text-align: center;">
+  <img src="../images/04_standards_and_findings/baseline_vs_final_comparison.png" alt="04_standards_and_findings_2" />
+  <figcaption class="drawlib-caption">7-Axis Deterministic Baseline vs. Final Audited Score After Bounded -10pt AI Qualitative Adjustments</figcaption>
+</figure>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">Engineering Axis</th>
+<th style="text-align:center">Deterministic Baseline</th>
+<th style="text-align:center">AI Δ (<code>±10pt</code>)</th>
+<th style="text-align:center">Final Score</th>
+<th style="text-align:left">Qualitative Adjustment Rationale</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left"><strong>Architecture</strong></td>
+<td style="text-align:center"><code>90</code></td>
+<td style="text-align:center"><strong><code>-10</code></strong></td>
+<td style="text-align:center"><strong><code>80</code></strong></td>
+<td style="text-align:left">Runtime <code>BillingController &lt;-&gt; BillingManager</code> circular dependency, <code>@Autowired</code> field injection, mutable singleton field <code>BillingController.channel</code>, and process-local static <code>HashMap INVOICE_CACHE</code>.</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>Code Quality</strong></td>
+<td style="text-align:center"><code>96</code></td>
+<td style="text-align:center"><strong><code>-10</code></strong></td>
+<td style="text-align:center"><strong><code>86</code></strong></td>
+<td style="text-align:left"><code>BillingManager.processBatchBilling</code> god method (<code>cognitive=56</code>, 8 params, 57 LOC), 3 <code>String ==</code> reference-equality bugs, empty <code>catch</code> block, broken private <code>@Transactional</code> self-invocation, and 4 <code>System.out</code>/<code>printStackTrace</code> calls.</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>Typing</strong></td>
+<td style="text-align:center"><code>87</code></td>
+<td style="text-align:center"><strong><code>-10</code></strong></td>
+<td style="text-align:center"><strong><code>77</code></strong></td>
+<td style="text-align:left">Raw <code>Map</code>/<code>List</code> generics in <code>BillingController</code> and <code>BillingManager</code>, untyped <code>Object</code> parameters (<code>traceHint</code>, <code>extraContext</code>), <code>@SuppressWarnings(&quot;unchecked&quot;)</code>, and Java 11 <code>java.net.http</code> import colliding with Java 1.8 target.</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>Testing</strong></td>
+<td style="text-align:center"><code>61</code></td>
+<td style="text-align:center"><strong><code>-10</code></strong></td>
+<td style="text-align:center"><strong><code>51</code></strong></td>
+<td style="text-align:left">Sole JUnit 4 test (<code>BillingManagerTest.testSmokeRun</code>) is assertion-free, static module coverage is <code>33.3%</code>, and live Maven/JaCoCo execution is completely blocked by the Java 8 vs. Spring Boot 4.2.0 build crash.</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>Dependencies</strong></td>
+<td style="text-align:center"><code>82</code></td>
+<td style="text-align:center"><strong><code>-10</code></strong></td>
+<td style="text-align:center"><strong><code>72</code></strong></td>
+<td style="text-align:left">Unpinned <code>spring-boot-starter-web:LATEST</code> (dynamically pulling Spring Boot 4.2.0 bytecode <code>61.0</code> and breaking Java 1.8 builds), EOL <code>javax.servlet</code>/JUnit 4, missing <code>mvnw</code>, and missing Dependabot.</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>Security</strong></td>
+<td style="text-align:center"><code>60</code></td>
+<td style="text-align:center"><strong><code>-10</code></strong></td>
+<td style="text-align:center"><strong><code>50</code></strong></td>
+<td style="text-align:left">Hardcoded <code>GATEWAY_SECRET</code> (<code>&lt;REDACTED_SECRET&gt;</code>), privileged <code>pull_request_target</code> + <code>actions/checkout@main</code> CI, root <code>openjdk:latest</code> Dockerfile (<code>DS-0001</code>/<code>DS-0002</code>/<code>DS-0026</code>), unpinned CRITICAL <code>CVE-2022-22965</code> static exposure, unauthenticated catch-all <code>ANY /charge</code>, and blocked DAST.</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>Documentation</strong></td>
+<td style="text-align:center"><code>54</code></td>
+<td style="text-align:center"><strong><code>-10</code></strong></td>
+<td style="text-align:center"><strong><code>44</code></strong></td>
+<td style="text-align:left">Minimal 2-line <code>README.md</code>, <code>33.3%</code> Javadoc coverage (10 missing public Javadocs), stale <code>@param obsoleteToken</code> mismatch, and missing <code>LICENSE</code>/<code>SECURITY.md</code>.</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>Overall Composite</strong></td>
+<td style="text-align:center"><strong><code>76</code></strong></td>
+<td style="text-align:center"><strong><code>-10</code></strong></td>
+<td style="text-align:center"><strong><code>66 (C)</code></strong></td>
+<td style="text-align:left"><strong>Compounding build, security, and architectural failures reduce overall health to Grade C.</strong></td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2>Executed Audit Step Scores &amp; Finding Source Split</h2>
+<p>All eight executed audit steps scored <strong>Grade D (<code>10</code> to <code>25 / 100</code>)</strong>, led downward by <code>container_runtime_audit (10)</code>, <code>supply_chain_audit (15)</code>, and <code>java_test_audit (15)</code>.</p>
+<figure class="drawlib-image" style="text-align: center;">
+  <img src="../images/04_standards_and_findings/audit_step_scores_bar.png" alt="04_standards_and_findings_3" />
+  <figcaption class="drawlib-caption">Executed Audit Step Scores Sorted Weakest-First (Left) and Finding Source & Triage Provenance (Right)</figcaption>
+</figure>
+<h3>Finding Source Split, Triage &amp; Waiver Log</h3>
+<ul>
+<li><strong>Finding Source Split</strong>: <code>deterministic_analyzers = 7</code>, <code>ai_qualitative = 12</code>, <code>total = 19</code> (consolidated to <code>14</code> unique locations).</li>
+<li><strong>AI False-Positive Triage Log</strong>: <code>0</code> deterministic pre-findings waived or reclassified.</li>
+<li><strong>Configured Design Waivers (<code>pni.toml [[opt_out]]</code>)</strong>: <code>0</code> active waivers.</li>
+</ul>
+<hr />
+<h2>Rule Compliance Matrix (<code>FAIL -&gt; WARN</code>, 16 Rules)</h2>
+<table>
+<thead>
+<tr>
+<th style="text-align:center">Status</th>
+<th style="text-align:left">Rule ID</th>
+<th style="text-align:left">Source Action</th>
+<th style="text-align:left">Concise Compliance Evidence</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center"><strong><code>FAIL</code></strong></td>
+<td style="text-align:left"><code>common/architecture</code></td>
+<td style="text-align:left"><code>java_ast_audit</code></td>
+<td style="text-align:left">1 runtime circular dependency (<code>BillingController -&gt; BillingManager -&gt; BillingController</code>), upward service-&gt;controller coupling via <code>@Autowired circularController</code>, and mutable static <code>INVOICE_CACHE</code>.</td>
+</tr>
+<tr>
+<td style="text-align:center"><strong><code>FAIL</code></strong></td>
+<td style="text-align:left"><code>common/documentation</code></td>
+<td style="text-align:left"><code>repo_structure_audit</code></td>
+<td style="text-align:left"><code>README.md</code> is only 2 lines (<code># Legacy Billing</code> / <code>Run mvn spring-boot:run</code>) with no architecture overview, environment configuration, API spec, or test instructions.</td>
+</tr>
+<tr>
+<td style="text-align:center"><strong><code>FAIL</code></strong></td>
+<td style="text-align:left"><code>common/maintainability</code></td>
+<td style="text-align:left"><code>java_ast_audit</code></td>
+<td style="text-align:left"><code>BillingManager.processBatchBilling</code> violates SIG unit size (57 lines), complexity (<code>branches=13</code>, <code>cognitive=56</code>), interfacing (8 params &gt; 6), and holds mutable static <code>INVOICE_CACHE</code> plus empty catch at line 83.</td>
+</tr>
+<tr>
+<td style="text-align:center"><strong><code>FAIL</code></strong></td>
+<td style="text-align:left"><code>common/production_readiness</code></td>
+<td style="text-align:left"><code>container_runtime_audit</code></td>
+<td style="text-align:left">Service cannot build or boot; <code>GatewayClient.java:22</code> lacks HTTP <code>connectTimeout</code>; <code>BillingManager.java:83</code> swallows exceptions in empty catch; 4 <code>System.out</code>/<code>printStackTrace</code> calls bypass structured logging; no Actuator <code>/healthz</code>; unauthenticated <code>ANY /charge</code>.</td>
+</tr>
+<tr>
+<td style="text-align:center"><strong><code>FAIL</code></strong></td>
+<td style="text-align:left"><code>common/runtime_verification</code></td>
+<td style="text-align:left"><code>deterministic_baseline</code></td>
+<td style="text-align:left"><code>harness_build=failed</code>; <code>RV-01</code> failed (<code>docker.io/library/openjdk:latest not found</code> and Java 8 Maven harness failed compiling <code>spring-boot-4.2.0.jar</code> bytecode <code>61.0</code> vs <code>52.0</code>); <code>RV-02</code>/<code>RV-03</code>/<code>RV-04</code> blocked.</td>
+</tr>
+<tr>
+<td style="text-align:center"><strong><code>FAIL</code></strong></td>
+<td style="text-align:left"><code>common/security</code></td>
+<td style="text-align:left"><code>repo_structure_audit</code></td>
+<td style="text-align:left">Hardcoded <code>GATEWAY_SECRET</code> (<code>&lt;REDACTED_SECRET&gt;</code>) at <code>GatewayClient.java:13</code>, privileged <code>pull_request_target</code> CI workflow, root <code>openjdk:latest</code> container, raw unvalidated <code>Map</code> payload, and unauthenticated catch-all <code>ANY /charge</code>.</td>
+</tr>
+<tr>
+<td style="text-align:center"><strong><code>FAIL</code></strong></td>
+<td style="text-align:left"><code>common/security_vulnerability</code></td>
+<td style="text-align:left"><code>java_ast_audit</code></td>
+<td style="text-align:left"><code>SEC-01</code>: CRITICAL <code>CVE-2022-22965</code> (CVSS 9.8) on unpinned <code>spring-boot-starter-web:LATEST</code>; <code>SEC-02</code>: Dockerfile <code>DS-0002</code> HIGH root + <code>DS-0001</code> MED <code>:latest</code> + <code>DS-0026</code> LOW; <code>SEC-03</code>: hardcoded <code>GATEWAY_SECRET</code>; <code>SEC-05</code>: unauthenticated <code>ANY /charge</code>; <code>SEC-06</code>: DAST <code>error</code> (<code>0</code> probes, container build failed).</td>
+</tr>
+<tr>
+<td style="text-align:center"><strong><code>FAIL</code></strong></td>
+<td style="text-align:left"><code>common/supply_chain</code></td>
+<td style="text-align:left"><code>repo_structure_audit</code></td>
+<td style="text-align:left">Missing <code>LICENSE</code>, <code>SECURITY.md</code>, Dependabot, and <code>mvnw</code>/lockfile; unpinned <code>spring-boot-starter-web:LATEST</code>; <code>.github/workflows/build.yml</code> uses <code>pull_request_target</code> + <code>actions/checkout@main</code> without <code>permissions:</code>; <code>Dockerfile</code> uses mutable root <code>openjdk:latest</code> without <code>.dockerignore</code>.</td>
+</tr>
+<tr>
+<td style="text-align:center"><strong><code>FAIL</code></strong></td>
+<td style="text-align:left"><code>common/twelve_factor</code></td>
+<td style="text-align:left"><code>service_readiness_audit</code></td>
+<td style="text-align:left">Factor III FAIL: direct <code>System.getenv(&quot;LEGACY_PAYMENT_URL&quot;)</code> in <code>GatewayClient.java:16</code>; Factor VI FAIL: mutable static <code>INVOICE_CACHE</code> and singleton field <code>BillingController.channel</code>; Factor XI FAIL: 4 <code>System.out.println</code>/<code>printStackTrace</code> calls.</td>
+</tr>
+<tr>
+<td style="text-align:center"><strong><code>FAIL</code></strong></td>
+<td style="text-align:left"><code>java/code_quality</code></td>
+<td style="text-align:left"><code>java_ast_audit</code></td>
+<td style="text-align:left"><code>33.3%</code> Javadoc coverage (10 missing Javadocs, 1 <code>@param</code> mismatch with stale <code>obsoleteToken</code>), 3 <code>String ==</code> literal bugs (<code>status==&quot;PAID&quot;</code>, <code>currency==&quot;USD&quot;/&quot;JPY&quot;</code>), empty catch block, 4 <code>System.out</code>/<code>printStackTrace</code> calls.</td>
+</tr>
+<tr>
+<td style="text-align:center"><strong><code>FAIL</code></strong></td>
+<td style="text-align:left"><code>java/dependencies</code></td>
+<td style="text-align:left"><code>repo_structure_audit</code></td>
+<td style="text-align:left"><code>pom.xml</code> pins <code>maven.compiler.source/target</code> to EOL <code>1.8</code>, uses dynamic version <code>LATEST</code> for <code>spring-boot-starter-web</code>, depends on legacy <code>javax.servlet:4.0.1</code> and JUnit 4 (<code>4.13.2</code>), and lacks <code>mvnw</code>.</td>
+</tr>
+<tr>
+<td style="text-align:center"><strong><code>FAIL</code></strong></td>
+<td style="text-align:left"><code>java/frameworks/spring_boot</code></td>
+<td style="text-align:left"><code>java_ast_audit</code></td>
+<td style="text-align:left">3 <code>@Autowired</code> field injections (<code>BillingController</code>, <code>BillingManager</code>), mutable singleton field <code>BillingController.channel</code> mutated per request, catch-all <code>@RequestMapping(&quot;/charge&quot;)</code>, private <code>@Transactional</code> without <code>spring-tx</code>, and legacy <code>javax.servlet</code>.</td>
+</tr>
+<tr>
+<td style="text-align:center"><strong><code>FAIL</code></strong></td>
+<td style="text-align:left"><code>java/modern_stack</code></td>
+<td style="text-align:left"><code>java_ast_audit</code></td>
+<td style="text-align:left">Java <code>1.8</code> target collides with Java 11 <code>java.net.http.HttpClient</code> import in <code>GatewayClient.java:4</code>; <code>LegacyDateHelper</code> uses non-thread-safe <code>SimpleDateFormat</code>, <code>java.util.Date</code>, and synchronized <code>Vector</code>; 4 unsorted imports and 1 wildcard import.</td>
+</tr>
+<tr>
+<td style="text-align:center"><strong><code>FAIL</code></strong></td>
+<td style="text-align:left"><code>java/testing</code></td>
+<td style="text-align:left"><code>java_test_audit</code></td>
+<td style="text-align:left">Legacy JUnit 4 (<code>junit:4.13.2</code>), only 1 test method (<code>BillingManagerTest.testSmokeRun</code>) with zero assertions (<code>assertion_free_tests=1</code>), <code>33.3%</code> static module coverage, and runtime JUnit/JaCoCo execution blocked by build failure.</td>
+</tr>
+<tr>
+<td style="text-align:center"><strong><code>FAIL</code></strong></td>
+<td style="text-align:left"><code>java/typing</code></td>
+<td style="text-align:left"><code>java_ast_audit</code></td>
+<td style="text-align:left"><code>81.8%</code> type safety coverage: raw <code>Map</code>/<code>List</code> in <code>BillingController.chargeCustomer</code> and <code>BillingManager.processBatchBilling</code>, untyped <code>Object</code> params (<code>traceHint</code>, <code>extraContext</code>), and <code>@SuppressWarnings(&quot;unchecked&quot;)</code>.</td>
+</tr>
+<tr>
+<td style="text-align:center"><strong><code>WARN</code></strong></td>
+<td style="text-align:left"><code>common/git_workflow</code></td>
+<td style="text-align:left"><code>repo_structure_audit</code></td>
+<td style="text-align:left"><code>.gitignore</code> is missing and <code>.github/workflows/build.yml</code> runs <code>mvn package</code> on <code>pull_request_target</code> instead of safe <code>pull_request</code> verification.</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2>Consolidated Location Findings Index (14 Unique Locations)</h2>
+<table>
+<thead>
+<tr>
+<th style="text-align:center">#</th>
+<th style="text-align:center">Severity</th>
+<th style="text-align:left">Location</th>
+<th style="text-align:left">Rules</th>
+<th style="text-align:left">Evidence &amp; Recommended Fix</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">1</td>
+<td style="text-align:center"><strong><code>CRITICAL</code></strong></td>
+<td style="text-align:left"><code>.github/workflows/build.yml</code></td>
+<td style="text-align:left"><code>common/supply_chain</code></td>
+<td style="text-align:left">Triggers on <code>pull_request_target</code> without <code>permissions:</code> and uses mutable <code>actions/checkout@main</code>. <strong>Fix</strong>: Switch to <code>pull_request</code>, add <code>permissions: { contents: read }</code>, and SHA-pin actions.</td>
+</tr>
+<tr>
+<td style="text-align:center">2</td>
+<td style="text-align:center"><strong><code>CRITICAL</code></strong></td>
+<td style="text-align:left"><code>examples/java/api_spring_messy/src/main/java/com/example/billing/client/GatewayClient.java:13</code></td>
+<td style="text-align:left"><code>common/security</code></td>
+<td style="text-align:left">Hardcoded secret literal assigned to <code>GATEWAY_SECRET</code> (<code>&lt;REDACTED_SECRET&gt;</code>, OWASP ASVS). <strong>Fix</strong>: Move secrets to environment variables or a secret manager and rotate exposed keys.</td>
+</tr>
+<tr>
+<td style="text-align:center">3</td>
+<td style="text-align:center"><strong><code>CRITICAL</code></strong></td>
+<td style="text-align:left"><code>pom.xml</code></td>
+<td style="text-align:left"><code>common/security_vulnerability</code>, <code>common/runtime_verification</code>, <code>java/dependencies</code></td>
+<td style="text-align:left">Unpinned <code>spring-boot-starter-web@LATEST</code> triggers Trivy <code>CVE-2022-22965</code> range match AND breaks Maven build (<code>spring-boot-4.2.0.jar</code> bytecode <code>61.0</code> vs Java <code>1.8</code> <code>52.0</code>), alongside legacy <code>javax.servlet</code>/JUnit 4 and missing <code>mvnw</code>. <strong>Fix</strong>: Pin Java 21 LTS + Spring Boot 3.4.x BOM + JUnit 5 and commit <code>mvnw</code>.</td>
+</tr>
+<tr>
+<td style="text-align:center">4</td>
+<td style="text-align:center"><strong><code>CRITICAL</code></strong></td>
+<td style="text-align:left"><code>src/main/java/com/example/billing/client/GatewayClient.java</code></td>
+<td style="text-align:left"><code>common/security</code>, <code>java/modern_stack</code></td>
+<td style="text-align:left">Embeds hardcoded <code>GATEWAY_SECRET</code> (<code>&lt;REDACTED_SECRET&gt;</code>), imports Java 11 <code>java.net.http</code> on Java 1.8 target, lacks connect/read timeouts, calls <code>System.getenv</code>, and prints stack traces. <strong>Fix</strong>: Rotate/externalize secret, upgrade to Java 21 + timeout-bounded <code>RestClient</code>, <code>@ConfigurationProperties</code>, SLF4J, and sorted imports.</td>
+</tr>
+<tr>
+<td style="text-align:center">5</td>
+<td style="text-align:center"><strong><code>CRITICAL</code></strong></td>
+<td style="text-align:left"><code>—</code> <em>(Dependency SCA)</em></td>
+<td style="text-align:left"><code>CVE-2022-22965</code></td>
+<td style="text-align:left"><code>org.springframework.boot:spring-boot-starter-web@LATEST (pom)</code> matched full historical Spring4Shell range. <strong>Fix</strong>: Lock to a patched release (<code>2.5.12, 2.6.6</code> minimum; target Spring Boot 3.4.x BOM).</td>
+</tr>
+<tr>
+<td style="text-align:center">6</td>
+<td style="text-align:center"><strong><code>HIGH</code></strong></td>
+<td style="text-align:left"><code>Dockerfile</code></td>
+<td style="text-align:left"><code>common/supply_chain</code></td>
+<td style="text-align:left">Builds from deprecated/mutable <code>openjdk:latest</code>, copies workspace without <code>.dockerignore</code>, and runs as <code>root</code>. <strong>Fix</strong>: Multi-stage <code>eclipse-temurin:21-jdk</code> / <code>21-jre-alpine</code> with non-root <code>USER</code> and <code>.dockerignore</code>.</td>
+</tr>
+<tr>
+<td style="text-align:center">7</td>
+<td style="text-align:center"><strong><code>HIGH</code></strong></td>
+<td style="text-align:left"><code>src/main/java/com/example/billing/controller/BillingController.java</code></td>
+<td style="text-align:left"><code>common/security_vulnerability</code>, <code>java/frameworks/spring_boot</code></td>
+<td style="text-align:left">Blocked <code>web_pentest</code> (<code>ANY /charge</code>), mutates singleton field <code>channel</code> per request, and binds raw <code>Map</code> without Bean Validation or auth. <strong>Fix</strong>: Remove <code>channel</code>, enforce <code>@PostMapping(&quot;/charge&quot;)</code> + <code>@Valid</code> Java <code>record</code> + auth, and re-run <code>web_pentest</code>.</td>
+</tr>
+<tr>
+<td style="text-align:center">8</td>
+<td style="text-align:center"><strong><code>HIGH</code></strong></td>
+<td style="text-align:left"><code>src/main/java/com/example/billing/service/BillingManager.java</code></td>
+<td style="text-align:left"><code>common/architecture</code>, <code>java/code_quality</code></td>
+<td style="text-align:left">Circular <code>@Autowired BillingController</code>, static raw <code>INVOICE_CACHE</code>, <code>processBatchBilling</code> (<code>cognitive=56</code>, 8 params, stale <code>@param obsoleteToken</code>, <code>String ==</code> lines 52/55/57, empty catch line 83, broken private <code>@Transactional</code>). <strong>Fix</strong>: Constructor injection, externalize cache, decompose method, <code>.equals()</code>, SLF4J, repository bean.</td>
+</tr>
+<tr>
+<td style="text-align:center">9</td>
+<td style="text-align:center"><strong><code>HIGH</code></strong></td>
+<td style="text-align:left"><code>src/test/java/com/example/billing/BillingManagerTest.java</code></td>
+<td style="text-align:left"><code>java/testing</code></td>
+<td style="text-align:left"><code>testSmokeRun</code> only instantiates <code>InvoiceRecord</code> without assertions or coverage of core classes. <strong>Fix</strong>: JUnit 5 + Mockito + <code>MockMvc</code> characterization suite reaching <code>&gt;=80%</code> JaCoCo line coverage.</td>
+</tr>
+<tr>
+<td style="text-align:center">10</td>
+<td style="text-align:center"><strong><code>HIGH</code></strong></td>
+<td style="text-align:left"><code>—</code> <em>(Import Graph)</em></td>
+<td style="text-align:left"><code>common/architecture</code></td>
+<td style="text-align:left">Circular import cycle: <code>BillingController -&gt; BillingManager -&gt; BillingController</code>. <strong>Fix</strong>: Remove upward dependency and extract shared models/interfaces into a lower layer.</td>
+</tr>
+<tr>
+<td style="text-align:center">11</td>
+<td style="text-align:center"><strong><code>MEDIUM</code></strong></td>
+<td style="text-align:left"><code>examples/java/api_spring_messy/src/main/java/com/example/billing/service/BillingManager.java:33</code></td>
+<td style="text-align:left"><code>common/maintainability</code></td>
+<td style="text-align:left"><code>processBatchBilling</code>: <code>length=57 lines</code>, <code>branches=13</code>, <code>cognitive=56</code>. <strong>Fix</strong>: Decompose into cohesive single-responsibility helpers (<code>cognitive &lt;= 15</code>).</td>
+</tr>
+<tr>
+<td style="text-align:center">12</td>
+<td style="text-align:center"><strong><code>MEDIUM</code></strong></td>
+<td style="text-align:left"><code>—</code> <em>(Repository Docs)</em></td>
+<td style="text-align:left"><code>common/documentation</code></td>
+<td style="text-align:left"><code>has_readme=True</code>, <code>lines=2</code>. <strong>Fix</strong>: Document architecture, environment setup, API usage, and test commands in <code>README.md</code>.</td>
+</tr>
+<tr>
+<td style="text-align:center">13</td>
+<td style="text-align:center"><strong><code>MEDIUM</code></strong></td>
+<td style="text-align:left"><code>—</code> <em>(Lockfile)</em></td>
+<td style="text-align:left"><code>common/supply_chain</code></td>
+<td style="text-align:left"><code>manifests=['pom.xml']</code>, <code>lockfiles=[]</code>. <strong>Fix</strong>: Pin BOM coordinates and commit Maven Wrapper (<code>mvnw</code>) / dependency verification metadata.</td>
+</tr>
+<tr>
+<td style="text-align:center">14</td>
+<td style="text-align:center"><strong><code>LOW</code></strong></td>
+<td style="text-align:left"><code>—</code> <em>(Version Bounds)</em></td>
+<td style="text-align:left"><code>common/supply_chain</code></td>
+<td style="text-align:left"><code>unpinned=['org.springframework.boot:spring-boot-starter-web:LATEST']</code>. <strong>Fix</strong>: Pin explicit dependency versions to ensure reproducible builds.</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2>Machine-Readable Evidence Artifacts</h2>
+<p>All structured metrics, findings, DAG metadata, and deterministic scanner outputs are persisted as machine-readable artifacts for CI gates and IDE integration:</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">Artifact Path</th>
+<th style="text-align:left">Format / Schema</th>
+<th style="text-align:left">Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left"><code>docs/reports/java_api_spring_messy/java_api_spring_messy_score.json</code></td>
+<td style="text-align:left"><code>ScoreResult</code> v2.0 (JSON)</td>
+<td style="text-align:left">Full structured 7-axis score, compliance matrix, findings, and action plan</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>docs/reports/java_api_spring_messy/java_api_spring_messy_summary.json</code></td>
+<td style="text-align:left"><code>ScoreSummary</code> (JSON)</td>
+<td style="text-align:left">Lightweight CI / portal summary badge metrics</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>docs/reports/java_api_spring_messy/java_api_spring_messy_findings.sarif</code></td>
+<td style="text-align:left"><code>SARIF 2.1.0</code></td>
+<td style="text-align:left">GitHub Code Scanning &amp; IDE inline diagnostic findings</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>docs_src/reports/java_api_spring_messy/_facts/plan.json</code></td>
+<td style="text-align:left">PNI Plan v2.0 (JSON)</td>
+<td style="text-align:left">Pre-flight reconnaissance plan &amp; validated workflow DAG</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>docs_src/reports/java_api_spring_messy/_facts/facts.json</code></td>
+<td style="text-align:left">Deterministic Bundle (JSON)</td>
+<td style="text-align:left">Raw AST, Maven/Docker runtime, Trivy SCA, and pentest facts</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>docs_src/reports/java_api_spring_messy/_facts/architecture.json</code></td>
+<td style="text-align:left"><code>ArchitectureRecord</code> (JSON)</td>
+<td style="text-align:left">Grounded 5-layer architecture, symbol map, and execution flows</td>
+</tr>
+</tbody>
+</table>
+
+</section>
+
+<section id="chapter-6-05_code_and_runtime_analysis" class="doc-chapter pdf-chapter">
+<h1>5. Deep Dive: Code Quality, Testing &amp; Runtime</h1>
+<p>Static tree-sitter AST analysis across the 6 Java source modules (<code>187 LOC</code>, <code>11</code> functions) and live Docker container verification reveal a sharp divide between clean isolated value objects (<code>InvoiceRecord.java</code>) and severely degraded core orchestration (<code>BillingManager.java</code>, <code>BillingController.java</code>, <code>GatewayClient.java</code>), compounded by a total Maven/Docker compilation crash that blocked runtime testing and JaCoCo coverage measurement.</p>
+<figure class="drawlib-image" style="text-align: center;">
+  <img src="../images/05_code_and_runtime_analysis/code_module_fitness_heatmap.png" alt="05_code_and_runtime_analysis_1" />
+  <figcaption class="drawlib-caption">Module × Quality Dimension Fitness Matrix (0–100 Scale Grounded in Per-File AST Findings; InvoiceRecord Clean Baseline vs. BillingManager Hotspot)</figcaption>
+</figure>
+<hr />
+<h2>Static AST Quality, SIG Maintainability &amp; 12-Factor Telemetry</h2>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">Metric Category</th>
+<th style="text-align:left">Metric Name</th>
+<th style="text-align:center">Measured Value</th>
+<th style="text-align:left">Diagnostic Interpretation</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left"><strong>Codebase Scale</strong></td>
+<td style="text-align:left"><code>total_files</code> / <code>total_loc</code> / <code>total_functions</code></td>
+<td style="text-align:center"><code>6</code> / <code>187</code> / <code>11</code></td>
+<td style="text-align:left">Compact service where defects concentrate heavily in 3 core files</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>Static Coverage</strong></td>
+<td style="text-align:left"><code>import_hygiene_coverage_pct</code></td>
+<td style="text-align:center"><code>83.3%</code></td>
+<td style="text-align:left">4 unsorted imports + 1 wildcard <code>import java.util.*;</code> in <code>GatewayClient.java</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>Static Coverage</strong></td>
+<td style="text-align:left"><code>type_safety_coverage_pct</code></td>
+<td style="text-align:center"><code>81.8%</code></td>
+<td style="text-align:left">2 raw generic signatures (<code>Map</code>/<code>List</code>), 2 untyped <code>Object</code> params, 2 <code>@SuppressWarnings(&quot;unchecked&quot;)</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>Static Coverage</strong></td>
+<td style="text-align:left"><code>docstring_coverage_pct</code></td>
+<td style="text-align:center"><code>33.3%</code></td>
+<td style="text-align:left">10 missing public Javadocs + 1 stale <code>@param obsoleteToken</code> mismatch on <code>processBatchBilling</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>Static Coverage</strong></td>
+<td style="text-align:left"><code>module_test_coverage_pct</code></td>
+<td style="text-align:center"><code>33.3%</code></td>
+<td style="text-align:left">Only <code>InvoiceRecord</code> touched by 1 assertion-free JUnit 4 smoke test</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>SIG Maintainability</strong></td>
+<td style="text-align:left"><code>complex_functions</code> / <code>excessive_parameters</code></td>
+<td style="text-align:center"><code>1</code> / <code>1</code></td>
+<td style="text-align:left"><code>BillingManager.processBatchBilling</code>: <code>57 lines</code>, <code>branches=13</code>, <code>cognitive=56</code>, <code>8 params (&gt; 6)</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>Coupling &amp; Correctness</strong></td>
+<td style="text-align:left"><code>circular_dependencies</code> / <code>global_state</code> / <code>bug_risk_idioms</code></td>
+<td style="text-align:center"><code>1</code> / <code>1</code> / <code>7</code></td>
+<td style="text-align:left"><code>BillingController &lt;-&gt; BillingManager</code>, static <code>INVOICE_CACHE</code>, 3 <code>String ==</code>, empty catch, 3 <code>System.out</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>Compatibility</strong></td>
+<td style="text-align:left"><code>undeclared_dependencies</code> / <code>language_version_mismatches</code></td>
+<td style="text-align:center"><code>1</code> / <code>1</code></td>
+<td style="text-align:left"><code>@Transactional</code> without <code>spring-tx</code>; Java 11 <code>java.net.http.HttpResponse</code> on Java 1.8 target</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>12-Factor / SRE PRR</strong></td>
+<td style="text-align:left"><code>missing_io_timeouts</code> / <code>scattered_env</code> / <code>unstructured_logging</code></td>
+<td style="text-align:center"><code>1</code> / <code>1</code> / <code>4</code></td>
+<td style="text-align:left"><code>HttpClient.newHttpClient()</code> without timeout; <code>System.getenv()</code>; 3 <code>System.out</code> + 1 <code>printStackTrace()</code></td>
+</tr>
+</tbody>
+</table>
+<h3>Primary Code Defect Breakdown</h3>
+<ol>
+<li><strong><code>BillingManager.processBatchBilling</code> (<code>src/main/java/com/example/billing/service/BillingManager.java:33</code>)</strong>:
+<ul>
+<li><strong>SIG Unit Size, Complexity &amp; Interfacing</strong>: <code>57</code> lines, <code>13</code> branches, cognitive complexity <strong><code>56</code></strong> (threshold <code>&lt;= 15</code>), and <strong><code>8</code> parameters</strong> (threshold <code>&lt;= 6</code>) mixing raw <code>List items</code>, booleans (<code>forceRetry</code>, <code>applyTax</code>), and untyped <code>Object extraContext</code>.</li>
+<li><strong>Reference-Equality Bugs (<code>String ==</code>)</strong>: Lines <code>52</code> (<code>status == &quot;PAID&quot;</code>), <code>55</code> (<code>currency == &quot;USD&quot;</code>), and <code>57</code> (<code>currency == &quot;JPY&quot;</code>) compare non-interned HTTP payload strings by reference identity rather than <code>.equals()</code>, causing tax rules to silently fall through for runtime-deserialized JSON values.</li>
+<li><strong>Silent Failure &amp; Ineffective Transaction Proxy</strong>: Line <code>83</code> contains an empty <code>catch (Exception e) {}</code> block that swallows audit, cache, and controller exceptions (including a latent invocation of nonexistent <code>dateHelper.currentPeriodLabel()</code> at line 79). Line <code>91</code> annotates <code>private void saveAuditTrail(...)</code> with <code>@Transactional</code>—which is both bypassed by Spring AOP self-invocation on a <code>private</code> method and backed by an undeclared <code>org.springframework.transaction</code> dependency missing from <code>pom.xml</code>.</li>
+<li><strong>Stale Documentation</strong>: Javadoc declares <code>@param obsoleteToken</code> (absent from signature) while omitting 7 actual parameters.</li>
+</ul>
+</li>
+<li><strong><code>GatewayClient.java</code> (<code>src/main/java/com/example/billing/client/GatewayClient.java</code>)</strong>:
+<ul>
+<li><strong>Language-Version API Mismatch</strong>: Imports Java 11+ <code>java.net.http.{HttpResponse, HttpRequest, HttpClient}</code> (line 4–6) while <code>pom.xml</code> pins <code>maven.compiler.source/target=1.8</code>.</li>
+<li><strong>Operational &amp; Logging Defects</strong>: Creates <code>HttpClient.newHttpClient()</code> at line 22 with zero connect/request timeout, calls <code>System.getenv(&quot;LEGACY_PAYMENT_URL&quot;)</code> inline at line 16, emits <code>System.out.println</code> (line 20) and <code>e.printStackTrace()</code> (line 32), and contains 4 unsorted imports plus <code>import java.util.*;</code>.</li>
+</ul>
+</li>
+<li><strong><code>LegacyDateHelper.java</code> (<code>src/main/java/com/example/billing/util/LegacyDateHelper.java</code>)</strong>:
+<ul>
+<li>Relies on non-thread-safe <code>SimpleDateFormat</code>, legacy <code>java.util.Date</code>, and legacy synchronized raw <code>Vector</code> instead of <code>java.time.Instant</code>/<code>DateTimeFormatter</code> and typed <code>List&lt;String&gt;</code>.</li>
+</ul>
+</li>
+</ol>
+<hr />
+<h2>Container Runtime Verification &amp; Build Failure Diagnosis</h2>
+<p>Both containerized build paths failed at gate <strong><code>RV-01</code> (Buildability)</strong>, cascading directly into blocked unit tests (<code>RV-02</code>), unmeasured JaCoCo coverage (<code>RV-03</code>), and blocked web startup smoke checks (<code>RV-04</code>).</p>
+<figure class="drawlib-image" style="text-align: center;">
+  <img src="../images/05_code_and_runtime_analysis/runtime_build_failure_diag.png" alt="05_code_and_runtime_analysis_2" />
+  <figcaption class="drawlib-caption">Dual Container Build Failures (RV-01) Cascading into Blocked JUnit, JaCoCo Coverage, and Startup Smoke Verification</figcaption>
+</figure>
+<h3>Verbatim Compiler &amp; Docker Failure Excerpts</h3>
+<p><strong>1. Project Dockerfile Build Failure (<code>examples/java/api_spring_messy/Dockerfile</code>, <code>1.21s</code>, exit code <code>1</code>)</strong>:</p>
+<pre><code class="language-text">#2 ERROR: docker.io/library/openjdk:latest: not found
+Dockerfile:1
+   1 | &gt;&gt;&gt; FROM openjdk:latest
+ERROR: failed to build: failed to solve: openjdk:latest: failed to resolve source metadata
+for docker.io/library/openjdk:latest: docker.io/library/openjdk:latest: not found
+</code></pre>
+<p><strong>2. Java 8 Maven Harness Compiler Failure (<code>.pni/dockerfiles/examples/java/api_spring_messy/Dockerfile</code>, <code>23.98s</code>, exit code <code>1</code>)</strong>:</p>
+<pre><code class="language-text">9.861 [ERROR]   bad class file: /m2repo/org/springframework/boot/spring-boot/4.2.0/spring-boot-4.2.0.jar(org/springframework/boot/SpringApplication.class)
+9.861 [ERROR]     class file has wrong version 61.0, should be 52.0
+9.861 [ERROR]     Please remove or make sure it appears in the correct subdirectory of the classpath.
+ERROR: failed to build: failed to solve: process "/bin/sh -c mvn -B -Dmaven.repo.local=/m2repo
+  org.jacoco:jacoco-maven-plugin:${JACOCO_VERSION}:prepare-agent test ...
+  org.jacoco:jacoco-maven-plugin:${JACOCO_VERSION}:report ..." did not complete successfully: exit code: 1
+</code></pre>
+<hr />
+<h2>Test Suite Health Analysis (<code>java/testing</code>)</h2>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">Test Metric</th>
+<th style="text-align:center">Observed Value</th>
+<th style="text-align:left">Assessment</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left"><strong>Framework &amp; Version</strong></td>
+<td style="text-align:center">JUnit 4 (<code>junit:4.13.2</code>, <code>&lt;scope&gt;test&lt;/scope&gt;</code>)</td>
+<td style="text-align:left">Legacy JUnit 4; needs migration to JUnit 5 (<code>junit-jupiter</code>)</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>Test Files / Test Methods</strong></td>
+<td style="text-align:center"><code>1</code> file (<code>BillingManagerTest.java</code>) / <code>1</code> method (<code>testSmokeRun</code>)</td>
+<td style="text-align:left">Critically under-tested across 6 production classes</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>Assertion-Free Tests</strong></td>
+<td style="text-align:center"><code>1 / 1</code> (<code>100%</code>)</td>
+<td style="text-align:left"><code>testSmokeRun</code> instantiates <code>InvoiceRecord</code> and calls <code>getAmountCents()</code> without any <code>assert*</code> or verification call</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>Static / Measured Coverage</strong></td>
+<td style="text-align:center"><code>33.3%</code> static / <code>N/A</code> measured</td>
+<td style="text-align:left"><code>BillingManager</code>, <code>BillingController</code>, <code>GatewayClient</code>, and <code>LegacyDateHelper</code> have zero direct test assertions; JaCoCo blocked by <code>RV-01</code></td>
+</tr>
+</tbody>
+</table>
+
+</section>
+
+<section id="chapter-7-06_security_and_supply_chain" class="doc-chapter pdf-chapter">
+<h1>6. Deep Dive: Security, Supply Chain &amp; API Surface</h1>
+<p><code>legacy-billing</code> fails all core security and supply-chain gates (<code>security=50/100</code>, <code>security_vulnerability_audit=18/100</code>, <code>supply_chain_audit=15/100</code>, <code>web_penetration_audit=20/100</code>). Risk spans every layer of the software delivery lifecycle: an unpinned Spring Boot dependency triggering a CRITICAL CVE range alert, a privileged GitHub Actions workflow, a deprecated root Dockerfile, a hardcoded gateway credential (<code>&lt;REDACTED_SECRET&gt;</code>), and an unauthenticated catch-all HTTP endpoint whose live DAST verification is blocked by the Maven compilation failure.</p>
+<figure class="drawlib-image" style="text-align: center;">
+  <img src="../images/06_security_and_supply_chain/sec_supply_chain_breakdown.png" alt="06_security_and_supply_chain_1" />
+  <figcaption class="drawlib-caption">Security Findings by Surface & Severity (Left) and Reconciliation of Static Trivy SCA vs. Live Maven Resolution (Right)</figcaption>
+</figure>
+<hr />
+<h2>Supply-Chain, SCA &amp; Container Hardening Audit</h2>
+<h3>Governance &amp; Supply-Chain Baseline</h3>
+<ul>
+<li><strong>Lockfiles &amp; Dependency Hygiene</strong>: <code>has_lockfile=False</code> (no <code>mvnw</code> or dependency verification), <code>dependencies_count=2</code>, <code>unpinned_dependencies_count=1</code> (<code>org.springframework.boot:spring-boot-starter-web:LATEST</code>).</li>
+<li><strong>Governance &amp; Automation</strong>: <code>has_license=False</code>, <code>has_security_policy=False</code>, <code>has_dependency_automation=False</code> (no Dependabot/Renovate), <code>has_gitignore=False</code>.</li>
+<li><strong>Trivy Scanner Configuration</strong>: <code>ghcr.io/aquasecurity/trivy:0.69.3</code> (<code>docker</code>), <code>scanned_filesystem=True</code>, <code>scanned_resolved_image=False</code> (project container failed to build due to <code>openjdk:latest not found</code>, so OS base-image CVEs are <code>0</code> / unverified until buildability is restored).</li>
+</ul>
+<h3>Application CVEs &amp; Dockerfile IaC Misconfigurations</h3>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">Category</th>
+<th style="text-align:left">ID</th>
+<th style="text-align:center">Severity</th>
+<th style="text-align:left">Target</th>
+<th style="text-align:left">Observed State / Details</th>
+<th style="text-align:left">Recommended Fix</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left"><strong>App CVE (<code>runtime_core</code>)</strong></td>
+<td style="text-align:left"><strong><code>CVE-2022-22965</code></strong></td>
+<td style="text-align:center"><strong><code>CRITICAL</code></strong> <em>(CVSS 9.8)</em></td>
+<td style="text-align:left"><code>pom.xml</code> (<code>spring-boot-starter-web@LATEST</code>)</td>
+<td style="text-align:left"><code>spring-framework: RCE via Data Binding on JDK 9+</code> (<code>is_unpinned_specifier=True</code> — static SCA evaluates full historical CVE range until locked; live Maven attempted <code>4.2.0</code> and crashed)</td>
+<td style="text-align:left">Pin explicit patched BOM release (<code>&gt;= 2.5.12 / 2.6.6</code>; migrate to Spring Boot <code>3.4.x</code> BOM + Java 21 LTS)</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>Container OS CVEs</strong></td>
+<td style="text-align:left"><code>—</code></td>
+<td style="text-align:center"><code>INFO</code></td>
+<td style="text-align:left">Project Docker Image</td>
+<td style="text-align:left"><code>0</code> reported (<code>scanned_resolved_image=False</code> because <code>openjdk:latest</code> failed to pull)</td>
+<td style="text-align:left">Migrate to <code>eclipse-temurin:21-jre-alpine</code> and re-scan built image</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>Dockerfile IaC</strong></td>
+<td style="text-align:left"><strong><code>DS-0002</code></strong></td>
+<td style="text-align:center"><strong><code>HIGH</code></strong></td>
+<td style="text-align:left"><code>Dockerfile</code></td>
+<td style="text-align:left">Image user should not be <code>root</code> (missing non-root <code>USER</code> instruction)</td>
+<td style="text-align:left">Create dedicated non-root user and add <code>USER appuser</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>Dockerfile IaC</strong></td>
+<td style="text-align:left"><strong><code>DS-0001</code></strong></td>
+<td style="text-align:center"><strong><code>MEDIUM</code></strong></td>
+<td style="text-align:left"><code>Dockerfile:1</code></td>
+<td style="text-align:left"><code>FROM openjdk:latest</code> uses mutable <code>:latest</code> tag (and image is deprecated)</td>
+<td style="text-align:left">Pin digest or explicit tag (<code>eclipse-temurin:21-jre-alpine</code>)</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>Dockerfile IaC</strong></td>
+<td style="text-align:left"><strong><code>DS-0026</code></strong></td>
+<td style="text-align:center"><strong><code>LOW</code></strong></td>
+<td style="text-align:left"><code>Dockerfile</code></td>
+<td style="text-align:left">No <code>HEALTHCHECK</code> defined; <code>.dockerignore</code> is also missing</td>
+<td style="text-align:left">Add <code>HEALTHCHECK</code> probing Spring Actuator <code>/actuator/health</code> and add <code>.dockerignore</code></td>
+</tr>
+</tbody>
+</table>
+<h3>CI/CD Supply-Chain Exposure (<code>.github/workflows/build.yml</code>)</h3>
+<ol>
+<li><strong>Privileged <code>pull_request_target</code> Trigger</strong>: Executes <code>mvn package</code> in the context of the base repository with privileged secrets/write scope on untrusted PRs. Replace with <code>pull_request</code>.</li>
+<li><strong>Missing Explicit <code>permissions:</code> Block</strong>: Violates OpenSSF Token-Permissions least-privilege guidance. Add <code>permissions: { contents: read }</code>.</li>
+<li><strong>Mutable Branch Reference (<code>actions/checkout@main</code>)</strong>: Tracks a moving branch tip instead of an immutable commit SHA. Pin <code>actions/checkout</code> to a verified full 40-character SHA.</li>
+</ol>
+<hr />
+<h2>Secret Hygiene, API Attack Surface &amp; Blocked DAST Status</h2>
+<figure class="drawlib-image" style="text-align: center;">
+  <img src="../images/06_security_and_supply_chain/sec_attack_surface_map.png" alt="06_security_and_supply_chain_2" />
+  <figcaption class="drawlib-caption">End-to-End Security Boundary & Attack Surface Map: CI/Build Supply Chain, Unauthenticated ANY /charge Ingress, and Redacted Outbound Secret</figcaption>
+</figure>
+<h3>Secret Detection, AST CWE Sinks &amp; HTTP Attack Surface Matrix</h3>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">Security Surface</th>
+<th style="text-align:left">Target / Symbol</th>
+<th style="text-align:center">Status</th>
+<th style="text-align:left">Detailed Audit Evidence</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left"><strong>Hardcoded Secret (<code>SEC-03</code>)</strong></td>
+<td style="text-align:left"><code>GatewayClient.GATEWAY_SECRET</code> (<code>GatewayClient.java:13</code>)</td>
+<td style="text-align:center"><strong><code>CRITICAL</code></strong></td>
+<td style="text-align:left">AST OWASP ASVS heuristic flagged hardcoded live-style secret token literal (<code>&lt;REDACTED_SECRET&gt;</code>). Trivy's generic regex secret scanner returned <code>0</code> (as the synthetic token prefix did not match vendor-specific signatures), proving the value of combined AST + SCA defense. Delete, rotate, and inject via <code>@ConfigurationProperties</code>.</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>AST Dangerous Sinks (CWE)</strong></td>
+<td style="text-align:left">Production source (<code>187 LOC</code>)</td>
+<td style="text-align:center"><strong><code>PASS (0)</code></strong></td>
+<td style="text-align:left"><code>0</code> CWE-tagged SQL injection, command execution, deserialization, or XXE sinks detected in Java source.</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>Extracted HTTP API Surface (<code>SEC-05</code>)</strong></td>
+<td style="text-align:left"><code>ANY /charge</code> -&gt; <code>BillingController.chargeCustomer</code> (<code>BillingController.java:22</code>)</td>
+<td style="text-align:center"><strong><code>HIGH</code></strong></td>
+<td style="text-align:left">Unrestricted <code>@RequestMapping(&quot;/charge&quot;)</code> accepts <code>GET</code>, <code>POST</code>, <code>PUT</code>, <code>DELETE</code>, etc. with <code>auth_hint=NONE</code>, raw untyped <code>@RequestBody Map</code>, and zero Bean Validation (<code>@Valid</code>).</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>Dynamic Web Pentest (<code>SEC-06</code>)</strong></td>
+<td style="text-align:left"><code>.pni/pentests/examples/java/api_spring_messy</code></td>
+<td style="text-align:center"><strong><code>ERROR</code> (Blocked)</strong></td>
+<td style="text-align:left">4 pytest/httpx probe modules materialized (<code>conftest.py</code>, <code>test_app_probes.py</code>, <code>test_baseline_http.py</code>, <code>test_target_surface.py</code>), <code>0/0</code> probes executed (<code>server_booted=False</code>) because the Maven container failed compiling <code>spring-boot-4.2.0.jar</code> under Java 8. Re-execute immediately after <code>P0</code> build restoration.</td>
+</tr>
+</tbody>
+</table>
+
+</section>
+    </main>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const langDropdowns = document.querySelectorAll('.lang-dropdown');
+            if (langDropdowns.length > 0) {
+                document.addEventListener('click', function(e) {
+                    langDropdowns.forEach(function(dd) {
+                        if (dd.hasAttribute('open') && !dd.contains(e.target)) {
+                            dd.removeAttribute('open');
+                        }
+                    });
+                });
+                document.addEventListener('keydown', function(e) {
+                    if (e.key === 'Escape') {
+                        langDropdowns.forEach(function(dd) {
+                            dd.removeAttribute('open');
+                        });
+                    }
+                });
+            }
+        });
+    </script>
+    
+</body>
+</html>

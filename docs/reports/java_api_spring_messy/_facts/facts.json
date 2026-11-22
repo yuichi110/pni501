@@ -1,0 +1,980 @@
+{
+  "workflow_id": "java_api_spring_messy",
+  "targets": {
+    "root": "examples/java/api_spring_messy",
+    "source": [
+      "src/main/java"
+    ],
+    "tests": [
+      "src/test/java"
+    ],
+    "docs": [
+      "README.md"
+    ],
+    "exclude": []
+  },
+  "outputs": {
+    "facts": ".pni/cache/java_api_spring_messy/facts.json",
+    "score": "docs/reports/java_api_spring_messy/java_api_spring_messy_score.json",
+    "report": "docs/reports/java_api_spring_messy/java_api_spring_messy.pdf"
+  },
+  "project_facts": {
+    "project_name": "legacy-billing",
+    "version": "0.0.1-SNAPSHOT",
+    "language": "java",
+    "runtime_types": [
+      "web_api"
+    ],
+    "build_system": "maven",
+    "language_version_constraint": "1.8",
+    "has_type_marker": null,
+    "manifest_files": [
+      "pom.xml"
+    ],
+    "lockfiles_found": [],
+    "dependencies": [
+      "org.springframework.boot:spring-boot-starter-web:LATEST",
+      "javax.servlet:javax.servlet-api:4.0.1"
+    ],
+    "unpinned_dependencies": [
+      "org.springframework.boot:spring-boot-starter-web:LATEST"
+    ],
+    "dev_dependencies": [
+      "junit:junit:4.13.2"
+    ],
+    "detected_frameworks": [
+      "spring-boot",
+      "spring-framework",
+      "javax-ee",
+      "junit4"
+    ],
+    "legacy_language_findings": [],
+    "tooling_modernization_issues": [
+      "Legacy JUnit 4 dependency detected — migrate to JUnit 5 (junit-jupiter)",
+      "Legacy javax.* EE namespace detected — migrate to jakarta.* (Spring Boot 3+)",
+      "Aging Java target '1.8' — consider upgrading to Java 21 LTS"
+    ],
+    "source_files_count": 6,
+    "test_files_count": 1,
+    "has_readme": true,
+    "readme_line_count": 2,
+    "readme_headings": [
+      "# Legacy Billing"
+    ],
+    "docs_inventory": [
+      "README.md"
+    ],
+    "has_gitignore": false,
+    "has_license": false,
+    "has_security_policy": false,
+    "has_dependency_automation": false,
+    "ci_workflows_found": [
+      ".github/workflows/build.yml"
+    ],
+    "ci_supply_chain_issues": [
+      ".github/workflows/build.yml: uses privileged 'pull_request_target' trigger — verify untrusted PR code is never executed",
+      ".github/workflows/build.yml: missing explicit GITHUB_TOKEN 'permissions:' block (OpenSSF Token-Permissions)",
+      ".github/workflows/build.yml: unpinned mutable action 'actions/checkout@main' — pin to an immutable commit SHA or release tag"
+    ],
+    "committed_secret_files": [],
+    "has_dockerfile": true,
+    "container_hygiene_issues": [
+      "Dockerfile: base image 'openjdk:latest' uses mutable ':latest' or untagged reference",
+      "Dockerfile: final stage runs as root (missing non-root 'USER' instruction)",
+      "Dockerfile: missing '.dockerignore' (risks leaking .git or secrets into build context)"
+    ],
+    "opt_out_counts": {}
+  },
+  "ast_facts": {
+    "language": "java",
+    "total_files": 6,
+    "total_loc": 187,
+    "total_classes": 6,
+    "total_functions": 11,
+    "module_inventory": [
+      {
+        "file": "examples/java/api_spring_messy/src/main/java/com/example/billing/BillingApp.java",
+        "loc": 9,
+        "public_types": [
+          "BillingApp"
+        ],
+        "public_callables": [
+          "main"
+        ]
+      },
+      {
+        "file": "examples/java/api_spring_messy/src/main/java/com/example/billing/client/GatewayClient.java",
+        "loc": 32,
+        "public_types": [
+          "GatewayClient"
+        ],
+        "public_callables": [
+          "sendCharge"
+        ]
+      },
+      {
+        "file": "examples/java/api_spring_messy/src/main/java/com/example/billing/controller/BillingController.java",
+        "loc": 38,
+        "public_types": [
+          "BillingController"
+        ],
+        "public_callables": [
+          "chargeCustomer",
+          "lastChannel"
+        ]
+      },
+      {
+        "file": "examples/java/api_spring_messy/src/main/java/com/example/billing/model/InvoiceRecord.java",
+        "loc": 15,
+        "public_types": [
+          "InvoiceRecord"
+        ],
+        "public_callables": [
+          "InvoiceRecord",
+          "getAmountCents",
+          "getInvoiceId"
+        ]
+      },
+      {
+        "file": "examples/java/api_spring_messy/src/main/java/com/example/billing/service/BillingManager.java",
+        "loc": 78,
+        "public_types": [
+          "BillingManager"
+        ],
+        "public_callables": [
+          "processBatchBilling"
+        ]
+      },
+      {
+        "file": "examples/java/api_spring_messy/src/main/java/com/example/billing/util/LegacyDateHelper.java",
+        "loc": 15,
+        "public_types": [
+          "LegacyDateHelper"
+        ],
+        "public_callables": [
+          "collectAuditTags",
+          "formatTimestamp"
+        ]
+      }
+    ],
+    "import_hygiene_coverage_pct": 83.3,
+    "unsorted_imports": [
+      {
+        "file": "examples/java/api_spring_messy/src/main/java/com/example/billing/client/GatewayClient.java",
+        "line": 4,
+        "symbol": "java.net.http.HttpResponse",
+        "detail": "Unsorted Java import 'java.net.http.HttpResponse' after 'org.springframework.stereotype.Component'"
+      },
+      {
+        "file": "examples/java/api_spring_messy/src/main/java/com/example/billing/client/GatewayClient.java",
+        "line": 5,
+        "symbol": "java.net.http.HttpRequest",
+        "detail": "Unsorted Java import 'java.net.http.HttpRequest' after 'java.net.http.HttpResponse'"
+      },
+      {
+        "file": "examples/java/api_spring_messy/src/main/java/com/example/billing/client/GatewayClient.java",
+        "line": 6,
+        "symbol": "java.net.http.HttpClient",
+        "detail": "Unsorted Java import 'java.net.http.HttpClient' after 'java.net.http.HttpRequest'"
+      },
+      {
+        "file": "examples/java/api_spring_messy/src/main/java/com/example/billing/client/GatewayClient.java",
+        "line": 7,
+        "symbol": "java.net.URI",
+        "detail": "Unsorted Java import 'java.net.URI' after 'java.net.http.HttpClient'"
+      }
+    ],
+    "wildcard_imports": [
+      {
+        "file": "examples/java/api_spring_messy/src/main/java/com/example/billing/client/GatewayClient.java",
+        "line": 8,
+        "symbol": "java.util.*",
+        "detail": "Wildcard import 'import java.util.*;'"
+      }
+    ],
+    "late_imports": [],
+    "type_safety_coverage_pct": 81.8,
+    "type_safety_issues": [
+      {
+        "file": "examples/java/api_spring_messy/src/main/java/com/example/billing/controller/BillingController.java",
+        "line": 22,
+        "symbol": "chargeCustomer",
+        "detail": "Raw generic types: return raw 'Map', param 'payload' uses raw 'Map'"
+      },
+      {
+        "file": "examples/java/api_spring_messy/src/main/java/com/example/billing/service/BillingManager.java",
+        "line": 33,
+        "symbol": "processBatchBilling",
+        "detail": "Raw generic types: return raw 'Map', param 'items' uses raw 'List'"
+      }
+    ],
+    "omitted_init_return_annotations": [],
+    "weak_type_usages": [
+      {
+        "file": "examples/java/api_spring_messy/src/main/java/com/example/billing/controller/BillingController.java",
+        "line": 22,
+        "symbol": "chargeCustomer",
+        "detail": "Parameter 'traceHint' uses untyped 'Object'"
+      },
+      {
+        "file": "examples/java/api_spring_messy/src/main/java/com/example/billing/controller/BillingController.java",
+        "line": 22,
+        "symbol": "chargeCustomer",
+        "detail": "Type suppression: @SuppressWarnings(\"unchecked\")"
+      },
+      {
+        "file": "examples/java/api_spring_messy/src/main/java/com/example/billing/service/BillingManager.java",
+        "line": 33,
+        "symbol": "processBatchBilling",
+        "detail": "Parameter 'extraContext' uses untyped 'Object'"
+      },
+      {
+        "file": "examples/java/api_spring_messy/src/main/java/com/example/billing/service/BillingManager.java",
+        "line": 33,
+        "symbol": "processBatchBilling",
+        "detail": "Type suppression: @SuppressWarnings(\"unchecked\")"
+      }
+    ],
+    "unscoped_type_ignores": [],
+    "docstring_coverage_pct": 33.3,
+    "annotated_doc_functions_count": 0,
+    "missing_docstrings": [
+      {
+        "file": "examples/java/api_spring_messy/src/main/java/com/example/billing/BillingApp.java",
+        "line": 6,
+        "symbol": "BillingApp",
+        "detail": "Missing public type Javadoc"
+      },
+      {
+        "file": "examples/java/api_spring_messy/src/main/java/com/example/billing/client/GatewayClient.java",
+        "line": 10,
+        "symbol": "GatewayClient",
+        "detail": "Missing public type Javadoc"
+      },
+      {
+        "file": "examples/java/api_spring_messy/src/main/java/com/example/billing/client/GatewayClient.java",
+        "line": 15,
+        "symbol": "sendCharge",
+        "detail": "Missing public method Javadoc"
+      },
+      {
+        "file": "examples/java/api_spring_messy/src/main/java/com/example/billing/controller/BillingController.java",
+        "line": 14,
+        "symbol": "BillingController",
+        "detail": "Missing public type Javadoc"
+      },
+      {
+        "file": "examples/java/api_spring_messy/src/main/java/com/example/billing/controller/BillingController.java",
+        "line": 22,
+        "symbol": "chargeCustomer",
+        "detail": "Missing public method Javadoc"
+      },
+      {
+        "file": "examples/java/api_spring_messy/src/main/java/com/example/billing/controller/BillingController.java",
+        "line": 41,
+        "symbol": "lastChannel",
+        "detail": "Missing public method Javadoc"
+      },
+      {
+        "file": "examples/java/api_spring_messy/src/main/java/com/example/billing/service/BillingManager.java",
+        "line": 14,
+        "symbol": "BillingManager",
+        "detail": "Missing public type Javadoc"
+      },
+      {
+        "file": "examples/java/api_spring_messy/src/main/java/com/example/billing/util/LegacyDateHelper.java",
+        "line": 7,
+        "symbol": "LegacyDateHelper",
+        "detail": "Missing public type Javadoc"
+      },
+      {
+        "file": "examples/java/api_spring_messy/src/main/java/com/example/billing/util/LegacyDateHelper.java",
+        "line": 9,
+        "symbol": "formatTimestamp",
+        "detail": "Missing public method Javadoc"
+      },
+      {
+        "file": "examples/java/api_spring_messy/src/main/java/com/example/billing/util/LegacyDateHelper.java",
+        "line": 14,
+        "symbol": "collectAuditTags",
+        "detail": "Missing public method Javadoc"
+      }
+    ],
+    "empty_docstrings": [],
+    "doc_signature_mismatches": [
+      {
+        "file": "examples/java/api_spring_messy/src/main/java/com/example/billing/service/BillingManager.java",
+        "line": 33,
+        "symbol": "processBatchBilling",
+        "detail": "Javadoc @param mismatch (undocumented params: applyTax, currency, extraContext, forceRetry, items, maxRetries, status; unknown @param tags: obsoleteToken)"
+      }
+    ],
+    "complex_functions": [
+      {
+        "file": "examples/java/api_spring_messy/src/main/java/com/example/billing/service/BillingManager.java",
+        "line": 33,
+        "symbol": "processBatchBilling",
+        "detail": "length=57 lines, branches=13, cognitive=56"
+      }
+    ],
+    "excessive_parameters": [
+      {
+        "file": "examples/java/api_spring_messy/src/main/java/com/example/billing/service/BillingManager.java",
+        "line": 33,
+        "symbol": "processBatchBilling",
+        "detail": "params=8 (> 6, SIG Unit Interfacing)"
+      }
+    ],
+    "global_state_usages": [
+      {
+        "file": "examples/java/api_spring_messy/src/main/java/com/example/billing/service/BillingManager.java",
+        "line": 17,
+        "symbol": "INVOICE_CACHE",
+        "detail": "Mutable non-final static field: INVOICE_CACHE"
+      }
+    ],
+    "bug_risk_idioms": [
+      {
+        "file": "examples/java/api_spring_messy/src/main/java/com/example/billing/client/GatewayClient.java",
+        "line": 20,
+        "symbol": "System.out",
+        "detail": "Direct console output via System.out; use structured logger (SLF4J)"
+      },
+      {
+        "file": "examples/java/api_spring_messy/src/main/java/com/example/billing/service/BillingManager.java",
+        "line": 83,
+        "symbol": "e",
+        "detail": "Empty catch block silently swallows exception"
+      },
+      {
+        "file": "examples/java/api_spring_messy/src/main/java/com/example/billing/service/BillingManager.java",
+        "line": 52,
+        "symbol": "status == \"PAID\"",
+        "detail": "Reference equality (== / !=) with String literal; use .equals()"
+      },
+      {
+        "file": "examples/java/api_spring_messy/src/main/java/com/example/billing/service/BillingManager.java",
+        "line": 55,
+        "symbol": "currency == \"USD\"",
+        "detail": "Reference equality (== / !=) with String literal; use .equals()"
+      },
+      {
+        "file": "examples/java/api_spring_messy/src/main/java/com/example/billing/service/BillingManager.java",
+        "line": 57,
+        "symbol": "currency == \"JPY\"",
+        "detail": "Reference equality (== / !=) with String literal; use .equals()"
+      },
+      {
+        "file": "examples/java/api_spring_messy/src/main/java/com/example/billing/service/BillingManager.java",
+        "line": 53,
+        "symbol": "System.out",
+        "detail": "Direct console output via System.out; use structured logger (SLF4J)"
+      },
+      {
+        "file": "examples/java/api_spring_messy/src/main/java/com/example/billing/service/BillingManager.java",
+        "line": 93,
+        "symbol": "System.out",
+        "detail": "Direct console output via System.out; use structured logger (SLF4J)"
+      }
+    ],
+    "internal_import_graph": {
+      "com.example.billing.BillingApp": [],
+      "com.example.billing.client.GatewayClient": [],
+      "com.example.billing.controller.BillingController": [
+        "com.example.billing.model.InvoiceRecord",
+        "com.example.billing.service.BillingManager"
+      ],
+      "com.example.billing.model.InvoiceRecord": [],
+      "com.example.billing.service.BillingManager": [
+        "com.example.billing.client.GatewayClient",
+        "com.example.billing.controller.BillingController",
+        "com.example.billing.model.InvoiceRecord",
+        "com.example.billing.util.LegacyDateHelper"
+      ],
+      "com.example.billing.util.LegacyDateHelper": []
+    },
+    "circular_dependencies": [
+      [
+        "com.example.billing.controller.BillingController",
+        "com.example.billing.service.BillingManager",
+        "com.example.billing.controller.BillingController"
+      ]
+    ],
+    "type_checking_cycles": [],
+    "unused_dependencies": [],
+    "undeclared_dependencies": [
+      {
+        "file": "examples/java/api_spring_messy/src/main/java/com/example/billing/service/BillingManager.java",
+        "line": 12,
+        "symbol": "org.springframework.transaction.annotation.Transactional",
+        "detail": "Spring transaction API imported without 'spring-tx' or data/jdbc starter in manifest"
+      }
+    ],
+    "boundary_violations": [],
+    "test_functions_count": 1,
+    "module_test_coverage_pct": 33.3,
+    "assertion_free_tests": [
+      {
+        "file": "examples/java/api_spring_messy/src/test/java/com/example/billing/BillingManagerTest.java",
+        "line": 8,
+        "symbol": "testSmokeRun",
+        "detail": "JUnit test method 'testSmokeRun' has no assertion or verification call"
+      }
+    ],
+    "test_harness_notes": [],
+    "framework_issues": [
+      {
+        "file": "examples/java/api_spring_messy/src/main/java/com/example/billing/controller/BillingController.java",
+        "line": 17,
+        "symbol": "billingManager",
+        "detail": "Field injection (@Autowired/@Inject) hinders testability; use constructor injection"
+      },
+      {
+        "file": "examples/java/api_spring_messy/src/main/java/com/example/billing/service/BillingManager.java",
+        "line": 19,
+        "symbol": "gatewayClient",
+        "detail": "Field injection (@Autowired/@Inject) hinders testability; use constructor injection"
+      },
+      {
+        "file": "examples/java/api_spring_messy/src/main/java/com/example/billing/service/BillingManager.java",
+        "line": 22,
+        "symbol": "circularController",
+        "detail": "Field injection (@Autowired/@Inject) hinders testability; use constructor injection"
+      }
+    ],
+    "modernization_hints": [
+      {
+        "file": "examples/java/api_spring_messy/src/main/java/com/example/billing/controller/BillingController.java",
+        "line": 22,
+        "symbol": "chargeCustomer",
+        "detail": "Method-level @RequestMapping; prefer @GetMapping/@PostMapping/@PutMapping"
+      },
+      {
+        "file": "examples/java/api_spring_messy/src/main/java/com/example/billing/util/LegacyDateHelper.java",
+        "line": 9,
+        "symbol": "Date",
+        "detail": "Legacy java.util.Date usage; prefer java.time (Instant / LocalDate / ZonedDateTime)"
+      },
+      {
+        "file": "examples/java/api_spring_messy/src/main/java/com/example/billing/util/LegacyDateHelper.java",
+        "line": 10,
+        "symbol": "SimpleDateFormat",
+        "detail": "Mutable non-thread-safe SimpleDateFormat; prefer java.time.format.DateTimeFormatter"
+      },
+      {
+        "file": "examples/java/api_spring_messy/src/main/java/com/example/billing/util/LegacyDateHelper.java",
+        "line": 14,
+        "symbol": "Vector",
+        "detail": "Legacy synchronized Vector; prefer ArrayList or CopyOnWriteArrayList"
+      },
+      {
+        "file": "examples/java/api_spring_messy/src/main/java/com/example/billing/util/LegacyDateHelper.java",
+        "line": 15,
+        "symbol": "Vector",
+        "detail": "Legacy synchronized Vector; prefer ArrayList or CopyOnWriteArrayList"
+      },
+      {
+        "file": "examples/java/api_spring_messy/src/main/java/com/example/billing/util/LegacyDateHelper.java",
+        "line": 16,
+        "symbol": "Date",
+        "detail": "Legacy java.util.Date usage; prefer java.time (Instant / LocalDate / ZonedDateTime)"
+      }
+    ],
+    "language_version_mismatches": [
+      {
+        "file": "examples/java/api_spring_messy/src/main/java/com/example/billing/client/GatewayClient.java",
+        "line": 4,
+        "symbol": "java.net.http.HttpResponse",
+        "detail": "Java 11+ 'java.net.http' API imported while declared target is Java 1.8"
+      }
+    ],
+    "missing_io_timeouts": [
+      {
+        "file": "examples/java/api_spring_messy/src/main/java/com/example/billing/client/GatewayClient.java",
+        "line": 22,
+        "symbol": "HttpClient.newHttpClient",
+        "detail": "Default HttpClient.newHttpClient() has no connectTimeout — use newBuilder() (SRE PRR)"
+      }
+    ],
+    "scattered_env_access": [
+      {
+        "file": "examples/java/api_spring_messy/src/main/java/com/example/billing/client/GatewayClient.java",
+        "line": 16,
+        "symbol": "System.getenv",
+        "detail": "Direct System.getenv() in 'GatewayClient' — centralize via @ConfigurationProperties or typed config (12-Factor III)"
+      }
+    ],
+    "unstructured_logging": [
+      {
+        "file": "examples/java/api_spring_messy/src/main/java/com/example/billing/client/GatewayClient.java",
+        "line": 20,
+        "symbol": "System.out",
+        "detail": "Unstructured System.out output — route through SLF4J logger (12-Factor XI)"
+      },
+      {
+        "file": "examples/java/api_spring_messy/src/main/java/com/example/billing/client/GatewayClient.java",
+        "line": 32,
+        "symbol": "printStackTrace",
+        "detail": "Raw printStackTrace() writes unstructured stderr — log exception via SLF4J"
+      },
+      {
+        "file": "examples/java/api_spring_messy/src/main/java/com/example/billing/service/BillingManager.java",
+        "line": 53,
+        "symbol": "System.out",
+        "detail": "Unstructured System.out output — route through SLF4J logger (12-Factor XI)"
+      },
+      {
+        "file": "examples/java/api_spring_messy/src/main/java/com/example/billing/service/BillingManager.java",
+        "line": 93,
+        "symbol": "System.out",
+        "detail": "Unstructured System.out output — route through SLF4J logger (12-Factor XI)"
+      }
+    ],
+    "hardcoded_secrets": [
+      {
+        "file": "examples/java/api_spring_messy/src/main/java/com/example/billing/client/GatewayClient.java",
+        "line": 13,
+        "symbol": "GATEWAY_SECRET",
+        "detail": "Hardcoded secret literal assigned to 'GATEWAY_SECRET' (OWASP ASVS)"
+      }
+    ],
+    "dangerous_sinks": [],
+    "api_endpoints": [
+      {
+        "http_method": "ANY",
+        "path": "/charge",
+        "handler": "BillingController.chargeCustomer",
+        "file": "examples/java/api_spring_messy/src/main/java/com/example/billing/controller/BillingController.java",
+        "line": 22,
+        "has_auth_hint": false,
+        "auth_mechanisms": []
+      }
+    ],
+    "opt_out_counts": {}
+  },
+  "runtime_facts": {
+    "status": "failed",
+    "container_engine": "docker",
+    "engine_available": true,
+    "skip_reason": "",
+    "language": "java",
+    "selected_dockerfile_template": "java/maven.dockerfile",
+    "harness_dockerfile_path": ".pni/dockerfiles/examples/java/api_spring_messy/Dockerfile",
+    "build_args": {
+      "JAVA_VERSION": "8"
+    },
+    "artifacts_dir": ".pni/cache/java_api_spring_messy/runtime",
+    "project_dockerfile_build": {
+      "attempted": true,
+      "status": "failed",
+      "dockerfile_used": "examples/java/api_spring_messy/Dockerfile",
+      "duration_sec": 1.21,
+      "exit_code": 1,
+      "error_tail": [
+        "#0 building with \"default\" instance using docker driver",
+        "#1 [internal] load build definition from Dockerfile",
+        "#1 transferring dockerfile: 127B done",
+        "#1 DONE 0.0s",
+        "#2 [internal] load metadata for docker.io/library/openjdk:latest",
+        "#2 ERROR: docker.io/library/openjdk:latest: not found",
+        "------",
+        " > [internal] load metadata for docker.io/library/openjdk:latest:",
+        "------",
+        "Dockerfile:1",
+        "--------------------",
+        "   1 | >>> FROM openjdk:latest",
+        "   2 |     WORKDIR /app",
+        "   3 |     COPY . .",
+        "--------------------",
+        "ERROR: failed to build: failed to solve: openjdk:latest: failed to resolve source metadata for docker.io/library/openjdk:latest: docker.io/library/openjdk:latest: not found"
+      ]
+    },
+    "harness_build": {
+      "attempted": true,
+      "status": "failed",
+      "dockerfile_used": ".pni/dockerfiles/examples/java/api_spring_messy/Dockerfile",
+      "duration_sec": 23.98,
+      "exit_code": 1,
+      "error_tail": [
+        "#8 ERROR: process \"/bin/sh -c mvn -B -Dmaven.repo.local=/m2repo       org.jacoco:jacoco-maven-plugin:${JACOCO_VERSION}:prepare-agent       test       -DfailIfNoTests=false       -Dmaven.test.failure.ignore=true       org.jacoco:jacoco-maven-plugin:${JACOCO_VERSION}:report       dependency:build-classpath -Dmdep.outputFile=/m2repo/runtime_cp.txt     && rm -rf target/surefire-reports target/site target/jacoco.exec     && chown -R pni:pni /workspace /m2repo     && chmod -R a+rwX /workspace /m2repo /out\" did not complete successfully: exit code: 1",
+        "------",
+        " > [5/5] RUN mvn -B -Dmaven.repo.local=/m2repo       org.jacoco:jacoco-maven-plugin:0.8.12:prepare-agent       test       -DfailIfNoTests=false       -Dmaven.test.failure.ignore=true       org.jacoco:jacoco-maven-plugin:0.8.12:report       dependency:build-classpath -Dmdep.outputFile=/m2repo/runtime_cp.txt     && rm -rf target/surefire-reports target/site target/jacoco.exec     && chown -R pni:pni /workspace /m2repo     && chmod -R a+rwX /workspace /m2repo /out:",
+        "9.861 [ERROR]   bad class file: /m2repo/org/springframework/boot/spring-boot/4.2.0/spring-boot-4.2.0.jar(org/springframework/boot/SpringApplication.class)",
+        "9.861 [ERROR]     class file has wrong version 61.0, should be 52.0",
+        "9.861 [ERROR]     Please remove or make sure it appears in the correct subdirectory of the classpath.",
+        "9.861 [ERROR] -> [Help 1]",
+        "9.861 [ERROR]",
+        "9.861 [ERROR] To see the full stack trace of the errors, re-run Maven with the -e switch.",
+        "9.861 [ERROR] Re-run Maven using the -X switch to enable full debug logging.",
+        "9.861 [ERROR]",
+        "9.861 [ERROR] For more information about the errors and possible solutions, please read the following articles:",
+        "9.861 [ERROR] [Help 1] http://cwiki.apache.org/confluence/display/MAVEN/MojoFailureException",
+        "------",
+        "Dockerfile:16",
+        "--------------------",
+        "  15 |",
+        "  16 | >>> RUN mvn -B -Dmaven.repo.local=/m2repo \\",
+        "  17 | >>>       org.jacoco:jacoco-maven-plugin:${JACOCO_VERSION}:prepare-agent \\",
+        "  18 | >>>       test \\",
+        "  19 | >>>       -DfailIfNoTests=false \\",
+        "  20 | >>>       -Dmaven.test.failure.ignore=true \\",
+        "  21 | >>>       org.jacoco:jacoco-maven-plugin:${JACOCO_VERSION}:report \\",
+        "  22 | >>>       dependency:build-classpath -Dmdep.outputFile=/m2repo/runtime_cp.txt \\",
+        "  23 | >>>     && rm -rf target/surefire-reports target/site target/jacoco.exec \\",
+        "  24 | >>>     && chown -R pni:pni /workspace /m2repo \\",
+        "  25 | >>>     && chmod -R a+rwX /workspace /m2repo /out",
+        "  26 |",
+        "--------------------",
+        "ERROR: failed to build: failed to solve: process \"/bin/sh -c mvn -B -Dmaven.repo.local=/m2repo       org.jacoco:jacoco-maven-plugin:${JACOCO_VERSION}:prepare-agent       test       -DfailIfNoTests=false       -Dmaven.test.failure.ignore=true       org.jacoco:jacoco-maven-plugin:${JACOCO_VERSION}:report       dependency:build-classpath -Dmdep.outputFile=/m2repo/runtime_cp.txt     && rm -rf target/surefire-reports target/site target/jacoco.exec     && chown -R pni:pni /workspace /m2repo     && chmod -R a+rwX /workspace /m2repo /out\" did not complete successfully: exit code: 1"
+      ]
+    },
+    "test_execution": {
+      "attempted": false,
+      "status": "blocked",
+      "command": "",
+      "duration_sec": 0.0,
+      "exit_code": null,
+      "total_tests": 0,
+      "passed_tests": 0,
+      "failed_tests": 0,
+      "error_tests": 0,
+      "skipped_tests": 0,
+      "failures": [],
+      "log_tail": []
+    },
+    "coverage": {
+      "measured": false,
+      "tool": "",
+      "line_coverage_pct": null,
+      "branch_coverage_pct": null,
+      "covered_lines": 0,
+      "total_statements": 0,
+      "lowest_covered_modules": []
+    },
+    "smoke_check": {
+      "attempted": false,
+      "archetype": "web_api",
+      "status": "blocked",
+      "command": "",
+      "duration_sec": 0.0,
+      "exit_code": null,
+      "http_status": null,
+      "probed_endpoint": null,
+      "failure_kind": "none",
+      "detail": "Blocked by harness build failure",
+      "log_tail": []
+    }
+  },
+  "security_facts": {
+    "status": "failed",
+    "scanner": "trivy",
+    "container_engine": "docker",
+    "engine_available": true,
+    "skip_reason": "",
+    "trivy_image": "ghcr.io/aquasecurity/trivy:0.69.3",
+    "scanned_filesystem": true,
+    "scanned_resolved_image": false,
+    "resolved_image_source": "",
+    "artifacts_dir": ".pni/cache/java_api_spring_messy/security",
+    "vuln_counts": {
+      "critical": 1,
+      "high": 0,
+      "medium": 0,
+      "low": 0,
+      "total": 1
+    },
+    "app_vuln_counts": {
+      "critical": 1,
+      "high": 0,
+      "medium": 0,
+      "low": 0,
+      "total": 1
+    },
+    "core_app_vuln_counts": {
+      "critical": 1,
+      "high": 0,
+      "medium": 0,
+      "low": 0,
+      "total": 1
+    },
+    "dev_app_vuln_counts": {
+      "critical": 0,
+      "high": 0,
+      "medium": 0,
+      "low": 0,
+      "total": 0
+    },
+    "os_vuln_counts": {
+      "critical": 0,
+      "high": 0,
+      "medium": 0,
+      "low": 0,
+      "total": 0
+    },
+    "harness_os_vuln_counts": {
+      "critical": 0,
+      "high": 0,
+      "medium": 0,
+      "low": 0,
+      "total": 0
+    },
+    "vulnerabilities": [
+      {
+        "vuln_id": "CVE-2022-22965",
+        "pkg_name": "org.springframework.boot:spring-boot-starter-web",
+        "pkg_type": "pom",
+        "installed_version": "LATEST",
+        "fixed_version": "2.5.12, 2.6.6",
+        "severity": "CRITICAL",
+        "scope": "runtime_core",
+        "title": "spring-framework: RCE via Data Binding on JDK 9+",
+        "target": "pom.xml",
+        "cvss_score": 9.8,
+        "is_unpinned_specifier": true,
+        "version_resolution_note": "Unpinned symbolic version in manifest; static SCA evaluates full historical CVE range until locked"
+      }
+    ],
+    "app_vulnerabilities": [
+      {
+        "vuln_id": "CVE-2022-22965",
+        "pkg_name": "org.springframework.boot:spring-boot-starter-web",
+        "pkg_type": "pom",
+        "installed_version": "LATEST",
+        "fixed_version": "2.5.12, 2.6.6",
+        "severity": "CRITICAL",
+        "scope": "runtime_core",
+        "title": "spring-framework: RCE via Data Binding on JDK 9+",
+        "target": "pom.xml",
+        "cvss_score": 9.8,
+        "is_unpinned_specifier": true,
+        "version_resolution_note": "Unpinned symbolic version in manifest; static SCA evaluates full historical CVE range until locked"
+      }
+    ],
+    "os_vulnerabilities": [],
+    "misconfigurations": [
+      {
+        "check_id": "DS-0002",
+        "severity": "HIGH",
+        "title": "Image user should not be 'root'",
+        "file_path": "Dockerfile",
+        "start_line": null,
+        "message": "Specify at least 1 USER command in Dockerfile with non-root user as argument",
+        "resolution": "Add 'USER <non root user name>' line to the Dockerfile"
+      },
+      {
+        "check_id": "DS-0001",
+        "severity": "MEDIUM",
+        "title": "':latest' tag used",
+        "file_path": "Dockerfile",
+        "start_line": 1,
+        "message": "Specify a tag in the 'FROM' statement for image 'openjdk'",
+        "resolution": "Add a tag to the image in the 'FROM' statement"
+      },
+      {
+        "check_id": "DS-0026",
+        "severity": "LOW",
+        "title": "No HEALTHCHECK defined",
+        "file_path": "Dockerfile",
+        "start_line": null,
+        "message": "Add HEALTHCHECK instruction in your Dockerfile",
+        "resolution": "Add HEALTHCHECK instruction in Dockerfile"
+      }
+    ],
+    "secrets": [],
+    "opt_out_counts": {}
+  },
+  "pentest_facts": {
+    "status": "error",
+    "container_engine": "docker",
+    "engine_available": true,
+    "skip_reason": "",
+    "pentests_dir": ".pni/pentests/examples/java/api_spring_messy",
+    "materialized_files": [
+      ".pni/pentests/examples/java/api_spring_messy/conftest.py",
+      ".pni/pentests/examples/java/api_spring_messy/test_app_probes.py",
+      ".pni/pentests/examples/java/api_spring_messy/test_baseline_http.py",
+      ".pni/pentests/examples/java/api_spring_messy/test_target_surface.py"
+    ],
+    "target_base_url": "",
+    "server_booted": false,
+    "boot_failure_reason": "Container build failed: ERROR: failed to build: failed to solve: process \"/bin/sh -c mvn -B -Dmaven.repo.local=/m2repo       org.jacoco:jacoco-maven-plugin:${JACOCO_VERSION}:prepare-agent       test       -DfailIfNoTests=false       -Dmaven.test.failure.ignore=tru",
+    "duration_sec": 25.31,
+    "artifacts_dir": ".pni/cache/java_api_spring_messy/pentest",
+    "probe_summary": {
+      "total_probes": 0,
+      "passed_probes": 0,
+      "failed_probes": 0,
+      "skipped_probes": 0,
+      "error_probes": 0
+    },
+    "findings": []
+  },
+  "migration_facts": null,
+  "progress_facts": null,
+  "architecture_record": {
+    "workflow_id": "java_api_spring_messy",
+    "workflow_run_id": "wf-8177454c",
+    "recorded_at": "2026-11-22T11:27:46.672357+00:00",
+    "target_root": "examples/java/api_spring_messy",
+    "system_profile": {
+      "system_purpose": "legacy-billing is a Java 8 / Spring Boot web API that accepts HTTP billing requests on /charge, computes invoice totals with tax rules, invokes an external payment gateway for retries, caches billed totals in a static HashMap, and prints audit trails to stdout.",
+      "domain_context": "Customer invoice charging, multi-currency tax calculation (USD/JPY), payment gateway retry integration, and ledger audit logging.",
+      "runtime_types": [
+        "web_api"
+      ],
+      "tech_stack": [
+        "Java 1.8 (pom.xml target, mismatched with Java 11 java.net.http usage)",
+        "Spring Boot Web Starter (unpinned LATEST in pom.xml)",
+        "javax.servlet-api 4.0.1",
+        "JUnit 4.13.2",
+        "Maven (no wrapper)"
+      ],
+      "external_integrations": [
+        "External payment gateway HTTP POST endpoint read via System.getenv('LEGACY_PAYMENT_URL') (default https://billing.example.invalid/charge)"
+      ]
+    },
+    "structure_map": {
+      "architecture_pattern": "Cyclic Legacy Spring Boot Layered Monolith with Shared Mutable Global/Singleton State",
+      "layers": [
+        {
+          "name": "Bootstrap Layer",
+          "responsibility": "Spring Boot application entrypoint.",
+          "paths": [
+            "src/main/java/com/example/billing/BillingApp.java"
+          ],
+          "allowed_dependencies": [
+            "Controller Layer",
+            "Service Layer",
+            "Client Layer"
+          ]
+        },
+        {
+          "name": "Controller Layer",
+          "responsibility": "HTTP /charge intake using raw Map payloads, @Autowired field injection, and mutable singleton state.",
+          "paths": [
+            "src/main/java/com/example/billing/controller/BillingController.java"
+          ],
+          "allowed_dependencies": [
+            "Service Layer",
+            "Model Layer"
+          ]
+        },
+        {
+          "name": "Service Layer",
+          "responsibility": "Batch billing calculation, tax rules, retry orchestration, static INVOICE_CACHE, and audit logging (improperly depends upward on BillingController).",
+          "paths": [
+            "src/main/java/com/example/billing/service/BillingManager.java"
+          ],
+          "allowed_dependencies": [
+            "Model Layer",
+            "Client Layer",
+            "Utility Layer"
+          ]
+        },
+        {
+          "name": "Model & Utility Layer",
+          "responsibility": "Immutable InvoiceRecord DTO and legacy date/tag helper using SimpleDateFormat and Vector.",
+          "paths": [
+            "src/main/java/com/example/billing/model/InvoiceRecord.java",
+            "src/main/java/com/example/billing/util/LegacyDateHelper.java"
+          ],
+          "allowed_dependencies": []
+        },
+        {
+          "name": "External Client Layer",
+          "responsibility": "Outbound payment gateway HTTP POST client using Java 11 HttpClient without timeouts and hardcoded GATEWAY_SECRET.",
+          "paths": [
+            "src/main/java/com/example/billing/client/GatewayClient.java"
+          ],
+          "allowed_dependencies": []
+        }
+      ],
+      "modules": [
+        {
+          "path": "src/main/java/com/example/billing/controller/BillingController.java",
+          "role": "REST controller exposing ANY /charge with raw Map and mutable 'channel' field",
+          "key_symbols": [
+            "BillingController",
+            "chargeCustomer",
+            "lastChannel"
+          ],
+          "depends_on": [
+            "src/main/java/com/example/billing/service/BillingManager.java",
+            "src/main/java/com/example/billing/model/InvoiceRecord.java"
+          ],
+          "health_note": "Part of runtime cycle with BillingManager; mutable singleton field race condition."
+        },
+        {
+          "path": "src/main/java/com/example/billing/service/BillingManager.java",
+          "role": "Core billing god-service with static INVOICE_CACHE and circular controller injection",
+          "key_symbols": [
+            "BillingManager",
+            "INVOICE_CACHE",
+            "processBatchBilling"
+          ],
+          "depends_on": [
+            "src/main/java/com/example/billing/controller/BillingController.java",
+            "src/main/java/com/example/billing/client/GatewayClient.java",
+            "src/main/java/com/example/billing/model/InvoiceRecord.java",
+            "src/main/java/com/example/billing/util/LegacyDateHelper.java"
+          ],
+          "health_note": "Primary risk hotspot: cognitive=56, 8 params, String ==, empty catch, broken private @Transactional."
+        },
+        {
+          "path": "src/main/java/com/example/billing/client/GatewayClient.java",
+          "role": "Payment gateway HTTP client",
+          "key_symbols": [
+            "GatewayClient",
+            "sendCharge"
+          ],
+          "depends_on": [],
+          "health_note": "Hardcoded secret, Java 11 API on Java 1.8 target, missing timeout, System.getenv."
+        },
+        {
+          "path": "src/main/java/com/example/billing/model/InvoiceRecord.java",
+          "role": "Immutable invoice value object",
+          "key_symbols": [
+            "InvoiceRecord",
+            "getInvoiceId",
+            "getAmountCents"
+          ],
+          "depends_on": [],
+          "health_note": "Cleanest module in repo; 0 AST issues."
+        }
+      ],
+      "boundary_assessment": "Severe boundary violation: BillingManager imports and @Autowired-injects BillingController, creating a runtime cycle (BillingController <-> BillingManager). Mutable static HashMap INVOICE_CACHE and singleton field BillingController.channel violate statelessness and thread safety."
+    },
+    "execution_flow_map": {
+      "entry_points": [
+        "src/main/java/com/example/billing/BillingApp.java:main",
+        "src/main/java/com/example/billing/controller/BillingController.java:chargeCustomer"
+      ],
+      "execution_flows": [
+        {
+          "name": "Customer Charge & Batch Billing Flow",
+          "trigger": "HTTP ANY /charge (unrestricted @RequestMapping)",
+          "steps": [
+            "BillingController.chargeCustomer() overwrites shared singleton field 'channel' with HTTP method and extracts customerId/amountCents from raw Map payload.",
+            "Constructs raw ArrayList containing one InvoiceRecord and calls BillingManager.processBatchBilling() with 8 arguments.",
+            "processBatchBilling() checks status=='PAID' and currency=='USD'/'JPY' via == reference equality to apply 8%/10% tax, or invokes GatewayClient.sendCharge(customerId, 100L) in a retry loop for non-positive amounts.",
+            "Calls private @Transactional saveAuditTrail() (self-invocation bypasses Spring proxy), writes to static raw HashMap INVOICE_CACHE using LegacyDateHelper, optionally reads circularController.lastChannel(), and swallows exceptions in an empty catch block."
+          ],
+          "involved_files": [
+            "src/main/java/com/example/billing/controller/BillingController.java",
+            "src/main/java/com/example/billing/service/BillingManager.java",
+            "src/main/java/com/example/billing/client/GatewayClient.java",
+            "src/main/java/com/example/billing/model/InvoiceRecord.java",
+            "src/main/java/com/example/billing/util/LegacyDateHelper.java"
+          ]
+        }
+      ],
+      "state_and_storage": [
+        "Unsynchronized process-local static raw HashMap BillingManager.INVOICE_CACHE (src/main/java/com/example/billing/service/BillingManager.java:17).",
+        "Mutable singleton controller field BillingController.channel overwritten on every HTTP request (src/main/java/com/example/billing/controller/BillingController.java:20)."
+      ],
+      "error_and_concurrency_model": "Thread-unsafe Servlet container execution: concurrent requests race on BillingController.channel and unsynchronized HashMap INVOICE_CACHE; BillingManager swallows all audit/cache exceptions in an empty catch block (line 83) and GatewayClient prints stack traces to stderr while blocking indefinitely without HTTP timeouts."
+    }
+  },
+  "base_score_result": null,
+  "companion_ast_facts": {}
+}

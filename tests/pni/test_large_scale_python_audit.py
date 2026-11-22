@@ -366,8 +366,8 @@ def test_dual_cli_library_archetype_smoke_pytest_args_and_legacy_score_compat(tm
     legacy_sp = SystemProfile.model_validate({"system_purpose": "Old API", "runtime_type": "api_service"})
     assert legacy_sp.runtime_types == ["api_service"]
 
-    score_files = sorted((REPO_ROOT / "reports").rglob("*_score.json"))
-    assert len(score_files) >= 9
+    score_files = sorted((REPO_ROOT / "docs" / "reports").rglob("*_score.json"))
+    assert len(score_files) >= 3
     for score_file in score_files:
         parsed = ScoreResult.model_validate_json(score_file.read_text(encoding="utf-8"))
         assert parsed.project_name

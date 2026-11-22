@@ -1,7 +1,7 @@
 id: php_wp_plugin_messy
 category: audit
 name: Sample Audit - Vulnerable WordPress Analytics Plugin (member-analytics-portal)
-description: Evaluate examples/php/wp_plugin_messy against WordPress plugin security standards (REST permission_callback, wp_ajax_nopriv, $wpdb->prepare, wp_verify_nonce, current_user_can, esc_html, ABSPATH guards, and PHP 8 typing).
+description: Workflow v2 DAG audit of examples/php/wp_plugin_messy against WordPress plugin security standards (REST permission_callback, wp_ajax_nopriv, $wpdb->prepare, wp_verify_nonce, current_user_can, esc_html, ABSPATH guards, and PHP 8 typing).
 
 targets:
   root: "examples/php/wp_plugin_messy"
@@ -18,36 +18,49 @@ steps:
 
   - id: supply_chain
     uses: supply_chain_audit
+    needs: [repo_and_deps]
 
   - id: ast_and_quality
     uses: php_ast_audit
-
-  - id: arch_recording
-    uses: architecture_analysis
-
-  - id: service_readiness
-    uses: service_readiness_audit
-
-  - id: test_health
-    uses: php_test_audit
+    needs: [repo_and_deps]
 
   - id: runtime_verification
     uses: container_runtime_audit
+    needs: [repo_and_deps]
+    when: "has_runtime_harness"
 
   - id: security_audit
     uses: security_vulnerability_audit
+    needs: [repo_and_deps]
+
+  - id: arch_recording
+    uses: architecture_analysis
+    needs: [ast_and_quality]
+
+  - id: service_readiness
+    uses: service_readiness_audit
+    needs: [ast_and_quality]
+
+  - id: test_health
+    uses: php_test_audit
+    needs: [ast_and_quality]
 
   - id: output_score
     uses: emit_score
+    needs: [supply_chain, arch_recording, service_readiness, test_health, runtime_verification, security_audit]
     with:
-      output_dir: "reports/php"
-      target: "wp_plugin_messy"
+      output_dir: "docs/reports/php_wp_plugin_messy"
+      target: "php_wp_plugin_messy"
 
   - id: create_report
     uses: write_drawlib_report
+    needs: [output_score]
     with:
-      src_dir: "reports_src/php"
-      output_dir: "reports/php"
-      target: "wp_plugin_messy"
-      lang: "ja"
+      src_dir: "docs_src/reports/php_wp_plugin_messy"
+      output_dir: "docs/reports/php_wp_plugin_messy"
+      target: "php_wp_plugin_messy"
+      lang: "en,ja"
       style: "google"
+      formats:
+        - "pdf"
+        - "html"

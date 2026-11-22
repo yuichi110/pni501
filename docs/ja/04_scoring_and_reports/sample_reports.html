@@ -1,0 +1,627 @@
+<!--
+ Copyright (c) 2026 Yuichi Ito (yuichi@yuichi.com)
+
+ This software is licensed under the Apache License, Version 2.0.
+ For more information, please visit: https://github.com/yuichi110/drawlib
+
+ This software is provided "as is", without warranty of any kind,
+ express or implied, including but not limited to the warranties of
+ merchantability, fitness for a particular purpose and noninfringement.
+-->
+<!DOCTYPE html>
+<html lang="ja" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>サンプルレポートギャラリー (Workflow v2 実測公開)</title>
+    <script>
+        (function() {
+            const saved = localStorage.getItem('drawlib-theme');
+            if (saved === 'dark' || (!saved && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                document.documentElement.setAttribute('data-theme', 'dark');
+            } else {
+                document.documentElement.setAttribute('data-theme', 'light');
+            }
+        })();
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+    
+    
+    <link rel="alternate" hreflang="en" href="https://www.pni501.com/en/04_scoring_and_reports/sample_reports.html">
+    
+    <link rel="alternate" hreflang="ja" href="https://www.pni501.com/ja/04_scoring_and_reports/sample_reports.html">
+    
+    <link rel="alternate" hreflang="x-default" href="https://www.pni501.com/en/04_scoring_and_reports/sample_reports.html">
+    
+    
+    
+    <meta name="description" content="PNI501 Workflow v2 を examples/ 配下の実リポジトリ群に対してエンドツーエンド実行し生成した、日英バイリンガル（English / 日本語）HTML・A4 ベクター PDF レポートの実例集です。すべての公開レポートは、決定論的 AST 解析・隔離 Docker…">
+    <link rel="canonical" href="https://www.pni501.com/ja/04_scoring_and_reports/sample_reports.html">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="pni501 ドキュメント">
+    <meta property="og:title" content="サンプルレポートギャラリー (Workflow v2 実測公開) — pni501 ドキュメント">
+    <meta property="og:description" content="PNI501 Workflow v2 を examples/ 配下の実リポジトリ群に対してエンドツーエンド実行し生成した、日英バイリンガル（English / 日本語）HTML・A4 ベクター PDF レポートの実例集です。すべての公開レポートは、決定論的 AST 解析・隔離 Docker…">
+    <meta property="og:url" content="https://www.pni501.com/ja/04_scoring_and_reports/sample_reports.html">
+    <meta property="og:image" content="https://www.pni501.com/_assets/logo.png">
+    <meta property="og:locale" content="ja_JP">
+    <meta property="og:locale:alternate" content="en_US">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="サンプルレポートギャラリー (Workflow v2 実測公開) — pni501 ドキュメント">
+    <meta name="twitter:description" content="PNI501 Workflow v2 を examples/ 配下の実リポジトリ群に対してエンドツーエンド実行し生成した、日英バイリンガル（English / 日本語）HTML・A4 ベクター PDF レポートの実例集です。すべての公開レポートは、決定論的 AST 解析・隔離 Docker…">
+    <meta name="twitter:image" content="https://www.pni501.com/_assets/logo.png">
+    
+    
+    <link rel="icon" type="image/png" href="../../_assets/favicon.png">
+    
+    
+    <link rel="stylesheet" href="../style.css">
+    
+    
+</head>
+<body>
+    
+    <div class="doc-layout">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <a href="../index.html" class="sidebar-brand" aria-label="pni501 ドキュメント">
+                    
+                    <img src="../../_assets/logo.png" alt="pni501 ドキュメント" class="sidebar-logo sidebar-logo-light">
+                    <img src="../../_assets/logo_dark.png" alt="pni501 ドキュメント" class="sidebar-logo sidebar-logo-dark">
+                    <span class="sidebar-brand-text">PNI501</span>
+                    
+                </a>
+                <div class="sidebar-header-actions">
+                    <button type="button" id="theme-toggle" class="theme-toggle-btn" aria-label="Toggle theme">
+                        <svg class="icon-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+                        <svg class="icon-moon" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+                    </button>
+                    <button type="button" id="menu-toggle" class="menu-toggle-btn" aria-label="Toggle navigation" aria-expanded="false">
+                        <svg class="icon-hamburger" viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+                        <svg class="icon-close" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                    </button>
+                </div>
+            </div>
+            <div class="sidebar-subbar">
+                
+                <a href="../01_getting_started/release_notes.html" class="sidebar-version-badge" title="View Release Notes">
+                    <span class="sidebar-version-dot" aria-hidden="true"></span>
+                    <span class="sidebar-version-text">v0.2.0</span>
+                </a>
+                <a href="https://github.com/yuichi110/pni501" target="_blank" rel="noopener noreferrer" class="sidebar-github-link" aria-label="GitHub Repository" title="GitHub Repository">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg>
+                </a>
+            </div>
+            <div class="sidebar-menu">
+                
+                    
+                        
+                        <ul class="nav-list">
+                            
+                            <li class="nav-item ">
+                                <a href="../index.html" >概要 (Overview)</a>
+                            </li>
+                            
+                        </ul>
+                    
+                        
+                        <div class="sidebar-heading">1. はじめに (Getting Started)</div>
+                        
+                        <ul class="nav-list">
+                            
+                            <li class="nav-item ">
+                                <a href="../01_getting_started/concepts.html" >背景とコアコンセプト</a>
+                            </li>
+                            
+                            <li class="nav-item ">
+                                <a href="../01_getting_started/quickstart.html" >クイックスタートガイド</a>
+                            </li>
+                            
+                            <li class="nav-item ">
+                                <a href="../01_getting_started/use_cases.html" >3つの主要ユースケース</a>
+                            </li>
+                            
+                            <li class="nav-item ">
+                                <a href="../01_getting_started/release_notes.html" >リリースノート</a>
+                            </li>
+                            
+                        </ul>
+                    
+                        
+                        <div class="sidebar-heading">2. アーキテクチャ (Architecture)</div>
+                        
+                        <ul class="nav-list">
+                            
+                            <li class="nav-item ">
+                                <a href="../02_architecture/domain_architecture.html" >ドメイン構造と3層カスケード</a>
+                            </li>
+                            
+                            <li class="nav-item ">
+                                <a href="../02_architecture/stateful_engine.html" >ステートフル Pull-Push エンジン</a>
+                            </li>
+                            
+                        </ul>
+                    
+                        
+                        <div class="sidebar-heading">3. ワークフローとアクション</div>
+                        
+                        <ul class="nav-list">
+                            
+                            <li class="nav-item ">
+                                <a href="../03_workflows_and_actions/workflows_guide.html" >ワークフローと Pre-Flight ゲート</a>
+                            </li>
+                            
+                            <li class="nav-item ">
+                                <a href="../03_workflows_and_actions/actions_pipeline.html" >182 アクションと 16 プリミティブ</a>
+                            </li>
+                            
+                            <li class="nav-item ">
+                                <a href="../03_workflows_and_actions/analyzers_and_pentest.html" >決定論的解析器とペネトレーションテスト</a>
+                            </li>
+                            
+                        </ul>
+                    
+                        
+                        <div class="sidebar-heading">4. スコアリングとレポート</div>
+                        
+                        <ul class="nav-list">
+                            
+                            <li class="nav-item ">
+                                <a href="scoring_model.html" >7軸品質スコアリングモデル</a>
+                            </li>
+                            
+                            <li class="nav-item ">
+                                <a href="drawlib_reporter.html" >Drawlib ビジュアルレポーター</a>
+                            </li>
+                            
+                            <li class="nav-item active">
+                                <a href="sample_reports.html" >サンプルレポートギャラリー</a>
+                            </li>
+                            
+                        </ul>
+                    
+                        
+                        <div class="sidebar-heading">5. 対応言語とリファレンス</div>
+                        
+                        <ul class="nav-list">
+                            
+                            <li class="nav-item ">
+                                <a href="../05_languages_and_reference/supported_languages.html" >対応55言語マトリクス</a>
+                            </li>
+                            
+                            <li class="nav-item ">
+                                <a href="../05_languages_and_reference/rules_and_cli.html" >ルール拡張と CLI リファレンス</a>
+                            </li>
+                            
+                        </ul>
+                    
+                        
+                        <div class="sidebar-heading">外部リンク (External Links)</div>
+                        
+                        <ul class="nav-list">
+                            
+                            <li class="nav-item ">
+                                <a href="https://github.com/yuichi110/pni501" target="_blank" rel="noopener noreferrer">GitHub リポジトリ<svg class="nav-external-icon" viewBox="0 0 24 24" aria-hidden="true"><line x1="7" y1="17" x2="17" y2="7"></line><polyline points="7 7 17 7 17 17"></polyline></svg></a>
+                            </li>
+                            
+                            <li class="nav-item ">
+                                <a href="https://pypi.org/project/pni501/" target="_blank" rel="noopener noreferrer">PyPI パッケージ<svg class="nav-external-icon" viewBox="0 0 24 24" aria-hidden="true"><line x1="7" y1="17" x2="17" y2="7"></line><polyline points="7 7 17 7 17 17"></polyline></svg></a>
+                            </li>
+                            
+                        </ul>
+                    
+                
+            </div>
+        </aside>
+        <div class="content-wrapper">
+            <header class="top-bar">
+                <div class="breadcrumbs">
+                    <span class="crumb">Docs</span>
+                    <span class="crumb-separator">&raquo;</span>
+                    <span class="crumb active">サンプルレポートギャラリー (Workflow v2 実測公開)</span>
+                </div>
+                
+                <div class="lang-switcher">
+                    <details class="lang-dropdown">
+                        <summary class="lang-dropdown-btn" aria-label="Select language">
+                            <svg class="lang-globe-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+                            <span class="lang-current-label">日本語</span>
+                            <svg class="lang-caret-icon" viewBox="0 0 24 24" aria-hidden="true"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                        </summary>
+                        <div class="lang-dropdown-menu" role="menu">
+                            
+                            <a href="../../en/04_scoring_and_reports/sample_reports.html" class="lang-option" lang="en" hreflang="en" >
+                                <span>English</span>
+                                
+                            </a>
+                            
+                            <a href="sample_reports.html" class="lang-option active" lang="ja" hreflang="ja" aria-current="page">
+                                <span>日本語</span>
+                                
+                                <svg class="lang-check-icon" viewBox="0 0 24 24" aria-hidden="true"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                                
+                            </a>
+                            
+                        </div>
+                    </details>
+                </div>
+                
+            </header>
+            <main class="main-content">
+                <h1>サンプルレポートギャラリー (Workflow v2 実測公開)</h1>
+<p><strong>PNI501 Workflow v2</strong> を <code>examples/</code> 配下の実リポジトリ群に対してエンドツーエンド実行し生成した、<strong>日英バイリンガル（<code>English</code> / <code>日本語</code>）HTML・A4 ベクター PDF レポート</strong>の実例集です。すべての公開レポートは、決定論的 AST 解析・隔離 Docker コンテナ実行検証・Trivy SCA/IaC スキャン・ライブ HTTP DAST ペネトレーションテスト（該当対象）・アクション粒度 <strong>実行監査 DAG</strong>・<strong>7軸 決定論ベースライン vs AI Δ（±10pt）</strong>・ダウンロード可能な <strong>ScoreResult v2.0 JSON / ScoreSummary / SARIF 2.1.0</strong> を備えています。</p>
+<figure class="drawlib-image" style="text-align: center;">
+  <img src="../../images/04_scoring_and_reports/sample_reports/sample_reports_portfolio.png" alt="sample_reports_1" />
+  <figcaption class="drawlib-caption">Python・Java・PHP にわたる PNI501 Workflow v2 公開サンプルレポートポートフォリオ</figcaption>
+</figure>
+<details class="drawlib-code-details">
+<summary>Source Code</summary>
+<pre><code class="language-python"><span class="kn">from</span><span class="w"> </span><span class="nn">drawlib.canvas</span><span class="w"> </span><span class="kn">import</span> <span class="n">save</span><span class="p">,</span> <span class="n">setup</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">drawlib.icons</span><span class="w"> </span><span class="kn">import</span> <span class="n">phosphor</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">drawlib.smartarts</span><span class="w"> </span><span class="kn">import</span> <span class="n">KpiCards</span><span class="p">,</span> <span class="n">Panel</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">drawlib.styles</span><span class="w"> </span><span class="kn">import</span> <span class="n">Styles</span>
+
+<span class="n">setup</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="mi">156</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">84</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">150</span><span class="p">)</span>
+
+<span class="n">outer</span> <span class="o">=</span> <span class="n">Panel</span><span class="p">(</span>
+    <span class="s2">"PNI501 Live Sample Portfolio — Bilingual (EN / JA) HTML + A4 PDF + JSON / SARIF"</span><span class="p">,</span>
+    <span class="n">header_variant</span><span class="o">=</span><span class="s2">"filled"</span><span class="p">,</span>
+    <span class="n">style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">PrimaryNeutral</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">shape_r</span><span class="o">=</span><span class="mf">2.0</span><span class="p">),</span>
+    <span class="n">header_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">PrimaryFlat</span><span class="p">,</span>
+    <span class="n">text_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">WhiteBold</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">text_size</span><span class="o">=</span><span class="mf">12.0</span><span class="p">),</span>
+<span class="p">)</span>
+<span class="n">outer</span><span class="o">.</span><span class="n">draw</span><span class="p">(</span><span class="n">xy</span><span class="o">=</span><span class="p">(</span><span class="mf">3.0</span><span class="p">,</span> <span class="mf">22.0</span><span class="p">),</span> <span class="n">width</span><span class="o">=</span><span class="mf">150.0</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mf">59.0</span><span class="p">)</span>
+
+<span class="n">cards</span> <span class="o">=</span> <span class="n">KpiCards</span><span class="p">(</span>
+    <span class="n">style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">Neutral</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">shape_r</span><span class="o">=</span><span class="mf">1.8</span><span class="p">),</span>
+    <span class="n">metric_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">SuccessBold</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">text_size</span><span class="o">=</span><span class="mf">13.0</span><span class="p">),</span>
+    <span class="n">text_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">DarkBold</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">text_size</span><span class="o">=</span><span class="mf">10.5</span><span class="p">),</span>
+    <span class="n">description_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">Dark</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">text_size</span><span class="o">=</span><span class="mf">9.8</span><span class="p">),</span>
+    <span class="n">accent_position</span><span class="o">=</span><span class="s2">"left_pill"</span><span class="p">,</span>
+    <span class="n">accent_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">SuccessFlat</span><span class="p">,</span>
+    <span class="n">icon_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">SuccessBold</span><span class="p">,</span>
+    <span class="n">spacing</span><span class="o">=</span><span class="mf">3.5</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">cards</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+    <span class="s2">"94 / S"</span><span class="p">,</span>
+    <span class="s2">"order-dispatch (Python FastAPI)"</span><span class="p">,</span>
+    <span class="s2">"Clean 4-layer benchmark: 4/4 tests,</span><span class="se">\n</span><span class="s2">85.2</span><span class="si">% c</span><span class="s2">ov, Trivy + live DAST (15/19)"</span><span class="p">,</span>
+    <span class="n">icon</span><span class="o">=</span><span class="n">phosphor</span><span class="o">.</span><span class="n">check_circle</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">cards</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+    <span class="s2">"66 / C"</span><span class="p">,</span>
+    <span class="s2">"legacy-billing (Java 8 Spring)"</span><span class="p">,</span>
+    <span class="s2">"AST x Docker x Trivy causal proof:</span><span class="se">\n</span><span class="s2">LATEST -&gt; 4.2.0 crash, cycle, secret"</span><span class="p">,</span>
+    <span class="n">accent_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">WarningFlat</span><span class="p">,</span>
+    <span class="n">metric_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">WarningBold</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">text_size</span><span class="o">=</span><span class="mf">13.0</span><span class="p">),</span>
+    <span class="n">icon_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">WarningBold</span><span class="p">,</span>
+    <span class="n">icon</span><span class="o">=</span><span class="n">phosphor</span><span class="o">.</span><span class="n">warning_circle</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">cards</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+    <span class="s2">"Plan"</span><span class="p">,</span>
+    <span class="s2">"Java 8 -&gt; Java 21 Migration"</span><span class="p">,</span>
+    <span class="s2">"based_on chained To-Be Clean Arch,</span><span class="se">\n</span><span class="s2">Wave DAG, Decision Log &amp; PR WBS"</span><span class="p">,</span>
+    <span class="n">accent_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">PrimaryFlat</span><span class="p">,</span>
+    <span class="n">metric_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">PrimaryBold</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">text_size</span><span class="o">=</span><span class="mf">13.0</span><span class="p">),</span>
+    <span class="n">icon_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">PrimaryBold</span><span class="p">,</span>
+    <span class="n">icon</span><span class="o">=</span><span class="n">phosphor</span><span class="o">.</span><span class="n">git_pull_request</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">cards</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+    <span class="s2">"60 / C"</span><span class="p">,</span>
+    <span class="s2">"Member Analytics (WP PHP)"</span><span class="p">,</span>
+    <span class="s2">"Security 30/D: 3x CWE-89 SQLi,</span><span class="se">\n</span><span class="s2">3x CWE-79 XSS, __return_true PII"</span><span class="p">,</span>
+    <span class="n">accent_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">DangerFlat</span><span class="p">,</span>
+    <span class="n">metric_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">DangerBold</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">text_size</span><span class="o">=</span><span class="mf">13.0</span><span class="p">),</span>
+    <span class="n">icon_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">DangerBold</span><span class="p">,</span>
+    <span class="n">icon</span><span class="o">=</span><span class="n">phosphor</span><span class="o">.</span><span class="n">shield_warning</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">cards</span><span class="o">.</span><span class="n">draw</span><span class="p">(</span><span class="n">xy</span><span class="o">=</span><span class="p">(</span><span class="mf">6.5</span><span class="p">,</span> <span class="mf">25.0</span><span class="p">),</span> <span class="n">width</span><span class="o">=</span><span class="mf">143.0</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mf">45.5</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+
+<span class="n">footer</span> <span class="o">=</span> <span class="n">KpiCards</span><span class="p">(</span>
+    <span class="n">style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">Neutral</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">shape_r</span><span class="o">=</span><span class="mf">1.6</span><span class="p">),</span>
+    <span class="n">metric_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">PrimaryBold</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">text_size</span><span class="o">=</span><span class="mf">12.5</span><span class="p">),</span>
+    <span class="n">text_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">DarkBold</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">text_size</span><span class="o">=</span><span class="mf">10.0</span><span class="p">),</span>
+    <span class="n">accent_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">PrimaryFlat</span><span class="p">,</span>
+    <span class="n">accent_position</span><span class="o">=</span><span class="s2">"top_bar"</span><span class="p">,</span>
+    <span class="n">metric_layout</span><span class="o">=</span><span class="s2">"top_stack"</span><span class="p">,</span>
+    <span class="n">spacing</span><span class="o">=</span><span class="mf">3.0</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">footer</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="s2">"3 Languages"</span><span class="p">,</span> <span class="s2">"Python / Java / PHP"</span><span class="p">)</span>
+<span class="n">footer</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="s2">"2 Tracks"</span><span class="p">,</span> <span class="s2">"Health Audit + Migration"</span><span class="p">)</span>
+<span class="n">footer</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="s2">"EN + JA"</span><span class="p">,</span> <span class="s2">"HTML Switcher &amp; A4 PDFs"</span><span class="p">)</span>
+<span class="n">footer</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="s2">"Zero Guess"</span><span class="p">,</span> <span class="s2">"_facts/ + SARIF 2.1.0"</span><span class="p">)</span>
+<span class="n">footer</span><span class="o">.</span><span class="n">draw</span><span class="p">(</span><span class="n">xy</span><span class="o">=</span><span class="p">(</span><span class="mf">3.0</span><span class="p">,</span> <span class="mf">3.0</span><span class="p">),</span> <span class="n">width</span><span class="o">=</span><span class="mf">150.0</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mf">16.5</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+<span class="n">save</span><span class="p">()</span>
+</code></pre>
+</details>
+<hr />
+<h2>1. 公開レポート一覧マトリクス</h2>
+<p>各サンプルレポートは <code>docs/reports/&lt;slug&gt;/</code> 直下に自己完結して出力され、ブラウザで読めるバイリンガル HTML・印刷用 A4 ベクター PDF・機械可読な JSON / SARIF を同一 URL 配下から直接参照できます：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">対象サンプル</th>
+<th style="text-align:left">トラック・技術スタック</th>
+<th style="text-align:left">評価結果</th>
+<th style="text-align:left">インタラクティブ HTML</th>
+<th style="text-align:left">A4 ベクター PDF</th>
+<th style="text-align:left">機械可読アーティファクト</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left"><strong><code>order-dispatch</code></strong> (<code>examples/python/api_fastapi_clean</code>)</td>
+<td style="text-align:left"><strong>健全性監査</strong><br>Python 3.11+ / FastAPI</td>
+<td style="text-align:left"><strong>94 / 100 (Grade S)</strong><br>12/16 ルール PASS</td>
+<td style="text-align:left"><a href="../../reports/py_api_fastapi_clean/ja/index.html">日本語</a> / <a href="../../reports/py_api_fastapi_clean/en/index.html">English</a></td>
+<td style="text-align:left"><a href="../../reports/py_api_fastapi_clean/py_api_fastapi_clean_ja.pdf">PDF (日本語)</a> / <a href="../../reports/py_api_fastapi_clean/py_api_fastapi_clean_en.pdf">PDF (EN)</a></td>
+<td style="text-align:left"><a href="../../reports/py_api_fastapi_clean/py_api_fastapi_clean_score.json">Score JSON</a> · <a href="../../reports/py_api_fastapi_clean/py_api_fastapi_clean_summary.json">Summary</a> · <a href="../../reports/py_api_fastapi_clean/py_api_fastapi_clean_findings.sarif">SARIF</a></td>
+</tr>
+<tr>
+<td style="text-align:left"><strong><code>legacy-billing</code></strong> (<code>examples/java/api_spring_messy</code>)</td>
+<td style="text-align:left"><strong>健全性監査</strong><br>Java 8 / Spring Boot</td>
+<td style="text-align:left"><strong>66 / 100 (Grade C)</strong><br>ビルド破綻 + 19件検出</td>
+<td style="text-align:left"><a href="../../reports/java_api_spring_messy/ja/index.html">日本語</a> / <a href="../../reports/java_api_spring_messy/en/index.html">English</a></td>
+<td style="text-align:left"><a href="../../reports/java_api_spring_messy/java_api_spring_messy_ja.pdf">PDF (日本語)</a> / <a href="../../reports/java_api_spring_messy/java_api_spring_messy_en.pdf">PDF (EN)</a></td>
+<td style="text-align:left"><a href="../../reports/java_api_spring_messy/java_api_spring_messy_score.json">Score JSON</a> · <a href="../../reports/java_api_spring_messy/java_api_spring_messy_summary.json">Summary</a> · <a href="../../reports/java_api_spring_messy/java_api_spring_messy_findings.sarif">SARIF</a></td>
+</tr>
+<tr>
+<td style="text-align:left"><strong><code>legacy-billing</code> 移行計画</strong> (<code>based_on: java_api_spring_messy</code>)</td>
+<td style="text-align:left"><strong>マイグレーション計画</strong><br>Java 21 + Spring Boot 3.4 + Clean Arch</td>
+<td style="text-align:left"><strong>段階的 PR 実行計画</strong><br>4 Wave · Phase 0–4</td>
+<td style="text-align:left"><a href="../../reports/java_api_spring_messy_migration/ja/index.html">日本語</a> / <a href="../../reports/java_api_spring_messy_migration/en/index.html">English</a></td>
+<td style="text-align:left"><a href="../../reports/java_api_spring_messy_migration/java_api_spring_messy_migration_ja.pdf">PDF (日本語)</a> / <a href="../../reports/java_api_spring_messy_migration/java_api_spring_messy_migration_en.pdf">PDF (EN)</a></td>
+<td style="text-align:left"><a href="../../reports/java_api_spring_messy_migration/java_api_spring_messy_migration_plan.json">Migration Plan JSON</a></td>
+</tr>
+<tr>
+<td style="text-align:left"><strong><code>Member Analytics Portal</code></strong> (<code>examples/php/wp_plugin_messy</code>)</td>
+<td style="text-align:left"><strong>健全性監査</strong><br>PHP 7.4 / WordPress プラグイン</td>
+<td style="text-align:left"><strong>60 / 100 (Grade C)</strong><br>Security <strong>30/D</strong> · 5 CWE シンク</td>
+<td style="text-align:left"><a href="../../reports/php_wp_plugin_messy/ja/index.html">日本語</a> / <a href="../../reports/php_wp_plugin_messy/en/index.html">English</a></td>
+<td style="text-align:left"><a href="../../reports/php_wp_plugin_messy/php_wp_plugin_messy_ja.pdf">PDF (日本語)</a> / <a href="../../reports/php_wp_plugin_messy/php_wp_plugin_messy_en.pdf">PDF (EN)</a></td>
+<td style="text-align:left"><a href="../../reports/php_wp_plugin_messy/php_wp_plugin_messy_score.json">Score JSON</a> · <a href="../../reports/php_wp_plugin_messy/php_wp_plugin_messy_summary.json">Summary</a> · <a href="../../reports/php_wp_plugin_messy/php_wp_plugin_messy_findings.sarif">SARIF</a></td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2>2. 各サンプルレポートの見どころ</h2>
+<h3>2.1 <code>order-dispatch</code>（Python FastAPI Clean — Grade S・94/100）</h3>
+<ul>
+<li><strong>クリーンマイクロサービスの基準ベンチマーク</strong>：14ファイル（435 LOC）で型安全性・インポート衛生・Google 形式 Docstring すべて 100%、循環依存ゼロの 4 層非巡回アーキテクチャ（<code>api -&gt; services -&gt; domain + infra</code>）を可視化しています。</li>
+<li><strong>実測 Docker + Trivy + ライブ DAST</strong>：<code>--network=none</code> オフライン単体テスト 4/4 合格（行カバレッジ <code>85.2%</code>・分岐 <code>62.5%</code>・<code>/healthz -&gt; 200</code> 起動確認）、アプリ依存 CRITICAL/HIGH CVE ゼロ、15/19 ライブ DAST プローブ通過の一方で、本番公開前に塞ぐべき <code>CWE-306</code>（未認証 <code>POST /v1/orders</code>）・<code>CWE-200</code>（<code>/openapi.json</code> 公開）・<code>CWE-693</code>（<code>X-Content-Type-Options</code> 欠如）を正確に特定しています。</li>
+<li><strong>AI 誤検知トリアージログ</strong>：ベースイメージ <code>python:3.12.6-slim-bookworm</code> に同梱されたビルド専用ツール <code>pip@24.2</code> の 5 件の CVE を <code>finding_adjustments</code> で根拠付き再分類する Workflow v2 の透明性を実例で示しています。</li>
+</ul>
+<h3>2.2 <code>legacy-billing</code>（Java 8 Spring レガシー — Grade C・66/100）</h3>
+<ul>
+<li><strong>AST × Docker × Trivy の因果相関実証</strong>：<code>pom.xml</code> の未固定 <code>spring-boot-starter-web:LATEST</code> が、実 Maven ビルド時に <code>spring-boot-4.2.0.jar</code>（JDK 17+ バイトコード <code>61.0</code>）を解決して Java <code>1.8</code>（<code>52.0</code>）と衝突クラッシュし、さらに廃止済み <code>openjdk:latest</code> で Dockerfile も失敗、Trivy 静的 SCA では未固定レンジ一致（<code>is_unpinned_specifier=True</code>）により <code>CVE-2022-22965</code> が検出され、結果として JaCoCo・DAST まで連鎖ブロックされる因果を一貫して証明しています。</li>
+<li><strong>ホットスポット対比と ±10pt アンカー</strong>：リスク集中の <code>BillingManager.java</code>（循環 DI・認知複雑度 56・引数 8・静的 <code>INVOICE_CACHE</code>・文字列 <code>==</code> バグ・空 <code>catch</code>・無効な <code>private @Transactional</code>）とクリーンな不変 DTO <code>InvoiceRecord.java</code> のコントラストを描画しています。</li>
+</ul>
+<h3>2.3 <code>legacy-billing</code> マイグレーション実行計画（<code>based_on: java_api_spring_messy</code>）</h3>
+<ul>
+<li><strong>前提監査 <code>based_on</code> 連鎖</strong>：完了済みの <code>java_api_spring_messy</code> 監査レコード（<code>.pni/cache/workflow_state.db</code>）から検証済み As-Is ファクトを自動継承し、ハルシネーションゼロの To-Be 移行計画を合成しています。</li>
+<li><strong>Clean Architecture 移行と PR 粒度 WBS</strong>：Java 21 LTS + Spring Boot 3.4 + PostgreSQL 16（JPA + Flyway）+ Redis 7 + Clean Architecture（<code>domain / port / usecase / adapter</code>）に向けたトポロジカル Wave 分割、Hyrum の法則に基づく意思決定ログ（<code>currency == &quot;USD&quot;</code>・<code>controllerPing</code>・固定 <code>100L</code> リトライ）、Phase 0〜4 の検証ゲート付き PR 計画を提示しています。</li>
+</ul>
+<h3>2.4 <code>Member Analytics Portal</code>（WordPress PHP プラグイン — Grade C・60/100・Security 30/D）</h3>
+<ul>
+<li><strong>WordPress 特化セキュリティ SAST</strong>：PHP 8.2 環境での <code>php -l</code> 構文検査・5フック起動スモークは通る一方、5件の HIGH CWE 危険シンク（<code>wp_users</code> / <code>wp_map_events</code> に対する 3件の <code>CWE-89</code> SQL インジェクションと 2件の <code>CWE-79</code> XSS ＋ ショートコード <code>$_GET</code> XSS）、ハードコード秘密鍵、<code>__return_true</code> による未認証 REST PII 流出、<code>wp_ajax_nopriv</code> 検索、<code>'read'</code> 権限による管理設定改ざん、全4ファイルの <code>ABSPATH</code> ガード欠如、テスト 0 件を網羅的に検出しています。</li>
+</ul>
+<hr />
+<h2>3. 統合公開ポータル構成（<code>docs_src/</code> -&gt; <code>docs/</code>）</h2>
+<p>公式サイト本体と公開サンプルレポートは <code>docs_src/</code> 配下の単一ソースツリーで管理され、GitHub Pages ルート <code>docs/</code> へ一括コンパイル・リンク検査されます：</p>
+<figure class="drawlib-image" style="text-align: center;">
+  <img src="../../images/04_scoring_and_reports/sample_reports/sample_reports_portal_layout.png" alt="sample_reports_2" />
+  <figcaption class="drawlib-caption">公式サイトと公開サンプルレポートの統合パブリッシング構成（docs_src/ -> docs/）</figcaption>
+</figure>
+<details class="drawlib-code-details">
+<summary>Source Code</summary>
+<pre><code class="language-python"><span class="kn">from</span><span class="w"> </span><span class="nn">drawlib.canvas</span><span class="w"> </span><span class="kn">import</span> <span class="n">save</span><span class="p">,</span> <span class="n">setup</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">drawlib.diagrams.architecture</span><span class="w"> </span><span class="kn">import</span> <span class="n">ArchitectureDiagram</span><span class="p">,</span> <span class="n">Node</span><span class="p">,</span> <span class="n">NodeGroup</span><span class="p">,</span> <span class="n">PhosphorIcon</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">drawlib.styles</span><span class="w"> </span><span class="kn">import</span> <span class="n">Styles</span>
+
+<span class="n">setup</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="mi">158</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">74</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">150</span><span class="p">)</span>
+
+<span class="n">diag</span> <span class="o">=</span> <span class="n">ArchitectureDiagram</span><span class="p">(</span>
+    <span class="n">node_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">PrimaryBold</span><span class="p">,</span>
+    <span class="n">node_text_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">DarkBold</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">text_size</span><span class="o">=</span><span class="mf">10.0</span><span class="p">),</span>
+    <span class="n">edge_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">DarkBold</span><span class="p">,</span>
+    <span class="n">edge_text_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">DarkBold</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">text_size</span><span class="o">=</span><span class="mf">9.5</span><span class="p">),</span>
+    <span class="n">node_card_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">WhiteBordered</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">shape_r</span><span class="o">=</span><span class="mf">1.5</span><span class="p">),</span>
+<span class="p">)</span>
+
+<span class="n">g_src</span> <span class="o">=</span> <span class="n">diag</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+    <span class="n">NodeGroup</span><span class="p">(</span>
+        <span class="n">title</span><span class="o">=</span><span class="s2">"1. Source of Truth (docs_src/)"</span><span class="p">,</span>
+        <span class="n">width</span><span class="o">=</span><span class="mf">46.0</span><span class="p">,</span>
+        <span class="n">height</span><span class="o">=</span><span class="mf">66.0</span><span class="p">,</span>
+        <span class="n">style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">Neutral</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">shape_r</span><span class="o">=</span><span class="mf">2.0</span><span class="p">),</span>
+        <span class="n">text_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">DarkBold</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">text_size</span><span class="o">=</span><span class="mf">10.5</span><span class="p">,</span> <span class="n">halign</span><span class="o">=</span><span class="s2">"left"</span><span class="p">,</span> <span class="n">valign</span><span class="o">=</span><span class="s2">"top"</span><span class="p">),</span>
+    <span class="p">),</span>
+    <span class="n">xy</span><span class="o">=</span><span class="p">(</span><span class="mf">3.0</span><span class="p">,</span> <span class="mf">4.0</span><span class="p">),</span>
+<span class="p">)</span>
+<span class="n">n_site_src</span> <span class="o">=</span> <span class="n">g_src</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+    <span class="n">Node</span><span class="p">(</span>
+        <span class="s2">"docs_src/site/</span><span class="se">\n</span><span class="s2">drawlib site (en + ja)"</span><span class="p">,</span>
+        <span class="n">width</span><span class="o">=</span><span class="mf">40.0</span><span class="p">,</span>
+        <span class="n">height</span><span class="o">=</span><span class="mf">18.0</span><span class="p">,</span>
+        <span class="n">icon</span><span class="o">=</span><span class="n">PhosphorIcon</span><span class="o">.</span><span class="n">BOOK_OPEN_TEXT</span><span class="p">,</span>
+        <span class="n">icon_size</span><span class="o">=</span><span class="mf">5.4</span><span class="p">,</span>
+        <span class="n">card_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">PrimaryNeutral</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">shape_r</span><span class="o">=</span><span class="mf">1.5</span><span class="p">),</span>
+    <span class="p">),</span>
+    <span class="n">xy</span><span class="o">=</span><span class="p">(</span><span class="mf">23.0</span><span class="p">,</span> <span class="mf">46.0</span><span class="p">),</span>
+<span class="p">)</span>
+<span class="n">n_rep_src</span> <span class="o">=</span> <span class="n">g_src</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+    <span class="n">Node</span><span class="p">(</span>
+        <span class="s2">"docs_src/reports/&lt;slug&gt;/</span><span class="se">\n</span><span class="s2">drawlib doc + _facts/ + en/ja"</span><span class="p">,</span>
+        <span class="n">width</span><span class="o">=</span><span class="mf">40.0</span><span class="p">,</span>
+        <span class="n">height</span><span class="o">=</span><span class="mf">18.0</span><span class="p">,</span>
+        <span class="n">icon</span><span class="o">=</span><span class="n">PhosphorIcon</span><span class="o">.</span><span class="n">FILE_TEXT</span><span class="p">,</span>
+        <span class="n">icon_size</span><span class="o">=</span><span class="mf">5.4</span><span class="p">,</span>
+        <span class="n">style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">SecondaryBold</span><span class="p">,</span>
+        <span class="n">card_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">SecondaryNeutral</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">shape_r</span><span class="o">=</span><span class="mf">1.5</span><span class="p">),</span>
+    <span class="p">),</span>
+    <span class="n">xy</span><span class="o">=</span><span class="p">(</span><span class="mf">23.0</span><span class="p">,</span> <span class="mf">17.0</span><span class="p">),</span>
+<span class="p">)</span>
+
+<span class="n">g_build</span> <span class="o">=</span> <span class="n">diag</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+    <span class="n">NodeGroup</span><span class="p">(</span>
+        <span class="n">title</span><span class="o">=</span><span class="s2">"2. Build &amp; Verify"</span><span class="p">,</span>
+        <span class="n">width</span><span class="o">=</span><span class="mf">38.0</span><span class="p">,</span>
+        <span class="n">height</span><span class="o">=</span><span class="mf">66.0</span><span class="p">,</span>
+        <span class="n">style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">Neutral</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">shape_r</span><span class="o">=</span><span class="mf">2.0</span><span class="p">),</span>
+        <span class="n">text_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">DarkBold</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">text_size</span><span class="o">=</span><span class="mf">10.5</span><span class="p">,</span> <span class="n">halign</span><span class="o">=</span><span class="s2">"left"</span><span class="p">,</span> <span class="n">valign</span><span class="o">=</span><span class="s2">"top"</span><span class="p">),</span>
+    <span class="p">),</span>
+    <span class="n">xy</span><span class="o">=</span><span class="p">(</span><span class="mf">58.0</span><span class="p">,</span> <span class="mf">4.0</span><span class="p">),</span>
+<span class="p">)</span>
+<span class="n">n_build</span> <span class="o">=</span> <span class="n">g_build</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+    <span class="n">Node</span><span class="p">(</span>
+        <span class="s2">"./docs_src/build.sh</span><span class="se">\n</span><span class="s2">pni report build</span><span class="se">\n</span><span class="s2">+ drawlib serve --check"</span><span class="p">,</span>
+        <span class="n">width</span><span class="o">=</span><span class="mf">32.0</span><span class="p">,</span>
+        <span class="n">height</span><span class="o">=</span><span class="mf">26.0</span><span class="p">,</span>
+        <span class="n">icon</span><span class="o">=</span><span class="n">PhosphorIcon</span><span class="o">.</span><span class="n">GEAR</span><span class="p">,</span>
+        <span class="n">icon_size</span><span class="o">=</span><span class="mf">5.6</span><span class="p">,</span>
+        <span class="n">style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">WhiteBold</span><span class="p">,</span>
+        <span class="n">text_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">WhiteBold</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">text_size</span><span class="o">=</span><span class="mf">10.0</span><span class="p">),</span>
+        <span class="n">card_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">PrimaryFlat</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">shape_r</span><span class="o">=</span><span class="mf">1.5</span><span class="p">),</span>
+    <span class="p">),</span>
+    <span class="n">xy</span><span class="o">=</span><span class="p">(</span><span class="mf">19.0</span><span class="p">,</span> <span class="mf">31.5</span><span class="p">),</span>
+<span class="p">)</span>
+
+<span class="n">g_out</span> <span class="o">=</span> <span class="n">diag</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+    <span class="n">NodeGroup</span><span class="p">(</span>
+        <span class="n">title</span><span class="o">=</span><span class="s2">"3. GitHub Pages (docs/)"</span><span class="p">,</span>
+        <span class="n">width</span><span class="o">=</span><span class="mf">49.0</span><span class="p">,</span>
+        <span class="n">height</span><span class="o">=</span><span class="mf">66.0</span><span class="p">,</span>
+        <span class="n">style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">Neutral</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">shape_r</span><span class="o">=</span><span class="mf">2.0</span><span class="p">),</span>
+        <span class="n">text_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">DarkBold</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">text_size</span><span class="o">=</span><span class="mf">10.5</span><span class="p">,</span> <span class="n">halign</span><span class="o">=</span><span class="s2">"left"</span><span class="p">,</span> <span class="n">valign</span><span class="o">=</span><span class="s2">"top"</span><span class="p">),</span>
+    <span class="p">),</span>
+    <span class="n">xy</span><span class="o">=</span><span class="p">(</span><span class="mf">106.0</span><span class="p">,</span> <span class="mf">4.0</span><span class="p">),</span>
+<span class="p">)</span>
+<span class="n">n_site_out</span> <span class="o">=</span> <span class="n">g_out</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+    <span class="n">Node</span><span class="p">(</span>
+        <span class="s2">"docs/{en,ja}/ + index.html</span><span class="se">\n</span><span class="s2">www.pni501.com"</span><span class="p">,</span>
+        <span class="n">width</span><span class="o">=</span><span class="mf">43.0</span><span class="p">,</span>
+        <span class="n">height</span><span class="o">=</span><span class="mf">18.0</span><span class="p">,</span>
+        <span class="n">icon</span><span class="o">=</span><span class="n">PhosphorIcon</span><span class="o">.</span><span class="n">GLOBE</span><span class="p">,</span>
+        <span class="n">icon_size</span><span class="o">=</span><span class="mf">5.4</span><span class="p">,</span>
+        <span class="n">card_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">PrimaryNeutral</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">shape_r</span><span class="o">=</span><span class="mf">1.5</span><span class="p">),</span>
+    <span class="p">),</span>
+    <span class="n">xy</span><span class="o">=</span><span class="p">(</span><span class="mf">24.5</span><span class="p">,</span> <span class="mf">46.0</span><span class="p">),</span>
+<span class="p">)</span>
+<span class="n">n_rep_out</span> <span class="o">=</span> <span class="n">g_out</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+    <span class="n">Node</span><span class="p">(</span>
+        <span class="s2">"docs/reports/&lt;slug&gt;/</span><span class="se">\n</span><span class="s2">HTML + EN/JA PDF + JSON/SARIF"</span><span class="p">,</span>
+        <span class="n">width</span><span class="o">=</span><span class="mf">43.0</span><span class="p">,</span>
+        <span class="n">height</span><span class="o">=</span><span class="mf">18.0</span><span class="p">,</span>
+        <span class="n">icon</span><span class="o">=</span><span class="n">PhosphorIcon</span><span class="o">.</span><span class="n">FILE_PDF</span><span class="p">,</span>
+        <span class="n">icon_size</span><span class="o">=</span><span class="mf">5.4</span><span class="p">,</span>
+        <span class="n">style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">SuccessBold</span><span class="p">,</span>
+        <span class="n">card_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">SuccessNeutral</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">shape_r</span><span class="o">=</span><span class="mf">1.5</span><span class="p">),</span>
+    <span class="p">),</span>
+    <span class="n">xy</span><span class="o">=</span><span class="p">(</span><span class="mf">24.5</span><span class="p">,</span> <span class="mf">17.0</span><span class="p">),</span>
+<span class="p">)</span>
+
+<span class="n">diag</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">n_site_src</span><span class="p">,</span> <span class="n">n_build</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">"site html"</span><span class="p">)</span>
+<span class="n">diag</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">n_rep_src</span><span class="p">,</span> <span class="n">n_build</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">"pdf + html"</span><span class="p">)</span>
+<span class="n">diag</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">n_build</span><span class="p">,</span> <span class="n">n_site_out</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">"portal"</span><span class="p">)</span>
+<span class="n">diag</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">n_build</span><span class="p">,</span> <span class="n">n_rep_out</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">"reports"</span><span class="p">)</span>
+<span class="n">diag</span><span class="o">.</span><span class="n">draw</span><span class="p">()</span>
+<span class="n">save</span><span class="p">()</span>
+</code></pre>
+</details>
+<p>ローカル環境でポータル全体を再ビルドしリンク切れゼロを検証するには、以下を実行します：</p>
+<pre><code class="language-bash">./docs_src/build.sh
+./docs_src/serve.sh
+</code></pre>
+
+            </main>
+        </div>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Theme toggle
+            const themeBtn = document.getElementById('theme-toggle');
+            if (themeBtn) {
+                themeBtn.addEventListener('click', function() {
+                    const current = document.documentElement.getAttribute('data-theme');
+                    const next = current === 'dark' ? 'light' : 'dark';
+                    document.documentElement.setAttribute('data-theme', next);
+                    localStorage.setItem('drawlib-theme', next);
+                });
+            }
+
+            // Language dropdown outside-click & Escape close
+            const langDropdowns = document.querySelectorAll('.lang-dropdown');
+            if (langDropdowns.length > 0) {
+                document.addEventListener('click', function(e) {
+                    langDropdowns.forEach(function(dd) {
+                        if (dd.hasAttribute('open') && !dd.contains(e.target)) {
+                            dd.removeAttribute('open');
+                        }
+                    });
+                });
+                document.addEventListener('keydown', function(e) {
+                    if (e.key === 'Escape') {
+                        langDropdowns.forEach(function(dd) {
+                            dd.removeAttribute('open');
+                        });
+                    }
+                });
+            }
+
+            // Mobile menu toggle
+            const menuBtn = document.getElementById('menu-toggle');
+            const sidebar = document.querySelector('.sidebar');
+            if (menuBtn && sidebar) {
+                function setMenuOpen(open) {
+                    sidebar.classList.toggle('is-open', open);
+                    menuBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
+                    document.body.classList.toggle('menu-open', open);
+                    if (open) {
+                        const menu = sidebar.querySelector('.sidebar-menu');
+                        if (menu) {
+                            menu.scrollTop = 0;
+                        }
+                    }
+                }
+
+                menuBtn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    const willOpen = !sidebar.classList.contains('is-open');
+                    setMenuOpen(willOpen);
+                });
+
+                // Close menu when clicking outside sidebar
+                document.addEventListener('click', function(e) {
+                    if (sidebar.classList.contains('is-open') && !sidebar.contains(e.target)) {
+                        setMenuOpen(false);
+                    }
+                });
+
+                // Close menu when a navigation link is clicked
+                const navLinks = sidebar.querySelectorAll('.nav-item a');
+                navLinks.forEach(function(link) {
+                    link.addEventListener('click', function() {
+                        setMenuOpen(false);
+                    });
+                });
+
+                // Close on Escape key
+                document.addEventListener('keydown', function(e) {
+                    if (e.key === 'Escape' && sidebar.classList.contains('is-open')) {
+                        setMenuOpen(false);
+                    }
+                });
+
+                // Reset menu state when resized above mobile breakpoint
+                window.addEventListener('resize', function() {
+                    if (window.innerWidth > 768 && sidebar.classList.contains('is-open')) {
+                        setMenuOpen(false);
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>

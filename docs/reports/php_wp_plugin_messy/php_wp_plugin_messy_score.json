@@ -1,0 +1,1641 @@
+{
+  "schema_version": "2.0",
+  "project_name": "wp_plugin_messy",
+  "workflow_id": "php_wp_plugin_messy",
+  "workflow_run_id": "wf-3389d5e7",
+  "evaluated_at": "2026-11-22T11:29:03.792183+00:00",
+  "language": "php",
+  "target_root": "examples/php/wp_plugin_messy",
+  "facts_file": "docs_src/reports/php_wp_plugin_messy/_facts/facts.json",
+  "key_files_inspected": [
+    "README.md",
+    "member-analytics-portal.php",
+    "includes/rest-endpoints.php",
+    "includes/ajax-handlers.php",
+    "admin/settings-page.php"
+  ],
+  "overall_score": 60,
+  "grade": "C",
+  "category_scores": {
+    "architecture": 90,
+    "code_quality": 90,
+    "typing": 36,
+    "testing": 55,
+    "dependencies": 90,
+    "security": 30,
+    "documentation": 27
+  },
+  "baseline_scores": {
+    "architecture": 100,
+    "code_quality": 100,
+    "typing": 46,
+    "testing": 65,
+    "dependencies": 100,
+    "security": 40,
+    "documentation": 37
+  },
+  "category_rationales": {
+    "architecture": "Baseline 100 adjusted -10pt because despite acyclic 4-file inclusion, the plugin relies entirely on global procedural functions, manual require_once, and 13 direct superglobal/global $wpdb accesses with zero OOP/PSR-4 boundaries.",
+    "code_quality": "Baseline 100 adjusted -10pt for 16 WordPress framework violations, @file_get_contents error suppression without HTTP timeout, print_r() debug output in REST handler, and hardcoded <script src=...> tag.",
+    "typing": "Baseline 46 adjusted -10pt for 0.0% PHP type safety: missing declare(strict_types=1) across all 4 files and zero parameter or return type declarations across all 7 functions.",
+    "testing": "Baseline 65 adjusted -10pt because zero PHPUnit/Pest tests exist (0% measured coverage), leaving all REST, AJAX, database, and admin paths unverified beyond php -l and a 5-hook load smoke test.",
+    "dependencies": "Baseline 100 adjusted -10pt because although 0 declared Composer CVEs exist, the plugin is unmanaged Composer-less raw PHP targeting EOL PHP >=7.4 with zero CI, LICENSE, SECURITY.md, or Dependabot.",
+    "security": "Baseline 40 adjusted -10pt for severe multi-vector WordPress vulnerabilities across all 4 files: hardcoded $map_webhook_secret, 3 CWE-89 SQL injection sinks, 3 CWE-79 reflected XSS sinks, unauthenticated wp_users REST export (__return_true) and wp_ajax_nopriv search, 'read'-capability admin settings escalation, zero CSRF nonces, and missing ABSPATH guards.",
+    "documentation": "Baseline 37 adjusted -10pt for a 2-line README.md and 0.0% PHPDoc coverage across all 7 public functions."
+  },
+  "metrics_snapshot": {
+    "language": "php",
+    "runtime_types": [
+      "web_api"
+    ],
+    "build_system": "raw_php",
+    "has_manifest": false,
+    "has_lockfile": false,
+    "has_license": false,
+    "has_security_policy": false,
+    "has_dependency_automation": false,
+    "dependencies_count": 0,
+    "unpinned_dependencies_count": 0,
+    "source_files_count": 4,
+    "test_files_count": 0,
+    "readme_line_count": 2,
+    "ci_supply_chain_issues_count": 0,
+    "committed_secret_files_count": 0,
+    "container_hygiene_issues_count": 0,
+    "legacy_language_findings_count": 0,
+    "total_files": 4,
+    "total_loc": 84,
+    "total_classes": 0,
+    "total_functions": 7,
+    "import_hygiene_coverage_pct": 75.0,
+    "type_safety_coverage_pct": 0.0,
+    "docstring_coverage_pct": 0.0,
+    "unsorted_imports_count": 0,
+    "wildcard_imports_count": 0,
+    "type_safety_issues_count": 11,
+    "omitted_init_return_count": 0,
+    "weak_type_usages_count": 0,
+    "annotated_doc_functions_count": 0,
+    "empty_docstrings_count": 0,
+    "doc_signature_mismatches_count": 0,
+    "complex_functions_count": 0,
+    "excessive_parameters_count": 0,
+    "global_state_usages_count": 13,
+    "bug_risk_idioms_count": 1,
+    "circular_dependencies_count": 0,
+    "type_checking_cycles_count": 0,
+    "unused_dependencies_count": 0,
+    "undeclared_dependencies_count": 0,
+    "test_functions_count": 0,
+    "assertion_free_tests_count": 0,
+    "has_conftest_assertion_hook": false,
+    "framework_issues_count": 16,
+    "modernization_hints_count": 1,
+    "language_version_mismatches_count": 0,
+    "missing_io_timeouts_count": 1,
+    "scattered_env_access_count": 0,
+    "unstructured_logging_count": 1,
+    "hardcoded_secrets_count": 1,
+    "ast_dangerous_sinks_count": 5,
+    "api_endpoints_count": 5,
+    "runtime_status": "passed",
+    "harness_build_status": "passed",
+    "tests_status": "passed",
+    "tests_total": 0,
+    "tests_passed": 0,
+    "tests_failed": 0,
+    "smoke_check_status": "passed",
+    "security_scan_status": "passed",
+    "app_vuln_critical": 0,
+    "app_vuln_high": 0,
+    "app_vuln_total": 0,
+    "core_app_vuln_total": 0,
+    "core_app_vuln_high_or_crit": 0,
+    "dev_app_vuln_total": 0,
+    "app_vuln_unpinned_range_matches": 0,
+    "os_vuln_high_or_crit": 0,
+    "harness_os_vuln_total": 3512,
+    "misconfig_count": 0,
+    "secret_leak_count": 0
+  },
+  "runtime_facts": {
+    "status": "passed",
+    "container_engine": "docker",
+    "engine_available": true,
+    "skip_reason": "",
+    "language": "php",
+    "selected_dockerfile_template": "php/raw.dockerfile",
+    "harness_dockerfile_path": ".pni/dockerfiles/examples/php/wp_plugin_messy/Dockerfile",
+    "build_args": {
+      "PHP_VERSION": "8.2"
+    },
+    "artifacts_dir": ".pni/cache/php_wp_plugin_messy/runtime",
+    "project_dockerfile_build": null,
+    "harness_build": {
+      "attempted": true,
+      "status": "passed",
+      "dockerfile_used": ".pni/dockerfiles/examples/php/wp_plugin_messy/Dockerfile",
+      "duration_sec": 49.1,
+      "exit_code": 0,
+      "error_tail": []
+    },
+    "test_execution": {
+      "attempted": true,
+      "status": "passed",
+      "command": "sh -c lint_fail=0; for p in $(find . -path '*/vendor' -prune -o \\( -name '*.php' -o -name '*.phtml' \\) -print 2>/dev/null); do   if ! php -l \"$p\" >/tmp/pni_lint_err.txt 2>&1; then     cat /tmp/pni_lint_err.txt >&2; lint_fail=1;   fi; done; if [ \"$lint_fail\" -ne 0 ]; then exit 1; fi; has_tests=0; for td in tests; do   if [ -d \"$td\" ] && [ -n \"$(find \"$td\" -name '*Test.php' -o -name '*_test.php' 2>/dev/null)\" ]; then     has_tests=1;   fi; done; if [ \"$has_tests\" -eq 1 ] && command -v phpunit >/dev/null 2>&1; then   cfg_flag=\"\";   tst_arg=\"\";   if [ ! -f phpunit.xml ] && [ ! -f phpunit.xml.dist ] && [ ! -f phpunit.dist.xml ]; then     dirs_xml=\"\"; ws_pwd=$(pwd);     for sd in .; do       if [ -d \"$sd\" ]; then dirs_xml=\"${dirs_xml}<directory>${ws_pwd}/${sd}</directory>\"; fi;     done;     if [ -z \"$dirs_xml\" ]; then dirs_xml=\"<directory>${ws_pwd}</directory>\"; fi;     printf '<phpunit><source><include>%s</include><exclude><directory>%s/vendor</directory><directory>%s/tests</directory></exclude></source></phpunit>' \"$dirs_xml\" \"$ws_pwd\" \"$ws_pwd\" >/tmp/pni_phpunit.xml;     cfg_flag=\"-c /tmp/pni_phpunit.xml\";     tst_arg=\"tests\";   fi;   phpunit $cfg_flag -d pcov.enabled=1 -d pcov.directory=. --log-junit /out/junit.xml --coverage-clover /out/clover.xml $tst_arg;   exit $?; fi; echo 'PHP syntax gate (php -l) passed; no PHPUnit tests executed.'; exit 0",
+      "duration_sec": 0.72,
+      "exit_code": 0,
+      "total_tests": 0,
+      "passed_tests": 0,
+      "failed_tests": 0,
+      "error_tests": 0,
+      "skipped_tests": 0,
+      "failures": [],
+      "log_tail": []
+    },
+    "coverage": {
+      "measured": false,
+      "tool": "",
+      "line_coverage_pct": null,
+      "branch_coverage_pct": null,
+      "covered_lines": 0,
+      "total_statements": 0,
+      "lowest_covered_modules": []
+    },
+    "smoke_check": {
+      "attempted": true,
+      "archetype": "web_api",
+      "status": "passed",
+      "command": "php -r define('ABSPATH', '/workspace/'); $GLOBALS['__pni_wp_hooks'] = 0; function add_action($t, $c, $p=10, $a=1) { $GLOBALS['__pni_wp_hooks']++; return true; } function add_filter($t, $c, $p=10, $a=1) { $GLOBALS['__pni_wp_hooks']++; return true; } function add_shortcode($t, $c) { $GLOBALS['__pni_wp_hooks']++; return true; } function register_activation_hook($f, $c) { $GLOBALS['__pni_wp_hooks']++; } function register_deactivation_hook($f, $c) { $GLOBALS['__pni_wp_hooks']++; } function register_rest_route($n, $r, $a=[]) { $GLOBALS['__pni_wp_hooks']++; return true; } function plugin_dir_path($f) { return dirname($f) . '/'; } function plugin_dir_url($f) { return 'http://localhost/wp-content/plugins/plugin/'; } function is_admin() { return false; } function __($t, $d='default') { return $t; } require_once '/workspace/member-analytics-portal.php'; $n = $GLOBALS['__pni_wp_hooks']; file_put_contents('/out/smoke.json', json_encode(['probed_endpoint' => 'wp-plugin://member-analytics-portal.php', 'http_status' => 200, 'detail' => 'WordPress plugin member-analytics-portal.php loaded cleanly (' . $n . ' hooks registered)']));",
+      "duration_sec": 0.64,
+      "exit_code": 0,
+      "http_status": 200,
+      "probed_endpoint": "wp-plugin://member-analytics-portal.php",
+      "failure_kind": "none",
+      "detail": "WordPress plugin member-analytics-portal.php loaded cleanly (5 hooks registered)",
+      "log_tail": []
+    }
+  },
+  "security_facts": {
+    "status": "passed",
+    "scanner": "trivy",
+    "container_engine": "docker",
+    "engine_available": true,
+    "skip_reason": "",
+    "trivy_image": "ghcr.io/aquasecurity/trivy:0.69.3",
+    "scanned_filesystem": true,
+    "scanned_resolved_image": true,
+    "resolved_image_source": ".pni/dockerfiles/examples/php/wp_plugin_messy/Dockerfile",
+    "artifacts_dir": ".pni/cache/php_wp_plugin_messy/security",
+    "vuln_counts": {
+      "critical": 0,
+      "high": 0,
+      "medium": 0,
+      "low": 0,
+      "total": 0
+    },
+    "app_vuln_counts": {
+      "critical": 0,
+      "high": 0,
+      "medium": 0,
+      "low": 0,
+      "total": 0
+    },
+    "core_app_vuln_counts": {
+      "critical": 0,
+      "high": 0,
+      "medium": 0,
+      "low": 0,
+      "total": 0
+    },
+    "dev_app_vuln_counts": {
+      "critical": 0,
+      "high": 0,
+      "medium": 0,
+      "low": 0,
+      "total": 0
+    },
+    "os_vuln_counts": {
+      "critical": 0,
+      "high": 0,
+      "medium": 0,
+      "low": 0,
+      "total": 0
+    },
+    "harness_os_vuln_counts": {
+      "critical": 6,
+      "high": 355,
+      "medium": 2005,
+      "low": 1125,
+      "total": 3512
+    },
+    "vulnerabilities": [],
+    "app_vulnerabilities": [],
+    "os_vulnerabilities": [],
+    "misconfigurations": [],
+    "secrets": [],
+    "opt_out_counts": {}
+  },
+  "pentest_facts": null,
+  "module_inventory": [
+    {
+      "file": "examples/php/wp_plugin_messy/admin/settings-page.php",
+      "loc": 31,
+      "public_types": [],
+      "public_callables": [
+        "map_register_admin_menu",
+        "map_render_settings_page"
+      ]
+    },
+    {
+      "file": "examples/php/wp_plugin_messy/includes/ajax-handlers.php",
+      "loc": 21,
+      "public_types": [],
+      "public_callables": [
+        "map_ajax_purge_logs",
+        "map_ajax_search_members"
+      ]
+    },
+    {
+      "file": "examples/php/wp_plugin_messy/includes/rest-endpoints.php",
+      "loc": 21,
+      "public_types": [],
+      "public_callables": [
+        "map_export_all_members",
+        "map_register_rest_routes"
+      ]
+    },
+    {
+      "file": "examples/php/wp_plugin_messy/member-analytics-portal.php",
+      "loc": 11,
+      "public_types": [],
+      "public_callables": [
+        "map_render_badge_shortcode"
+      ]
+    }
+  ],
+  "dangerous_sinks": [
+    {
+      "category": "xss",
+      "cwe_id": "CWE-79",
+      "severity": "high",
+      "file": "examples/php/wp_plugin_messy/admin/settings-page.php",
+      "line": 26,
+      "symbol": "map_render_settings_page",
+      "detail": "Unescaped request input rendered directly via 'echo $_GET['tab'] ?? 'general';'"
+    },
+    {
+      "category": "sql_injection",
+      "cwe_id": "CWE-89",
+      "severity": "high",
+      "file": "examples/php/wp_plugin_messy/includes/ajax-handlers.php",
+      "line": 10,
+      "symbol": "map_ajax_search_members",
+      "detail": "Unparameterized SQL in '$wpdb->get_results(\"SELECT ID, display_name, user_email FROM {$w)' — use prepared placeholders"
+    },
+    {
+      "category": "sql_injection",
+      "cwe_id": "CWE-89",
+      "severity": "high",
+      "file": "examples/php/wp_plugin_messy/includes/ajax-handlers.php",
+      "line": 21,
+      "symbol": "map_ajax_purge_logs",
+      "detail": "Unparameterized SQL in '$wpdb->query(\"DELETE FROM wp_map_events WHERE category = ')' — use prepared placeholders"
+    },
+    {
+      "category": "xss",
+      "cwe_id": "CWE-79",
+      "severity": "high",
+      "file": "examples/php/wp_plugin_messy/includes/ajax-handlers.php",
+      "line": 22,
+      "symbol": "map_ajax_purge_logs",
+      "detail": "Unescaped request input rendered directly via 'echo \"Purged category: \" . $_POST['category'];'"
+    },
+    {
+      "category": "sql_injection",
+      "cwe_id": "CWE-89",
+      "severity": "high",
+      "file": "examples/php/wp_plugin_messy/includes/rest-endpoints.php",
+      "line": 19,
+      "symbol": "map_export_all_members",
+      "detail": "Unparameterized SQL in '$wpdb->get_results($sql)' — use prepared placeholders"
+    }
+  ],
+  "api_endpoints": [
+    {
+      "http_method": "ANY",
+      "path": "/examples/php/wp_plugin_messy/admin/settings-page.php",
+      "handler": "settings-page.php",
+      "file": "examples/php/wp_plugin_messy/admin/settings-page.php",
+      "line": 1,
+      "has_auth_hint": false,
+      "auth_mechanisms": []
+    },
+    {
+      "http_method": "GET",
+      "path": "/examples/php/wp_plugin_messy/member-analytics-portal.php",
+      "handler": "member-analytics-portal.php",
+      "file": "examples/php/wp_plugin_messy/member-analytics-portal.php",
+      "line": 1,
+      "has_auth_hint": false,
+      "auth_mechanisms": []
+    },
+    {
+      "http_method": "POST",
+      "path": "/wp-admin/admin-ajax.php?action=map_purge_logs",
+      "handler": "map_ajax_purge_logs",
+      "file": "examples/php/wp_plugin_messy/includes/ajax-handlers.php",
+      "line": 4,
+      "has_auth_hint": true,
+      "auth_mechanisms": [
+        "wp_ajax_session"
+      ]
+    },
+    {
+      "http_method": "POST",
+      "path": "/wp-admin/admin-ajax.php?action=map_search_members",
+      "handler": "map_ajax_search_members",
+      "file": "examples/php/wp_plugin_messy/includes/ajax-handlers.php",
+      "line": 3,
+      "has_auth_hint": false,
+      "auth_mechanisms": []
+    },
+    {
+      "http_method": "GET",
+      "path": "/wp-json/member-analytics/v1/export",
+      "handler": "map_export_all_members",
+      "file": "examples/php/wp_plugin_messy/includes/rest-endpoints.php",
+      "line": 7,
+      "has_auth_hint": false,
+      "auth_mechanisms": []
+    }
+  ],
+  "language_version_mismatches": [],
+  "architecture_overview": {
+    "pattern": "Procedural Flat WordPress Plugin (Global Hook & Superglobal Coupling, No OOP/PSR-4 Layering)",
+    "entry_points": [
+      "member-analytics-portal.php:map_render_badge_shortcode",
+      "includes/rest-endpoints.php:map_export_all_members",
+      "includes/ajax-handlers.php:map_ajax_search_members",
+      "includes/ajax-handlers.php:map_ajax_purge_logs",
+      "admin/settings-page.php:map_render_settings_page"
+    ],
+    "modules": [
+      {
+        "path": "member-analytics-portal.php",
+        "role": "Plugin header, manual require_once loader, and [member_analytics_badge] shortcode",
+        "key_symbols": [
+          "map_render_badge_shortcode"
+        ],
+        "depends_on": [
+          "includes/rest-endpoints.php",
+          "includes/ajax-handlers.php",
+          "admin/settings-page.php"
+        ],
+        "health_note": "No ABSPATH guard, EOL PHP 7.4 header, unescaped $_GET['badge_label'] XSS."
+      },
+      {
+        "path": "includes/rest-endpoints.php",
+        "role": "WordPress REST API member exporter",
+        "key_symbols": [
+          "map_register_rest_routes",
+          "map_export_all_members"
+        ],
+        "depends_on": [],
+        "health_note": "Hardcoded $map_webhook_secret, __return_true public PII export, CWE-89 SQLi, print_r debug leak."
+      },
+      {
+        "path": "includes/ajax-handlers.php",
+        "role": "WordPress admin-ajax search and purge handlers",
+        "key_symbols": [
+          "map_ajax_search_members",
+          "map_ajax_purge_logs"
+        ],
+        "depends_on": [],
+        "health_note": "wp_ajax_nopriv SQLi, missing nonce/capability on DELETE SQLi, unescaped $_POST XSS."
+      },
+      {
+        "path": "admin/settings-page.php",
+        "role": "WordPress admin settings UI and telemetry ping",
+        "key_symbols": [
+          "map_register_admin_menu",
+          "map_render_settings_page"
+        ],
+        "depends_on": [],
+        "health_note": "'read' capability privilege escalation, missing nonce, CWE-79 XSS, unbounded @file_get_contents, raw <script>."
+      }
+    ],
+    "dependency_notes": "Acyclic 4-file procedural split without circular includes, but completely lacks PSR-4 class boundaries, input/output sanitization layers, or WordPress authorization/nonce middleware."
+  },
+  "architecture_record": {
+    "workflow_id": "php_wp_plugin_messy",
+    "workflow_run_id": "wf-3389d5e7",
+    "recorded_at": "2026-11-22T11:27:49.322090+00:00",
+    "target_root": "examples/php/wp_plugin_messy",
+    "system_profile": {
+      "system_purpose": "Member Analytics Portal (wp_plugin_messy v1.3.0) is a procedural WordPress plugin that registers a REST member-export endpoint, two admin-ajax handlers (member search and event log purge), an admin settings page with outbound telemetry pings, and a frontend badge shortcode.",
+      "domain_context": "WordPress site administration, member directory export/search, event log purging, telemetry option storage, and frontend badge rendering.",
+      "runtime_types": [
+        "web_api"
+      ],
+      "tech_stack": [
+        "Raw PHP (declared Requires PHP: 7.4, tested under PHP 8.2 harness)",
+        "WordPress Plugin API (REST API, admin-ajax, admin_menu, shortcode, global $wpdb)"
+      ],
+      "external_integrations": [
+        "Outbound HTTP GET ping to https://telemetry.example.com/ping via @file_get_contents() in admin/settings-page.php:21",
+        "WordPress MySQL database accessed via global $wpdb ($wpdb->users, wp_map_events)"
+      ]
+    },
+    "structure_map": {
+      "architecture_pattern": "Procedural Flat WordPress Plugin (Global Hook & Superglobal Coupling, No OOP/PSR-4 Layering)",
+      "layers": [
+        {
+          "name": "Plugin Bootstrap & Shortcode Entrypoint",
+          "responsibility": "Manual require_once loading of plugin files, REST/shortcode hook registration, and badge shortcode rendering.",
+          "paths": [
+            "member-analytics-portal.php"
+          ],
+          "allowed_dependencies": [
+            "REST Endpoint Module",
+            "AJAX Handler Module",
+            "Admin Settings Module"
+          ]
+        },
+        {
+          "name": "REST Endpoint Module",
+          "responsibility": "Registers /wp-json/member-analytics/v1/export and queries wp_users via global $wpdb.",
+          "paths": [
+            "includes/rest-endpoints.php"
+          ],
+          "allowed_dependencies": []
+        },
+        {
+          "name": "AJAX Handler Module",
+          "responsibility": "Handles public wp_ajax_nopriv member search and wp_ajax event log deletion directly against global $wpdb.",
+          "paths": [
+            "includes/ajax-handlers.php"
+          ],
+          "allowed_dependencies": []
+        },
+        {
+          "name": "Admin Settings Module",
+          "responsibility": "Registers WP admin options page, persists telemetry URL option, pings external telemetry URL, and renders inline HTML/JS.",
+          "paths": [
+            "admin/settings-page.php"
+          ],
+          "allowed_dependencies": []
+        }
+      ],
+      "modules": [
+        {
+          "path": "member-analytics-portal.php",
+          "role": "Plugin header, manual require_once loader, and [member_analytics_badge] shortcode",
+          "key_symbols": [
+            "map_render_badge_shortcode"
+          ],
+          "depends_on": [
+            "includes/rest-endpoints.php",
+            "includes/ajax-handlers.php",
+            "admin/settings-page.php"
+          ],
+          "health_note": "No ABSPATH guard, EOL PHP 7.4 header, unescaped $_GET['badge_label'] XSS."
+        },
+        {
+          "path": "includes/rest-endpoints.php",
+          "role": "WordPress REST API member exporter",
+          "key_symbols": [
+            "map_register_rest_routes",
+            "map_export_all_members"
+          ],
+          "depends_on": [],
+          "health_note": "Hardcoded $map_webhook_secret, __return_true public PII export, CWE-89 SQLi, print_r debug leak."
+        },
+        {
+          "path": "includes/ajax-handlers.php",
+          "role": "WordPress admin-ajax search and purge handlers",
+          "key_symbols": [
+            "map_ajax_search_members",
+            "map_ajax_purge_logs"
+          ],
+          "depends_on": [],
+          "health_note": "wp_ajax_nopriv SQLi, missing nonce/capability on DELETE SQLi, unescaped $_POST XSS."
+        },
+        {
+          "path": "admin/settings-page.php",
+          "role": "WordPress admin settings UI and telemetry ping",
+          "key_symbols": [
+            "map_register_admin_menu",
+            "map_render_settings_page"
+          ],
+          "depends_on": [],
+          "health_note": "'read' capability privilege escalation, missing nonce, CWE-79 XSS, unbounded @file_get_contents, raw <script>."
+        }
+      ],
+      "boundary_assessment": "Acyclic 4-file procedural split without circular includes, but completely lacks PSR-4 class boundaries, input/output sanitization layers, or WordPress authorization/nonce middleware."
+    },
+    "execution_flow_map": {
+      "entry_points": [
+        "member-analytics-portal.php:map_render_badge_shortcode",
+        "includes/rest-endpoints.php:map_export_all_members",
+        "includes/ajax-handlers.php:map_ajax_search_members",
+        "includes/ajax-handlers.php:map_ajax_purge_logs",
+        "admin/settings-page.php:map_render_settings_page"
+      ],
+      "execution_flows": [
+        {
+          "name": "Unauthenticated REST Member Export",
+          "trigger": "HTTP GET /wp-json/member-analytics/v1/export?role_filter=...",
+          "steps": [
+            "WordPress invokes map_export_all_members() with permission_callback=>'__return_true' (zero authentication).",
+            "Reads raw $_GET['role_filter'], interpolates directly into SQL LIKE query against $wpdb->users, optionally dumps rows via print_r(), and returns user_login/user_email records."
+          ],
+          "involved_files": [
+            "includes/rest-endpoints.php"
+          ]
+        },
+        {
+          "name": "AJAX Member Search & Event Log Purge",
+          "trigger": "HTTP POST /wp-admin/admin-ajax.php?action=map_search_members|map_purge_logs",
+          "steps": [
+            "map_ajax_search_members() runs via wp_ajax_nopriv without nonce/auth and interpolates raw $_POST['term'] into $wpdb->get_results().",
+            "map_ajax_purge_logs() runs without nonce or current_user_can(), executes raw DELETE FROM wp_map_events with $_POST['category'], and echoes unescaped $_POST['category']."
+          ],
+          "involved_files": [
+            "includes/ajax-handlers.php"
+          ]
+        },
+        {
+          "name": "Admin Settings Mutation & Telemetry Ping",
+          "trigger": "WordPress Admin Options Page (capability 'read') POST/GET",
+          "steps": [
+            "Any logged-in subscriber ('read' cap) can POST map_telemetry_url without nonce, persisting raw input via update_option() and firing unbounded @file_get_contents() to telemetry.example.com.",
+            "Renders unescaped $_GET['tab'] into HTML heading and form input value."
+          ],
+          "involved_files": [
+            "admin/settings-page.php"
+          ]
+        }
+      ],
+      "state_and_storage": [
+        "WordPress MySQL database tables ($wpdb->users, wp_map_events) queried via global $wpdb without $wpdb->prepare().",
+        "WordPress wp_options key 'map_telemetry_url' mutated via update_option() without sanitization or nonce verification.",
+        "Global variable $map_webhook_secret hardcoded in includes/rest-endpoints.php:3."
+      ],
+      "error_and_concurrency_model": "Synchronous PHP request-per-process model under WordPress with silent error suppression (@file_get_contents), unstructured print_r() debug leaks, and zero defensive validation or exception handling."
+    }
+  },
+  "audit_dimensions": [
+    {
+      "action_id": "act-15",
+      "audit_id": "php_test_audit",
+      "title": "Evaluate PHP Test Suite Completeness & Structure",
+      "score": 10,
+      "grade": "D",
+      "rules_evaluated": [
+        "php/testing"
+      ],
+      "pass_count": 0,
+      "warn_count": 0,
+      "fail_count": 1,
+      "summary": "wp_plugin_messy has zero automated tests (0 test files, 0 PHPUnit/Pest tests, no phpunit.xml, no measured coverage) despite exposing critical REST, AJAX, database, and admin-mutation surfaces."
+    },
+    {
+      "action_id": "act-10",
+      "audit_id": "security_vulnerability_audit",
+      "title": "Evaluate Supply-Chain CVEs, Container Misconfigs, Secrets, Dangerous Sinks & API Boundaries",
+      "score": 14,
+      "grade": "D",
+      "rules_evaluated": [
+        "common/security_vulnerability",
+        "common/supply_chain"
+      ],
+      "pass_count": 0,
+      "warn_count": 0,
+      "fail_count": 2,
+      "summary": "Trivy SCA found 0 declared app dependency CVEs (since no composer.json/vendor packages are declared) and 0 project Dockerfile misconfigs (no project Dockerfile), while cleanly isolating harness-only OS CVEs (harness_os_vuln_counts excluded from project score). However, SAST/AST security gates fail severely on SEC-03 (hardcoded $map_webhook_secret), SEC-04 (5 HIGH CWE-89 SQLi and CWE-79 XSS sinks), and SEC-05 (4/5 unauthenticated endpoints including __return_true REST user export and wp_ajax_nopriv member search)."
+    },
+    {
+      "action_id": "act-06",
+      "audit_id": "php_ast_audit",
+      "title": "Interpret PHP AST Facts & Evaluate Quality, Strict Types, Sinks & Frameworks",
+      "score": 16,
+      "grade": "D",
+      "rules_evaluated": [
+        "common/architecture",
+        "common/maintainability",
+        "common/security",
+        "common/security_vulnerability",
+        "php/code_quality",
+        "php/typing",
+        "php/modern_stack",
+        "php/frameworks/laravel",
+        "php/frameworks/wordpress"
+      ],
+      "pass_count": 0,
+      "warn_count": 2,
+      "fail_count": 6,
+      "summary": "PHP AST analysis across 4 files (84 LOC, 7 procedural functions, 0 classes) reveals critical WordPress security and code-quality breakdowns: 0.0% type safety (no declare(strict_types=1) or return/param types), 0.0% PHPDoc, 16 WordPress framework violations (missing ABSPATH guards on all 4 files, missing wp_verify_nonce and current_user_can on POST/AJAX mutations, unsanitized superglobals, low 'read' capability on admin settings page), 5 HIGH CWE sinks (3x CWE-89 unparameterized $wpdb SQLi, 2x CWE-79 unescaped XSS + shortcode XSS), unauthenticated REST export (__return_true) and wp_ajax_nopriv member search, hardcoded secret, unbounded @file_get_contents HTTP call, and print_r debug leaks."
+    },
+    {
+      "action_id": "act-04",
+      "audit_id": "supply_chain_audit",
+      "title": "Evaluate Supply-Chain, CI Permissions, Container & Secret Hygiene",
+      "score": 20,
+      "grade": "D",
+      "rules_evaluated": [
+        "common/supply_chain",
+        "common/security",
+        "common/git_workflow"
+      ],
+      "pass_count": 0,
+      "warn_count": 1,
+      "fail_count": 2,
+      "summary": "wp_plugin_messy fails supply-chain and secret hygiene gates: Composer-less raw PHP with manual require_once, EOL PHP >=7.4 target, zero CI/Dependabot/LICENSE/SECURITY.md/.gitignore, and a hardcoded webhook secret ($map_webhook_secret) in includes/rest-endpoints.php:3."
+    },
+    {
+      "action_id": "act-14",
+      "audit_id": "service_readiness_audit",
+      "title": "Evaluate 12-Factor Config/Statelessness & SRE PRR Timeouts/Observability",
+      "score": 20,
+      "grade": "D",
+      "rules_evaluated": [
+        "common/twelve_factor",
+        "common/production_readiness",
+        "common/security"
+      ],
+      "pass_count": 0,
+      "warn_count": 1,
+      "fail_count": 2,
+      "summary": "wp_plugin_messy fails production readiness and security hygiene: outbound telemetry call in admin/settings-page.php:21 uses @file_get_contents() with no timeout and silent error suppression, includes/rest-endpoints.php:21 dumps DB rows via print_r(), all handlers rely directly on raw $_GET/$_POST superglobals and global $wpdb without sanitization, and critical security gaps expose PII and destructive DB mutations."
+    },
+    {
+      "action_id": "act-03",
+      "audit_id": "repo_structure_audit",
+      "title": "Evaluate PHP Packaging, Composer Lockfile, Runtime Version & Governance",
+      "score": 25,
+      "grade": "D",
+      "rules_evaluated": [
+        "common/supply_chain",
+        "common/documentation",
+        "common/git_workflow",
+        "common/security",
+        "php/dependencies",
+        "php/modern_stack"
+      ],
+      "pass_count": 0,
+      "warn_count": 1,
+      "fail_count": 5,
+      "summary": "wp_plugin_messy (Member Analytics Portal v1.3.0) is an unmanaged Composer-less raw PHP WordPress plugin targeting EOL PHP >=7.4 with zero automated test runner configuration, missing governance files (LICENSE, SECURITY.md, .gitignore, CI), minimal 2-line README, and immediate unescaped $_GET shortcode output in the plugin entrypoint."
+    },
+    {
+      "action_id": "act-08",
+      "audit_id": "container_runtime_audit",
+      "title": "Evaluate Buildability, Offline Test Results, Measured Coverage & Startup Health",
+      "score": 45,
+      "grade": "D",
+      "rules_evaluated": [
+        "common/runtime_verification",
+        "common/production_readiness"
+      ],
+      "pass_count": 0,
+      "warn_count": 0,
+      "fail_count": 2,
+      "summary": "Docker PHP 8.2 harness built cleanly (49.1s), php -l syntax checks passed across all 4 files, and the WordPress hook smoke check loaded member-analytics-portal.php registering 5 hooks cleanly. However, zero PHPUnit/Pest tests exist (total_tests=0, coverage.measured=False), leaving all security and business logic untested."
+    }
+  ],
+  "rule_compliance": [
+    {
+      "rule_id": "common/documentation",
+      "status": "fail",
+      "source_action": "repo_structure_audit",
+      "evidence": "README.md contains only 2 lines (# Member Analytics Portal + upload note) with no installation requirements, shortcode/REST reference, or security/dev instructions.",
+      "summary": ""
+    },
+    {
+      "rule_id": "common/production_readiness",
+      "status": "fail",
+      "source_action": "container_runtime_audit",
+      "evidence": "admin/settings-page.php:21 invokes remote @file_get_contents() without a stream timeout and suppresses errors with '@'; includes/rest-endpoints.php:21 uses print_r() instead of structured logging.; admin/settings-page.php:21 performs remote HTTP @file_get_contents() without timeout and suppresses failures via '@'; rest-endpoints.php:21 leaks raw data via print_r().",
+      "summary": ""
+    },
+    {
+      "rule_id": "common/runtime_verification",
+      "status": "fail",
+      "source_action": "container_runtime_audit",
+      "evidence": "build=passed, tests=0/0, smoke=passed; RV-01 harness build passed; RV-02 php -l passed but 0 automated tests exist; RV-03 coverage.measured=False (0% measured coverage); RV-04 WordPress plugin smoke check passed (5 hooks registered).",
+      "summary": ""
+    },
+    {
+      "rule_id": "common/security",
+      "status": "fail",
+      "source_action": "repo_structure_audit",
+      "evidence": "member-analytics-portal.php lines 20-21 concatenate raw $_GET['badge_label'] directly into HTML output without esc_html() or sanitize_text_field(), and the file lacks an ABSPATH direct-access guard.; Hardcoded secret literal $map_webhook_secret in includes/rest-endpoints.php:3 plus 5 HIGH CWE-89/CWE-79 dangerous code sinks across 3 files.; Hardcoded $map_webhook_secret, 3 unparameterized $wpdb SQL injection sinks, 3 reflected XSS points, unauthenticated PII export, and missing CSRF/capability enforcement.; Hardcoded $map_webhook_secret, 3 SQLi sinks, 3 XSS sinks, unauthenticated REST/AJAX PII exposure, and zero CSRF/capability protection.",
+      "summary": ""
+    },
+    {
+      "rule_id": "common/security_vulnerability",
+      "status": "fail",
+      "source_action": "php_ast_audit",
+      "evidence": "SEC-03 hardcoded secret; SEC-04 5 HIGH CWE sinks (3x CWE-89 SQLi, 2x CWE-79 XSS); SEC-05 4/5 endpoints lack auth (REST __return_true export, wp_ajax_nopriv search, missing ABSPATH guards).; SEC-01: 0 declared app CVEs (unmanaged raw PHP, harness OS CVEs excluded); SEC-02: no project Dockerfile (not_applicable); SEC-03 FAIL: hardcoded $map_webhook_secret (rest-endpoints.php:3); SEC-04 FAIL: 5 HIGH CWE sinks (3x CWE-89 SQLi, 2x CWE-79 XSS); SEC-05 FAIL: 4/5 unauthenticated endpoints (__return_true, wp_ajax_nopriv, missing ABSPATH).",
+      "summary": ""
+    },
+    {
+      "rule_id": "common/supply_chain",
+      "status": "fail",
+      "source_action": "repo_structure_audit",
+      "evidence": "LICENSE file missing at repository root; Missing LICENSE, SECURITY.md, CI workflows, dependency automation, and Composer lockfile/manifest.; Missing composer.json/composer.lock, LICENSE, SECURITY.md, CI workflows, and Dependabot; relies on unmanaged raw PHP targeting EOL PHP >=7.4.; No composer.json/composer.lock, no LICENSE, no SECURITY.md, no CI security workflows, and EOL PHP 7.4 requirement.",
+      "summary": ""
+    },
+    {
+      "rule_id": "php/code_quality",
+      "status": "fail",
+      "source_action": "php_ast_audit",
+      "evidence": "0.0% PHPDoc coverage across all 7 functions, 13 direct superglobal/global $wpdb usages, print_r() debug output in REST handler, and @file_get_contents error suppression.",
+      "summary": ""
+    },
+    {
+      "rule_id": "php/dependencies",
+      "status": "fail",
+      "source_action": "repo_structure_audit",
+      "evidence": "Raw PHP plugin without composer.json/composer.lock or PSR-4 autoloading; relies on manual require_once in member-analytics-portal.php and declares EOL Requires PHP: 7.4.",
+      "summary": ""
+    },
+    {
+      "rule_id": "php/frameworks/wordpress",
+      "status": "fail",
+      "source_action": "php_ast_audit",
+      "evidence": "16 WordPress security/hygiene failures: missing ABSPATH guards in all 4 files, REST permission_callback=>'__return_true' exposing wp_users, wp_ajax_nopriv unauthenticated member search, admin options page gated only by 'read' instead of 'manage_options', zero wp_verify_nonce/check_admin_referer/current_user_can checks, raw $wpdb queries without $wpdb->prepare(), hardcoded <script src=...> instead of wp_enqueue_script(), and unescaped echo.",
+      "summary": ""
+    },
+    {
+      "rule_id": "php/modern_stack",
+      "status": "fail",
+      "source_action": "repo_structure_audit",
+      "evidence": "Declares EOL PHP >=7.4, omits declare(strict_types=1) and parameter/return type declarations in member-analytics-portal.php, and lacks PHPUnit/Pest configuration.; EOL PHP >=7.4 header, manual require_once instead of Composer PSR-4, remote file_get_contents without timeout (missing_io_timeouts=1), print_r() unstructured debug output.",
+      "summary": ""
+    },
+    {
+      "rule_id": "php/testing",
+      "status": "fail",
+      "source_action": "php_test_audit",
+      "evidence": "0 test files and 0 PHPUnit tests across 4 plugin modules (coverage.measured=False); only runtime syntax lint (php -l) and hook load smoke check ran.",
+      "summary": ""
+    },
+    {
+      "rule_id": "php/typing",
+      "status": "fail",
+      "source_action": "php_ast_audit",
+      "evidence": "0.0% type safety coverage: missing declare(strict_types=1) in all 4 files and missing parameter/return types on all 7 functions.",
+      "summary": ""
+    },
+    {
+      "rule_id": "common/architecture",
+      "status": "warn",
+      "source_action": "php_ast_audit",
+      "evidence": "Acyclic 4-file procedural split (entrypoint -> rest/ajax/admin), but relies on manual require_once, 0 classes/namespaces, and 13 global/superglobal state accesses ($wpdb, $_GET, $_POST).",
+      "summary": ""
+    },
+    {
+      "rule_id": "common/git_workflow",
+      "status": "warn",
+      "source_action": "repo_structure_audit",
+      "evidence": "Missing .gitignore and CI workflow gates to run PHPCS/PHPStan/PHPUnit on pull requests.; Missing .gitignore and automated CI pull-request checks.",
+      "summary": ""
+    },
+    {
+      "rule_id": "common/maintainability",
+      "status": "warn",
+      "source_action": "php_ast_audit",
+      "evidence": "Functions are small (0 complexity hotspots), but heavy global/superglobal coupling (13 usages) and @file_get_contents error suppression hinder testability.",
+      "summary": ""
+    },
+    {
+      "rule_id": "common/twelve_factor",
+      "status": "warn",
+      "source_action": "service_readiness_audit",
+      "evidence": "WordPress plugin relies on WP options/$wpdb (partially expected for WP), but hardcodes $map_webhook_secret in rest-endpoints.php:3 and outputs unstructured print_r() at line 21.",
+      "summary": ""
+    },
+    {
+      "rule_id": "php/frameworks/laravel",
+      "status": "not_applicable",
+      "source_action": "php_ast_audit",
+      "evidence": "Target is a standalone WordPress plugin (detected_frameworks=['wordpress']); Laravel is not used.",
+      "summary": ""
+    }
+  ],
+  "module_hotspots": [
+    {
+      "file_path": "examples/php/wp_plugin_messy/includes/ajax-handlers.php",
+      "loc": 21,
+      "risk_score": 1.0,
+      "finding_counts": {
+        "high": 3
+      },
+      "top_rules": [
+        "CWE-79",
+        "CWE-89"
+      ]
+    },
+    {
+      "file_path": "examples/php/wp_plugin_messy/includes/rest-endpoints.php",
+      "loc": 21,
+      "risk_score": 1.0,
+      "finding_counts": {
+        "critical": 1,
+        "high": 1
+      },
+      "top_rules": [
+        "common/security",
+        "CWE-89"
+      ]
+    },
+    {
+      "file_path": "member-analytics-portal.php",
+      "loc": 0,
+      "risk_score": 1.0,
+      "finding_counts": {
+        "high": 4
+      },
+      "top_rules": [
+        "php/dependencies",
+        "common/security",
+        "common/runtime_verification",
+        "php/typing"
+      ]
+    },
+    {
+      "file_path": "includes/rest-endpoints.php",
+      "loc": 0,
+      "risk_score": 0.9,
+      "finding_counts": {
+        "critical": 2
+      },
+      "top_rules": [
+        "common/security",
+        "php/frameworks/wordpress"
+      ]
+    },
+    {
+      "file_path": "examples/php/wp_plugin_messy/admin/settings-page.php",
+      "loc": 31,
+      "risk_score": 0.54,
+      "finding_counts": {
+        "high": 1
+      },
+      "top_rules": [
+        "CWE-79"
+      ]
+    },
+    {
+      "file_path": "includes/ajax-handlers.php",
+      "loc": 0,
+      "risk_score": 0.45,
+      "finding_counts": {
+        "critical": 1
+      },
+      "top_rules": [
+        "php/frameworks/wordpress"
+      ]
+    },
+    {
+      "file_path": "admin/settings-page.php",
+      "loc": 0,
+      "risk_score": 0.28,
+      "finding_counts": {
+        "high": 1
+      },
+      "top_rules": [
+        "php/frameworks/wordpress"
+      ]
+    },
+    {
+      "file_path": "examples/php/wp_plugin_messy/member-analytics-portal.php",
+      "loc": 11,
+      "risk_score": 0.14,
+      "finding_counts": {},
+      "top_rules": []
+    }
+  ],
+  "strengths": [
+    "Separates plugin responsibilities across entrypoint, includes/rest-endpoints.php, includes/ajax-handlers.php, and admin/settings-page.php.",
+    "No circular file inclusions and each module stays compact (11-31 LOC).",
+    "All 4 PHP files pass PHP 8.2 syntax lint (php -l) and plugin entrypoint loads cleanly registering 5 WordPress hooks under isolated smoke test."
+  ],
+  "findings": [
+    {
+      "finding_id": "det-14cd1ace",
+      "source": "deterministic",
+      "component": null,
+      "severity": "critical",
+      "category": "security",
+      "rule_id": "common/security",
+      "file_path": "examples/php/wp_plugin_messy/includes/rest-endpoints.php",
+      "line": 3,
+      "symbol": "map_webhook_secret",
+      "evidence": "Hardcoded secret literal assigned to '$map_webhook_secret'",
+      "description": "Potential hardcoded secret detected in `examples/php/wp_plugin_messy/includes/rest-endpoints.php:3`.",
+      "recommendation": "Move secrets to environment variables or a secret manager and rotate exposed keys."
+    },
+    {
+      "finding_id": "",
+      "source": "ai",
+      "component": null,
+      "severity": "critical",
+      "category": "security",
+      "rule_id": "common/security",
+      "file_path": "includes/rest-endpoints.php",
+      "line": null,
+      "symbol": null,
+      "evidence": "",
+      "description": "includes/rest-endpoints.php line 3 assigns a hardcoded live-style webhook secret string directly to global variable $map_webhook_secret.",
+      "recommendation": "Remove the hardcoded secret immediately, rotate the key, and read it from a secure WordPress environment constant or encrypted option."
+    },
+    {
+      "finding_id": "",
+      "source": "ai",
+      "component": null,
+      "severity": "critical",
+      "category": "security",
+      "rule_id": "php/frameworks/wordpress",
+      "file_path": "includes/ajax-handlers.php",
+      "line": null,
+      "symbol": null,
+      "evidence": "",
+      "description": "map_ajax_search_members exposes wp_users via wp_ajax_nopriv with raw $_POST['term'] SQLi; map_ajax_purge_logs executes unparameterized DELETE FROM wp_map_events without check_ajax_referer() or current_user_can('manage_options') and echoes raw $_POST['category'] (CWE-79).",
+      "recommendation": "Remove wp_ajax_nopriv hook, enforce check_ajax_referer() + current_user_can('manage_options'), parameterize all queries with $wpdb->prepare(), and use wp_send_json_success() with esc_html()."
+    },
+    {
+      "finding_id": "",
+      "source": "ai",
+      "component": null,
+      "severity": "critical",
+      "category": "security",
+      "rule_id": "php/frameworks/wordpress",
+      "file_path": "includes/rest-endpoints.php",
+      "line": null,
+      "symbol": null,
+      "evidence": "",
+      "description": "GET /wp-json/member-analytics/v1/export sets permission_callback=>'__return_true', concatenates raw $_GET['role_filter'] into $wpdb->get_results($sql) querying wp_users (ID, user_login, user_email), and dumps rows via print_r() when ?debug is set.",
+      "recommendation": "Enforce current_user_can('manage_options') in permission_callback, sanitize input via $request->get_param('role_filter'), parameterize with $wpdb->prepare() + $wpdb->esc_like(), and remove print_r()."
+    },
+    {
+      "finding_id": "",
+      "source": "ai",
+      "component": null,
+      "severity": "high",
+      "category": "dependencies",
+      "rule_id": "php/dependencies",
+      "file_path": "member-analytics-portal.php",
+      "line": null,
+      "symbol": null,
+      "evidence": "",
+      "description": "Plugin header declares Requires PHP: 7.4 (EOL since Nov 2022) and loads files via manual require_once without composer.json, PSR-4 autoloading, or automated test configuration.",
+      "recommendation": "Add composer.json with php ^8.2|^8.3, PSR-4 autoloading, PHPUnit + PHPStan dev dependencies, and update the plugin header to Requires PHP: 8.2+."
+    },
+    {
+      "finding_id": "det-5adba809",
+      "source": "deterministic",
+      "component": null,
+      "severity": "high",
+      "category": "security",
+      "rule_id": "CWE-79",
+      "file_path": "examples/php/wp_plugin_messy/admin/settings-page.php",
+      "line": 26,
+      "symbol": "map_render_settings_page",
+      "evidence": "Unescaped request input rendered directly via 'echo $_GET['tab'] ?? 'general';'",
+      "description": "Dangerous sink (CWE-79 xss): Unescaped request input rendered directly via 'echo $_GET['tab'] ?? 'general';'",
+      "recommendation": "Replace with parameterized/safe APIs or enforce strict allow-list validation."
+    },
+    {
+      "finding_id": "det-22a1080a",
+      "source": "deterministic",
+      "component": null,
+      "severity": "high",
+      "category": "security",
+      "rule_id": "CWE-79",
+      "file_path": "examples/php/wp_plugin_messy/includes/ajax-handlers.php",
+      "line": 22,
+      "symbol": "map_ajax_purge_logs",
+      "evidence": "Unescaped request input rendered directly via 'echo \"Purged category: \" . $_POST['category'];'",
+      "description": "Dangerous sink (CWE-79 xss): Unescaped request input rendered directly via 'echo \"Purged category: \" . $_POST['category'];'",
+      "recommendation": "Replace with parameterized/safe APIs or enforce strict allow-list validation."
+    },
+    {
+      "finding_id": "det-fba364e9",
+      "source": "deterministic",
+      "component": null,
+      "severity": "high",
+      "category": "security",
+      "rule_id": "CWE-89",
+      "file_path": "examples/php/wp_plugin_messy/includes/ajax-handlers.php",
+      "line": 10,
+      "symbol": "map_ajax_search_members",
+      "evidence": "Unparameterized SQL in '$wpdb->get_results(\"SELECT ID, display_name, user_email FROM {$w)' — use prepared placeholders",
+      "description": "Dangerous sink (CWE-89 sql_injection): Unparameterized SQL in '$wpdb->get_results(\"SELECT ID, display_name, user_email FROM {$w)' — use prepared placeholders",
+      "recommendation": "Replace with parameterized/safe APIs or enforce strict allow-list validation."
+    },
+    {
+      "finding_id": "det-10ebcb2e",
+      "source": "deterministic",
+      "component": null,
+      "severity": "high",
+      "category": "security",
+      "rule_id": "CWE-89",
+      "file_path": "examples/php/wp_plugin_messy/includes/ajax-handlers.php",
+      "line": 21,
+      "symbol": "map_ajax_purge_logs",
+      "evidence": "Unparameterized SQL in '$wpdb->query(\"DELETE FROM wp_map_events WHERE category = ')' — use prepared placeholders",
+      "description": "Dangerous sink (CWE-89 sql_injection): Unparameterized SQL in '$wpdb->query(\"DELETE FROM wp_map_events WHERE category = ')' — use prepared placeholders",
+      "recommendation": "Replace with parameterized/safe APIs or enforce strict allow-list validation."
+    },
+    {
+      "finding_id": "det-9663cf10",
+      "source": "deterministic",
+      "component": null,
+      "severity": "high",
+      "category": "security",
+      "rule_id": "CWE-89",
+      "file_path": "examples/php/wp_plugin_messy/includes/rest-endpoints.php",
+      "line": 19,
+      "symbol": "map_export_all_members",
+      "evidence": "Unparameterized SQL in '$wpdb->get_results($sql)' — use prepared placeholders",
+      "description": "Dangerous sink (CWE-89 sql_injection): Unparameterized SQL in '$wpdb->get_results($sql)' — use prepared placeholders",
+      "recommendation": "Replace with parameterized/safe APIs or enforce strict allow-list validation."
+    },
+    {
+      "finding_id": "",
+      "source": "ai",
+      "component": null,
+      "severity": "high",
+      "category": "security",
+      "rule_id": "common/security",
+      "file_path": "member-analytics-portal.php",
+      "line": null,
+      "symbol": null,
+      "evidence": "",
+      "description": "map_render_badge_shortcode() directly interpolates untrusted $_GET['badge_label'] into '<span class=\"map-badge\">' without sanitization or esc_html(), and member-analytics-portal.php lacks defined('ABSPATH') || exit.",
+      "recommendation": "Add defined('ABSPATH') || exit at top of file, read badge label from shortcode_atts(), and escape output with esc_html()."
+    },
+    {
+      "finding_id": "",
+      "source": "ai",
+      "component": null,
+      "severity": "high",
+      "category": "security",
+      "rule_id": "php/frameworks/wordpress",
+      "file_path": "admin/settings-page.php",
+      "line": null,
+      "symbol": null,
+      "evidence": "",
+      "description": "add_options_page grants access to 'read' capability (any subscriber), mutates update_option('map_telemetry_url') without check_admin_referer() or current_user_can('manage_options'), calls @file_get_contents() without timeout (should use wp_remote_get), echoes unescaped $_GET['tab'] and $active_tab, and hardcodes <script src=...>.",
+      "recommendation": "Restrict capability to 'manage_options', verify nonce via check_admin_referer(), validate URL with esc_url_raw(), use wp_remote_get(['timeout'=>5]), escape with esc_html()/esc_attr(), and register JS via wp_enqueue_script()."
+    },
+    {
+      "finding_id": "",
+      "source": "ai",
+      "component": null,
+      "severity": "high",
+      "category": "testing",
+      "rule_id": "common/runtime_verification",
+      "file_path": "member-analytics-portal.php",
+      "line": null,
+      "symbol": null,
+      "evidence": "",
+      "description": "Although php -l and WordPress hook bootstrap succeeded, the plugin contains 0 test files and 0 PHPUnit tests (coverage.measured=False), providing zero regression protection for SQLi/XSS/capability fixes.",
+      "recommendation": "Configure Composer + PHPUnit (with WP_Mock or Brain Monkey) and write unit/security regression tests covering REST permission_callback, AJAX nonces, SQL preparation, and HTML escaping."
+    },
+    {
+      "finding_id": "",
+      "source": "ai",
+      "component": null,
+      "severity": "high",
+      "category": "typing",
+      "rule_id": "php/typing",
+      "file_path": "member-analytics-portal.php",
+      "line": null,
+      "symbol": null,
+      "evidence": "",
+      "description": "None of the 4 PHP files guard direct web execution with defined('ABSPATH') || exit, declare strict_types=1, type function signatures, or include PHPDoc blocks.",
+      "recommendation": "Add declare(strict_types=1) and defined('ABSPATH') || exit to every PHP file, migrate to typed PSR-4 classes, and add complete PHPDoc annotations."
+    },
+    {
+      "finding_id": "det-c7173d77",
+      "source": "deterministic",
+      "component": null,
+      "severity": "medium",
+      "category": "documentation",
+      "rule_id": "common/documentation",
+      "file_path": null,
+      "line": null,
+      "symbol": null,
+      "evidence": "has_readme=True, lines=2",
+      "description": "README documentation is missing or minimal (< 10 lines).",
+      "recommendation": "Document architecture overview, setup instructions, and usage in README.md."
+    }
+  ],
+  "consolidated_findings": [
+    {
+      "severity": "critical",
+      "file_path": "examples/php/wp_plugin_messy/includes/rest-endpoints.php",
+      "line": 3,
+      "symbol": "map_webhook_secret",
+      "rule_ids": [
+        "common/security"
+      ],
+      "categories": [
+        "security"
+      ],
+      "primary_description": "Potential hardcoded secret detected in `examples/php/wp_plugin_messy/includes/rest-endpoints.php:3`.",
+      "combined_evidence": "Hardcoded secret literal assigned to '$map_webhook_secret'",
+      "merged_recommendation": "Move secrets to environment variables or a secret manager and rotate exposed keys."
+    },
+    {
+      "severity": "critical",
+      "file_path": "includes/ajax-handlers.php",
+      "line": null,
+      "symbol": null,
+      "rule_ids": [
+        "php/frameworks/wordpress"
+      ],
+      "categories": [
+        "security"
+      ],
+      "primary_description": "map_ajax_search_members exposes wp_users via wp_ajax_nopriv with raw $_POST['term'] SQLi; map_ajax_purge_logs executes unparameterized DELETE FROM wp_map_events without check_ajax_referer() or current_user_can('manage_options') and echoes raw $_POST['category'] (CWE-79).",
+      "combined_evidence": "map_ajax_search_members exposes wp_users via wp_ajax_nopriv with raw $_POST['term'] SQLi; map_ajax_purge_logs executes unparameterized DELETE FROM wp_map_events without check_ajax_referer() or current_user_can('manage_options') and echoes raw $_POST['category'] (CWE-79).",
+      "merged_recommendation": "Remove wp_ajax_nopriv hook, enforce check_ajax_referer() + current_user_can('manage_options'), parameterize all queries with $wpdb->prepare(), and use wp_send_json_success() with esc_html()."
+    },
+    {
+      "severity": "critical",
+      "file_path": "includes/rest-endpoints.php",
+      "line": null,
+      "symbol": null,
+      "rule_ids": [
+        "common/security",
+        "php/frameworks/wordpress"
+      ],
+      "categories": [
+        "security"
+      ],
+      "primary_description": "includes/rest-endpoints.php line 3 assigns a hardcoded live-style webhook secret string directly to global variable $map_webhook_secret.",
+      "combined_evidence": "includes/rest-endpoints.php line 3 assigns a hardcoded live-style webhook secret string directly to global variable $map_webhook_secret. | GET /wp-json/member-analytics/v1/export sets permission_callback=>'__return_true', concatenates raw $_GET['role_filter'] into $wpdb->get_results($sql) querying wp_users (ID, user_login, user_email), and dumps rows via print_r() when ?debug is set.",
+      "merged_recommendation": "Remove the hardcoded secret immediately, rotate the key, and read it from a secure WordPress environment constant or encrypted option. / Enforce current_user_can('manage_options') in permission_callback, sanitize input via $request->get_param('role_filter'), parameterize with $wpdb->prepare() + $wpdb->esc_like(), and remove print_r()."
+    },
+    {
+      "severity": "high",
+      "file_path": "admin/settings-page.php",
+      "line": null,
+      "symbol": null,
+      "rule_ids": [
+        "php/frameworks/wordpress"
+      ],
+      "categories": [
+        "security"
+      ],
+      "primary_description": "add_options_page grants access to 'read' capability (any subscriber), mutates update_option('map_telemetry_url') without check_admin_referer() or current_user_can('manage_options'), calls @file_get_contents() without timeout (should use wp_remote_get), echoes unescaped $_GET['tab'] and $active_tab, and hardcodes <script src=...>.",
+      "combined_evidence": "add_options_page grants access to 'read' capability (any subscriber), mutates update_option('map_telemetry_url') without check_admin_referer() or current_user_can('manage_options'), calls @file_get_contents() without timeout (should use wp_remote_get), echoes unescaped $_GET['tab'] and $active_tab, and hardcodes <script src=...>.",
+      "merged_recommendation": "Restrict capability to 'manage_options', verify nonce via check_admin_referer(), validate URL with esc_url_raw(), use wp_remote_get(['timeout'=>5]), escape with esc_html()/esc_attr(), and register JS via wp_enqueue_script()."
+    },
+    {
+      "severity": "high",
+      "file_path": "examples/php/wp_plugin_messy/admin/settings-page.php",
+      "line": 26,
+      "symbol": "map_render_settings_page",
+      "rule_ids": [
+        "CWE-79"
+      ],
+      "categories": [
+        "security"
+      ],
+      "primary_description": "Dangerous sink (CWE-79 xss): Unescaped request input rendered directly via 'echo $_GET['tab'] ?? 'general';'",
+      "combined_evidence": "Unescaped request input rendered directly via 'echo $_GET['tab'] ?? 'general';'",
+      "merged_recommendation": "Replace with parameterized/safe APIs or enforce strict allow-list validation."
+    },
+    {
+      "severity": "high",
+      "file_path": "examples/php/wp_plugin_messy/includes/ajax-handlers.php",
+      "line": 10,
+      "symbol": "map_ajax_search_members",
+      "rule_ids": [
+        "CWE-89"
+      ],
+      "categories": [
+        "security"
+      ],
+      "primary_description": "Dangerous sink (CWE-89 sql_injection): Unparameterized SQL in '$wpdb->get_results(\"SELECT ID, display_name, user_email FROM {$w)' — use prepared placeholders",
+      "combined_evidence": "Unparameterized SQL in '$wpdb->get_results(\"SELECT ID, display_name, user_email FROM {$w)' — use prepared placeholders",
+      "merged_recommendation": "Replace with parameterized/safe APIs or enforce strict allow-list validation."
+    },
+    {
+      "severity": "high",
+      "file_path": "examples/php/wp_plugin_messy/includes/ajax-handlers.php",
+      "line": 21,
+      "symbol": "map_ajax_purge_logs",
+      "rule_ids": [
+        "CWE-89"
+      ],
+      "categories": [
+        "security"
+      ],
+      "primary_description": "Dangerous sink (CWE-89 sql_injection): Unparameterized SQL in '$wpdb->query(\"DELETE FROM wp_map_events WHERE category = ')' — use prepared placeholders",
+      "combined_evidence": "Unparameterized SQL in '$wpdb->query(\"DELETE FROM wp_map_events WHERE category = ')' — use prepared placeholders",
+      "merged_recommendation": "Replace with parameterized/safe APIs or enforce strict allow-list validation."
+    },
+    {
+      "severity": "high",
+      "file_path": "examples/php/wp_plugin_messy/includes/ajax-handlers.php",
+      "line": 22,
+      "symbol": "map_ajax_purge_logs",
+      "rule_ids": [
+        "CWE-79"
+      ],
+      "categories": [
+        "security"
+      ],
+      "primary_description": "Dangerous sink (CWE-79 xss): Unescaped request input rendered directly via 'echo \"Purged category: \" . $_POST['category'];'",
+      "combined_evidence": "Unescaped request input rendered directly via 'echo \"Purged category: \" . $_POST['category'];'",
+      "merged_recommendation": "Replace with parameterized/safe APIs or enforce strict allow-list validation."
+    },
+    {
+      "severity": "high",
+      "file_path": "examples/php/wp_plugin_messy/includes/rest-endpoints.php",
+      "line": 19,
+      "symbol": "map_export_all_members",
+      "rule_ids": [
+        "CWE-89"
+      ],
+      "categories": [
+        "security"
+      ],
+      "primary_description": "Dangerous sink (CWE-89 sql_injection): Unparameterized SQL in '$wpdb->get_results($sql)' — use prepared placeholders",
+      "combined_evidence": "Unparameterized SQL in '$wpdb->get_results($sql)' — use prepared placeholders",
+      "merged_recommendation": "Replace with parameterized/safe APIs or enforce strict allow-list validation."
+    },
+    {
+      "severity": "high",
+      "file_path": "member-analytics-portal.php",
+      "line": null,
+      "symbol": null,
+      "rule_ids": [
+        "php/dependencies",
+        "common/security",
+        "common/runtime_verification",
+        "php/typing"
+      ],
+      "categories": [
+        "dependencies",
+        "security",
+        "testing",
+        "typing"
+      ],
+      "primary_description": "Plugin header declares Requires PHP: 7.4 (EOL since Nov 2022) and loads files via manual require_once without composer.json, PSR-4 autoloading, or automated test configuration.",
+      "combined_evidence": "Plugin header declares Requires PHP: 7.4 (EOL since Nov 2022) and loads files via manual require_once without composer.json, PSR-4 autoloading, or automated test configuration. | map_render_badge_shortcode() directly interpolates untrusted $_GET['badge_label'] into '<span class=\"map-badge\">' without sanitization or esc_html(), and member-analytics-portal.php lacks defined('ABSPATH') || exit. | Although php -l and WordPress hook bootstrap succeeded, the plugin contains 0 test files and 0 PHPUnit tests (coverage.measured=False), providing zero regression protection for SQLi/XSS/capability fixes. | None of the 4 PHP files guard direct web execution with defined('ABSPATH') || exit, declare strict_types=1, type function signatures, or include PHPDoc blocks.",
+      "merged_recommendation": "Add composer.json with php ^8.2|^8.3, PSR-4 autoloading, PHPUnit + PHPStan dev dependencies, and update the plugin header to Requires PHP: 8.2+. / Add defined('ABSPATH') || exit at top of file, read badge label from shortcode_atts(), and escape output with esc_html(). / Configure Composer + PHPUnit (with WP_Mock or Brain Monkey) and write unit/security regression tests covering REST permission_callback, AJAX nonces, SQL preparation, and HTML escaping. / Add declare(strict_types=1) and defined('ABSPATH') || exit to every PHP file, migrate to typed PSR-4 classes, and add complete PHPDoc annotations."
+    },
+    {
+      "severity": "medium",
+      "file_path": "",
+      "line": null,
+      "symbol": null,
+      "rule_ids": [
+        "common/documentation"
+      ],
+      "categories": [
+        "documentation"
+      ],
+      "primary_description": "README documentation is missing or minimal (< 10 lines).",
+      "combined_evidence": "has_readme=True, lines=2",
+      "merged_recommendation": "Document architecture overview, setup instructions, and usage in README.md."
+    }
+  ],
+  "action_plan": [
+    {
+      "priority": "P0",
+      "title": "Add ABSPATH guard and escape shortcode output",
+      "category": "security",
+      "component": null,
+      "target_files": [
+        "member-analytics-portal.php"
+      ],
+      "related_rules": [
+        "common/security"
+      ],
+      "action": "Add ABSPATH guard and escape/sanitize shortcode attributes with esc_html(sanitize_text_field(...)).",
+      "expected_impact": "Eliminates reflected XSS in the public shortcode entrypoint."
+    },
+    {
+      "priority": "P0",
+      "title": "Eliminate SQLi, XSS, CSRF, and broken access control across REST, AJAX, and Admin handlers",
+      "category": "security",
+      "component": null,
+      "target_files": [
+        "includes/rest-endpoints.php",
+        "includes/ajax-handlers.php",
+        "admin/settings-page.php",
+        "member-analytics-portal.php"
+      ],
+      "related_rules": [
+        "php/frameworks/wordpress",
+        "common/security_vulnerability",
+        "CWE-89",
+        "CWE-79",
+        "CWE-352",
+        "CWE-862"
+      ],
+      "action": "Enforce ABSPATH guards, current_user_can('manage_options'), wp_verify_nonce/check_ajax_referer/check_admin_referer, $wpdb->prepare() + esc_like(), esc_html()/esc_attr(), and remove wp_ajax_nopriv / __return_true / print_r.",
+      "expected_impact": "Neutralizes all 5 HIGH CWE-89/CWE-79 sinks and unauthenticated PII exposure / destructive log purge."
+    },
+    {
+      "priority": "P0",
+      "title": "Remediate all CWE-89 SQLi, CWE-79 XSS, hardcoded secret, and unauthenticated REST/AJAX endpoints",
+      "category": "security",
+      "component": null,
+      "target_files": [
+        "includes/rest-endpoints.php",
+        "includes/ajax-handlers.php",
+        "admin/settings-page.php",
+        "member-analytics-portal.php"
+      ],
+      "related_rules": [
+        "common/security_vulnerability",
+        "SEC-03",
+        "SEC-04",
+        "SEC-05",
+        "CWE-89",
+        "CWE-79"
+      ],
+      "action": "Remove $map_webhook_secret literal, replace all 3 raw $wpdb queries with $wpdb->prepare(), escape all rendered $_GET/$_POST values, and enforce manage_options + nonce verification across REST, AJAX, and admin endpoints.",
+      "expected_impact": "Eliminates critical remote SQL injection, PII exfiltration, arbitrary log deletion, and XSS risks."
+    },
+    {
+      "priority": "P0",
+      "title": "Remove hardcoded $map_webhook_secret and externalize via wp-config/env secret",
+      "category": "security",
+      "component": null,
+      "target_files": [
+        "includes/rest-endpoints.php"
+      ],
+      "related_rules": [
+        "common/security",
+        "common/supply_chain"
+      ],
+      "action": "Delete the literal secret at line 3, rotate the webhook secret, and load it from an externalized environment variable or wp-config.php constant.",
+      "expected_impact": "Eliminates CRITICAL credential leak in source code."
+    },
+    {
+      "priority": "P1",
+      "title": "Replace @file_get_contents with timeout-bounded wp_remote_get and remove print_r",
+      "category": "code_quality",
+      "component": null,
+      "target_files": [
+        "admin/settings-page.php",
+        "includes/rest-endpoints.php"
+      ],
+      "related_rules": [
+        "common/production_readiness",
+        "common/twelve_factor"
+      ],
+      "action": "Use wp_remote_get() with explicit timeout and WP_Error handling in settings-page.php:21 and delete the ?debug print_r() branch in rest-endpoints.php:20-22.",
+      "expected_impact": "Eliminates hung PHP worker threads and debug data leaks."
+    },
+    {
+      "priority": "P1",
+      "title": "Adopt Composer PSR-4 packaging, PHP 8.2+, and CI governance",
+      "category": "dependencies",
+      "component": null,
+      "target_files": [
+        "member-analytics-portal.php"
+      ],
+      "related_rules": [
+        "php/dependencies",
+        "php/modern_stack",
+        "common/supply_chain"
+      ],
+      "action": "Introduce composer.json (PHP >=8.2, PSR-4, PHPUnit, PHPStan/PHPCS) and GitHub Actions CI + .gitignore + LICENSE + SECURITY.md.",
+      "expected_impact": "Brings the plugin to modern supported PHP 8.2+/8.3+ packaging and supply-chain governance."
+    },
+    {
+      "priority": "P1",
+      "title": "Add PHPUnit + WP_Mock/Brain Monkey security regression test suite with PCOV coverage",
+      "category": "testing",
+      "component": null,
+      "target_files": [
+        "member-analytics-portal.php",
+        "includes/rest-endpoints.php",
+        "includes/ajax-handlers.php",
+        "admin/settings-page.php"
+      ],
+      "related_rules": [
+        "common/runtime_verification"
+      ],
+      "action": "Add phpunit.xml and unit tests verifying capability checks, nonce validation, $wpdb->prepare parameterization, and esc_html output.",
+      "expected_impact": "Establishes automated CI regression testing and measurable line/branch coverage."
+    },
+    {
+      "priority": "P1",
+      "title": "Modernize to PHP 8.2+ strict_types, PSR-4 classes, wp_remote_get, and wp_enqueue_script",
+      "category": "typing",
+      "component": null,
+      "target_files": [
+        "member-analytics-portal.php",
+        "admin/settings-page.php"
+      ],
+      "related_rules": [
+        "php/typing",
+        "php/code_quality",
+        "php/modern_stack",
+        "php/frameworks/wordpress"
+      ],
+      "action": "Add declare(strict_types=1), native parameter/return types, PHPDoc, replace @file_get_contents with wp_remote_get(['timeout'=>5]), and enqueue admin-chart.js via wp_enqueue_script().",
+      "expected_impact": "Eliminates silent type coercion, unbounded HTTP calls, and WordPress asset-loading anti-patterns."
+    }
+  ],
+  "opt_outs": [],
+  "triaged_adjustments": [],
+  "execution_dag": {
+    "workflow_id": "php_wp_plugin_messy",
+    "category": "audit",
+    "scope": "repo",
+    "nodes": [
+      {
+        "stage_id": "confirm_plan",
+        "label": "Confirm Audit Plan & Execution DAG",
+        "mode": "ASK",
+        "status": "completed",
+        "needs": [],
+        "rules_count": 0,
+        "highlight": "Plan approved",
+        "skip_reason": ""
+      },
+      {
+        "stage_id": "repo_and_deps",
+        "label": "Repo Structure Audit",
+        "mode": "HYBRID",
+        "status": "completed",
+        "needs": [
+          "confirm_plan"
+        ],
+        "rules_count": 6,
+        "highlight": "4 src / 0 test files, 0 deps",
+        "skip_reason": ""
+      },
+      {
+        "stage_id": "supply_chain",
+        "label": "Evaluate Supply-Chain, CI Permissions, Container...",
+        "mode": "AI",
+        "status": "completed",
+        "needs": [
+          "repo_and_deps"
+        ],
+        "rules_count": 3,
+        "highlight": "completed",
+        "skip_reason": ""
+      },
+      {
+        "stage_id": "ast_and_quality",
+        "label": "Php Ast Audit",
+        "mode": "HYBRID",
+        "status": "completed",
+        "needs": [
+          "repo_and_deps"
+        ],
+        "rules_count": 9,
+        "highlight": "4 files, 84 LOC, 5 sinks",
+        "skip_reason": ""
+      },
+      {
+        "stage_id": "runtime_verification",
+        "label": "Container Runtime Audit",
+        "mode": "HYBRID",
+        "status": "completed",
+        "needs": [
+          "repo_and_deps"
+        ],
+        "rules_count": 2,
+        "highlight": "build=passed, tests=0/0",
+        "skip_reason": ""
+      },
+      {
+        "stage_id": "security_audit",
+        "label": "Security Vulnerability Audit",
+        "mode": "HYBRID",
+        "status": "completed",
+        "needs": [
+          "repo_and_deps"
+        ],
+        "rules_count": 2,
+        "highlight": "Trivy CVEs=0 (CRIT=0, HIGH=0), secrets=0",
+        "skip_reason": ""
+      },
+      {
+        "stage_id": "arch_recording",
+        "label": "Architecture Analysis",
+        "mode": "AI",
+        "status": "completed",
+        "needs": [
+          "ast_and_quality"
+        ],
+        "rules_count": 1,
+        "highlight": "4 layers, 3 flows grounded",
+        "skip_reason": ""
+      },
+      {
+        "stage_id": "service_readiness",
+        "label": "Evaluate 12-Factor Config/Statelessness & SRE PRR...",
+        "mode": "AI",
+        "status": "completed",
+        "needs": [
+          "ast_and_quality"
+        ],
+        "rules_count": 3,
+        "highlight": "completed",
+        "skip_reason": ""
+      },
+      {
+        "stage_id": "test_health",
+        "label": "Evaluate PHP Test Suite Completeness & Structure",
+        "mode": "AI",
+        "status": "completed",
+        "needs": [
+          "ast_and_quality"
+        ],
+        "rules_count": 1,
+        "highlight": "completed",
+        "skip_reason": ""
+      },
+      {
+        "stage_id": "output_score",
+        "label": "Write Validated Score & AI Context JSON",
+        "mode": "AI",
+        "status": "completed",
+        "needs": [
+          "supply_chain",
+          "arch_recording",
+          "service_readiness",
+          "test_health",
+          "runtime_verification",
+          "security_audit"
+        ],
+        "rules_count": 0,
+        "highlight": "score=60/100 (C), 17 rules, 15 findings",
+        "skip_reason": ""
+      },
+      {
+        "stage_id": "create_report",
+        "label": "Create Visual Report with drawlib",
+        "mode": "AI",
+        "status": "pending",
+        "needs": [
+          "output_score"
+        ],
+        "rules_count": 0,
+        "highlight": "A4 Drawlib PDF report synthesis",
+        "skip_reason": ""
+      }
+    ],
+    "audit_scope": {
+      "target_root": "examples/php/wp_plugin_messy",
+      "source_targets": [
+        "."
+      ],
+      "test_targets": [
+        "tests"
+      ],
+      "doc_targets": [
+        "README.md"
+      ],
+      "exclude_globs": [],
+      "language": "php",
+      "companion_languages": [],
+      "detected_frameworks": [
+        "wordpress"
+      ],
+      "git_branch": "main",
+      "git_sha": "d1e02277",
+      "git_dirty": true,
+      "tools_used": [
+        "project_inspect (php)",
+        "tree-sitter AST (php)",
+        "container runtime harness (docker: php/raw.dockerfile)",
+        "Trivy (docker: fs+image)"
+      ],
+      "artifact_manifest": {
+        "score_json": "docs/reports/php_wp_plugin_messy/php_wp_plugin_messy_score.json",
+        "summary_json": "docs/reports/php_wp_plugin_messy/php_wp_plugin_messy_summary.json",
+        "findings_sarif": "docs/reports/php_wp_plugin_messy/php_wp_plugin_messy_findings.sarif",
+        "plan_json": "docs_src/reports/php_wp_plugin_messy/_facts/plan.json",
+        "facts_json": "docs_src/reports/php_wp_plugin_messy/_facts/facts.json",
+        "architecture_json": "docs_src/reports/php_wp_plugin_messy/_facts/architecture.json"
+      }
+    }
+  },
+  "components": [],
+  "approved_plan_summary": "Auto-approved via --auto-approve or plan_gate=false.",
+  "report_hints": [
+    "Focus Chapter 6 security deep dive on the 4-module WordPress attack surface: REST __return_true + SQLi + hardcoded secret, AJAX wp_ajax_nopriv SQLi + destructive DELETE SQLi/XSS, Admin 'read' cap + CSRF + XSS + @file_get_contents, and Shortcode $_GET XSS.",
+    "Highlight clean separation of harness-only OS CVEs (excluded) vs. severe application-layer CWE-89/CWE-79/CWE-352/CWE-862 risks.",
+    "Contrast passing PHP 8.2 php -l / 5-hook smoke load against 0 PHPUnit tests and 0% typing/PHPDoc."
+  ],
+  "summary": "wp_plugin_messy (Member Analytics Portal v1.3.0) scores 60/100 (Grade C overall, Security 30/100 Grade D, Documentation 27/100 Grade D, Typing 36/100 Grade D) due to systemic WordPress security failures across every module. While isolated PHP 8.2 runtime syntax checks (php -l) and WordPress hook loading (5 hooks) succeeded with 0 declared Composer CVEs, SAST and AST inspection uncovered 1 hardcoded webhook secret ($map_webhook_secret), 5 HIGH CWE dangerous sinks (3x CWE-89 unparameterized $wpdb SQL injection querying wp_users and deleting wp_map_events, 2x CWE-79 unescaped XSS plus shortcode $_GET XSS), unauthenticated PII exposure via REST permission_callback=>'__return_true' and wp_ajax_nopriv, subscriber-level ('read') admin settings privilege escalation without nonces, missing ABSPATH guards in all 4 files, 0% typing/PHPDoc, and 0 automated tests."
+}

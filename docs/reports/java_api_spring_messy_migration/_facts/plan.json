@@ -1,0 +1,166 @@
+{
+  "schema_version": "2.0",
+  "workflow_id": "java_api_spring_messy_migration",
+  "category": "migration",
+  "scope": "repo",
+  "target_root": "examples/java/api_spring_messy",
+  "language": "java",
+  "runtime_types": [
+    "web_api"
+  ],
+  "detected_frameworks": [
+    "spring-boot",
+    "spring-framework",
+    "javax-ee",
+    "junit4"
+  ],
+  "container_engine": null,
+  "harness_template": "java/maven.dockerfile",
+  "components": [
+    {
+      "id": "python",
+      "root": ".",
+      "language": "python",
+      "file_count": 161,
+      "approx_loc": 55986,
+      "has_runtime_harness": true,
+      "recommended_dockerfile": "python/..."
+    },
+    {
+      "id": "objc",
+      "root": ".",
+      "language": "objc",
+      "file_count": 18,
+      "approx_loc": 1267,
+      "has_runtime_harness": false,
+      "recommended_dockerfile": ""
+    },
+    {
+      "id": "php",
+      "root": ".",
+      "language": "php",
+      "file_count": 24,
+      "approx_loc": 1149,
+      "has_runtime_harness": true,
+      "recommended_dockerfile": "php/..."
+    },
+    {
+      "id": "haskell",
+      "root": ".",
+      "language": "haskell",
+      "file_count": 9,
+      "approx_loc": 1083,
+      "has_runtime_harness": true,
+      "recommended_dockerfile": "haskell/..."
+    }
+  ],
+  "companion_languages": [
+    "bicep",
+    "css",
+    "dockerfile",
+    "hcl",
+    "html",
+    "json",
+    "make",
+    "nix",
+    "protobuf",
+    "scss",
+    "sql",
+    "starlark",
+    "toml",
+    "xml",
+    "yaml"
+  ],
+  "nodes": [
+    {
+      "action_id": "act-01",
+      "step_key": "confirm_plan",
+      "name": "Confirm Audit Plan & Execution DAG",
+      "primitive_type": "confirm_plan",
+      "source_action": null,
+      "needs": [],
+      "when": null,
+      "status": "ask",
+      "badge": "ASK",
+      "detail": "",
+      "skip_reason": ""
+    },
+    {
+      "action_id": "act-02",
+      "step_key": "migration_intelligence_and_plan",
+      "name": "Extract Topological Waves, Contracts, Touchpoints & Ambiguities",
+      "primitive_type": "migration_analyze",
+      "source_action": "migration_proposal",
+      "needs": [
+        "confirm_plan"
+      ],
+      "when": null,
+      "status": "run",
+      "badge": "AUTO",
+      "detail": "rules=common/migration_planning",
+      "skip_reason": ""
+    },
+    {
+      "action_id": "act-03",
+      "step_key": "migration_intelligence_and_plan",
+      "name": "Evaluate Migration Constraints & Architecture Boundaries",
+      "primitive_type": "ai_interpret",
+      "source_action": "migration_proposal",
+      "needs": [
+        "act-02"
+      ],
+      "when": null,
+      "status": "run",
+      "badge": "AI",
+      "detail": "rules=common/migration_planning",
+      "skip_reason": ""
+    },
+    {
+      "action_id": "act-04",
+      "step_key": "migration_intelligence_and_plan",
+      "name": "Emit Validated MigrationPlanResult JSON",
+      "primitive_type": "emit_migration_plan",
+      "source_action": "migration_proposal",
+      "needs": [
+        "act-03"
+      ],
+      "when": null,
+      "status": "run",
+      "badge": "AI",
+      "detail": "rules=common/migration_planning",
+      "skip_reason": ""
+    },
+    {
+      "action_id": "act-05",
+      "step_key": "compile_migration_report",
+      "name": "Author & Compile Drawlib Migration Execution Plan PDF",
+      "primitive_type": "write_drawlib_report",
+      "source_action": "write_migration_report",
+      "needs": [
+        "migration_intelligence_and_plan"
+      ],
+      "when": null,
+      "status": "run",
+      "badge": "AI",
+      "detail": "",
+      "skip_reason": ""
+    }
+  ],
+  "mermaid_dag": "flowchart TD\n    act_01[\"[ASK] act-01: Confirm Audit Plan & Execution DAG\"]\n    act_02[\"[AUTO] act-02: Extract Topological Waves, Contracts, Touchpoints & Ambiguities\"]\n    act_03[\"[AI] act-03: Evaluate Migration Constraints & Architecture Boundaries\"]\n    act_04[\"[AI] act-04: Emit Validated MigrationPlanResult JSON\"]\n    act_05[\"[AI] act-05: Author & Compile Drawlib Migration Execution Plan PDF\"]\n    act_01 --> act_02\n    act_02 --> act_03\n    act_03 --> act_04\n    act_04 --> act_05\n    classDef auto fill:#e8f0fe,stroke:#1a73e8,color:#174ea6\n    classDef ai fill:#fef7e0,stroke:#f9ab00,color:#b06000\n    classDef skip fill:#f1f3f4,stroke:#9aa0a6,color:#5f6368\n    classDef ask fill:#e6f4ea,stroke:#1e8e3e,color:#137333\n    class act_01 ask\n    class act_02 auto\n    class act_03 ai\n    class act_04 ai\n    class act_05 ai",
+  "alignment_questions": [
+    "Target scope check: `root=examples/java/api_spring_messy`, `source=['src/main/java']`, `tests=['src/test/java']` (6 source / 1 test files detected for `java`). Any directories to add or exclude?",
+    "Any focus areas (e.g. security, refactoring, test coverage), design waivers (`opt_out`), or preferred report language/format (`en`/`ja`, `pdf`/`html`)?"
+  ],
+  "approval": {
+    "approved": true,
+    "confirmed_targets": null,
+    "enabled_steps": [],
+    "disabled_steps": [],
+    "focus_areas": [],
+    "extra_opt_outs": [],
+    "report_lang": null,
+    "report_formats": [],
+    "report_mode": "unified",
+    "alignment_summary": "Auto-approved via --auto-approve or plan_gate=false."
+  }
+}

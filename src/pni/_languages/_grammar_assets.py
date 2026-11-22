@@ -35,6 +35,8 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Final
 
+from pni._languages._settings import load_grammar_asset_settings
+
 try:
     import fcntl
 except ImportError:  # pragma: no cover - Windows fallback
@@ -102,7 +104,7 @@ class GrammarReleaseAsset:
         repo_name: str = DEFAULT_GRAMMAR_REPO_NAME,
     ) -> str:
         """Return the HTTPS download URL for this grammar archive."""
-        resolved_base = (base_url or os.environ.get("PNI_GRAMMAR_BASE_URL", "")).strip().rstrip("/")
+        resolved_base = (base_url or load_grammar_asset_settings().base_url).strip().rstrip("/")
         if resolved_base:
             return f"{resolved_base}/{self.archive_name}"
         tag = (release_tag or resolve_release_tag()).strip()
@@ -125,7 +127,233 @@ class GrammarCacheStatus:
 
 
 # BEGIN PINNED_GRAMMAR_ASSETS
-PINNED_GRAMMAR_ASSETS: Final[dict[tuple[str, str], GrammarReleaseAsset]] = {}
+PINNED_GRAMMAR_ASSETS: Final[dict[tuple[str, str], GrammarReleaseAsset]] = {
+    ("cobol", "linux_aarch64"): GrammarReleaseAsset(
+        asset_id="cobol",
+        grammar_id="cobol",
+        platform_tag="linux_aarch64",
+        archive_name="pni_grammar_cobol_linux_aarch64.zip",
+        binary_filename="_cobol.abi3.so",
+        sha256="50b01a05b80f4b9360126fe0aa798e1abb6cd2ff81861a9d9adb21db3e6f833d",
+        size=845503,
+    ),
+    ("cobol", "linux_x86_64"): GrammarReleaseAsset(
+        asset_id="cobol",
+        grammar_id="cobol",
+        platform_tag="linux_x86_64",
+        archive_name="pni_grammar_cobol_linux_x86_64.zip",
+        binary_filename="_cobol.abi3.so",
+        sha256="66931c75718b80549b6278e48b67b5ebbde06f02525b8b45fc8344f640687828",
+        size=770509,
+    ),
+    ("cobol", "macos_arm64"): GrammarReleaseAsset(
+        asset_id="cobol",
+        grammar_id="cobol",
+        platform_tag="macos_arm64",
+        archive_name="pni_grammar_cobol_macos_arm64.zip",
+        binary_filename="_cobol.abi3.so",
+        sha256="fea68d693d9d22b6627512fa348fa59c3c405c3624d91924ebed687fa19836d5",
+        size=809573,
+    ),
+    ("cobol", "macos_x86_64"): GrammarReleaseAsset(
+        asset_id="cobol",
+        grammar_id="cobol",
+        platform_tag="macos_x86_64",
+        archive_name="pni_grammar_cobol_macos_x86_64.zip",
+        binary_filename="_cobol.abi3.so",
+        sha256="9df78aa23ae9b55c0bed8b1a9b074f91bfec0a4c931580bcf84fe17da253666c",
+        size=707256,
+    ),
+    ("cobol", "windows_amd64"): GrammarReleaseAsset(
+        asset_id="cobol",
+        grammar_id="cobol",
+        platform_tag="windows_amd64",
+        archive_name="pni_grammar_cobol_windows_amd64.zip",
+        binary_filename="_cobol.pyd",
+        sha256="96865a7a7f9df64332f7954977071970ea8f7812e85b21ef1698078e5e9e16ab",
+        size=707559,
+    ),
+    ("dockerfile", "linux_aarch64"): GrammarReleaseAsset(
+        asset_id="dockerfile",
+        grammar_id="dockerfile",
+        platform_tag="linux_aarch64",
+        archive_name="pni_grammar_dockerfile_linux_aarch64.zip",
+        binary_filename="_dockerfile.abi3.so",
+        sha256="a9eef5b8749908fae15483d6a4960b19f64c35a8ed960325c53c30668a2f43ff",
+        size=43295,
+    ),
+    ("dockerfile", "linux_x86_64"): GrammarReleaseAsset(
+        asset_id="dockerfile",
+        grammar_id="dockerfile",
+        platform_tag="linux_x86_64",
+        archive_name="pni_grammar_dockerfile_linux_x86_64.zip",
+        binary_filename="_dockerfile.abi3.so",
+        sha256="33bd4dcb014df06b92aebd4fb3ed7797585ad630366fec1a339c2dd02a403041",
+        size=36094,
+    ),
+    ("dockerfile", "macos_arm64"): GrammarReleaseAsset(
+        asset_id="dockerfile",
+        grammar_id="dockerfile",
+        platform_tag="macos_arm64",
+        archive_name="pni_grammar_dockerfile_macos_arm64.zip",
+        binary_filename="_dockerfile.abi3.so",
+        sha256="18d94d67a825a7e995e05d9ec6ca281af163feb96ddaef98ab06fb0031acbb19",
+        size=21825,
+    ),
+    ("dockerfile", "macos_x86_64"): GrammarReleaseAsset(
+        asset_id="dockerfile",
+        grammar_id="dockerfile",
+        platform_tag="macos_x86_64",
+        archive_name="pni_grammar_dockerfile_macos_x86_64.zip",
+        binary_filename="_dockerfile.abi3.so",
+        sha256="244f3f534e6e1e86b5c3f4a0aa0de16300d4962b3f268930d8fad2a1dde7f27c",
+        size=20310,
+    ),
+    ("dockerfile", "windows_amd64"): GrammarReleaseAsset(
+        asset_id="dockerfile",
+        grammar_id="dockerfile",
+        platform_tag="windows_amd64",
+        archive_name="pni_grammar_dockerfile_windows_amd64.zip",
+        binary_filename="_dockerfile.pyd",
+        sha256="ef0229dabf79d3838c26d92e4ace7fb0fcb103d6a7fde7af4c098299ca0f6958",
+        size=23783,
+    ),
+    ("proto", "linux_aarch64"): GrammarReleaseAsset(
+        asset_id="proto",
+        grammar_id="protobuf",
+        platform_tag="linux_aarch64",
+        archive_name="pni_grammar_proto_linux_aarch64.zip",
+        binary_filename="_proto.abi3.so",
+        sha256="7ba57a2bf2b1c747baae27f1d31c9a84a5034dbd315e06f9dc7fb2dc91ea30d6",
+        size=36489,
+    ),
+    ("proto", "linux_x86_64"): GrammarReleaseAsset(
+        asset_id="proto",
+        grammar_id="protobuf",
+        platform_tag="linux_x86_64",
+        archive_name="pni_grammar_proto_linux_x86_64.zip",
+        binary_filename="_proto.abi3.so",
+        sha256="f5904aa08ea2b3a4a90681761af3ecbf64346edf521c271f97c92a8d1d5e69e7",
+        size=28761,
+    ),
+    ("proto", "macos_arm64"): GrammarReleaseAsset(
+        asset_id="proto",
+        grammar_id="protobuf",
+        platform_tag="macos_arm64",
+        archive_name="pni_grammar_proto_macos_arm64.zip",
+        binary_filename="_proto.abi3.so",
+        sha256="f3a709ea153e044a98c7c2201adb8e8ed20c0ba1c76b1ab0512d945a9672a72c",
+        size=19458,
+    ),
+    ("proto", "macos_x86_64"): GrammarReleaseAsset(
+        asset_id="proto",
+        grammar_id="protobuf",
+        platform_tag="macos_x86_64",
+        archive_name="pni_grammar_proto_macos_x86_64.zip",
+        binary_filename="_proto.abi3.so",
+        sha256="59e00939f4da752a6c7922319a7381b6c980137ea4f37d0d44ebdbb2d0853f2c",
+        size=18153,
+    ),
+    ("proto", "windows_amd64"): GrammarReleaseAsset(
+        asset_id="proto",
+        grammar_id="protobuf",
+        platform_tag="windows_amd64",
+        archive_name="pni_grammar_proto_windows_amd64.zip",
+        binary_filename="_proto.pyd",
+        sha256="16f190bf341bc93eeb52e2ee630083ec287df6b50a1b64bff8ce76c676d932ac",
+        size=21025,
+    ),
+    ("r", "linux_aarch64"): GrammarReleaseAsset(
+        asset_id="r",
+        grammar_id="r",
+        platform_tag="linux_aarch64",
+        archive_name="pni_grammar_r_linux_aarch64.zip",
+        binary_filename="_r.abi3.so",
+        sha256="25f1f55976d2609b448fe9bfb130ed136dd6cbc6bcbb964f49bfe4cef67bd936",
+        size=80617,
+    ),
+    ("r", "linux_x86_64"): GrammarReleaseAsset(
+        asset_id="r",
+        grammar_id="r",
+        platform_tag="linux_x86_64",
+        archive_name="pni_grammar_r_linux_x86_64.zip",
+        binary_filename="_r.abi3.so",
+        sha256="bda74675f1d157065505d3d8903997a5d41715c406dc53f7ca6251c87071babd",
+        size=79442,
+    ),
+    ("r", "macos_arm64"): GrammarReleaseAsset(
+        asset_id="r",
+        grammar_id="r",
+        platform_tag="macos_arm64",
+        archive_name="pni_grammar_r_macos_arm64.zip",
+        binary_filename="_r.abi3.so",
+        sha256="20032b65e1a6cc39ac3bdc30ced671a73525455a92328e60416a970c80baf609",
+        size=59091,
+    ),
+    ("r", "macos_x86_64"): GrammarReleaseAsset(
+        asset_id="r",
+        grammar_id="r",
+        platform_tag="macos_x86_64",
+        archive_name="pni_grammar_r_macos_x86_64.zip",
+        binary_filename="_r.abi3.so",
+        sha256="84267c72e46afc81e3bad64888a96ddf3c759fa86beec0168a84260777ff1151",
+        size=53375,
+    ),
+    ("r", "windows_amd64"): GrammarReleaseAsset(
+        asset_id="r",
+        grammar_id="r",
+        platform_tag="windows_amd64",
+        archive_name="pni_grammar_r_windows_amd64.zip",
+        binary_filename="_r.pyd",
+        sha256="4ff2f3bd27130330f26202f237ece36e0daf575fa5a35ebbe0cbd7d057f53e9e",
+        size=54842,
+    ),
+    ("vue", "linux_aarch64"): GrammarReleaseAsset(
+        asset_id="vue",
+        grammar_id="vue",
+        platform_tag="linux_aarch64",
+        archive_name="pni_grammar_vue_linux_aarch64.zip",
+        binary_filename="_vue.abi3.so",
+        sha256="377d00913a67be19c4fa06bb04b0c09548adf1d95cceed016b2d6268a1ef1b87",
+        size=40022,
+    ),
+    ("vue", "linux_x86_64"): GrammarReleaseAsset(
+        asset_id="vue",
+        grammar_id="vue",
+        platform_tag="linux_x86_64",
+        archive_name="pni_grammar_vue_linux_x86_64.zip",
+        binary_filename="_vue.abi3.so",
+        sha256="5662ed5f2432b1196c01ea5570c0b8b617f4a65f1168700b21a69891b65dd8d4",
+        size=39519,
+    ),
+    ("vue", "macos_arm64"): GrammarReleaseAsset(
+        asset_id="vue",
+        grammar_id="vue",
+        platform_tag="macos_arm64",
+        archive_name="pni_grammar_vue_macos_arm64.zip",
+        binary_filename="_vue.abi3.so",
+        sha256="6615777c11941787d013d80ba97623c97eff4051b2520a269c420580ec7b0165",
+        size=14115,
+    ),
+    ("vue", "macos_x86_64"): GrammarReleaseAsset(
+        asset_id="vue",
+        grammar_id="vue",
+        platform_tag="macos_x86_64",
+        archive_name="pni_grammar_vue_macos_x86_64.zip",
+        binary_filename="_vue.abi3.so",
+        sha256="28f4b52df21cbc54788883baf5dee84496046cac814a805dcf6e92556267ad47",
+        size=13923,
+    ),
+    ("vue", "windows_amd64"): GrammarReleaseAsset(
+        asset_id="vue",
+        grammar_id="vue",
+        platform_tag="windows_amd64",
+        archive_name="pni_grammar_vue_windows_amd64.zip",
+        binary_filename="_vue.pyd",
+        sha256="f59c15b53290cf1e2ae111352e17a047ab15a55e1f246ec25ef085ba58e60dce",
+        size=15845,
+    ),
+}
 # END PINNED_GRAMMAR_ASSETS
 
 
@@ -144,7 +372,7 @@ def resolve_release_tag(release_tag: str | None = None) -> str:
     """Return the active GitHub Release tag for extra grammar downloads."""
     if release_tag and release_tag.strip():
         return release_tag.strip()
-    env_tag = os.environ.get("PNI_GRAMMAR_RELEASE_TAG", "").strip()
+    env_tag = load_grammar_asset_settings().release_tag
     return env_tag or DEFAULT_GRAMMAR_RELEASE_TAG
 
 
@@ -196,11 +424,12 @@ def _is_dir_writable(path: Path) -> bool:
 
 def _os_user_cache_dir() -> Path:
     """Return the standard OS user cache directory for pni501 grammar binaries."""
+    settings = load_grammar_asset_settings()
     if sys.platform == "win32":
-        local_app = os.environ.get("LOCALAPPDATA")
+        local_app = settings.local_app_data
         base = Path(local_app) if local_app else Path.home() / "AppData" / "Local"
         return base / "pni501" / "grammars"
-    xdg = os.environ.get("XDG_CACHE_HOME")
+    xdg = settings.xdg_cache_home
     base = Path(xdg) if xdg else Path.home() / ".cache"
     return base / "pni501" / "grammars"
 
@@ -214,7 +443,7 @@ def resolve_grammar_cache_dir() -> Path:
         3. OS user cache directory (``~/.cache/pni501/grammars`` or ``%LOCALAPPDATA%``).
         4. System temp fallback (``<tmp>/pni501_grammars``).
     """
-    env_override = os.environ.get("PNI_GRAMMAR_CACHE_DIR", "").strip()
+    env_override = load_grammar_asset_settings().cache_dir
     if env_override:
         override_path = Path(env_override).expanduser().resolve()
         override_path.mkdir(parents=True, exist_ok=True)
@@ -268,7 +497,7 @@ def _validate_download_url(url: str) -> None:
     lower = url.lower()
     if lower.startswith("https://"):
         return
-    if lower.startswith("http://") and os.environ.get("PNI_GRAMMAR_BASE_URL", "").strip():
+    if lower.startswith("http://") and load_grammar_asset_settings().base_url:
         return
     msg = f"Refusing unsafe grammar download URL scheme: '{url}' (only https:// is permitted)."
     raise ValueError(msg)
@@ -290,7 +519,7 @@ def _fetch_remote_manifest_asset(
     base_url: str | None = None,
 ) -> GrammarReleaseAsset:
     """Fallback lookup against remote manifest.json when a custom release tag is unpinned."""
-    resolved_base = (base_url or os.environ.get("PNI_GRAMMAR_BASE_URL", "")).strip().rstrip("/")
+    resolved_base = (base_url or load_grammar_asset_settings().base_url).strip().rstrip("/")
     if resolved_base:
         manifest_url = f"{resolved_base}/manifest.json"
     else:

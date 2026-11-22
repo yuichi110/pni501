@@ -1,0 +1,1747 @@
+{
+  "workflow_id": "py_api_fastapi_clean",
+  "targets": {
+    "root": "examples/python/api_fastapi_clean",
+    "source": [
+      "src"
+    ],
+    "tests": [
+      "tests"
+    ],
+    "docs": [
+      "README.md"
+    ],
+    "exclude": []
+  },
+  "outputs": {
+    "facts": ".pni/cache/py_api_fastapi_clean/facts.json",
+    "score": "docs/reports/py_api_fastapi_clean/py_api_fastapi_clean_score.json",
+    "report": "docs/reports/py_api_fastapi_clean/py_api_fastapi_clean.pdf"
+  },
+  "project_facts": {
+    "project_name": "order-dispatch",
+    "version": "1.2.0",
+    "language": "python",
+    "runtime_types": [
+      "web_api",
+      "library"
+    ],
+    "build_system": "uv",
+    "language_version_constraint": ">=3.11",
+    "has_type_marker": true,
+    "manifest_files": [
+      "pyproject.toml"
+    ],
+    "lockfiles_found": [
+      "uv.lock"
+    ],
+    "dependencies": [
+      "fastapi>=0.115.0",
+      "httpx>=0.27.0",
+      "pydantic>=2.8.0",
+      "pydantic-settings>=2.4.0",
+      "uvicorn>=0.30.0"
+    ],
+    "unpinned_dependencies": [],
+    "dev_dependencies": [
+      "pytest>=8.3.0",
+      "pytest-cov>=6.0.0",
+      "ruff>=0.9.0",
+      "ty>=0.0.35"
+    ],
+    "detected_frameworks": [
+      "fastapi",
+      "pydantic",
+      "pytest",
+      "httpx"
+    ],
+    "legacy_language_findings": [],
+    "tooling_modernization_issues": [],
+    "source_files_count": 14,
+    "test_files_count": 3,
+    "has_readme": true,
+    "readme_line_count": 23,
+    "readme_headings": [
+      "# order-dispatch",
+      "## Quickstart Tutorial",
+      "## Operations How-To Guide",
+      "### Configure Environment Variables (12-Factor III)",
+      "## HTTP API Reference",
+      "## Layered Architecture Explanation"
+    ],
+    "docs_inventory": [
+      "README.md",
+      "SECURITY.md"
+    ],
+    "has_gitignore": true,
+    "has_license": true,
+    "has_security_policy": true,
+    "has_dependency_automation": true,
+    "ci_workflows_found": [
+      ".github/workflows/ci.yml"
+    ],
+    "ci_supply_chain_issues": [],
+    "committed_secret_files": [],
+    "has_dockerfile": true,
+    "container_hygiene_issues": [],
+    "opt_out_counts": {}
+  },
+  "ast_facts": {
+    "language": "python",
+    "total_files": 14,
+    "total_loc": 435,
+    "total_classes": 14,
+    "total_functions": 23,
+    "module_inventory": [
+      {
+        "file": "examples/python/api_fastapi_clean/src/order_dispatch/__init__.py",
+        "loc": 2,
+        "public_types": [],
+        "public_callables": []
+      },
+      {
+        "file": "examples/python/api_fastapi_clean/src/order_dispatch/api/__init__.py",
+        "loc": 2,
+        "public_types": [],
+        "public_callables": []
+      },
+      {
+        "file": "examples/python/api_fastapi_clean/src/order_dispatch/api/routes.py",
+        "loc": 74,
+        "public_types": [],
+        "public_callables": [
+          "get_dispatcher",
+          "get_settings",
+          "health_check",
+          "create_order",
+          "get_order"
+        ]
+      },
+      {
+        "file": "examples/python/api_fastapi_clean/src/order_dispatch/api/schemas.py",
+        "loc": 67,
+        "public_types": [
+          "CreateOrderRequest",
+          "HealthResponse",
+          "OrderLineInput",
+          "OrderResponse"
+        ],
+        "public_callables": [
+          "to_domain_lines",
+          "to_order_response"
+        ]
+      },
+      {
+        "file": "examples/python/api_fastapi_clean/src/order_dispatch/domain/__init__.py",
+        "loc": 2,
+        "public_types": [],
+        "public_callables": []
+      },
+      {
+        "file": "examples/python/api_fastapi_clean/src/order_dispatch/domain/models.py",
+        "loc": 29,
+        "public_types": [
+          "CustomerTier",
+          "OrderLine",
+          "OrderRecord",
+          "OrderStatus"
+        ],
+        "public_callables": []
+      },
+      {
+        "file": "examples/python/api_fastapi_clean/src/order_dispatch/domain/pricing.py",
+        "loc": 41,
+        "public_types": [
+          "PricingError"
+        ],
+        "public_callables": [
+          "calculate_subtotal_cents",
+          "compute_order_total_cents"
+        ]
+      },
+      {
+        "file": "examples/python/api_fastapi_clean/src/order_dispatch/infra/__init__.py",
+        "loc": 2,
+        "public_types": [],
+        "public_callables": []
+      },
+      {
+        "file": "examples/python/api_fastapi_clean/src/order_dispatch/infra/repository.py",
+        "loc": 39,
+        "public_types": [
+          "InMemoryOrderRepository",
+          "OrderRepository"
+        ],
+        "public_callables": []
+      },
+      {
+        "file": "examples/python/api_fastapi_clean/src/order_dispatch/infra/webhook_client.py",
+        "loc": 35,
+        "public_types": [
+          "AsyncWebhookClient"
+        ],
+        "public_callables": []
+      },
+      {
+        "file": "examples/python/api_fastapi_clean/src/order_dispatch/main.py",
+        "loc": 48,
+        "public_types": [],
+        "public_callables": [
+          "lifespan",
+          "create_app"
+        ]
+      },
+      {
+        "file": "examples/python/api_fastapi_clean/src/order_dispatch/services/__init__.py",
+        "loc": 2,
+        "public_types": [],
+        "public_callables": []
+      },
+      {
+        "file": "examples/python/api_fastapi_clean/src/order_dispatch/services/dispatcher.py",
+        "loc": 74,
+        "public_types": [
+          "OrderDispatcherService"
+        ],
+        "public_callables": []
+      },
+      {
+        "file": "examples/python/api_fastapi_clean/src/order_dispatch/settings.py",
+        "loc": 18,
+        "public_types": [
+          "ServiceSettings"
+        ],
+        "public_callables": [
+          "load_settings"
+        ]
+      }
+    ],
+    "import_hygiene_coverage_pct": 100.0,
+    "unsorted_imports": [],
+    "wildcard_imports": [],
+    "late_imports": [],
+    "type_safety_coverage_pct": 100.0,
+    "type_safety_issues": [],
+    "omitted_init_return_annotations": [],
+    "weak_type_usages": [],
+    "unscoped_type_ignores": [],
+    "docstring_coverage_pct": 100.0,
+    "annotated_doc_functions_count": 0,
+    "missing_docstrings": [],
+    "empty_docstrings": [],
+    "doc_signature_mismatches": [],
+    "complex_functions": [],
+    "excessive_parameters": [],
+    "global_state_usages": [],
+    "bug_risk_idioms": [],
+    "internal_import_graph": {
+      "order_dispatch": [],
+      "order_dispatch.api": [],
+      "order_dispatch.api.routes": [
+        "order_dispatch.api.schemas",
+        "order_dispatch.services.dispatcher",
+        "order_dispatch.settings"
+      ],
+      "order_dispatch.api.schemas": [
+        "order_dispatch.domain.models"
+      ],
+      "order_dispatch.domain": [],
+      "order_dispatch.domain.models": [],
+      "order_dispatch.domain.pricing": [
+        "order_dispatch.domain.models"
+      ],
+      "order_dispatch.infra": [],
+      "order_dispatch.infra.repository": [
+        "order_dispatch.domain.models"
+      ],
+      "order_dispatch.infra.webhook_client": [
+        "order_dispatch.domain.models"
+      ],
+      "order_dispatch.main": [
+        "order_dispatch.api.routes",
+        "order_dispatch.infra.repository",
+        "order_dispatch.infra.webhook_client",
+        "order_dispatch.services.dispatcher",
+        "order_dispatch.settings"
+      ],
+      "order_dispatch.services": [],
+      "order_dispatch.services.dispatcher": [
+        "order_dispatch.domain.models",
+        "order_dispatch.domain.pricing",
+        "order_dispatch.infra.repository",
+        "order_dispatch.infra.webhook_client"
+      ],
+      "order_dispatch.settings": []
+    },
+    "circular_dependencies": [],
+    "type_checking_cycles": [],
+    "unused_dependencies": [],
+    "undeclared_dependencies": [],
+    "boundary_violations": [],
+    "test_functions_count": 4,
+    "module_test_coverage_pct": 100.0,
+    "assertion_free_tests": [],
+    "test_harness_notes": [],
+    "framework_issues": [],
+    "modernization_hints": [],
+    "language_version_mismatches": [],
+    "missing_io_timeouts": [],
+    "scattered_env_access": [],
+    "unstructured_logging": [],
+    "hardcoded_secrets": [],
+    "dangerous_sinks": [],
+    "api_endpoints": [
+      {
+        "http_method": "GET",
+        "path": "/healthz",
+        "handler": "health_check",
+        "file": "examples/python/api_fastapi_clean/src/order_dispatch/api/routes.py",
+        "line": 47,
+        "has_auth_hint": false,
+        "auth_mechanisms": []
+      },
+      {
+        "http_method": "POST",
+        "path": "/v1/orders",
+        "handler": "create_order",
+        "file": "examples/python/api_fastapi_clean/src/order_dispatch/api/routes.py",
+        "line": 60,
+        "has_auth_hint": false,
+        "auth_mechanisms": []
+      },
+      {
+        "http_method": "GET",
+        "path": "/v1/orders/{order_id}",
+        "handler": "get_order",
+        "file": "examples/python/api_fastapi_clean/src/order_dispatch/api/routes.py",
+        "line": 83,
+        "has_auth_hint": false,
+        "auth_mechanisms": []
+      }
+    ],
+    "opt_out_counts": {}
+  },
+  "runtime_facts": {
+    "status": "passed",
+    "container_engine": "docker",
+    "engine_available": true,
+    "skip_reason": "",
+    "language": "python",
+    "selected_dockerfile_template": "python/uv.dockerfile",
+    "harness_dockerfile_path": ".pni/dockerfiles/examples/python/api_fastapi_clean/Dockerfile",
+    "build_args": {
+      "PYTHON_VERSION": "3.12"
+    },
+    "artifacts_dir": ".pni/cache/py_api_fastapi_clean/runtime",
+    "project_dockerfile_build": {
+      "attempted": true,
+      "status": "passed",
+      "dockerfile_used": "examples/python/api_fastapi_clean/Dockerfile",
+      "duration_sec": 31.33,
+      "exit_code": 0,
+      "error_tail": []
+    },
+    "harness_build": {
+      "attempted": true,
+      "status": "passed",
+      "dockerfile_used": ".pni/dockerfiles/examples/python/api_fastapi_clean/Dockerfile",
+      "duration_sec": 0.48,
+      "exit_code": 0,
+      "error_tail": []
+    },
+    "test_execution": {
+      "attempted": true,
+      "status": "passed",
+      "command": "pytest -o junit_family=xunit2 --junitxml=/out/junit.xml",
+      "duration_sec": 5.05,
+      "exit_code": 0,
+      "total_tests": 4,
+      "passed_tests": 4,
+      "failed_tests": 0,
+      "error_tests": 0,
+      "skipped_tests": 0,
+      "failures": [],
+      "log_tail": []
+    },
+    "coverage": {
+      "measured": true,
+      "tool": "pytest-cov",
+      "line_coverage_pct": 85.2,
+      "branch_coverage_pct": 62.5,
+      "covered_lines": 178,
+      "total_statements": 209,
+      "lowest_covered_modules": [
+        {
+          "file_path": "src/order_dispatch/infra/webhook_client.py",
+          "line_coverage_pct": 55.6,
+          "branch_coverage_pct": null,
+          "covered_lines": 10,
+          "total_statements": 18,
+          "missing_lines_preview": [
+            36,
+            41,
+            42,
+            43,
+            44,
+            45,
+            46,
+            47
+          ]
+        },
+        {
+          "file_path": "src/order_dispatch/api/routes.py",
+          "line_coverage_pct": 56.0,
+          "branch_coverage_pct": 0.0,
+          "covered_lines": 14,
+          "total_statements": 25,
+          "missing_lines_preview": [
+            29,
+            30,
+            42,
+            43,
+            56,
+            74,
+            79,
+            96,
+            97,
+            98
+          ]
+        },
+        {
+          "file_path": "src/order_dispatch/main.py",
+          "line_coverage_pct": 67.9,
+          "branch_coverage_pct": 0.0,
+          "covered_lines": 19,
+          "total_statements": 28,
+          "missing_lines_preview": [
+            30,
+            31,
+            32,
+            33,
+            34,
+            38,
+            43,
+            44,
+            45
+          ]
+        },
+        {
+          "file_path": "src/order_dispatch/api/schemas.py",
+          "line_coverage_pct": 94.6,
+          "branch_coverage_pct": 50.0,
+          "covered_lines": 35,
+          "total_statements": 37,
+          "missing_lines_preview": [
+            32,
+            90
+          ]
+        },
+        {
+          "file_path": "src/order_dispatch/domain/pricing.py",
+          "line_coverage_pct": 95.2,
+          "branch_coverage_pct": 90.0,
+          "covered_lines": 20,
+          "total_statements": 21,
+          "missing_lines_preview": [
+            49
+          ]
+        },
+        {
+          "file_path": "src/order_dispatch/services/dispatcher.py",
+          "line_coverage_pct": 100.0,
+          "branch_coverage_pct": null,
+          "covered_lines": 26,
+          "total_statements": 26,
+          "missing_lines_preview": []
+        },
+        {
+          "file_path": "src/order_dispatch/domain/models.py",
+          "line_coverage_pct": 100.0,
+          "branch_coverage_pct": null,
+          "covered_lines": 24,
+          "total_statements": 24,
+          "missing_lines_preview": []
+        },
+        {
+          "file_path": "src/order_dispatch/infra/repository.py",
+          "line_coverage_pct": 100.0,
+          "branch_coverage_pct": null,
+          "covered_lines": 13,
+          "total_statements": 13,
+          "missing_lines_preview": []
+        },
+        {
+          "file_path": "src/order_dispatch/settings.py",
+          "line_coverage_pct": 100.0,
+          "branch_coverage_pct": null,
+          "covered_lines": 12,
+          "total_statements": 12,
+          "missing_lines_preview": []
+        },
+        {
+          "file_path": "src/order_dispatch/__init__.py",
+          "line_coverage_pct": 100.0,
+          "branch_coverage_pct": null,
+          "covered_lines": 1,
+          "total_statements": 1,
+          "missing_lines_preview": []
+        },
+        {
+          "file_path": "src/order_dispatch/api/__init__.py",
+          "line_coverage_pct": 100.0,
+          "branch_coverage_pct": null,
+          "covered_lines": 1,
+          "total_statements": 1,
+          "missing_lines_preview": []
+        },
+        {
+          "file_path": "src/order_dispatch/domain/__init__.py",
+          "line_coverage_pct": 100.0,
+          "branch_coverage_pct": null,
+          "covered_lines": 1,
+          "total_statements": 1,
+          "missing_lines_preview": []
+        },
+        {
+          "file_path": "src/order_dispatch/infra/__init__.py",
+          "line_coverage_pct": 100.0,
+          "branch_coverage_pct": null,
+          "covered_lines": 1,
+          "total_statements": 1,
+          "missing_lines_preview": []
+        },
+        {
+          "file_path": "src/order_dispatch/services/__init__.py",
+          "line_coverage_pct": 100.0,
+          "branch_coverage_pct": null,
+          "covered_lines": 1,
+          "total_statements": 1,
+          "missing_lines_preview": []
+        }
+      ]
+    },
+    "smoke_check": {
+      "attempted": true,
+      "archetype": "web_api+library",
+      "status": "passed",
+      "command": "python -c import importlib, json, pathlib; mod = importlib.import_module('order_dispatch.main'); factory = getattr(mod, 'create_app', None); app = getattr(mod, 'app', None) or (factory() if callable(factory) else None); assert app is not None, 'No app or create_app() found'; paths = ('/healthz', '/health', '/api/v1/health', '/openapi.json', '/'); status, hit = None, None\nif callable(getattr(app, 'test_client', None)):\n    c = app.test_client()\n    for p in paths:\n        r = c.get(p)\n        status, hit = r.status_code, p\n        if r.status_code < 400: break\nelse:\n    from fastapi.testclient import TestClient\n    with TestClient(app) as c:\n        for p in paths:\n            r = c.get(p)\n            status, hit = r.status_code, p\n            if r.status_code < 400: break\nassert status is not None and status < 500, f'Unexpected status {status} on {hit}'; pathlib.Path('/out/smoke.json').write_text(json.dumps({'probed_endpoint': hit, 'http_status': status, 'detail': f'ASGI/WSGI app order_dispatch.main booted cleanly ({hit} -> {status})'}))",
+      "duration_sec": 2.25,
+      "exit_code": 0,
+      "http_status": 200,
+      "probed_endpoint": "/healthz",
+      "failure_kind": "none",
+      "detail": "ASGI/WSGI app order_dispatch.main booted cleanly (/healthz -> 200)",
+      "log_tail": [
+        "/opt/pni-venv/lib/python3.12/site-packages/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.",
+        "  from starlette.testclient import TestClient as TestClient  # noqa"
+      ]
+    }
+  },
+  "security_facts": {
+    "status": "passed",
+    "scanner": "trivy",
+    "container_engine": "docker",
+    "engine_available": true,
+    "skip_reason": "",
+    "trivy_image": "ghcr.io/aquasecurity/trivy:0.69.3",
+    "scanned_filesystem": true,
+    "scanned_resolved_image": true,
+    "resolved_image_source": "examples/python/api_fastapi_clean/Dockerfile",
+    "artifacts_dir": ".pni/cache/py_api_fastapi_clean/security",
+    "vuln_counts": {
+      "critical": 9,
+      "high": 158,
+      "medium": 258,
+      "low": 174,
+      "total": 618
+    },
+    "app_vuln_counts": {
+      "critical": 0,
+      "high": 0,
+      "medium": 5,
+      "low": 1,
+      "total": 6
+    },
+    "core_app_vuln_counts": {
+      "critical": 0,
+      "high": 0,
+      "medium": 5,
+      "low": 1,
+      "total": 6
+    },
+    "dev_app_vuln_counts": {
+      "critical": 0,
+      "high": 0,
+      "medium": 0,
+      "low": 0,
+      "total": 0
+    },
+    "os_vuln_counts": {
+      "critical": 9,
+      "high": 158,
+      "medium": 253,
+      "low": 173,
+      "total": 612
+    },
+    "harness_os_vuln_counts": {
+      "critical": 0,
+      "high": 0,
+      "medium": 0,
+      "low": 0,
+      "total": 0
+    },
+    "vulnerabilities": [
+      {
+        "vuln_id": "CVE-2026-8643",
+        "pkg_name": "pip",
+        "pkg_type": "python-pkg",
+        "installed_version": "24.2",
+        "fixed_version": "26.1.2",
+        "severity": "MEDIUM",
+        "scope": "runtime_core",
+        "title": "python-pip: Path traversal via malicious entry point name in pip wheel installation allows arbitrary file overwrite",
+        "target": "Python",
+        "cvss_score": 8.0,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      },
+      {
+        "vuln_id": "CVE-2026-13346",
+        "pkg_name": "pip",
+        "pkg_type": "python-pkg",
+        "installed_version": "24.2",
+        "fixed_version": "26.2.0",
+        "severity": "MEDIUM",
+        "scope": "runtime_core",
+        "title": "pip: pip: Arbitrary file installation via malicious package indexes",
+        "target": "Python",
+        "cvss_score": 6.5,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      },
+      {
+        "vuln_id": "CVE-2026-6357",
+        "pkg_name": "pip",
+        "pkg_type": "python-pkg",
+        "installed_version": "24.2",
+        "fixed_version": "26.1",
+        "severity": "MEDIUM",
+        "scope": "runtime_core",
+        "title": "pip: pip: Arbitrary code execution or information disclosure via malicious wheel package installation",
+        "target": "Python",
+        "cvss_score": 5.8,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      },
+      {
+        "vuln_id": "CVE-2025-8869",
+        "pkg_name": "pip",
+        "pkg_type": "python-pkg",
+        "installed_version": "24.2",
+        "fixed_version": "25.3",
+        "severity": "MEDIUM",
+        "scope": "runtime_core",
+        "title": "pip: pip missing checks on symbolic link extraction",
+        "target": "Python",
+        "cvss_score": 5.3,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      },
+      {
+        "vuln_id": "CVE-2026-3219",
+        "pkg_name": "pip",
+        "pkg_type": "python-pkg",
+        "installed_version": "24.2",
+        "fixed_version": "26.1",
+        "severity": "MEDIUM",
+        "scope": "runtime_core",
+        "title": "pip: pip: Incorrect file installation due to improper archive handling",
+        "target": "Python",
+        "cvss_score": 5.0,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      },
+      {
+        "vuln_id": "CVE-2026-1703",
+        "pkg_name": "pip",
+        "pkg_type": "python-pkg",
+        "installed_version": "24.2",
+        "fixed_version": "26.0",
+        "severity": "LOW",
+        "scope": "runtime_core",
+        "title": "pip: pip: Information disclosure via path traversal when installing crafted wheel archives",
+        "target": "Python",
+        "cvss_score": 3.9,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      },
+      {
+        "vuln_id": "CVE-2026-42010",
+        "pkg_name": "libgnutls30",
+        "pkg_type": "debian",
+        "installed_version": "3.7.9-2+deb12u3",
+        "fixed_version": "3.7.9-2+deb12u7",
+        "severity": "CRITICAL",
+        "scope": "os_package",
+        "title": "gnutls: gnutls: Authentication Bypass via NUL Character in Username",
+        "target": "/out/image.tar (debian 12.7)",
+        "cvss_score": 9.8,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      },
+      {
+        "vuln_id": "CVE-2026-31789",
+        "pkg_name": "libssl3",
+        "pkg_type": "debian",
+        "installed_version": "3.0.14-1~deb12u2",
+        "fixed_version": "3.0.19-1~deb12u2",
+        "severity": "CRITICAL",
+        "scope": "os_package",
+        "title": "openssl: OpenSSL: Heap buffer overflow on 32-bit systems from large X.509 certificate processing",
+        "target": "/out/image.tar (debian 12.7)",
+        "cvss_score": 9.8,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      },
+      {
+        "vuln_id": "CVE-2026-31789",
+        "pkg_name": "openssl",
+        "pkg_type": "debian",
+        "installed_version": "3.0.14-1~deb12u2",
+        "fixed_version": "3.0.19-1~deb12u2",
+        "severity": "CRITICAL",
+        "scope": "os_package",
+        "title": "openssl: OpenSSL: Heap buffer overflow on 32-bit systems from large X.509 certificate processing",
+        "target": "/out/image.tar (debian 12.7)",
+        "cvss_score": 9.8,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      },
+      {
+        "vuln_id": "CVE-2026-8376",
+        "pkg_name": "perl-base",
+        "pkg_type": "debian",
+        "installed_version": "5.36.0-7+deb12u1",
+        "fixed_version": "5.36.0-7+deb12u4",
+        "severity": "CRITICAL",
+        "scope": "os_package",
+        "title": "perl: Perl: Heap buffer overflow when compiling regular expressions on 32-bit builds",
+        "target": "/out/image.tar (debian 12.7)",
+        "cvss_score": 9.8,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      },
+      {
+        "vuln_id": "CVE-2023-45853",
+        "pkg_name": "zlib1g",
+        "pkg_type": "debian",
+        "installed_version": "1:1.2.13.dfsg-1",
+        "fixed_version": "",
+        "severity": "CRITICAL",
+        "scope": "os_package",
+        "title": "zlib: integer overflow and resultant heap-based buffer overflow in zipOpenNewFileInZip4_6",
+        "target": "/out/image.tar (debian 12.7)",
+        "cvss_score": 9.8,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      },
+      {
+        "vuln_id": "CVE-2026-33845",
+        "pkg_name": "libgnutls30",
+        "pkg_type": "debian",
+        "installed_version": "3.7.9-2+deb12u3",
+        "fixed_version": "3.7.9-2+deb12u7",
+        "severity": "CRITICAL",
+        "scope": "os_package",
+        "title": "gnutls: GnuTLS: Denial of Service via DTLS zero-length fragment",
+        "target": "/out/image.tar (debian 12.7)",
+        "cvss_score": 9.1,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      },
+      {
+        "vuln_id": "CVE-2025-7458",
+        "pkg_name": "libsqlite3-0",
+        "pkg_type": "debian",
+        "installed_version": "3.40.1-2",
+        "fixed_version": "",
+        "severity": "CRITICAL",
+        "scope": "os_package",
+        "title": "sqlite: SQLite integer overflow",
+        "target": "/out/image.tar (debian 12.7)",
+        "cvss_score": 9.1,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      },
+      {
+        "vuln_id": "CVE-2026-13221",
+        "pkg_name": "perl-base",
+        "pkg_type": "debian",
+        "installed_version": "5.36.0-7+deb12u1",
+        "fixed_version": "5.36.0-7+deb12u4",
+        "severity": "CRITICAL",
+        "scope": "os_package",
+        "title": "perl: Perl: Incorrect regular expression processing via large regular expressions",
+        "target": "/out/image.tar (debian 12.7)",
+        "cvss_score": 9.1,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      },
+      {
+        "vuln_id": "CVE-2026-42496",
+        "pkg_name": "perl-base",
+        "pkg_type": "debian",
+        "installed_version": "5.36.0-7+deb12u1",
+        "fixed_version": "5.36.0-7+deb12u4",
+        "severity": "CRITICAL",
+        "scope": "os_package",
+        "title": "perl-archive-tar: perl-archive-tar: Path traversal via crafted symlinks allows arbitrary file access",
+        "target": "/out/image.tar (debian 12.7)",
+        "cvss_score": 9.1,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      },
+      {
+        "vuln_id": "CVE-2025-6965",
+        "pkg_name": "libsqlite3-0",
+        "pkg_type": "debian",
+        "installed_version": "3.40.1-2",
+        "fixed_version": "3.40.1-2+deb12u2",
+        "severity": "HIGH",
+        "scope": "os_package",
+        "title": "sqlite: Integer Truncation in SQLite",
+        "target": "/out/image.tar (debian 12.7)",
+        "cvss_score": 9.8,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      },
+      {
+        "vuln_id": "CVE-2025-15467",
+        "pkg_name": "libssl3",
+        "pkg_type": "debian",
+        "installed_version": "3.0.14-1~deb12u2",
+        "fixed_version": "3.0.18-1~deb12u2",
+        "severity": "HIGH",
+        "scope": "os_package",
+        "title": "openssl: OpenSSL: Remote code execution or Denial of Service via oversized Initialization Vector in CMS parsing",
+        "target": "/out/image.tar (debian 12.7)",
+        "cvss_score": 9.8,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      },
+      {
+        "vuln_id": "CVE-2025-15467",
+        "pkg_name": "openssl",
+        "pkg_type": "debian",
+        "installed_version": "3.0.14-1~deb12u2",
+        "fixed_version": "3.0.18-1~deb12u2",
+        "severity": "HIGH",
+        "scope": "os_package",
+        "title": "openssl: OpenSSL: Remote code execution or Denial of Service via oversized Initialization Vector in CMS parsing",
+        "target": "/out/image.tar (debian 12.7)",
+        "cvss_score": 9.8,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      },
+      {
+        "vuln_id": "CVE-2026-45447",
+        "pkg_name": "libssl3",
+        "pkg_type": "debian",
+        "installed_version": "3.0.14-1~deb12u2",
+        "fixed_version": "3.0.20-1~deb12u2",
+        "severity": "HIGH",
+        "scope": "os_package",
+        "title": "openssl: Heap Use-After-Free in OpenSSL PKCS7_verify()",
+        "target": "/out/image.tar (debian 12.7)",
+        "cvss_score": 8.8,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      },
+      {
+        "vuln_id": "CVE-2026-16742",
+        "pkg_name": "libsystemd0",
+        "pkg_type": "debian",
+        "installed_version": "252.30-1~deb12u2",
+        "fixed_version": "",
+        "severity": "HIGH",
+        "scope": "os_package",
+        "title": "systemd: systemd-homed: Local privilege escalation via missing home-record signature verification",
+        "target": "/out/image.tar (debian 12.7)",
+        "cvss_score": 8.8,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      },
+      {
+        "vuln_id": "CVE-2026-16742",
+        "pkg_name": "libudev1",
+        "pkg_type": "debian",
+        "installed_version": "252.30-1~deb12u2",
+        "fixed_version": "",
+        "severity": "HIGH",
+        "scope": "os_package",
+        "title": "systemd: systemd-homed: Local privilege escalation via missing home-record signature verification",
+        "target": "/out/image.tar (debian 12.7)",
+        "cvss_score": 8.8,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      },
+      {
+        "vuln_id": "CVE-2026-45447",
+        "pkg_name": "openssl",
+        "pkg_type": "debian",
+        "installed_version": "3.0.14-1~deb12u2",
+        "fixed_version": "3.0.20-1~deb12u2",
+        "severity": "HIGH",
+        "scope": "os_package",
+        "title": "openssl: Heap Use-After-Free in OpenSSL PKCS7_verify()",
+        "target": "/out/image.tar (debian 12.7)",
+        "cvss_score": 8.8,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      },
+      {
+        "vuln_id": "CVE-2026-57432",
+        "pkg_name": "perl-base",
+        "pkg_type": "debian",
+        "installed_version": "5.36.0-7+deb12u1",
+        "fixed_version": "5.36.0-7+deb12u4",
+        "severity": "HIGH",
+        "scope": "os_package",
+        "title": "perl: Perl: Information disclosure via integer overflow in pack/unpack operations",
+        "target": "/out/image.tar (debian 12.7)",
+        "cvss_score": 8.4,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      },
+      {
+        "vuln_id": "CVE-2026-118370",
+        "pkg_name": "libexpat1",
+        "pkg_type": "debian",
+        "installed_version": "2.5.0-1+deb12u1",
+        "fixed_version": "",
+        "severity": "HIGH",
+        "scope": "os_package",
+        "title": "expat: expat: Denial of Service via integer overflow during XML attribute parsing",
+        "target": "/out/image.tar (debian 12.7)",
+        "cvss_score": 8.2,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      },
+      {
+        "vuln_id": "CVE-2026-77214",
+        "pkg_name": "libexpat1",
+        "pkg_type": "debian",
+        "installed_version": "2.5.0-1+deb12u1",
+        "fixed_version": "2.5.0-1+deb12u5",
+        "severity": "HIGH",
+        "scope": "os_package",
+        "title": "expat: expat: Information disclosure via heap buffer over-read in XML_ParseBuffer",
+        "target": "/out/image.tar (debian 12.7)",
+        "cvss_score": 8.2,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      },
+      {
+        "vuln_id": "CVE-2025-32988",
+        "pkg_name": "libgnutls30",
+        "pkg_type": "debian",
+        "installed_version": "3.7.9-2+deb12u3",
+        "fixed_version": "3.7.9-2+deb12u5",
+        "severity": "HIGH",
+        "scope": "os_package",
+        "title": "gnutls: Vulnerability in GnuTLS otherName SAN export",
+        "target": "/out/image.tar (debian 12.7)",
+        "cvss_score": 8.2,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      },
+      {
+        "vuln_id": "CVE-2025-32990",
+        "pkg_name": "libgnutls30",
+        "pkg_type": "debian",
+        "installed_version": "3.7.9-2+deb12u3",
+        "fixed_version": "3.7.9-2+deb12u5",
+        "severity": "HIGH",
+        "scope": "os_package",
+        "title": "gnutls: Vulnerability in GnuTLS certtool template parsing",
+        "target": "/out/image.tar (debian 12.7)",
+        "cvss_score": 8.2,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      },
+      {
+        "vuln_id": "CVE-2026-86145",
+        "pkg_name": "libpcre2-8-0",
+        "pkg_type": "debian",
+        "installed_version": "10.42-1",
+        "fixed_version": "10.42-1+deb12u1",
+        "severity": "HIGH",
+        "scope": "os_package",
+        "title": "pcre2: PCRE2: Out-of-bounds write allows arbitrary code execution via crafted regular expressions",
+        "target": "/out/image.tar (debian 12.7)",
+        "cvss_score": 8.2,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      },
+      {
+        "vuln_id": "CVE-2026-109518",
+        "pkg_name": "apt",
+        "pkg_type": "debian",
+        "installed_version": "2.6.1",
+        "fixed_version": "2.6.2",
+        "severity": "HIGH",
+        "scope": "os_package",
+        "title": "apt: apt: Remote code execution via hard link reuse during package download retries",
+        "target": "/out/image.tar (debian 12.7)",
+        "cvss_score": 8.1,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      },
+      {
+        "vuln_id": "CVE-2026-109518",
+        "pkg_name": "libapt-pkg6.0",
+        "pkg_type": "debian",
+        "installed_version": "2.6.1",
+        "fixed_version": "2.6.2",
+        "severity": "HIGH",
+        "scope": "os_package",
+        "title": "apt: apt: Remote code execution via hard link reuse during package download retries",
+        "target": "/out/image.tar (debian 12.7)",
+        "cvss_score": 8.1,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      },
+      {
+        "vuln_id": "CVE-2026-71199",
+        "pkg_name": "libgssapi-krb5-2",
+        "pkg_type": "debian",
+        "installed_version": "1.20.1-2+deb12u2",
+        "fixed_version": "",
+        "severity": "HIGH",
+        "scope": "os_package",
+        "title": "krb5: Alteration of authentication indicators in CAMMAC container",
+        "target": "/out/image.tar (debian 12.7)",
+        "cvss_score": 8.1,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      }
+    ],
+    "app_vulnerabilities": [
+      {
+        "vuln_id": "CVE-2026-8643",
+        "pkg_name": "pip",
+        "pkg_type": "python-pkg",
+        "installed_version": "24.2",
+        "fixed_version": "26.1.2",
+        "severity": "MEDIUM",
+        "scope": "runtime_core",
+        "title": "python-pip: Path traversal via malicious entry point name in pip wheel installation allows arbitrary file overwrite",
+        "target": "Python",
+        "cvss_score": 8.0,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      },
+      {
+        "vuln_id": "CVE-2026-13346",
+        "pkg_name": "pip",
+        "pkg_type": "python-pkg",
+        "installed_version": "24.2",
+        "fixed_version": "26.2.0",
+        "severity": "MEDIUM",
+        "scope": "runtime_core",
+        "title": "pip: pip: Arbitrary file installation via malicious package indexes",
+        "target": "Python",
+        "cvss_score": 6.5,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      },
+      {
+        "vuln_id": "CVE-2026-6357",
+        "pkg_name": "pip",
+        "pkg_type": "python-pkg",
+        "installed_version": "24.2",
+        "fixed_version": "26.1",
+        "severity": "MEDIUM",
+        "scope": "runtime_core",
+        "title": "pip: pip: Arbitrary code execution or information disclosure via malicious wheel package installation",
+        "target": "Python",
+        "cvss_score": 5.8,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      },
+      {
+        "vuln_id": "CVE-2025-8869",
+        "pkg_name": "pip",
+        "pkg_type": "python-pkg",
+        "installed_version": "24.2",
+        "fixed_version": "25.3",
+        "severity": "MEDIUM",
+        "scope": "runtime_core",
+        "title": "pip: pip missing checks on symbolic link extraction",
+        "target": "Python",
+        "cvss_score": 5.3,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      },
+      {
+        "vuln_id": "CVE-2026-3219",
+        "pkg_name": "pip",
+        "pkg_type": "python-pkg",
+        "installed_version": "24.2",
+        "fixed_version": "26.1",
+        "severity": "MEDIUM",
+        "scope": "runtime_core",
+        "title": "pip: pip: Incorrect file installation due to improper archive handling",
+        "target": "Python",
+        "cvss_score": 5.0,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      },
+      {
+        "vuln_id": "CVE-2026-1703",
+        "pkg_name": "pip",
+        "pkg_type": "python-pkg",
+        "installed_version": "24.2",
+        "fixed_version": "26.0",
+        "severity": "LOW",
+        "scope": "runtime_core",
+        "title": "pip: pip: Information disclosure via path traversal when installing crafted wheel archives",
+        "target": "Python",
+        "cvss_score": 3.9,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      }
+    ],
+    "os_vulnerabilities": [
+      {
+        "vuln_id": "CVE-2026-42010",
+        "pkg_name": "libgnutls30",
+        "pkg_type": "debian",
+        "installed_version": "3.7.9-2+deb12u3",
+        "fixed_version": "3.7.9-2+deb12u7",
+        "severity": "CRITICAL",
+        "scope": "os_package",
+        "title": "gnutls: gnutls: Authentication Bypass via NUL Character in Username",
+        "target": "/out/image.tar (debian 12.7)",
+        "cvss_score": 9.8,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      },
+      {
+        "vuln_id": "CVE-2026-31789",
+        "pkg_name": "libssl3",
+        "pkg_type": "debian",
+        "installed_version": "3.0.14-1~deb12u2",
+        "fixed_version": "3.0.19-1~deb12u2",
+        "severity": "CRITICAL",
+        "scope": "os_package",
+        "title": "openssl: OpenSSL: Heap buffer overflow on 32-bit systems from large X.509 certificate processing",
+        "target": "/out/image.tar (debian 12.7)",
+        "cvss_score": 9.8,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      },
+      {
+        "vuln_id": "CVE-2026-31789",
+        "pkg_name": "openssl",
+        "pkg_type": "debian",
+        "installed_version": "3.0.14-1~deb12u2",
+        "fixed_version": "3.0.19-1~deb12u2",
+        "severity": "CRITICAL",
+        "scope": "os_package",
+        "title": "openssl: OpenSSL: Heap buffer overflow on 32-bit systems from large X.509 certificate processing",
+        "target": "/out/image.tar (debian 12.7)",
+        "cvss_score": 9.8,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      },
+      {
+        "vuln_id": "CVE-2026-8376",
+        "pkg_name": "perl-base",
+        "pkg_type": "debian",
+        "installed_version": "5.36.0-7+deb12u1",
+        "fixed_version": "5.36.0-7+deb12u4",
+        "severity": "CRITICAL",
+        "scope": "os_package",
+        "title": "perl: Perl: Heap buffer overflow when compiling regular expressions on 32-bit builds",
+        "target": "/out/image.tar (debian 12.7)",
+        "cvss_score": 9.8,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      },
+      {
+        "vuln_id": "CVE-2023-45853",
+        "pkg_name": "zlib1g",
+        "pkg_type": "debian",
+        "installed_version": "1:1.2.13.dfsg-1",
+        "fixed_version": "",
+        "severity": "CRITICAL",
+        "scope": "os_package",
+        "title": "zlib: integer overflow and resultant heap-based buffer overflow in zipOpenNewFileInZip4_6",
+        "target": "/out/image.tar (debian 12.7)",
+        "cvss_score": 9.8,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      },
+      {
+        "vuln_id": "CVE-2026-33845",
+        "pkg_name": "libgnutls30",
+        "pkg_type": "debian",
+        "installed_version": "3.7.9-2+deb12u3",
+        "fixed_version": "3.7.9-2+deb12u7",
+        "severity": "CRITICAL",
+        "scope": "os_package",
+        "title": "gnutls: GnuTLS: Denial of Service via DTLS zero-length fragment",
+        "target": "/out/image.tar (debian 12.7)",
+        "cvss_score": 9.1,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      },
+      {
+        "vuln_id": "CVE-2025-7458",
+        "pkg_name": "libsqlite3-0",
+        "pkg_type": "debian",
+        "installed_version": "3.40.1-2",
+        "fixed_version": "",
+        "severity": "CRITICAL",
+        "scope": "os_package",
+        "title": "sqlite: SQLite integer overflow",
+        "target": "/out/image.tar (debian 12.7)",
+        "cvss_score": 9.1,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      },
+      {
+        "vuln_id": "CVE-2026-13221",
+        "pkg_name": "perl-base",
+        "pkg_type": "debian",
+        "installed_version": "5.36.0-7+deb12u1",
+        "fixed_version": "5.36.0-7+deb12u4",
+        "severity": "CRITICAL",
+        "scope": "os_package",
+        "title": "perl: Perl: Incorrect regular expression processing via large regular expressions",
+        "target": "/out/image.tar (debian 12.7)",
+        "cvss_score": 9.1,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      },
+      {
+        "vuln_id": "CVE-2026-42496",
+        "pkg_name": "perl-base",
+        "pkg_type": "debian",
+        "installed_version": "5.36.0-7+deb12u1",
+        "fixed_version": "5.36.0-7+deb12u4",
+        "severity": "CRITICAL",
+        "scope": "os_package",
+        "title": "perl-archive-tar: perl-archive-tar: Path traversal via crafted symlinks allows arbitrary file access",
+        "target": "/out/image.tar (debian 12.7)",
+        "cvss_score": 9.1,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      },
+      {
+        "vuln_id": "CVE-2025-6965",
+        "pkg_name": "libsqlite3-0",
+        "pkg_type": "debian",
+        "installed_version": "3.40.1-2",
+        "fixed_version": "3.40.1-2+deb12u2",
+        "severity": "HIGH",
+        "scope": "os_package",
+        "title": "sqlite: Integer Truncation in SQLite",
+        "target": "/out/image.tar (debian 12.7)",
+        "cvss_score": 9.8,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      },
+      {
+        "vuln_id": "CVE-2025-15467",
+        "pkg_name": "libssl3",
+        "pkg_type": "debian",
+        "installed_version": "3.0.14-1~deb12u2",
+        "fixed_version": "3.0.18-1~deb12u2",
+        "severity": "HIGH",
+        "scope": "os_package",
+        "title": "openssl: OpenSSL: Remote code execution or Denial of Service via oversized Initialization Vector in CMS parsing",
+        "target": "/out/image.tar (debian 12.7)",
+        "cvss_score": 9.8,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      },
+      {
+        "vuln_id": "CVE-2025-15467",
+        "pkg_name": "openssl",
+        "pkg_type": "debian",
+        "installed_version": "3.0.14-1~deb12u2",
+        "fixed_version": "3.0.18-1~deb12u2",
+        "severity": "HIGH",
+        "scope": "os_package",
+        "title": "openssl: OpenSSL: Remote code execution or Denial of Service via oversized Initialization Vector in CMS parsing",
+        "target": "/out/image.tar (debian 12.7)",
+        "cvss_score": 9.8,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      },
+      {
+        "vuln_id": "CVE-2026-45447",
+        "pkg_name": "libssl3",
+        "pkg_type": "debian",
+        "installed_version": "3.0.14-1~deb12u2",
+        "fixed_version": "3.0.20-1~deb12u2",
+        "severity": "HIGH",
+        "scope": "os_package",
+        "title": "openssl: Heap Use-After-Free in OpenSSL PKCS7_verify()",
+        "target": "/out/image.tar (debian 12.7)",
+        "cvss_score": 8.8,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      },
+      {
+        "vuln_id": "CVE-2026-16742",
+        "pkg_name": "libsystemd0",
+        "pkg_type": "debian",
+        "installed_version": "252.30-1~deb12u2",
+        "fixed_version": "",
+        "severity": "HIGH",
+        "scope": "os_package",
+        "title": "systemd: systemd-homed: Local privilege escalation via missing home-record signature verification",
+        "target": "/out/image.tar (debian 12.7)",
+        "cvss_score": 8.8,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      },
+      {
+        "vuln_id": "CVE-2026-16742",
+        "pkg_name": "libudev1",
+        "pkg_type": "debian",
+        "installed_version": "252.30-1~deb12u2",
+        "fixed_version": "",
+        "severity": "HIGH",
+        "scope": "os_package",
+        "title": "systemd: systemd-homed: Local privilege escalation via missing home-record signature verification",
+        "target": "/out/image.tar (debian 12.7)",
+        "cvss_score": 8.8,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      },
+      {
+        "vuln_id": "CVE-2026-45447",
+        "pkg_name": "openssl",
+        "pkg_type": "debian",
+        "installed_version": "3.0.14-1~deb12u2",
+        "fixed_version": "3.0.20-1~deb12u2",
+        "severity": "HIGH",
+        "scope": "os_package",
+        "title": "openssl: Heap Use-After-Free in OpenSSL PKCS7_verify()",
+        "target": "/out/image.tar (debian 12.7)",
+        "cvss_score": 8.8,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      },
+      {
+        "vuln_id": "CVE-2026-57432",
+        "pkg_name": "perl-base",
+        "pkg_type": "debian",
+        "installed_version": "5.36.0-7+deb12u1",
+        "fixed_version": "5.36.0-7+deb12u4",
+        "severity": "HIGH",
+        "scope": "os_package",
+        "title": "perl: Perl: Information disclosure via integer overflow in pack/unpack operations",
+        "target": "/out/image.tar (debian 12.7)",
+        "cvss_score": 8.4,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      },
+      {
+        "vuln_id": "CVE-2026-118370",
+        "pkg_name": "libexpat1",
+        "pkg_type": "debian",
+        "installed_version": "2.5.0-1+deb12u1",
+        "fixed_version": "",
+        "severity": "HIGH",
+        "scope": "os_package",
+        "title": "expat: expat: Denial of Service via integer overflow during XML attribute parsing",
+        "target": "/out/image.tar (debian 12.7)",
+        "cvss_score": 8.2,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      },
+      {
+        "vuln_id": "CVE-2026-77214",
+        "pkg_name": "libexpat1",
+        "pkg_type": "debian",
+        "installed_version": "2.5.0-1+deb12u1",
+        "fixed_version": "2.5.0-1+deb12u5",
+        "severity": "HIGH",
+        "scope": "os_package",
+        "title": "expat: expat: Information disclosure via heap buffer over-read in XML_ParseBuffer",
+        "target": "/out/image.tar (debian 12.7)",
+        "cvss_score": 8.2,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      },
+      {
+        "vuln_id": "CVE-2025-32988",
+        "pkg_name": "libgnutls30",
+        "pkg_type": "debian",
+        "installed_version": "3.7.9-2+deb12u3",
+        "fixed_version": "3.7.9-2+deb12u5",
+        "severity": "HIGH",
+        "scope": "os_package",
+        "title": "gnutls: Vulnerability in GnuTLS otherName SAN export",
+        "target": "/out/image.tar (debian 12.7)",
+        "cvss_score": 8.2,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      },
+      {
+        "vuln_id": "CVE-2025-32990",
+        "pkg_name": "libgnutls30",
+        "pkg_type": "debian",
+        "installed_version": "3.7.9-2+deb12u3",
+        "fixed_version": "3.7.9-2+deb12u5",
+        "severity": "HIGH",
+        "scope": "os_package",
+        "title": "gnutls: Vulnerability in GnuTLS certtool template parsing",
+        "target": "/out/image.tar (debian 12.7)",
+        "cvss_score": 8.2,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      },
+      {
+        "vuln_id": "CVE-2026-86145",
+        "pkg_name": "libpcre2-8-0",
+        "pkg_type": "debian",
+        "installed_version": "10.42-1",
+        "fixed_version": "10.42-1+deb12u1",
+        "severity": "HIGH",
+        "scope": "os_package",
+        "title": "pcre2: PCRE2: Out-of-bounds write allows arbitrary code execution via crafted regular expressions",
+        "target": "/out/image.tar (debian 12.7)",
+        "cvss_score": 8.2,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      },
+      {
+        "vuln_id": "CVE-2026-109518",
+        "pkg_name": "apt",
+        "pkg_type": "debian",
+        "installed_version": "2.6.1",
+        "fixed_version": "2.6.2",
+        "severity": "HIGH",
+        "scope": "os_package",
+        "title": "apt: apt: Remote code execution via hard link reuse during package download retries",
+        "target": "/out/image.tar (debian 12.7)",
+        "cvss_score": 8.1,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      },
+      {
+        "vuln_id": "CVE-2026-109518",
+        "pkg_name": "libapt-pkg6.0",
+        "pkg_type": "debian",
+        "installed_version": "2.6.1",
+        "fixed_version": "2.6.2",
+        "severity": "HIGH",
+        "scope": "os_package",
+        "title": "apt: apt: Remote code execution via hard link reuse during package download retries",
+        "target": "/out/image.tar (debian 12.7)",
+        "cvss_score": 8.1,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      },
+      {
+        "vuln_id": "CVE-2026-71199",
+        "pkg_name": "libgssapi-krb5-2",
+        "pkg_type": "debian",
+        "installed_version": "1.20.1-2+deb12u2",
+        "fixed_version": "",
+        "severity": "HIGH",
+        "scope": "os_package",
+        "title": "krb5: Alteration of authentication indicators in CAMMAC container",
+        "target": "/out/image.tar (debian 12.7)",
+        "cvss_score": 8.1,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      }
+    ],
+    "misconfigurations": [
+      {
+        "check_id": "DS-0026",
+        "severity": "LOW",
+        "title": "No HEALTHCHECK defined",
+        "file_path": "Dockerfile",
+        "start_line": null,
+        "message": "Add HEALTHCHECK instruction in your Dockerfile",
+        "resolution": "Add HEALTHCHECK instruction in Dockerfile"
+      }
+    ],
+    "secrets": [],
+    "opt_out_counts": {}
+  },
+  "pentest_facts": {
+    "status": "passed",
+    "container_engine": "docker",
+    "engine_available": true,
+    "skip_reason": "",
+    "pentests_dir": ".pni/pentests/examples/python/api_fastapi_clean",
+    "materialized_files": [
+      ".pni/pentests/examples/python/api_fastapi_clean/conftest.py",
+      ".pni/pentests/examples/python/api_fastapi_clean/test_app_probes.py",
+      ".pni/pentests/examples/python/api_fastapi_clean/test_baseline_http.py",
+      ".pni/pentests/examples/python/api_fastapi_clean/test_target_surface.py"
+    ],
+    "target_base_url": "http://127.0.0.1:55857",
+    "server_booted": true,
+    "boot_failure_reason": "",
+    "duration_sec": 28.04,
+    "artifacts_dir": ".pni/cache/py_api_fastapi_clean/pentest",
+    "probe_summary": {
+      "total_probes": 19,
+      "passed_probes": 15,
+      "failed_probes": 3,
+      "skipped_probes": 1,
+      "error_probes": 0
+    },
+    "findings": [
+      {
+        "test_id": "test_app_probes::test_create_order_enforces_authentication_guard",
+        "test_file": "test_app_probes.py",
+        "cwe_id": "CWE-306",
+        "category": "missing_authentication",
+        "severity": "medium",
+        "endpoint": "/v1/orders",
+        "title": "State-mutating POST /v1/orders accepts unauthenticated order creation (HTTP 201)",
+        "evidence": "Unauthenticated POST /v1/orders returned 201: {\"order_id\":\"ord-94b1ebabb3\",\"customer_id\":\"unauth-caller\",\"tier\":\"vip\",\"subtotal_cents\":2000,\"total_cents\":1800,\"status\":\"webhook_deferred\""
+      },
+      {
+        "test_id": "test_app_probes::test_openapi_schema_not_publicly_exposed_without_auth",
+        "test_file": "test_app_probes.py",
+        "cwe_id": "CWE-200",
+        "category": "api_schema_exposure",
+        "severity": "low",
+        "endpoint": "/openapi.json",
+        "title": "Unauthenticated OpenAPI specification (/openapi.json) exposed by default",
+        "evidence": "GET /openapi.json returned 200 (4753 bytes)"
+      },
+      {
+        "test_id": "test_baseline_http::test_x_content_type_options_nosniff",
+        "test_file": "test_baseline_http.py",
+        "cwe_id": "CWE-693",
+        "category": "missing_security_headers",
+        "severity": "low",
+        "endpoint": "/healthz",
+        "title": "Missing X-Content-Type-Options: nosniff response header",
+        "evidence": "GET /healthz -> 200, X-Content-Type-Options=<absent>"
+      }
+    ]
+  },
+  "migration_facts": null,
+  "progress_facts": null,
+  "architecture_record": {
+    "workflow_id": "py_api_fastapi_clean",
+    "workflow_run_id": "wf-f819234f",
+    "recorded_at": "2026-11-22T11:27:44.171485+00:00",
+    "target_root": "examples/python/api_fastapi_clean",
+    "system_profile": {
+      "system_purpose": "order-dispatch is an async FastAPI + Pydantic v2 microservice that prices multi-line customer orders in integer cents, persists fulfillment records via a repository Protocol port, and dispatches non-blocking outbound partner webhooks with bounded timeouts.",
+      "domain_context": "E-commerce order intake, loyalty-tier pricing (Standard vs. VIP), order persistence, and asynchronous fulfillment webhook notification.",
+      "runtime_types": [
+        "web_api",
+        "library"
+      ],
+      "tech_stack": [
+        "Python >=3.11 (uv_build + uv.lock)",
+        "FastAPI >=0.115.0 + Uvicorn >=0.30.0",
+        "Pydantic v2 >=2.8.0 + pydantic-settings >=2.4.0",
+        "httpx >=0.27.0 (AsyncClient)",
+        "pytest + pytest-cov + Ruff + Ty"
+      ],
+      "external_integrations": [
+        "Partner fulfillment webhook HTTP endpoint configured via ORDER_DISPATCH_WEBHOOK_URL (default https://partner-gateway.internal/v1/events)"
+      ]
+    },
+    "structure_map": {
+      "architecture_pattern": "Strict 4-Layer Acyclic Clean/Hexagonal Microservice (api -> services -> domain + infra)",
+      "layers": [
+        {
+          "name": "Composition & Config Root",
+          "responsibility": "FastAPI application factory, asynccontextmanager lifespan wiring, and centralized pydantic-settings configuration.",
+          "paths": [
+            "src/order_dispatch/main.py",
+            "src/order_dispatch/settings.py"
+          ],
+          "allowed_dependencies": [
+            "API Layer",
+            "Application Service Layer",
+            "Infrastructure Layer"
+          ]
+        },
+        {
+          "name": "API Layer",
+          "responsibility": "HTTP routing, dependency injection, and strict Pydantic v2 request/response DTO serialization.",
+          "paths": [
+            "src/order_dispatch/api/routes.py",
+            "src/order_dispatch/api/schemas.py"
+          ],
+          "allowed_dependencies": [
+            "Application Service Layer",
+            "Domain Layer",
+            "Composition & Config Root"
+          ]
+        },
+        {
+          "name": "Application Service Layer",
+          "responsibility": "Stateless orchestration of order pricing, async webhook dispatch, and repository persistence.",
+          "paths": [
+            "src/order_dispatch/services/dispatcher.py"
+          ],
+          "allowed_dependencies": [
+            "Domain Layer",
+            "Infrastructure Layer"
+          ]
+        },
+        {
+          "name": "Domain Layer",
+          "responsibility": "Pure immutable order value objects, enums, and integer-cents pricing/VIP discount invariants with zero external dependencies.",
+          "paths": [
+            "src/order_dispatch/domain/models.py",
+            "src/order_dispatch/domain/pricing.py"
+          ],
+          "allowed_dependencies": []
+        },
+        {
+          "name": "Infrastructure Layer",
+          "responsibility": "OrderRepository Protocol + in-memory adapter and timeout-bounded async httpx webhook notifier.",
+          "paths": [
+            "src/order_dispatch/infra/repository.py",
+            "src/order_dispatch/infra/webhook_client.py"
+          ],
+          "allowed_dependencies": [
+            "Domain Layer"
+          ]
+        }
+      ],
+      "modules": [
+        {
+          "path": "src/order_dispatch/main.py",
+          "role": "FastAPI factory and async lifespan dependency composition",
+          "key_symbols": [
+            "lifespan",
+            "create_app"
+          ],
+          "depends_on": [
+            "src/order_dispatch/api/routes.py",
+            "src/order_dispatch/services/dispatcher.py",
+            "src/order_dispatch/infra/repository.py",
+            "src/order_dispatch/infra/webhook_client.py",
+            "src/order_dispatch/settings.py"
+          ],
+          "health_note": "Clean wiring; defaults to InMemoryOrderRepository in lifespan."
+        },
+        {
+          "path": "src/order_dispatch/api/routes.py",
+          "role": "FastAPI HTTP endpoints (/healthz, POST /v1/orders, GET /v1/orders/{order_id})",
+          "key_symbols": [
+            "health_check",
+            "create_order",
+            "get_order"
+          ],
+          "depends_on": [
+            "src/order_dispatch/api/schemas.py",
+            "src/order_dispatch/services/dispatcher.py",
+            "src/order_dispatch/settings.py"
+          ],
+          "health_note": "Typed response_model and Depends(); /v1/orders lacks auth dependency."
+        },
+        {
+          "path": "src/order_dispatch/services/dispatcher.py",
+          "role": "OrderDispatcherService application orchestrator",
+          "key_symbols": [
+            "OrderDispatcherService"
+          ],
+          "depends_on": [
+            "src/order_dispatch/domain/models.py",
+            "src/order_dispatch/domain/pricing.py",
+            "src/order_dispatch/infra/repository.py",
+            "src/order_dispatch/infra/webhook_client.py"
+          ],
+          "health_note": "100% line coverage; pure constructor DI."
+        },
+        {
+          "path": "src/order_dispatch/domain/pricing.py",
+          "role": "Pure integer-cents subtotal and VIP discount calculator",
+          "key_symbols": [
+            "PricingError",
+            "calculate_subtotal_cents",
+            "compute_order_total_cents"
+          ],
+          "depends_on": [
+            "src/order_dispatch/domain/models.py"
+          ],
+          "health_note": "Zero framework or I/O imports; 95.2% line / 90.0% branch coverage."
+        },
+        {
+          "path": "src/order_dispatch/infra/webhook_client.py",
+          "role": "Async httpx webhook client with bounded timeout and graceful fallback",
+          "key_symbols": [
+            "AsyncWebhookClient"
+          ],
+          "depends_on": [
+            "src/order_dispatch/domain/models.py"
+          ],
+          "health_note": "Explicit timeout_sec=5.0; needs MockTransport branch tests (55.6% line cov)."
+        }
+      ],
+      "boundary_assessment": "Exemplary downward-only acyclic layering with 0 circular dependencies and 0 boundary violations; domain package is completely free of FastAPI/httpx/Pydantic imports."
+    },
+    "execution_flow_map": {
+      "entry_points": [
+        "src/order_dispatch/main.py:create_app",
+        "src/order_dispatch/api/routes.py:health_check",
+        "src/order_dispatch/api/routes.py:create_order",
+        "src/order_dispatch/api/routes.py:get_order"
+      ],
+      "execution_flows": [
+        {
+          "name": "Order Creation & Async Webhook Dispatch",
+          "trigger": "HTTP POST /v1/orders",
+          "steps": [
+            "FastAPI validates inbound JSON via CreateOrderRequest (extra='forbid', normalized uppercase SKU).",
+            "create_order() resolves OrderDispatcherService via Depends(get_dispatcher) and converts lines via to_domain_lines().",
+            "OrderDispatcherService.place_order() calls compute_order_total_cents() for integer-cent subtotal and VIP discount.",
+            "AsyncWebhookClient.notify_order_accepted() posts event with explicit timeout_sec=5.0, degrading to WEBHOOK_DEFERRED on httpx.HTTPError.",
+            "OrderRepository.save() persists finalized OrderRecord and to_order_response() returns HTTP 201 JSON."
+          ],
+          "involved_files": [
+            "src/order_dispatch/api/routes.py",
+            "src/order_dispatch/api/schemas.py",
+            "src/order_dispatch/services/dispatcher.py",
+            "src/order_dispatch/domain/pricing.py",
+            "src/order_dispatch/infra/webhook_client.py",
+            "src/order_dispatch/infra/repository.py"
+          ]
+        },
+        {
+          "name": "Readiness Probe & Order Lookup",
+          "trigger": "HTTP GET /healthz or GET /v1/orders/{order_id}",
+          "steps": [
+            "GET /healthz returns ServiceSettings metadata as frozen HealthResponse (HTTP 200).",
+            "GET /v1/orders/{order_id} queries OrderDispatcherService.find_order() -> OrderRepository.get() and raises HTTP 404 when absent."
+          ],
+          "involved_files": [
+            "src/order_dispatch/api/routes.py",
+            "src/order_dispatch/services/dispatcher.py",
+            "src/order_dispatch/infra/repository.py"
+          ]
+        }
+      ],
+      "state_and_storage": [
+        "Application-scoped dependencies stored on FastAPI app.state during asynccontextmanager lifespan (src/order_dispatch/main.py).",
+        "Default persistence adapter is process-local InMemoryOrderRepository behind OrderRepository Protocol (src/order_dispatch/infra/repository.py)."
+      ],
+      "error_and_concurrency_model": "Asyncio event loop via Uvicorn + FastAPI with non-blocking httpx.AsyncClient; domain invariant violations raise PricingError, missing lookups raise HTTPException(404), and outbound webhook httpx.HTTPError failures degrade gracefully to OrderStatus.WEBHOOK_DEFERRED with warning logs."
+    }
+  },
+  "base_score_result": null,
+  "companion_ast_facts": {}
+}

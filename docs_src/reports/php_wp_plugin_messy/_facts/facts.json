@@ -1,0 +1,872 @@
+{
+  "workflow_id": "php_wp_plugin_messy",
+  "targets": {
+    "root": "examples/php/wp_plugin_messy",
+    "source": [
+      "."
+    ],
+    "tests": [
+      "tests"
+    ],
+    "docs": [
+      "README.md"
+    ],
+    "exclude": []
+  },
+  "outputs": {
+    "facts": ".pni/cache/php_wp_plugin_messy/facts.json",
+    "score": "docs/reports/php_wp_plugin_messy/php_wp_plugin_messy_score.json",
+    "report": "docs/reports/php_wp_plugin_messy/php_wp_plugin_messy.pdf"
+  },
+  "project_facts": {
+    "project_name": "wp_plugin_messy",
+    "version": "1.3.0",
+    "language": "php",
+    "runtime_types": [
+      "web_api"
+    ],
+    "build_system": "raw_php",
+    "language_version_constraint": ">=7.4",
+    "has_type_marker": null,
+    "manifest_files": [],
+    "lockfiles_found": [],
+    "dependencies": [],
+    "unpinned_dependencies": [],
+    "dev_dependencies": [],
+    "detected_frameworks": [
+      "wordpress"
+    ],
+    "legacy_language_findings": [],
+    "tooling_modernization_issues": [
+      "Missing composer.json — dependencies and PSR-4 autoloading are unmanaged (legacy raw PHP)",
+      "EOL PHP version constraint '>=7.4' — upgrade to active PHP 8.2+ / 8.3+",
+      "No automated PHP test runner (PHPUnit / Pest) configured"
+    ],
+    "source_files_count": 4,
+    "test_files_count": 0,
+    "has_readme": true,
+    "readme_line_count": 2,
+    "readme_headings": [
+      "# Member Analytics Portal (WordPress Plugin)"
+    ],
+    "docs_inventory": [
+      "README.md"
+    ],
+    "has_gitignore": false,
+    "has_license": false,
+    "has_security_policy": false,
+    "has_dependency_automation": false,
+    "ci_workflows_found": [],
+    "ci_supply_chain_issues": [],
+    "committed_secret_files": [],
+    "has_dockerfile": false,
+    "container_hygiene_issues": [],
+    "opt_out_counts": {}
+  },
+  "ast_facts": {
+    "language": "php",
+    "total_files": 4,
+    "total_loc": 84,
+    "total_classes": 0,
+    "total_functions": 7,
+    "module_inventory": [
+      {
+        "file": "examples/php/wp_plugin_messy/admin/settings-page.php",
+        "loc": 31,
+        "public_types": [],
+        "public_callables": [
+          "map_register_admin_menu",
+          "map_render_settings_page"
+        ]
+      },
+      {
+        "file": "examples/php/wp_plugin_messy/includes/ajax-handlers.php",
+        "loc": 21,
+        "public_types": [],
+        "public_callables": [
+          "map_ajax_purge_logs",
+          "map_ajax_search_members"
+        ]
+      },
+      {
+        "file": "examples/php/wp_plugin_messy/includes/rest-endpoints.php",
+        "loc": 21,
+        "public_types": [],
+        "public_callables": [
+          "map_export_all_members",
+          "map_register_rest_routes"
+        ]
+      },
+      {
+        "file": "examples/php/wp_plugin_messy/member-analytics-portal.php",
+        "loc": 11,
+        "public_types": [],
+        "public_callables": [
+          "map_render_badge_shortcode"
+        ]
+      }
+    ],
+    "import_hygiene_coverage_pct": 75.0,
+    "unsorted_imports": [],
+    "wildcard_imports": [],
+    "late_imports": [
+      {
+        "file": "examples/php/wp_plugin_messy/member-analytics-portal.php",
+        "line": 11,
+        "symbol": "require_once",
+        "detail": "Procedural file include 'require_once plugin_dir_path(__FILE__) . 'includes/rest-endp' — migrate to Composer PSR-4 autoloading"
+      },
+      {
+        "file": "examples/php/wp_plugin_messy/member-analytics-portal.php",
+        "line": 12,
+        "symbol": "require_once",
+        "detail": "Procedural file include 'require_once plugin_dir_path(__FILE__) . 'includes/ajax-hand' — migrate to Composer PSR-4 autoloading"
+      },
+      {
+        "file": "examples/php/wp_plugin_messy/member-analytics-portal.php",
+        "line": 13,
+        "symbol": "require_once",
+        "detail": "Procedural file include 'require_once plugin_dir_path(__FILE__) . 'admin/settings-pag' — migrate to Composer PSR-4 autoloading"
+      }
+    ],
+    "type_safety_coverage_pct": 0.0,
+    "type_safety_issues": [
+      {
+        "file": "examples/php/wp_plugin_messy/admin/settings-page.php",
+        "line": 1,
+        "symbol": "settings-page.php",
+        "detail": "Missing 'declare(strict_types=1);' at file entry (allows silent scalar coercion)"
+      },
+      {
+        "file": "examples/php/wp_plugin_messy/admin/settings-page.php",
+        "line": 5,
+        "symbol": "map_register_admin_menu",
+        "detail": "missing return type"
+      },
+      {
+        "file": "examples/php/wp_plugin_messy/admin/settings-page.php",
+        "line": 16,
+        "symbol": "map_render_settings_page",
+        "detail": "missing return type"
+      },
+      {
+        "file": "examples/php/wp_plugin_messy/includes/ajax-handlers.php",
+        "line": 1,
+        "symbol": "ajax-handlers.php",
+        "detail": "Missing 'declare(strict_types=1);' at file entry (allows silent scalar coercion)"
+      },
+      {
+        "file": "examples/php/wp_plugin_messy/includes/ajax-handlers.php",
+        "line": 6,
+        "symbol": "map_ajax_search_members",
+        "detail": "missing return type"
+      },
+      {
+        "file": "examples/php/wp_plugin_messy/includes/ajax-handlers.php",
+        "line": 17,
+        "symbol": "map_ajax_purge_logs",
+        "detail": "missing return type"
+      },
+      {
+        "file": "examples/php/wp_plugin_messy/includes/rest-endpoints.php",
+        "line": 1,
+        "symbol": "rest-endpoints.php",
+        "detail": "Missing 'declare(strict_types=1);' at file entry (allows silent scalar coercion)"
+      },
+      {
+        "file": "examples/php/wp_plugin_messy/includes/rest-endpoints.php",
+        "line": 5,
+        "symbol": "map_register_rest_routes",
+        "detail": "missing return type"
+      },
+      {
+        "file": "examples/php/wp_plugin_messy/includes/rest-endpoints.php",
+        "line": 14,
+        "symbol": "map_export_all_members",
+        "detail": "untyped params: $request; missing return type"
+      },
+      {
+        "file": "examples/php/wp_plugin_messy/member-analytics-portal.php",
+        "line": 1,
+        "symbol": "member-analytics-portal.php",
+        "detail": "Missing 'declare(strict_types=1);' at file entry (allows silent scalar coercion)"
+      },
+      {
+        "file": "examples/php/wp_plugin_messy/member-analytics-portal.php",
+        "line": 18,
+        "symbol": "map_render_badge_shortcode",
+        "detail": "untyped params: $atts; missing return type"
+      }
+    ],
+    "omitted_init_return_annotations": [],
+    "weak_type_usages": [],
+    "unscoped_type_ignores": [],
+    "docstring_coverage_pct": 0.0,
+    "annotated_doc_functions_count": 0,
+    "missing_docstrings": [
+      {
+        "file": "examples/php/wp_plugin_messy/admin/settings-page.php",
+        "line": 5,
+        "symbol": "map_register_admin_menu",
+        "detail": "Missing PHPDoc '/** ... */' on public callable"
+      },
+      {
+        "file": "examples/php/wp_plugin_messy/admin/settings-page.php",
+        "line": 16,
+        "symbol": "map_render_settings_page",
+        "detail": "Missing PHPDoc '/** ... */' on public callable"
+      },
+      {
+        "file": "examples/php/wp_plugin_messy/includes/ajax-handlers.php",
+        "line": 6,
+        "symbol": "map_ajax_search_members",
+        "detail": "Missing PHPDoc '/** ... */' on public callable"
+      },
+      {
+        "file": "examples/php/wp_plugin_messy/includes/ajax-handlers.php",
+        "line": 17,
+        "symbol": "map_ajax_purge_logs",
+        "detail": "Missing PHPDoc '/** ... */' on public callable"
+      },
+      {
+        "file": "examples/php/wp_plugin_messy/includes/rest-endpoints.php",
+        "line": 5,
+        "symbol": "map_register_rest_routes",
+        "detail": "Missing PHPDoc '/** ... */' on public callable"
+      },
+      {
+        "file": "examples/php/wp_plugin_messy/includes/rest-endpoints.php",
+        "line": 14,
+        "symbol": "map_export_all_members",
+        "detail": "Missing PHPDoc '/** ... */' on public callable"
+      },
+      {
+        "file": "examples/php/wp_plugin_messy/member-analytics-portal.php",
+        "line": 18,
+        "symbol": "map_render_badge_shortcode",
+        "detail": "Missing PHPDoc '/** ... */' on public callable"
+      }
+    ],
+    "empty_docstrings": [],
+    "doc_signature_mismatches": [],
+    "complex_functions": [],
+    "excessive_parameters": [],
+    "global_state_usages": [
+      {
+        "file": "examples/php/wp_plugin_messy/admin/settings-page.php",
+        "line": 18,
+        "symbol": "map_render_settings_page",
+        "detail": "Direct superglobal '$_POST' access — encapsulate via typed Request/Session abstraction"
+      },
+      {
+        "file": "examples/php/wp_plugin_messy/admin/settings-page.php",
+        "line": 19,
+        "symbol": "map_render_settings_page",
+        "detail": "Direct superglobal '$_POST' access — encapsulate via typed Request/Session abstraction"
+      },
+      {
+        "file": "examples/php/wp_plugin_messy/admin/settings-page.php",
+        "line": 23,
+        "symbol": "map_render_settings_page",
+        "detail": "Direct superglobal '$_GET' access — encapsulate via typed Request/Session abstraction"
+      },
+      {
+        "file": "examples/php/wp_plugin_messy/admin/settings-page.php",
+        "line": 26,
+        "symbol": "map_render_settings_page",
+        "detail": "Direct superglobal '$_GET' access — encapsulate via typed Request/Session abstraction"
+      },
+      {
+        "file": "examples/php/wp_plugin_messy/includes/ajax-handlers.php",
+        "line": 8,
+        "symbol": "map_ajax_search_members",
+        "detail": "Global state coupling via 'global $wpdb;'"
+      },
+      {
+        "file": "examples/php/wp_plugin_messy/includes/ajax-handlers.php",
+        "line": 19,
+        "symbol": "map_ajax_purge_logs",
+        "detail": "Global state coupling via 'global $wpdb;'"
+      },
+      {
+        "file": "examples/php/wp_plugin_messy/includes/ajax-handlers.php",
+        "line": 9,
+        "symbol": "map_ajax_search_members",
+        "detail": "Direct superglobal '$_POST' access — encapsulate via typed Request/Session abstraction"
+      },
+      {
+        "file": "examples/php/wp_plugin_messy/includes/ajax-handlers.php",
+        "line": 20,
+        "symbol": "map_ajax_purge_logs",
+        "detail": "Direct superglobal '$_POST' access — encapsulate via typed Request/Session abstraction"
+      },
+      {
+        "file": "examples/php/wp_plugin_messy/includes/ajax-handlers.php",
+        "line": 22,
+        "symbol": "map_ajax_purge_logs",
+        "detail": "Direct superglobal '$_POST' access — encapsulate via typed Request/Session abstraction"
+      },
+      {
+        "file": "examples/php/wp_plugin_messy/includes/rest-endpoints.php",
+        "line": 16,
+        "symbol": "map_export_all_members",
+        "detail": "Global state coupling via 'global $wpdb;'"
+      },
+      {
+        "file": "examples/php/wp_plugin_messy/includes/rest-endpoints.php",
+        "line": 17,
+        "symbol": "map_export_all_members",
+        "detail": "Direct superglobal '$_GET' access — encapsulate via typed Request/Session abstraction"
+      },
+      {
+        "file": "examples/php/wp_plugin_messy/includes/rest-endpoints.php",
+        "line": 20,
+        "symbol": "map_export_all_members",
+        "detail": "Direct superglobal '$_GET' access — encapsulate via typed Request/Session abstraction"
+      },
+      {
+        "file": "examples/php/wp_plugin_messy/member-analytics-portal.php",
+        "line": 20,
+        "symbol": "map_render_badge_shortcode",
+        "detail": "Direct superglobal '$_GET' access — encapsulate via typed Request/Session abstraction"
+      }
+    ],
+    "bug_risk_idioms": [
+      {
+        "file": "examples/php/wp_plugin_messy/admin/settings-page.php",
+        "line": 21,
+        "symbol": "map_render_settings_page",
+        "detail": "Error-suppression operator '@file_get_contents('https://telemetry.example' hides runtime failures"
+      }
+    ],
+    "internal_import_graph": {
+      "examples/php/wp_plugin_messy/admin/settings-page.php": [],
+      "examples/php/wp_plugin_messy/includes/ajax-handlers.php": [],
+      "examples/php/wp_plugin_messy/includes/rest-endpoints.php": [],
+      "examples/php/wp_plugin_messy/member-analytics-portal.php": [
+        "examples/php/wp_plugin_messy/admin/settings-page.php",
+        "examples/php/wp_plugin_messy/includes/ajax-handlers.php",
+        "examples/php/wp_plugin_messy/includes/rest-endpoints.php"
+      ]
+    },
+    "circular_dependencies": [],
+    "type_checking_cycles": [],
+    "unused_dependencies": [],
+    "undeclared_dependencies": [],
+    "boundary_violations": [],
+    "test_functions_count": 0,
+    "module_test_coverage_pct": null,
+    "assertion_free_tests": [],
+    "test_harness_notes": [],
+    "framework_issues": [
+      {
+        "file": "examples/php/wp_plugin_messy/admin/settings-page.php",
+        "line": 1,
+        "symbol": "settings-page.php",
+        "detail": "Missing 'if (!defined(\\'ABSPATH\\')) { exit; }' direct-access guard at top of file"
+      },
+      {
+        "file": "examples/php/wp_plugin_messy/admin/settings-page.php",
+        "line": 16,
+        "symbol": "map_render_settings_page",
+        "detail": "WordPress handler reads '$_POST'/'$_FILES' without 'wp_verify_nonce()' or 'check_admin_referer()' (CSRF risk)"
+      },
+      {
+        "file": "examples/php/wp_plugin_messy/admin/settings-page.php",
+        "line": 16,
+        "symbol": "map_render_settings_page",
+        "detail": "WordPress handler processes POST mutation without 'current_user_can(...)' check"
+      },
+      {
+        "file": "examples/php/wp_plugin_messy/admin/settings-page.php",
+        "line": 19,
+        "symbol": "map_render_settings_page",
+        "detail": "Unsanitized superglobal assigned to '$telemetry_url' — wrap with 'wp_unslash()' + 'sanitize_text_field()'/'absint()'"
+      },
+      {
+        "file": "examples/php/wp_plugin_messy/admin/settings-page.php",
+        "line": 23,
+        "symbol": "map_render_settings_page",
+        "detail": "Unsanitized superglobal assigned to '$active_tab' — wrap with 'wp_unslash()' + 'sanitize_text_field()'/'absint()'"
+      },
+      {
+        "file": "examples/php/wp_plugin_messy/includes/ajax-handlers.php",
+        "line": 1,
+        "symbol": "ajax-handlers.php",
+        "detail": "Missing 'if (!defined(\\'ABSPATH\\')) { exit; }' direct-access guard at top of file"
+      },
+      {
+        "file": "examples/php/wp_plugin_messy/includes/ajax-handlers.php",
+        "line": 6,
+        "symbol": "map_ajax_search_members",
+        "detail": "WordPress handler reads '$_POST'/'$_FILES' without 'wp_verify_nonce()' or 'check_admin_referer()' (CSRF risk)"
+      },
+      {
+        "file": "examples/php/wp_plugin_messy/includes/ajax-handlers.php",
+        "line": 6,
+        "symbol": "map_ajax_search_members",
+        "detail": "WordPress handler processes POST mutation without 'current_user_can(...)' check"
+      },
+      {
+        "file": "examples/php/wp_plugin_messy/includes/ajax-handlers.php",
+        "line": 17,
+        "symbol": "map_ajax_purge_logs",
+        "detail": "WordPress handler reads '$_POST'/'$_FILES' without 'wp_verify_nonce()' or 'check_admin_referer()' (CSRF risk)"
+      },
+      {
+        "file": "examples/php/wp_plugin_messy/includes/ajax-handlers.php",
+        "line": 17,
+        "symbol": "map_ajax_purge_logs",
+        "detail": "WordPress handler processes POST mutation without 'current_user_can(...)' check"
+      },
+      {
+        "file": "examples/php/wp_plugin_messy/includes/ajax-handlers.php",
+        "line": 9,
+        "symbol": "map_ajax_search_members",
+        "detail": "Unsanitized superglobal assigned to '$term' — wrap with 'wp_unslash()' + 'sanitize_text_field()'/'absint()'"
+      },
+      {
+        "file": "examples/php/wp_plugin_messy/includes/ajax-handlers.php",
+        "line": 20,
+        "symbol": "map_ajax_purge_logs",
+        "detail": "Unsanitized superglobal assigned to '$category' — wrap with 'wp_unslash()' + 'sanitize_text_field()'/'absint()'"
+      },
+      {
+        "file": "examples/php/wp_plugin_messy/includes/rest-endpoints.php",
+        "line": 1,
+        "symbol": "rest-endpoints.php",
+        "detail": "Missing 'if (!defined(\\'ABSPATH\\')) { exit; }' direct-access guard at top of file"
+      },
+      {
+        "file": "examples/php/wp_plugin_messy/includes/rest-endpoints.php",
+        "line": 17,
+        "symbol": "map_export_all_members",
+        "detail": "Unsanitized superglobal assigned to '$role_filter' — wrap with 'wp_unslash()' + 'sanitize_text_field()'/'absint()'"
+      },
+      {
+        "file": "examples/php/wp_plugin_messy/member-analytics-portal.php",
+        "line": 1,
+        "symbol": "member-analytics-portal.php",
+        "detail": "Missing 'if (!defined(\\'ABSPATH\\')) { exit; }' direct-access guard at top of file"
+      },
+      {
+        "file": "examples/php/wp_plugin_messy/member-analytics-portal.php",
+        "line": 20,
+        "symbol": "map_render_badge_shortcode",
+        "detail": "Unsanitized superglobal assigned to '$label' — wrap with 'wp_unslash()' + 'sanitize_text_field()'/'absint()'"
+      }
+    ],
+    "modernization_hints": [
+      {
+        "file": "examples/php/wp_plugin_messy/admin/settings-page.php",
+        "line": 27,
+        "symbol": "wp_enqueue_script",
+        "detail": "Hardcoded '<script src=...>' tag — register assets via 'wp_enqueue_script()'"
+      }
+    ],
+    "language_version_mismatches": [],
+    "missing_io_timeouts": [
+      {
+        "file": "examples/php/wp_plugin_messy/admin/settings-page.php",
+        "line": 21,
+        "symbol": "map_render_settings_page",
+        "detail": "Remote HTTP 'file_get_contents(...)' without stream_context timeout"
+      }
+    ],
+    "scattered_env_access": [],
+    "unstructured_logging": [
+      {
+        "file": "examples/php/wp_plugin_messy/includes/rest-endpoints.php",
+        "line": 21,
+        "symbol": "map_export_all_members",
+        "detail": "Unstructured debug/log function 'print_r()' — use PSR-3 LoggerInterface"
+      }
+    ],
+    "hardcoded_secrets": [
+      {
+        "file": "examples/php/wp_plugin_messy/includes/rest-endpoints.php",
+        "line": 3,
+        "symbol": "map_webhook_secret",
+        "detail": "Hardcoded secret literal assigned to '$map_webhook_secret'"
+      }
+    ],
+    "dangerous_sinks": [
+      {
+        "category": "xss",
+        "cwe_id": "CWE-79",
+        "severity": "high",
+        "file": "examples/php/wp_plugin_messy/admin/settings-page.php",
+        "line": 26,
+        "symbol": "map_render_settings_page",
+        "detail": "Unescaped request input rendered directly via 'echo $_GET['tab'] ?? 'general';'"
+      },
+      {
+        "category": "sql_injection",
+        "cwe_id": "CWE-89",
+        "severity": "high",
+        "file": "examples/php/wp_plugin_messy/includes/ajax-handlers.php",
+        "line": 10,
+        "symbol": "map_ajax_search_members",
+        "detail": "Unparameterized SQL in '$wpdb->get_results(\"SELECT ID, display_name, user_email FROM {$w)' — use prepared placeholders"
+      },
+      {
+        "category": "sql_injection",
+        "cwe_id": "CWE-89",
+        "severity": "high",
+        "file": "examples/php/wp_plugin_messy/includes/ajax-handlers.php",
+        "line": 21,
+        "symbol": "map_ajax_purge_logs",
+        "detail": "Unparameterized SQL in '$wpdb->query(\"DELETE FROM wp_map_events WHERE category = ')' — use prepared placeholders"
+      },
+      {
+        "category": "xss",
+        "cwe_id": "CWE-79",
+        "severity": "high",
+        "file": "examples/php/wp_plugin_messy/includes/ajax-handlers.php",
+        "line": 22,
+        "symbol": "map_ajax_purge_logs",
+        "detail": "Unescaped request input rendered directly via 'echo \"Purged category: \" . $_POST['category'];'"
+      },
+      {
+        "category": "sql_injection",
+        "cwe_id": "CWE-89",
+        "severity": "high",
+        "file": "examples/php/wp_plugin_messy/includes/rest-endpoints.php",
+        "line": 19,
+        "symbol": "map_export_all_members",
+        "detail": "Unparameterized SQL in '$wpdb->get_results($sql)' — use prepared placeholders"
+      }
+    ],
+    "api_endpoints": [
+      {
+        "http_method": "ANY",
+        "path": "/examples/php/wp_plugin_messy/admin/settings-page.php",
+        "handler": "settings-page.php",
+        "file": "examples/php/wp_plugin_messy/admin/settings-page.php",
+        "line": 1,
+        "has_auth_hint": false,
+        "auth_mechanisms": []
+      },
+      {
+        "http_method": "GET",
+        "path": "/examples/php/wp_plugin_messy/member-analytics-portal.php",
+        "handler": "member-analytics-portal.php",
+        "file": "examples/php/wp_plugin_messy/member-analytics-portal.php",
+        "line": 1,
+        "has_auth_hint": false,
+        "auth_mechanisms": []
+      },
+      {
+        "http_method": "POST",
+        "path": "/wp-admin/admin-ajax.php?action=map_purge_logs",
+        "handler": "map_ajax_purge_logs",
+        "file": "examples/php/wp_plugin_messy/includes/ajax-handlers.php",
+        "line": 4,
+        "has_auth_hint": true,
+        "auth_mechanisms": [
+          "wp_ajax_session"
+        ]
+      },
+      {
+        "http_method": "POST",
+        "path": "/wp-admin/admin-ajax.php?action=map_search_members",
+        "handler": "map_ajax_search_members",
+        "file": "examples/php/wp_plugin_messy/includes/ajax-handlers.php",
+        "line": 3,
+        "has_auth_hint": false,
+        "auth_mechanisms": []
+      },
+      {
+        "http_method": "GET",
+        "path": "/wp-json/member-analytics/v1/export",
+        "handler": "map_export_all_members",
+        "file": "examples/php/wp_plugin_messy/includes/rest-endpoints.php",
+        "line": 7,
+        "has_auth_hint": false,
+        "auth_mechanisms": []
+      }
+    ],
+    "opt_out_counts": {}
+  },
+  "runtime_facts": {
+    "status": "passed",
+    "container_engine": "docker",
+    "engine_available": true,
+    "skip_reason": "",
+    "language": "php",
+    "selected_dockerfile_template": "php/raw.dockerfile",
+    "harness_dockerfile_path": ".pni/dockerfiles/examples/php/wp_plugin_messy/Dockerfile",
+    "build_args": {
+      "PHP_VERSION": "8.2"
+    },
+    "artifacts_dir": ".pni/cache/php_wp_plugin_messy/runtime",
+    "project_dockerfile_build": null,
+    "harness_build": {
+      "attempted": true,
+      "status": "passed",
+      "dockerfile_used": ".pni/dockerfiles/examples/php/wp_plugin_messy/Dockerfile",
+      "duration_sec": 49.1,
+      "exit_code": 0,
+      "error_tail": []
+    },
+    "test_execution": {
+      "attempted": true,
+      "status": "passed",
+      "command": "sh -c lint_fail=0; for p in $(find . -path '*/vendor' -prune -o \\( -name '*.php' -o -name '*.phtml' \\) -print 2>/dev/null); do   if ! php -l \"$p\" >/tmp/pni_lint_err.txt 2>&1; then     cat /tmp/pni_lint_err.txt >&2; lint_fail=1;   fi; done; if [ \"$lint_fail\" -ne 0 ]; then exit 1; fi; has_tests=0; for td in tests; do   if [ -d \"$td\" ] && [ -n \"$(find \"$td\" -name '*Test.php' -o -name '*_test.php' 2>/dev/null)\" ]; then     has_tests=1;   fi; done; if [ \"$has_tests\" -eq 1 ] && command -v phpunit >/dev/null 2>&1; then   cfg_flag=\"\";   tst_arg=\"\";   if [ ! -f phpunit.xml ] && [ ! -f phpunit.xml.dist ] && [ ! -f phpunit.dist.xml ]; then     dirs_xml=\"\"; ws_pwd=$(pwd);     for sd in .; do       if [ -d \"$sd\" ]; then dirs_xml=\"${dirs_xml}<directory>${ws_pwd}/${sd}</directory>\"; fi;     done;     if [ -z \"$dirs_xml\" ]; then dirs_xml=\"<directory>${ws_pwd}</directory>\"; fi;     printf '<phpunit><source><include>%s</include><exclude><directory>%s/vendor</directory><directory>%s/tests</directory></exclude></source></phpunit>' \"$dirs_xml\" \"$ws_pwd\" \"$ws_pwd\" >/tmp/pni_phpunit.xml;     cfg_flag=\"-c /tmp/pni_phpunit.xml\";     tst_arg=\"tests\";   fi;   phpunit $cfg_flag -d pcov.enabled=1 -d pcov.directory=. --log-junit /out/junit.xml --coverage-clover /out/clover.xml $tst_arg;   exit $?; fi; echo 'PHP syntax gate (php -l) passed; no PHPUnit tests executed.'; exit 0",
+      "duration_sec": 0.72,
+      "exit_code": 0,
+      "total_tests": 0,
+      "passed_tests": 0,
+      "failed_tests": 0,
+      "error_tests": 0,
+      "skipped_tests": 0,
+      "failures": [],
+      "log_tail": []
+    },
+    "coverage": {
+      "measured": false,
+      "tool": "",
+      "line_coverage_pct": null,
+      "branch_coverage_pct": null,
+      "covered_lines": 0,
+      "total_statements": 0,
+      "lowest_covered_modules": []
+    },
+    "smoke_check": {
+      "attempted": true,
+      "archetype": "web_api",
+      "status": "passed",
+      "command": "php -r define('ABSPATH', '/workspace/'); $GLOBALS['__pni_wp_hooks'] = 0; function add_action($t, $c, $p=10, $a=1) { $GLOBALS['__pni_wp_hooks']++; return true; } function add_filter($t, $c, $p=10, $a=1) { $GLOBALS['__pni_wp_hooks']++; return true; } function add_shortcode($t, $c) { $GLOBALS['__pni_wp_hooks']++; return true; } function register_activation_hook($f, $c) { $GLOBALS['__pni_wp_hooks']++; } function register_deactivation_hook($f, $c) { $GLOBALS['__pni_wp_hooks']++; } function register_rest_route($n, $r, $a=[]) { $GLOBALS['__pni_wp_hooks']++; return true; } function plugin_dir_path($f) { return dirname($f) . '/'; } function plugin_dir_url($f) { return 'http://localhost/wp-content/plugins/plugin/'; } function is_admin() { return false; } function __($t, $d='default') { return $t; } require_once '/workspace/member-analytics-portal.php'; $n = $GLOBALS['__pni_wp_hooks']; file_put_contents('/out/smoke.json', json_encode(['probed_endpoint' => 'wp-plugin://member-analytics-portal.php', 'http_status' => 200, 'detail' => 'WordPress plugin member-analytics-portal.php loaded cleanly (' . $n . ' hooks registered)']));",
+      "duration_sec": 0.64,
+      "exit_code": 0,
+      "http_status": 200,
+      "probed_endpoint": "wp-plugin://member-analytics-portal.php",
+      "failure_kind": "none",
+      "detail": "WordPress plugin member-analytics-portal.php loaded cleanly (5 hooks registered)",
+      "log_tail": []
+    }
+  },
+  "security_facts": {
+    "status": "passed",
+    "scanner": "trivy",
+    "container_engine": "docker",
+    "engine_available": true,
+    "skip_reason": "",
+    "trivy_image": "ghcr.io/aquasecurity/trivy:0.69.3",
+    "scanned_filesystem": true,
+    "scanned_resolved_image": true,
+    "resolved_image_source": ".pni/dockerfiles/examples/php/wp_plugin_messy/Dockerfile",
+    "artifacts_dir": ".pni/cache/php_wp_plugin_messy/security",
+    "vuln_counts": {
+      "critical": 0,
+      "high": 0,
+      "medium": 0,
+      "low": 0,
+      "total": 0
+    },
+    "app_vuln_counts": {
+      "critical": 0,
+      "high": 0,
+      "medium": 0,
+      "low": 0,
+      "total": 0
+    },
+    "core_app_vuln_counts": {
+      "critical": 0,
+      "high": 0,
+      "medium": 0,
+      "low": 0,
+      "total": 0
+    },
+    "dev_app_vuln_counts": {
+      "critical": 0,
+      "high": 0,
+      "medium": 0,
+      "low": 0,
+      "total": 0
+    },
+    "os_vuln_counts": {
+      "critical": 0,
+      "high": 0,
+      "medium": 0,
+      "low": 0,
+      "total": 0
+    },
+    "harness_os_vuln_counts": {
+      "critical": 6,
+      "high": 355,
+      "medium": 2005,
+      "low": 1125,
+      "total": 3512
+    },
+    "vulnerabilities": [],
+    "app_vulnerabilities": [],
+    "os_vulnerabilities": [],
+    "misconfigurations": [],
+    "secrets": [],
+    "opt_out_counts": {}
+  },
+  "pentest_facts": null,
+  "migration_facts": null,
+  "progress_facts": null,
+  "architecture_record": {
+    "workflow_id": "php_wp_plugin_messy",
+    "workflow_run_id": "wf-3389d5e7",
+    "recorded_at": "2026-11-22T11:27:49.318737+00:00",
+    "target_root": "examples/php/wp_plugin_messy",
+    "system_profile": {
+      "system_purpose": "Member Analytics Portal (wp_plugin_messy v1.3.0) is a procedural WordPress plugin that registers a REST member-export endpoint, two admin-ajax handlers (member search and event log purge), an admin settings page with outbound telemetry pings, and a frontend badge shortcode.",
+      "domain_context": "WordPress site administration, member directory export/search, event log purging, telemetry option storage, and frontend badge rendering.",
+      "runtime_types": [
+        "web_api"
+      ],
+      "tech_stack": [
+        "Raw PHP (declared Requires PHP: 7.4, tested under PHP 8.2 harness)",
+        "WordPress Plugin API (REST API, admin-ajax, admin_menu, shortcode, global $wpdb)"
+      ],
+      "external_integrations": [
+        "Outbound HTTP GET ping to https://telemetry.example.com/ping via @file_get_contents() in admin/settings-page.php:21",
+        "WordPress MySQL database accessed via global $wpdb ($wpdb->users, wp_map_events)"
+      ]
+    },
+    "structure_map": {
+      "architecture_pattern": "Procedural Flat WordPress Plugin (Global Hook & Superglobal Coupling, No OOP/PSR-4 Layering)",
+      "layers": [
+        {
+          "name": "Plugin Bootstrap & Shortcode Entrypoint",
+          "responsibility": "Manual require_once loading of plugin files, REST/shortcode hook registration, and badge shortcode rendering.",
+          "paths": [
+            "member-analytics-portal.php"
+          ],
+          "allowed_dependencies": [
+            "REST Endpoint Module",
+            "AJAX Handler Module",
+            "Admin Settings Module"
+          ]
+        },
+        {
+          "name": "REST Endpoint Module",
+          "responsibility": "Registers /wp-json/member-analytics/v1/export and queries wp_users via global $wpdb.",
+          "paths": [
+            "includes/rest-endpoints.php"
+          ],
+          "allowed_dependencies": []
+        },
+        {
+          "name": "AJAX Handler Module",
+          "responsibility": "Handles public wp_ajax_nopriv member search and wp_ajax event log deletion directly against global $wpdb.",
+          "paths": [
+            "includes/ajax-handlers.php"
+          ],
+          "allowed_dependencies": []
+        },
+        {
+          "name": "Admin Settings Module",
+          "responsibility": "Registers WP admin options page, persists telemetry URL option, pings external telemetry URL, and renders inline HTML/JS.",
+          "paths": [
+            "admin/settings-page.php"
+          ],
+          "allowed_dependencies": []
+        }
+      ],
+      "modules": [
+        {
+          "path": "member-analytics-portal.php",
+          "role": "Plugin header, manual require_once loader, and [member_analytics_badge] shortcode",
+          "key_symbols": [
+            "map_render_badge_shortcode"
+          ],
+          "depends_on": [
+            "includes/rest-endpoints.php",
+            "includes/ajax-handlers.php",
+            "admin/settings-page.php"
+          ],
+          "health_note": "No ABSPATH guard, EOL PHP 7.4 header, unescaped $_GET['badge_label'] XSS."
+        },
+        {
+          "path": "includes/rest-endpoints.php",
+          "role": "WordPress REST API member exporter",
+          "key_symbols": [
+            "map_register_rest_routes",
+            "map_export_all_members"
+          ],
+          "depends_on": [],
+          "health_note": "Hardcoded $map_webhook_secret, __return_true public PII export, CWE-89 SQLi, print_r debug leak."
+        },
+        {
+          "path": "includes/ajax-handlers.php",
+          "role": "WordPress admin-ajax search and purge handlers",
+          "key_symbols": [
+            "map_ajax_search_members",
+            "map_ajax_purge_logs"
+          ],
+          "depends_on": [],
+          "health_note": "wp_ajax_nopriv SQLi, missing nonce/capability on DELETE SQLi, unescaped $_POST XSS."
+        },
+        {
+          "path": "admin/settings-page.php",
+          "role": "WordPress admin settings UI and telemetry ping",
+          "key_symbols": [
+            "map_register_admin_menu",
+            "map_render_settings_page"
+          ],
+          "depends_on": [],
+          "health_note": "'read' capability privilege escalation, missing nonce, CWE-79 XSS, unbounded @file_get_contents, raw <script>."
+        }
+      ],
+      "boundary_assessment": "Acyclic 4-file procedural split without circular includes, but completely lacks PSR-4 class boundaries, input/output sanitization layers, or WordPress authorization/nonce middleware."
+    },
+    "execution_flow_map": {
+      "entry_points": [
+        "member-analytics-portal.php:map_render_badge_shortcode",
+        "includes/rest-endpoints.php:map_export_all_members",
+        "includes/ajax-handlers.php:map_ajax_search_members",
+        "includes/ajax-handlers.php:map_ajax_purge_logs",
+        "admin/settings-page.php:map_render_settings_page"
+      ],
+      "execution_flows": [
+        {
+          "name": "Unauthenticated REST Member Export",
+          "trigger": "HTTP GET /wp-json/member-analytics/v1/export?role_filter=...",
+          "steps": [
+            "WordPress invokes map_export_all_members() with permission_callback=>'__return_true' (zero authentication).",
+            "Reads raw $_GET['role_filter'], interpolates directly into SQL LIKE query against $wpdb->users, optionally dumps rows via print_r(), and returns user_login/user_email records."
+          ],
+          "involved_files": [
+            "includes/rest-endpoints.php"
+          ]
+        },
+        {
+          "name": "AJAX Member Search & Event Log Purge",
+          "trigger": "HTTP POST /wp-admin/admin-ajax.php?action=map_search_members|map_purge_logs",
+          "steps": [
+            "map_ajax_search_members() runs via wp_ajax_nopriv without nonce/auth and interpolates raw $_POST['term'] into $wpdb->get_results().",
+            "map_ajax_purge_logs() runs without nonce or current_user_can(), executes raw DELETE FROM wp_map_events with $_POST['category'], and echoes unescaped $_POST['category']."
+          ],
+          "involved_files": [
+            "includes/ajax-handlers.php"
+          ]
+        },
+        {
+          "name": "Admin Settings Mutation & Telemetry Ping",
+          "trigger": "WordPress Admin Options Page (capability 'read') POST/GET",
+          "steps": [
+            "Any logged-in subscriber ('read' cap) can POST map_telemetry_url without nonce, persisting raw input via update_option() and firing unbounded @file_get_contents() to telemetry.example.com.",
+            "Renders unescaped $_GET['tab'] into HTML heading and form input value."
+          ],
+          "involved_files": [
+            "admin/settings-page.php"
+          ]
+        }
+      ],
+      "state_and_storage": [
+        "WordPress MySQL database tables ($wpdb->users, wp_map_events) queried via global $wpdb without $wpdb->prepare().",
+        "WordPress wp_options key 'map_telemetry_url' mutated via update_option() without sanitization or nonce verification.",
+        "Global variable $map_webhook_secret hardcoded in includes/rest-endpoints.php:3."
+      ],
+      "error_and_concurrency_model": "Synchronous PHP request-per-process model under WordPress with silent error suppression (@file_get_contents), unstructured print_r() debug leaks, and zero defensive validation or exception handling."
+    }
+  },
+  "base_score_result": null,
+  "companion_ast_facts": {}
+}

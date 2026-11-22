@@ -1,0 +1,18 @@
+[project]
+name = "java_api_spring_messy_migration"
+type = "doc"
+title = "PNI Migration Plan: legacy-billing -> Java 21 + Spring Boot 3.4 + Clean Architecture"
+description = "Workflow v2 chained migration execution plan (based_on: java_api_spring_messy) targeting Java 21 LTS, Spring Boot 3.4, PostgreSQL 16, Redis 7, and Clean Architecture."
+style = "google"
+
+[i18n]
+default_lang = "en"
+langs = ["en", "ja"]
+
+[i18n.labels]
+en = "English"
+ja = "日本語"
+
+[i18n.descriptions]
+en = "PNI501 Migration Execution Plan for legacy-billing -> Java 21 LTS + Spring Boot 3.4 + PostgreSQL 16 + Redis 7 + Clean Architecture."
+ja = "legacy-billing -> Java 21 LTS + Spring Boot 3.4 + PostgreSQL 16 + Redis 7 + Clean Architecture PNI501 マイグレーション実行計画レポート。"

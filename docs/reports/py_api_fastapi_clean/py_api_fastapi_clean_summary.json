@@ -1,0 +1,44 @@
+{
+  "schema_version": "2.0",
+  "project_name": "order-dispatch",
+  "workflow_id": "py_api_fastapi_clean",
+  "workflow_run_id": "wf-f819234f",
+  "evaluated_at": "2026-11-22T11:29:00.803894+00:00",
+  "language": "python",
+  "target_root": "examples/python/api_fastapi_clean",
+  "overall_score": 94,
+  "grade": "S",
+  "category_scores": {
+    "architecture": 96,
+    "code_quality": 98,
+    "typing": 100,
+    "testing": 90,
+    "dependencies": 95,
+    "security": 84,
+    "documentation": 98
+  },
+  "baseline_scores": {
+    "architecture": 100,
+    "code_quality": 100,
+    "typing": 100,
+    "testing": 100,
+    "dependencies": 100,
+    "security": 85,
+    "documentation": 100
+  },
+  "total_loc": 435,
+  "measured_line_coverage_pct": 85.2,
+  "passed_rules": 12,
+  "applicable_rules": 16,
+  "finding_counts": {
+    "critical": 0,
+    "high": 0,
+    "medium": 3,
+    "low": 9,
+    "info": 0
+  },
+  "components": [],
+  "score_file": "docs/reports/py_api_fastapi_clean/py_api_fastapi_clean_score.json",
+  "sarif_file": "docs/reports/py_api_fastapi_clean/py_api_fastapi_clean_findings.sarif",
+  "summary": "order-dispatch achieves Grade S (94/100) as a clean Python 3.11+ FastAPI + Pydantic v2 microservice benchmark: 100% typing, import hygiene, and docstring coverage, strict acyclic 4-layer Clean Architecture, 4/4 passing offline Docker tests (85.2% line coverage, clean /healthz ASGI boot), zero declared application CVEs, and SHA-pinned OpenSSF CI governance. Live DAST and Trivy image inspection identified four concrete production hardening targets: adding OAuth2/JWT authentication on /v1/orders (CWE-306), refreshing the python:3.12.6-slim-bookworm base image into a pip-free multi-stage build with HEALTHCHECK, adding HTTP security headers and gating /openapi.json in prod, and expanding TestClient/MockTransport branch coverage from 62.5% above 80%."
+}

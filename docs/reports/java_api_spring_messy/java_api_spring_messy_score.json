@@ -1,0 +1,1964 @@
+{
+  "schema_version": "2.0",
+  "project_name": "legacy-billing",
+  "workflow_id": "java_api_spring_messy",
+  "workflow_run_id": "wf-8177454c",
+  "evaluated_at": "2026-11-22T11:29:02.337544+00:00",
+  "language": "java",
+  "target_root": "examples/java/api_spring_messy",
+  "facts_file": "docs_src/reports/java_api_spring_messy/_facts/facts.json",
+  "key_files_inspected": [
+    "pom.xml",
+    "Dockerfile",
+    ".github/workflows/build.yml",
+    "README.md",
+    "src/main/java/com/example/billing/BillingApp.java",
+    "src/main/java/com/example/billing/controller/BillingController.java",
+    "src/main/java/com/example/billing/service/BillingManager.java",
+    "src/main/java/com/example/billing/client/GatewayClient.java",
+    "src/main/java/com/example/billing/model/InvoiceRecord.java",
+    "src/main/java/com/example/billing/util/LegacyDateHelper.java",
+    "src/test/java/com/example/billing/BillingManagerTest.java"
+  ],
+  "overall_score": 66,
+  "grade": "C",
+  "category_scores": {
+    "architecture": 80,
+    "code_quality": 86,
+    "typing": 77,
+    "testing": 51,
+    "dependencies": 72,
+    "security": 50,
+    "documentation": 44
+  },
+  "baseline_scores": {
+    "architecture": 90,
+    "code_quality": 96,
+    "typing": 87,
+    "testing": 61,
+    "dependencies": 82,
+    "security": 60,
+    "documentation": 54
+  },
+  "category_rationales": {
+    "architecture": "Baseline 90 adjusted -10pt for runtime BillingController <-> BillingManager circular dependency, @Autowired field injection, mutable singleton field BillingController.channel, and process-local static HashMap INVOICE_CACHE.",
+    "code_quality": "Baseline 96 adjusted -10pt for BillingManager.processBatchBilling god method (cognitive=56, 8 params, 57 LOC), 3 String == reference-equality bugs, empty catch block, broken private @Transactional self-invocation, and 4 System.out/printStackTrace calls.",
+    "typing": "Baseline 87 adjusted -10pt for raw Map/List generics in BillingController and BillingManager, untyped Object parameters, @SuppressWarnings('unchecked'), and Java 11 java.net.http import colliding with Java 1.8 target.",
+    "testing": "Baseline 61 adjusted -10pt because the sole JUnit 4 test (BillingManagerTest.testSmokeRun) is assertion-free, static module coverage is 33.3%, and live Maven/JaCoCo execution is completely blocked by the Java 8 vs Spring Boot 4.2.0 build crash.",
+    "dependencies": "Baseline 82 adjusted -10pt for unpinned spring-boot-starter-web:LATEST (which dynamically pulls Spring Boot 4.2.0 bytecode 61.0 and breaks Java 1.8 builds), EOL javax.servlet/JUnit 4, missing mvnw, and missing Dependabot.",
+    "security": "Baseline 60 adjusted -10pt for hardcoded GATEWAY_SECRET, privileged pull_request_target + actions/checkout@main CI, root openjdk:latest Dockerfile (DS-0001/DS-0002/DS-0026), unpinned CRITICAL CVE-2022-22965 static exposure, unauthenticated catch-all ANY /charge, and blocked DAST.",
+    "documentation": "Baseline 54 adjusted -10pt for minimal 2-line README.md, 33.3% Javadoc coverage (10 missing public Javadocs), stale @param obsoleteToken mismatch, and missing LICENSE/SECURITY.md."
+  },
+  "metrics_snapshot": {
+    "language": "java",
+    "runtime_types": [
+      "web_api"
+    ],
+    "build_system": "maven",
+    "has_manifest": true,
+    "has_lockfile": false,
+    "has_license": false,
+    "has_security_policy": false,
+    "has_dependency_automation": false,
+    "dependencies_count": 2,
+    "unpinned_dependencies_count": 1,
+    "source_files_count": 6,
+    "test_files_count": 1,
+    "readme_line_count": 2,
+    "ci_supply_chain_issues_count": 3,
+    "committed_secret_files_count": 0,
+    "container_hygiene_issues_count": 3,
+    "legacy_language_findings_count": 0,
+    "total_files": 6,
+    "total_loc": 187,
+    "total_classes": 6,
+    "total_functions": 11,
+    "import_hygiene_coverage_pct": 83.3,
+    "type_safety_coverage_pct": 81.8,
+    "docstring_coverage_pct": 33.3,
+    "module_test_coverage_pct": 33.3,
+    "unsorted_imports_count": 4,
+    "wildcard_imports_count": 1,
+    "type_safety_issues_count": 2,
+    "omitted_init_return_count": 0,
+    "weak_type_usages_count": 4,
+    "annotated_doc_functions_count": 0,
+    "empty_docstrings_count": 0,
+    "doc_signature_mismatches_count": 1,
+    "complex_functions_count": 1,
+    "excessive_parameters_count": 1,
+    "global_state_usages_count": 1,
+    "bug_risk_idioms_count": 7,
+    "circular_dependencies_count": 1,
+    "type_checking_cycles_count": 0,
+    "unused_dependencies_count": 0,
+    "undeclared_dependencies_count": 1,
+    "test_functions_count": 1,
+    "assertion_free_tests_count": 1,
+    "has_conftest_assertion_hook": false,
+    "framework_issues_count": 3,
+    "modernization_hints_count": 6,
+    "language_version_mismatches_count": 1,
+    "missing_io_timeouts_count": 1,
+    "scattered_env_access_count": 1,
+    "unstructured_logging_count": 4,
+    "hardcoded_secrets_count": 1,
+    "ast_dangerous_sinks_count": 0,
+    "api_endpoints_count": 1,
+    "runtime_status": "failed",
+    "harness_build_status": "failed",
+    "tests_status": "blocked",
+    "tests_total": 0,
+    "tests_passed": 0,
+    "tests_failed": 0,
+    "smoke_check_status": "blocked",
+    "security_scan_status": "failed",
+    "app_vuln_critical": 1,
+    "app_vuln_high": 0,
+    "app_vuln_total": 1,
+    "core_app_vuln_total": 1,
+    "core_app_vuln_high_or_crit": 1,
+    "dev_app_vuln_total": 0,
+    "app_vuln_unpinned_range_matches": 1,
+    "os_vuln_high_or_crit": 0,
+    "harness_os_vuln_total": 0,
+    "misconfig_count": 3,
+    "secret_leak_count": 0,
+    "pentest_status": "error",
+    "pentest_probes_total": 0,
+    "pentest_probes_passed": 0,
+    "pentest_probes_failed": 0,
+    "pentest_findings_count": 0,
+    "pentest_high_or_crit_count": 0
+  },
+  "runtime_facts": {
+    "status": "failed",
+    "container_engine": "docker",
+    "engine_available": true,
+    "skip_reason": "",
+    "language": "java",
+    "selected_dockerfile_template": "java/maven.dockerfile",
+    "harness_dockerfile_path": ".pni/dockerfiles/examples/java/api_spring_messy/Dockerfile",
+    "build_args": {
+      "JAVA_VERSION": "8"
+    },
+    "artifacts_dir": ".pni/cache/java_api_spring_messy/runtime",
+    "project_dockerfile_build": {
+      "attempted": true,
+      "status": "failed",
+      "dockerfile_used": "examples/java/api_spring_messy/Dockerfile",
+      "duration_sec": 1.21,
+      "exit_code": 1,
+      "error_tail": [
+        "#0 building with \"default\" instance using docker driver",
+        "#1 [internal] load build definition from Dockerfile",
+        "#1 transferring dockerfile: 127B done",
+        "#1 DONE 0.0s",
+        "#2 [internal] load metadata for docker.io/library/openjdk:latest",
+        "#2 ERROR: docker.io/library/openjdk:latest: not found",
+        "------",
+        " > [internal] load metadata for docker.io/library/openjdk:latest:",
+        "------",
+        "Dockerfile:1",
+        "--------------------",
+        "   1 | >>> FROM openjdk:latest",
+        "   2 |     WORKDIR /app",
+        "   3 |     COPY . .",
+        "--------------------",
+        "ERROR: failed to build: failed to solve: openjdk:latest: failed to resolve source metadata for docker.io/library/openjdk:latest: docker.io/library/openjdk:latest: not found"
+      ]
+    },
+    "harness_build": {
+      "attempted": true,
+      "status": "failed",
+      "dockerfile_used": ".pni/dockerfiles/examples/java/api_spring_messy/Dockerfile",
+      "duration_sec": 23.98,
+      "exit_code": 1,
+      "error_tail": [
+        "#8 ERROR: process \"/bin/sh -c mvn -B -Dmaven.repo.local=/m2repo       org.jacoco:jacoco-maven-plugin:${JACOCO_VERSION}:prepare-agent       test       -DfailIfNoTests=false       -Dmaven.test.failure.ignore=true       org.jacoco:jacoco-maven-plugin:${JACOCO_VERSION}:report       dependency:build-classpath -Dmdep.outputFile=/m2repo/runtime_cp.txt     && rm -rf target/surefire-reports target/site target/jacoco.exec     && chown -R pni:pni /workspace /m2repo     && chmod -R a+rwX /workspace /m2repo /out\" did not complete successfully: exit code: 1",
+        "------",
+        " > [5/5] RUN mvn -B -Dmaven.repo.local=/m2repo       org.jacoco:jacoco-maven-plugin:0.8.12:prepare-agent       test       -DfailIfNoTests=false       -Dmaven.test.failure.ignore=true       org.jacoco:jacoco-maven-plugin:0.8.12:report       dependency:build-classpath -Dmdep.outputFile=/m2repo/runtime_cp.txt     && rm -rf target/surefire-reports target/site target/jacoco.exec     && chown -R pni:pni /workspace /m2repo     && chmod -R a+rwX /workspace /m2repo /out:",
+        "9.861 [ERROR]   bad class file: /m2repo/org/springframework/boot/spring-boot/4.2.0/spring-boot-4.2.0.jar(org/springframework/boot/SpringApplication.class)",
+        "9.861 [ERROR]     class file has wrong version 61.0, should be 52.0",
+        "9.861 [ERROR]     Please remove or make sure it appears in the correct subdirectory of the classpath.",
+        "9.861 [ERROR] -> [Help 1]",
+        "9.861 [ERROR]",
+        "9.861 [ERROR] To see the full stack trace of the errors, re-run Maven with the -e switch.",
+        "9.861 [ERROR] Re-run Maven using the -X switch to enable full debug logging.",
+        "9.861 [ERROR]",
+        "9.861 [ERROR] For more information about the errors and possible solutions, please read the following articles:",
+        "9.861 [ERROR] [Help 1] http://cwiki.apache.org/confluence/display/MAVEN/MojoFailureException",
+        "------",
+        "Dockerfile:16",
+        "--------------------",
+        "  15 |",
+        "  16 | >>> RUN mvn -B -Dmaven.repo.local=/m2repo \\",
+        "  17 | >>>       org.jacoco:jacoco-maven-plugin:${JACOCO_VERSION}:prepare-agent \\",
+        "  18 | >>>       test \\",
+        "  19 | >>>       -DfailIfNoTests=false \\",
+        "  20 | >>>       -Dmaven.test.failure.ignore=true \\",
+        "  21 | >>>       org.jacoco:jacoco-maven-plugin:${JACOCO_VERSION}:report \\",
+        "  22 | >>>       dependency:build-classpath -Dmdep.outputFile=/m2repo/runtime_cp.txt \\",
+        "  23 | >>>     && rm -rf target/surefire-reports target/site target/jacoco.exec \\",
+        "  24 | >>>     && chown -R pni:pni /workspace /m2repo \\",
+        "  25 | >>>     && chmod -R a+rwX /workspace /m2repo /out",
+        "  26 |",
+        "--------------------",
+        "ERROR: failed to build: failed to solve: process \"/bin/sh -c mvn -B -Dmaven.repo.local=/m2repo       org.jacoco:jacoco-maven-plugin:${JACOCO_VERSION}:prepare-agent       test       -DfailIfNoTests=false       -Dmaven.test.failure.ignore=true       org.jacoco:jacoco-maven-plugin:${JACOCO_VERSION}:report       dependency:build-classpath -Dmdep.outputFile=/m2repo/runtime_cp.txt     && rm -rf target/surefire-reports target/site target/jacoco.exec     && chown -R pni:pni /workspace /m2repo     && chmod -R a+rwX /workspace /m2repo /out\" did not complete successfully: exit code: 1"
+      ]
+    },
+    "test_execution": {
+      "attempted": false,
+      "status": "blocked",
+      "command": "",
+      "duration_sec": 0.0,
+      "exit_code": null,
+      "total_tests": 0,
+      "passed_tests": 0,
+      "failed_tests": 0,
+      "error_tests": 0,
+      "skipped_tests": 0,
+      "failures": [],
+      "log_tail": []
+    },
+    "coverage": {
+      "measured": false,
+      "tool": "",
+      "line_coverage_pct": null,
+      "branch_coverage_pct": null,
+      "covered_lines": 0,
+      "total_statements": 0,
+      "lowest_covered_modules": []
+    },
+    "smoke_check": {
+      "attempted": false,
+      "archetype": "web_api",
+      "status": "blocked",
+      "command": "",
+      "duration_sec": 0.0,
+      "exit_code": null,
+      "http_status": null,
+      "probed_endpoint": null,
+      "failure_kind": "none",
+      "detail": "Blocked by harness build failure",
+      "log_tail": []
+    }
+  },
+  "security_facts": {
+    "status": "failed",
+    "scanner": "trivy",
+    "container_engine": "docker",
+    "engine_available": true,
+    "skip_reason": "",
+    "trivy_image": "ghcr.io/aquasecurity/trivy:0.69.3",
+    "scanned_filesystem": true,
+    "scanned_resolved_image": false,
+    "resolved_image_source": "",
+    "artifacts_dir": ".pni/cache/java_api_spring_messy/security",
+    "vuln_counts": {
+      "critical": 1,
+      "high": 0,
+      "medium": 0,
+      "low": 0,
+      "total": 1
+    },
+    "app_vuln_counts": {
+      "critical": 1,
+      "high": 0,
+      "medium": 0,
+      "low": 0,
+      "total": 1
+    },
+    "core_app_vuln_counts": {
+      "critical": 1,
+      "high": 0,
+      "medium": 0,
+      "low": 0,
+      "total": 1
+    },
+    "dev_app_vuln_counts": {
+      "critical": 0,
+      "high": 0,
+      "medium": 0,
+      "low": 0,
+      "total": 0
+    },
+    "os_vuln_counts": {
+      "critical": 0,
+      "high": 0,
+      "medium": 0,
+      "low": 0,
+      "total": 0
+    },
+    "harness_os_vuln_counts": {
+      "critical": 0,
+      "high": 0,
+      "medium": 0,
+      "low": 0,
+      "total": 0
+    },
+    "vulnerabilities": [
+      {
+        "vuln_id": "CVE-2022-22965",
+        "pkg_name": "org.springframework.boot:spring-boot-starter-web",
+        "pkg_type": "pom",
+        "installed_version": "LATEST",
+        "fixed_version": "2.5.12, 2.6.6",
+        "severity": "CRITICAL",
+        "scope": "runtime_core",
+        "title": "spring-framework: RCE via Data Binding on JDK 9+",
+        "target": "pom.xml",
+        "cvss_score": 9.8,
+        "is_unpinned_specifier": true,
+        "version_resolution_note": "Unpinned symbolic version in manifest; static SCA evaluates full historical CVE range until locked"
+      }
+    ],
+    "app_vulnerabilities": [
+      {
+        "vuln_id": "CVE-2022-22965",
+        "pkg_name": "org.springframework.boot:spring-boot-starter-web",
+        "pkg_type": "pom",
+        "installed_version": "LATEST",
+        "fixed_version": "2.5.12, 2.6.6",
+        "severity": "CRITICAL",
+        "scope": "runtime_core",
+        "title": "spring-framework: RCE via Data Binding on JDK 9+",
+        "target": "pom.xml",
+        "cvss_score": 9.8,
+        "is_unpinned_specifier": true,
+        "version_resolution_note": "Unpinned symbolic version in manifest; static SCA evaluates full historical CVE range until locked"
+      }
+    ],
+    "os_vulnerabilities": [],
+    "misconfigurations": [
+      {
+        "check_id": "DS-0002",
+        "severity": "HIGH",
+        "title": "Image user should not be 'root'",
+        "file_path": "Dockerfile",
+        "start_line": null,
+        "message": "Specify at least 1 USER command in Dockerfile with non-root user as argument",
+        "resolution": "Add 'USER <non root user name>' line to the Dockerfile"
+      },
+      {
+        "check_id": "DS-0001",
+        "severity": "MEDIUM",
+        "title": "':latest' tag used",
+        "file_path": "Dockerfile",
+        "start_line": 1,
+        "message": "Specify a tag in the 'FROM' statement for image 'openjdk'",
+        "resolution": "Add a tag to the image in the 'FROM' statement"
+      },
+      {
+        "check_id": "DS-0026",
+        "severity": "LOW",
+        "title": "No HEALTHCHECK defined",
+        "file_path": "Dockerfile",
+        "start_line": null,
+        "message": "Add HEALTHCHECK instruction in your Dockerfile",
+        "resolution": "Add HEALTHCHECK instruction in Dockerfile"
+      }
+    ],
+    "secrets": [],
+    "opt_out_counts": {}
+  },
+  "pentest_facts": {
+    "status": "error",
+    "container_engine": "docker",
+    "engine_available": true,
+    "skip_reason": "",
+    "pentests_dir": ".pni/pentests/examples/java/api_spring_messy",
+    "materialized_files": [
+      ".pni/pentests/examples/java/api_spring_messy/conftest.py",
+      ".pni/pentests/examples/java/api_spring_messy/test_app_probes.py",
+      ".pni/pentests/examples/java/api_spring_messy/test_baseline_http.py",
+      ".pni/pentests/examples/java/api_spring_messy/test_target_surface.py"
+    ],
+    "target_base_url": "",
+    "server_booted": false,
+    "boot_failure_reason": "Container build failed: ERROR: failed to build: failed to solve: process \"/bin/sh -c mvn -B -Dmaven.repo.local=/m2repo       org.jacoco:jacoco-maven-plugin:${JACOCO_VERSION}:prepare-agent       test       -DfailIfNoTests=false       -Dmaven.test.failure.ignore=tru",
+    "duration_sec": 25.31,
+    "artifacts_dir": ".pni/cache/java_api_spring_messy/pentest",
+    "probe_summary": {
+      "total_probes": 0,
+      "passed_probes": 0,
+      "failed_probes": 0,
+      "skipped_probes": 0,
+      "error_probes": 0
+    },
+    "findings": []
+  },
+  "module_inventory": [
+    {
+      "file": "examples/java/api_spring_messy/src/main/java/com/example/billing/BillingApp.java",
+      "loc": 9,
+      "public_types": [
+        "BillingApp"
+      ],
+      "public_callables": [
+        "main"
+      ]
+    },
+    {
+      "file": "examples/java/api_spring_messy/src/main/java/com/example/billing/client/GatewayClient.java",
+      "loc": 32,
+      "public_types": [
+        "GatewayClient"
+      ],
+      "public_callables": [
+        "sendCharge"
+      ]
+    },
+    {
+      "file": "examples/java/api_spring_messy/src/main/java/com/example/billing/controller/BillingController.java",
+      "loc": 38,
+      "public_types": [
+        "BillingController"
+      ],
+      "public_callables": [
+        "chargeCustomer",
+        "lastChannel"
+      ]
+    },
+    {
+      "file": "examples/java/api_spring_messy/src/main/java/com/example/billing/model/InvoiceRecord.java",
+      "loc": 15,
+      "public_types": [
+        "InvoiceRecord"
+      ],
+      "public_callables": [
+        "InvoiceRecord",
+        "getAmountCents",
+        "getInvoiceId"
+      ]
+    },
+    {
+      "file": "examples/java/api_spring_messy/src/main/java/com/example/billing/service/BillingManager.java",
+      "loc": 78,
+      "public_types": [
+        "BillingManager"
+      ],
+      "public_callables": [
+        "processBatchBilling"
+      ]
+    },
+    {
+      "file": "examples/java/api_spring_messy/src/main/java/com/example/billing/util/LegacyDateHelper.java",
+      "loc": 15,
+      "public_types": [
+        "LegacyDateHelper"
+      ],
+      "public_callables": [
+        "collectAuditTags",
+        "formatTimestamp"
+      ]
+    }
+  ],
+  "dangerous_sinks": [],
+  "api_endpoints": [
+    {
+      "http_method": "ANY",
+      "path": "/charge",
+      "handler": "BillingController.chargeCustomer",
+      "file": "examples/java/api_spring_messy/src/main/java/com/example/billing/controller/BillingController.java",
+      "line": 22,
+      "has_auth_hint": false,
+      "auth_mechanisms": []
+    }
+  ],
+  "language_version_mismatches": [
+    {
+      "file": "examples/java/api_spring_messy/src/main/java/com/example/billing/client/GatewayClient.java",
+      "line": 4,
+      "symbol": "java.net.http.HttpResponse",
+      "detail": "Java 11+ 'java.net.http' API imported while declared target is Java 1.8"
+    }
+  ],
+  "architecture_overview": {
+    "pattern": "Cyclic Legacy Spring Boot Layered Monolith with Shared Mutable Global/Singleton State",
+    "entry_points": [
+      "src/main/java/com/example/billing/BillingApp.java:main",
+      "src/main/java/com/example/billing/controller/BillingController.java:chargeCustomer"
+    ],
+    "modules": [
+      {
+        "path": "src/main/java/com/example/billing/controller/BillingController.java",
+        "role": "REST controller exposing ANY /charge with raw Map and mutable 'channel' field",
+        "key_symbols": [
+          "BillingController",
+          "chargeCustomer",
+          "lastChannel"
+        ],
+        "depends_on": [
+          "src/main/java/com/example/billing/service/BillingManager.java",
+          "src/main/java/com/example/billing/model/InvoiceRecord.java"
+        ],
+        "health_note": "Part of runtime cycle with BillingManager; mutable singleton field race condition."
+      },
+      {
+        "path": "src/main/java/com/example/billing/service/BillingManager.java",
+        "role": "Core billing god-service with static INVOICE_CACHE and circular controller injection",
+        "key_symbols": [
+          "BillingManager",
+          "INVOICE_CACHE",
+          "processBatchBilling"
+        ],
+        "depends_on": [
+          "src/main/java/com/example/billing/controller/BillingController.java",
+          "src/main/java/com/example/billing/client/GatewayClient.java",
+          "src/main/java/com/example/billing/model/InvoiceRecord.java",
+          "src/main/java/com/example/billing/util/LegacyDateHelper.java"
+        ],
+        "health_note": "Primary risk hotspot: cognitive=56, 8 params, String ==, empty catch, broken private @Transactional."
+      },
+      {
+        "path": "src/main/java/com/example/billing/client/GatewayClient.java",
+        "role": "Payment gateway HTTP client",
+        "key_symbols": [
+          "GatewayClient",
+          "sendCharge"
+        ],
+        "depends_on": [],
+        "health_note": "Hardcoded secret, Java 11 API on Java 1.8 target, missing timeout, System.getenv."
+      },
+      {
+        "path": "src/main/java/com/example/billing/model/InvoiceRecord.java",
+        "role": "Immutable invoice value object",
+        "key_symbols": [
+          "InvoiceRecord",
+          "getInvoiceId",
+          "getAmountCents"
+        ],
+        "depends_on": [],
+        "health_note": "Cleanest module in repo; 0 AST issues."
+      }
+    ],
+    "dependency_notes": "Severe boundary violation: BillingManager imports and @Autowired-injects BillingController, creating a runtime cycle (BillingController <-> BillingManager). Mutable static HashMap INVOICE_CACHE and singleton field BillingController.channel violate statelessness and thread safety."
+  },
+  "architecture_record": {
+    "workflow_id": "java_api_spring_messy",
+    "workflow_run_id": "wf-8177454c",
+    "recorded_at": "2026-11-22T11:27:46.675722+00:00",
+    "target_root": "examples/java/api_spring_messy",
+    "system_profile": {
+      "system_purpose": "legacy-billing is a Java 8 / Spring Boot web API that accepts HTTP billing requests on /charge, computes invoice totals with tax rules, invokes an external payment gateway for retries, caches billed totals in a static HashMap, and prints audit trails to stdout.",
+      "domain_context": "Customer invoice charging, multi-currency tax calculation (USD/JPY), payment gateway retry integration, and ledger audit logging.",
+      "runtime_types": [
+        "web_api"
+      ],
+      "tech_stack": [
+        "Java 1.8 (pom.xml target, mismatched with Java 11 java.net.http usage)",
+        "Spring Boot Web Starter (unpinned LATEST in pom.xml)",
+        "javax.servlet-api 4.0.1",
+        "JUnit 4.13.2",
+        "Maven (no wrapper)"
+      ],
+      "external_integrations": [
+        "External payment gateway HTTP POST endpoint read via System.getenv('LEGACY_PAYMENT_URL') (default https://billing.example.invalid/charge)"
+      ]
+    },
+    "structure_map": {
+      "architecture_pattern": "Cyclic Legacy Spring Boot Layered Monolith with Shared Mutable Global/Singleton State",
+      "layers": [
+        {
+          "name": "Bootstrap Layer",
+          "responsibility": "Spring Boot application entrypoint.",
+          "paths": [
+            "src/main/java/com/example/billing/BillingApp.java"
+          ],
+          "allowed_dependencies": [
+            "Controller Layer",
+            "Service Layer",
+            "Client Layer"
+          ]
+        },
+        {
+          "name": "Controller Layer",
+          "responsibility": "HTTP /charge intake using raw Map payloads, @Autowired field injection, and mutable singleton state.",
+          "paths": [
+            "src/main/java/com/example/billing/controller/BillingController.java"
+          ],
+          "allowed_dependencies": [
+            "Service Layer",
+            "Model Layer"
+          ]
+        },
+        {
+          "name": "Service Layer",
+          "responsibility": "Batch billing calculation, tax rules, retry orchestration, static INVOICE_CACHE, and audit logging (improperly depends upward on BillingController).",
+          "paths": [
+            "src/main/java/com/example/billing/service/BillingManager.java"
+          ],
+          "allowed_dependencies": [
+            "Model Layer",
+            "Client Layer",
+            "Utility Layer"
+          ]
+        },
+        {
+          "name": "Model & Utility Layer",
+          "responsibility": "Immutable InvoiceRecord DTO and legacy date/tag helper using SimpleDateFormat and Vector.",
+          "paths": [
+            "src/main/java/com/example/billing/model/InvoiceRecord.java",
+            "src/main/java/com/example/billing/util/LegacyDateHelper.java"
+          ],
+          "allowed_dependencies": []
+        },
+        {
+          "name": "External Client Layer",
+          "responsibility": "Outbound payment gateway HTTP POST client using Java 11 HttpClient without timeouts and hardcoded GATEWAY_SECRET.",
+          "paths": [
+            "src/main/java/com/example/billing/client/GatewayClient.java"
+          ],
+          "allowed_dependencies": []
+        }
+      ],
+      "modules": [
+        {
+          "path": "src/main/java/com/example/billing/controller/BillingController.java",
+          "role": "REST controller exposing ANY /charge with raw Map and mutable 'channel' field",
+          "key_symbols": [
+            "BillingController",
+            "chargeCustomer",
+            "lastChannel"
+          ],
+          "depends_on": [
+            "src/main/java/com/example/billing/service/BillingManager.java",
+            "src/main/java/com/example/billing/model/InvoiceRecord.java"
+          ],
+          "health_note": "Part of runtime cycle with BillingManager; mutable singleton field race condition."
+        },
+        {
+          "path": "src/main/java/com/example/billing/service/BillingManager.java",
+          "role": "Core billing god-service with static INVOICE_CACHE and circular controller injection",
+          "key_symbols": [
+            "BillingManager",
+            "INVOICE_CACHE",
+            "processBatchBilling"
+          ],
+          "depends_on": [
+            "src/main/java/com/example/billing/controller/BillingController.java",
+            "src/main/java/com/example/billing/client/GatewayClient.java",
+            "src/main/java/com/example/billing/model/InvoiceRecord.java",
+            "src/main/java/com/example/billing/util/LegacyDateHelper.java"
+          ],
+          "health_note": "Primary risk hotspot: cognitive=56, 8 params, String ==, empty catch, broken private @Transactional."
+        },
+        {
+          "path": "src/main/java/com/example/billing/client/GatewayClient.java",
+          "role": "Payment gateway HTTP client",
+          "key_symbols": [
+            "GatewayClient",
+            "sendCharge"
+          ],
+          "depends_on": [],
+          "health_note": "Hardcoded secret, Java 11 API on Java 1.8 target, missing timeout, System.getenv."
+        },
+        {
+          "path": "src/main/java/com/example/billing/model/InvoiceRecord.java",
+          "role": "Immutable invoice value object",
+          "key_symbols": [
+            "InvoiceRecord",
+            "getInvoiceId",
+            "getAmountCents"
+          ],
+          "depends_on": [],
+          "health_note": "Cleanest module in repo; 0 AST issues."
+        }
+      ],
+      "boundary_assessment": "Severe boundary violation: BillingManager imports and @Autowired-injects BillingController, creating a runtime cycle (BillingController <-> BillingManager). Mutable static HashMap INVOICE_CACHE and singleton field BillingController.channel violate statelessness and thread safety."
+    },
+    "execution_flow_map": {
+      "entry_points": [
+        "src/main/java/com/example/billing/BillingApp.java:main",
+        "src/main/java/com/example/billing/controller/BillingController.java:chargeCustomer"
+      ],
+      "execution_flows": [
+        {
+          "name": "Customer Charge & Batch Billing Flow",
+          "trigger": "HTTP ANY /charge (unrestricted @RequestMapping)",
+          "steps": [
+            "BillingController.chargeCustomer() overwrites shared singleton field 'channel' with HTTP method and extracts customerId/amountCents from raw Map payload.",
+            "Constructs raw ArrayList containing one InvoiceRecord and calls BillingManager.processBatchBilling() with 8 arguments.",
+            "processBatchBilling() checks status=='PAID' and currency=='USD'/'JPY' via == reference equality to apply 8%/10% tax, or invokes GatewayClient.sendCharge(customerId, 100L) in a retry loop for non-positive amounts.",
+            "Calls private @Transactional saveAuditTrail() (self-invocation bypasses Spring proxy), writes to static raw HashMap INVOICE_CACHE using LegacyDateHelper, optionally reads circularController.lastChannel(), and swallows exceptions in an empty catch block."
+          ],
+          "involved_files": [
+            "src/main/java/com/example/billing/controller/BillingController.java",
+            "src/main/java/com/example/billing/service/BillingManager.java",
+            "src/main/java/com/example/billing/client/GatewayClient.java",
+            "src/main/java/com/example/billing/model/InvoiceRecord.java",
+            "src/main/java/com/example/billing/util/LegacyDateHelper.java"
+          ]
+        }
+      ],
+      "state_and_storage": [
+        "Unsynchronized process-local static raw HashMap BillingManager.INVOICE_CACHE (src/main/java/com/example/billing/service/BillingManager.java:17).",
+        "Mutable singleton controller field BillingController.channel overwritten on every HTTP request (src/main/java/com/example/billing/controller/BillingController.java:20)."
+      ],
+      "error_and_concurrency_model": "Thread-unsafe Servlet container execution: concurrent requests race on BillingController.channel and unsynchronized HashMap INVOICE_CACHE; BillingManager swallows all audit/cache exceptions in an empty catch block (line 83) and GatewayClient prints stack traces to stderr while blocking indefinitely without HTTP timeouts."
+    }
+  },
+  "audit_dimensions": [
+    {
+      "action_id": "act-08",
+      "audit_id": "container_runtime_audit",
+      "title": "Evaluate Buildability, Offline Test Results, Measured Coverage & Startup Health",
+      "score": 10,
+      "grade": "D",
+      "rules_evaluated": [
+        "common/runtime_verification",
+        "common/production_readiness"
+      ],
+      "pass_count": 0,
+      "warn_count": 0,
+      "fail_count": 2,
+      "summary": "Containerized runtime verification failed at RV-01 (buildability): both the project Dockerfile (openjdk:latest not found) and the Java 8 Maven harness failed to build because unpinned spring-boot-starter-web:LATEST resolved spring-boot-4.2.0.jar (bytecode version 61.0 / JDK 17+) against Java 8 (version 52.0), blocking offline unit test execution, JaCoCo coverage measurement, and Spring ApplicationContext boot."
+    },
+    {
+      "action_id": "act-04",
+      "audit_id": "supply_chain_audit",
+      "title": "Evaluate Supply-Chain, CI Permissions, Container & Secret Hygiene",
+      "score": 15,
+      "grade": "D",
+      "rules_evaluated": [
+        "common/supply_chain",
+        "common/security",
+        "common/git_workflow"
+      ],
+      "pass_count": 0,
+      "warn_count": 1,
+      "fail_count": 2,
+      "summary": "legacy-billing fails all core supply-chain, CI security, container hygiene, and secret management gates: privileged pull_request_target workflow checking out mutable @main without permissions, deprecated root openjdk:latest Dockerfile without .dockerignore, unpinned spring-boot-starter-web:LATEST without mvnw, missing LICENSE/SECURITY.md/Dependabot, and a hardcoded GATEWAY_SECRET literal in GatewayClient.java:13."
+    },
+    {
+      "action_id": "act-17",
+      "audit_id": "java_test_audit",
+      "title": "Evaluate JUnit Test Suite Completeness & Structure",
+      "score": 15,
+      "grade": "D",
+      "rules_evaluated": [
+        "java/testing"
+      ],
+      "pass_count": 0,
+      "warn_count": 0,
+      "fail_count": 1,
+      "summary": "Java test health is critically weak: only 1 legacy JUnit 4 test file (BillingManagerTest.java) with 1 assertion-free smoke method (testSmokeRun), 33.3% static module coverage, and 0% measured coverage because broken Maven compilation blocks JUnit/JaCoCo execution."
+    },
+    {
+      "action_id": "act-16",
+      "audit_id": "service_readiness_audit",
+      "title": "Evaluate 12-Factor Config/Statelessness & SRE PRR Timeouts/Observability",
+      "score": 16,
+      "grade": "D",
+      "rules_evaluated": [
+        "common/twelve_factor",
+        "common/production_readiness",
+        "common/security"
+      ],
+      "pass_count": 0,
+      "warn_count": 0,
+      "fail_count": 3,
+      "summary": "legacy-billing fails 12-Factor and SRE Production Readiness across every dimension: scattered System.getenv in GatewayClient.java:16, mutable process-local static INVOICE_CACHE (BillingManager.java:17) and mutable singleton BillingController.channel (line 20), missing HttpClient connect/read timeouts (GatewayClient.java:22), silent empty catch block (BillingManager.java:83), 4 unstructured System.out/printStackTrace calls, no health/readiness endpoint, and hardcoded GATEWAY_SECRET."
+    },
+    {
+      "action_id": "act-10",
+      "audit_id": "security_vulnerability_audit",
+      "title": "Evaluate Supply-Chain CVEs, Container Misconfigs, Secrets, Dangerous Sinks & API Boundaries",
+      "score": 18,
+      "grade": "D",
+      "rules_evaluated": [
+        "common/security_vulnerability",
+        "common/supply_chain"
+      ],
+      "pass_count": 0,
+      "warn_count": 0,
+      "fail_count": 2,
+      "summary": "Trivy filesystem SCA flagged CRITICAL CVE-2022-22965 (Spring4Shell, CVSS 9.8) on unpinned org.springframework.boot:spring-boot-starter-web@LATEST via static full-range matching (is_unpinned_specifier=True, reconciling cleanly with Maven's live resolution of 4.2.0), plus 3 Dockerfile misconfigurations (DS-0002 HIGH root user, DS-0001 MEDIUM :latest tag, DS-0026 LOW missing HEALTHCHECK). Combined with AST hardcoded GATEWAY_SECRET and unauthenticated ANY /charge, security posture is critical."
+    },
+    {
+      "action_id": "act-12",
+      "audit_id": "web_penetration_audit",
+      "title": "Evaluate Live HTTP Penetration Findings, Security Headers & Endpoint Defenses",
+      "score": 20,
+      "grade": "D",
+      "rules_evaluated": [
+        "common/security_vulnerability"
+      ],
+      "pass_count": 0,
+      "warn_count": 0,
+      "fail_count": 1,
+      "summary": "Live HTTP DAST penetration test could not boot the target container (status=error, 0 probes executed) because the Maven container build failed compiling unpinned spring-boot-4.2.0.jar (bytecode 61.0) against Java 1.8 (bytecode 52.0). Dynamic verification of ANY /charge (BillingController.java:22) remains blocked until buildability is restored."
+    },
+    {
+      "action_id": "act-03",
+      "audit_id": "repo_structure_audit",
+      "title": "Evaluate Maven/Gradle Build, Supply Chain & Dependencies",
+      "score": 24,
+      "grade": "D",
+      "rules_evaluated": [
+        "common/supply_chain",
+        "common/documentation",
+        "common/git_workflow",
+        "common/security",
+        "java/dependencies"
+      ],
+      "pass_count": 0,
+      "warn_count": 1,
+      "fail_count": 4,
+      "summary": "legacy-billing exhibits severe supply-chain, build reproducibility, and container hygiene deficiencies: EOL Java 1.8 target, unpinned spring-boot-starter-web:LATEST without Maven Wrapper, privileged pull_request_target CI checking out @main without permissions block, root openjdk:latest Dockerfile without .dockerignore, and missing governance files (LICENSE, SECURITY.md, .gitignore, Dependabot)."
+    },
+    {
+      "action_id": "act-06",
+      "audit_id": "java_ast_audit",
+      "title": "Interpret Java AST Facts & Evaluate Quality/Generics/Imports/Security",
+      "score": 25,
+      "grade": "D",
+      "rules_evaluated": [
+        "common/architecture",
+        "common/maintainability",
+        "common/security",
+        "common/security_vulnerability",
+        "java/code_quality",
+        "java/typing",
+        "java/modern_stack",
+        "java/frameworks/spring_boot"
+      ],
+      "pass_count": 0,
+      "warn_count": 0,
+      "fail_count": 8,
+      "summary": "Java AST analysis across 6 files (187 LOC) uncovers severe architectural and maintainability defects concentrated in BillingManager.java (78 LOC, cognitive complexity 56, 8 params, circular dependency with BillingController, mutable static INVOICE_CACHE, empty catch block, == String comparisons, ineffective private @Transactional without spring-tx), BillingController.java (raw Map, @Autowired field injection, mutable singleton field channel, catch-all @RequestMapping), and GatewayClient.java (Java 11 java.net.http mismatch on Java 1.8 target, hardcoded secret, missing connectTimeout, wildcard/unsorted imports)."
+    }
+  ],
+  "rule_compliance": [
+    {
+      "rule_id": "common/architecture",
+      "status": "fail",
+      "source_action": "java_ast_audit",
+      "evidence": "1 runtime circular dependency (BillingController -> BillingManager -> BillingController), upward service->controller coupling via @Autowired circularController, and mutable static INVOICE_CACHE.",
+      "summary": ""
+    },
+    {
+      "rule_id": "common/documentation",
+      "status": "fail",
+      "source_action": "repo_structure_audit",
+      "evidence": "README.md is only 2 lines (# Legacy Billing / Run mvn spring-boot:run) with no architecture overview, environment configuration, API spec, or test instructions.",
+      "summary": ""
+    },
+    {
+      "rule_id": "common/maintainability",
+      "status": "fail",
+      "source_action": "java_ast_audit",
+      "evidence": "BillingManager.processBatchBilling violates SIG unit size (57 lines), complexity (branches=13, cognitive=56), interfacing (8 params > 6), and holds mutable static INVOICE_CACHE plus empty catch at line 83.",
+      "summary": ""
+    },
+    {
+      "rule_id": "common/production_readiness",
+      "status": "fail",
+      "source_action": "container_runtime_audit",
+      "evidence": "Service cannot build or boot; GatewayClient.java:22 lacks HTTP connectTimeout, BillingManager.java:83 swallows exceptions in empty catch, and 4 System.out/printStackTrace calls bypass structured logging.; GatewayClient.java:22 uses HttpClient.newHttpClient() with no connect/read timeout; BillingManager.java:83 has empty catch(Exception e) {}; no Spring Actuator /healthz endpoint; unauthenticated catch-all ANY /charge.",
+      "summary": ""
+    },
+    {
+      "rule_id": "common/runtime_verification",
+      "status": "fail",
+      "source_action": "deterministic_baseline",
+      "evidence": "harness_build=failed; RV-01 failed: project Dockerfile failed (docker.io/library/openjdk:latest not found) and Java 8 Maven harness failed compiling against dynamically resolved spring-boot-4.2.0.jar (class file version 61.0 vs 52.0); RV-02/RV-03/RV-04 blocked.",
+      "summary": "Containerized harness build failed."
+    },
+    {
+      "rule_id": "common/security",
+      "status": "fail",
+      "source_action": "repo_structure_audit",
+      "evidence": "Privileged pull_request_target workflow combined with root openjdk:latest container violates principle of least privilege.; Hardcoded secret GATEWAY_SECRET at src/main/java/com/example/billing/client/GatewayClient.java:13, privileged CI workflow, and root container configuration.; Hardcoded GATEWAY_SECRET in GatewayClient.java:13, raw unvalidated Map request body in BillingController.chargeCustomer, and unauthenticated catch-all ANY /charge endpoint.; Hardcoded GATEWAY_SECRET literal at GatewayClient.java:13, raw unvalidated Map input in BillingController.chargeCustomer, and unauthenticated /charge endpoint.",
+      "summary": ""
+    },
+    {
+      "rule_id": "common/security_vulnerability",
+      "status": "fail",
+      "source_action": "java_ast_audit",
+      "evidence": "SEC-03 hardcoded secret in GatewayClient.java:13; SEC-05 catch-all @RequestMapping('/charge') accepts ANY HTTP method without auth or bean validation.; SEC-01: CRITICAL CVE-2022-22965 (CVSS 9.8) on unpinned spring-boot-starter-web:LATEST (is_unpinned_specifier=True static range exposure); SEC-02: Dockerfile DS-0002 HIGH root + DS-0001 MEDIUM :latest + DS-0026 LOW; SEC-03: hardcoded GATEWAY_SECRET at GatewayClient.java:13; SEC-05: unauthenticated ANY /charge.; SEC-06 DAST status=error (server_booted=False, 0 probes executed): Container build failed on Maven Java 8 vs Spring Boot 4.2.0 bytecode mismatch, blocking live penetration testing of unauthenticated ANY /charge.",
+      "summary": ""
+    },
+    {
+      "rule_id": "common/supply_chain",
+      "status": "fail",
+      "source_action": "repo_structure_audit",
+      "evidence": "LICENSE file missing at repository root; Missing LICENSE, SECURITY.md, Dependabot, and Maven wrapper; .github/workflows/build.yml uses privileged pull_request_target without permissions and unpinned actions/checkout@main; Dockerfile uses openjdk:latest as root with no .dockerignore.; Missing mvnw/lockfile, unpinned spring-boot-starter-web:LATEST, missing LICENSE/SECURITY.md/Dependabot, .github/workflows/build.yml uses pull_request_target + actions/checkout@main without permissions, and Dockerfile uses mutable root openjdk:latest without .dockerignore.; Unpinned LATEST version triggers static CVE range exposure and live build breakage; Dockerfile fails DS-0001/DS-0002/DS-0026; CI uses pull_request_target and @main.",
+      "summary": ""
+    },
+    {
+      "rule_id": "common/twelve_factor",
+      "status": "fail",
+      "source_action": "service_readiness_audit",
+      "evidence": "Factor III FAIL: direct System.getenv('LEGACY_PAYMENT_URL') in GatewayClient.java:16; Factor VI FAIL: mutable static INVOICE_CACHE and singleton field BillingController.channel; Factor XI FAIL: 4 System.out.println/printStackTrace calls.",
+      "summary": ""
+    },
+    {
+      "rule_id": "java/code_quality",
+      "status": "fail",
+      "source_action": "java_ast_audit",
+      "evidence": "33.3% Javadoc coverage (10 missing Javadocs, 1 @param mismatch with stale obsoleteToken), 3 String == literal bugs (status=='PAID', currency=='USD'/'JPY'), empty catch block, 4 System.out/printStackTrace calls.",
+      "summary": ""
+    },
+    {
+      "rule_id": "java/dependencies",
+      "status": "fail",
+      "source_action": "repo_structure_audit",
+      "evidence": "pom.xml pins maven.compiler.source/target to EOL 1.8, uses dynamic version LATEST for spring-boot-starter-web, depends on legacy javax.servlet:4.0.1 and JUnit 4 (4.13.2), and lacks mvnw.",
+      "summary": ""
+    },
+    {
+      "rule_id": "java/frameworks/spring_boot",
+      "status": "fail",
+      "source_action": "java_ast_audit",
+      "evidence": "3 @Autowired field injections (BillingController, BillingManager), mutable singleton field BillingController.channel mutated per request, catch-all @RequestMapping('/charge'), private @Transactional method without spring-tx dependency, and legacy javax.servlet.",
+      "summary": ""
+    },
+    {
+      "rule_id": "java/modern_stack",
+      "status": "fail",
+      "source_action": "java_ast_audit",
+      "evidence": "Java 1.8 target collides with Java 11 java.net.http.HttpClient import in GatewayClient.java:4; LegacyDateHelper uses non-thread-safe SimpleDateFormat, java.util.Date, and synchronized Vector; 4 unsorted imports and 1 wildcard import.",
+      "summary": ""
+    },
+    {
+      "rule_id": "java/testing",
+      "status": "fail",
+      "source_action": "java_test_audit",
+      "evidence": "Legacy JUnit 4 (junit:4.13.2), only 1 test method (BillingManagerTest.testSmokeRun) with zero assertions (assertion_free_tests=1), 33.3% static module coverage, and runtime JUnit/JaCoCo execution blocked by build failure.",
+      "summary": ""
+    },
+    {
+      "rule_id": "java/typing",
+      "status": "fail",
+      "source_action": "java_ast_audit",
+      "evidence": "81.8% type safety coverage: raw Map/List in BillingController.chargeCustomer and BillingManager.processBatchBilling, untyped Object params (traceHint, extraContext), and @SuppressWarnings('unchecked').",
+      "summary": ""
+    },
+    {
+      "rule_id": "common/git_workflow",
+      "status": "warn",
+      "source_action": "repo_structure_audit",
+      "evidence": ".gitignore is missing and .github/workflows/build.yml runs mvn package on pull_request_target instead of safe pull_request verification.; Missing .gitignore and unsafe pull_request_target CI trigger in .github/workflows/build.yml.",
+      "summary": ""
+    }
+  ],
+  "module_hotspots": [
+    {
+      "file_path": "pom.xml",
+      "loc": 0,
+      "risk_score": 1.0,
+      "finding_counts": {
+        "critical": 2,
+        "high": 1
+      },
+      "top_rules": [
+        "common/security_vulnerability",
+        "common/runtime_verification",
+        "java/dependencies"
+      ]
+    },
+    {
+      "file_path": "examples/java/api_spring_messy/src/main/java/com/example/billing/client/GatewayClient.java",
+      "loc": 32,
+      "risk_score": 0.7,
+      "finding_counts": {
+        "critical": 1
+      },
+      "top_rules": [
+        "common/security"
+      ]
+    },
+    {
+      "file_path": "src/main/java/com/example/billing/client/GatewayClient.java",
+      "loc": 0,
+      "risk_score": 0.6,
+      "finding_counts": {
+        "critical": 1,
+        "medium": 1
+      },
+      "top_rules": [
+        "common/security",
+        "java/modern_stack"
+      ]
+    },
+    {
+      "file_path": "Dockerfile",
+      "loc": 0,
+      "risk_score": 0.58,
+      "finding_counts": {
+        "high": 1
+      },
+      "top_rules": [
+        "common/supply_chain"
+      ]
+    },
+    {
+      "file_path": "src/main/java/com/example/billing/controller/BillingController.java",
+      "loc": 0,
+      "risk_score": 0.56,
+      "finding_counts": {
+        "high": 2
+      },
+      "top_rules": [
+        "common/security_vulnerability",
+        "java/frameworks/spring_boot"
+      ]
+    },
+    {
+      "file_path": "src/main/java/com/example/billing/service/BillingManager.java",
+      "loc": 0,
+      "risk_score": 0.56,
+      "finding_counts": {
+        "high": 2
+      },
+      "top_rules": [
+        "common/architecture",
+        "java/code_quality"
+      ]
+    },
+    {
+      "file_path": ".github/workflows/build.yml",
+      "loc": 0,
+      "risk_score": 0.45,
+      "finding_counts": {
+        "critical": 1
+      },
+      "top_rules": [
+        "common/supply_chain"
+      ]
+    },
+    {
+      "file_path": "examples/java/api_spring_messy/src/main/java/com/example/billing/service/BillingManager.java",
+      "loc": 78,
+      "risk_score": 0.41,
+      "finding_counts": {
+        "medium": 1
+      },
+      "top_rules": [
+        "common/maintainability"
+      ]
+    },
+    {
+      "file_path": "examples/java/api_spring_messy/Dockerfile",
+      "loc": 0,
+      "risk_score": 0.3,
+      "finding_counts": {},
+      "top_rules": []
+    },
+    {
+      "file_path": "src/test/java/com/example/billing/BillingManagerTest.java",
+      "loc": 0,
+      "risk_score": 0.28,
+      "finding_counts": {
+        "high": 1
+      },
+      "top_rules": [
+        "java/testing"
+      ]
+    },
+    {
+      "file_path": "examples/java/api_spring_messy/src/main/java/com/example/billing/controller/BillingController.java",
+      "loc": 38,
+      "risk_score": 0.06,
+      "finding_counts": {},
+      "top_rules": []
+    },
+    {
+      "file_path": "examples/java/api_spring_messy/src/main/java/com/example/billing/model/InvoiceRecord.java",
+      "loc": 15,
+      "risk_score": 0.06,
+      "finding_counts": {},
+      "top_rules": []
+    },
+    {
+      "file_path": "examples/java/api_spring_messy/src/main/java/com/example/billing/util/LegacyDateHelper.java",
+      "loc": 15,
+      "risk_score": 0.06,
+      "finding_counts": {},
+      "top_rules": []
+    },
+    {
+      "file_path": "examples/java/api_spring_messy/src/main/java/com/example/billing/BillingApp.java",
+      "loc": 9,
+      "risk_score": 0.06,
+      "finding_counts": {},
+      "top_rules": []
+    }
+  ],
+  "strengths": [
+    "Test dependency junit:4.13.2 is properly scoped to <scope>test</scope> in pom.xml.",
+    "InvoiceRecord.java is a clean immutable DTO with complete Javadocs and zero AST violations, providing a clear baseline pattern."
+  ],
+  "findings": [
+    {
+      "finding_id": "det-8593d247",
+      "source": "deterministic",
+      "component": null,
+      "severity": "critical",
+      "category": "security",
+      "rule_id": "CVE-2022-22965",
+      "file_path": null,
+      "line": null,
+      "symbol": null,
+      "evidence": "org.springframework.boot:spring-boot-starter-web@LATEST (pom)",
+      "description": "Core runtime dependency vulnerability CVE-2022-22965: spring-framework: RCE via Data Binding on JDK 9+",
+      "recommendation": "Upgrade `org.springframework.boot:spring-boot-starter-web` to `2.5.12, 2.6.6`."
+    },
+    {
+      "finding_id": "det-e23b658f",
+      "source": "deterministic",
+      "component": null,
+      "severity": "critical",
+      "category": "security",
+      "rule_id": "common/security",
+      "file_path": "examples/java/api_spring_messy/src/main/java/com/example/billing/client/GatewayClient.java",
+      "line": 13,
+      "symbol": "GATEWAY_SECRET",
+      "evidence": "Hardcoded secret literal assigned to 'GATEWAY_SECRET' (OWASP ASVS)",
+      "description": "Potential hardcoded secret detected in `examples/java/api_spring_messy/src/main/java/com/example/billing/client/GatewayClient.java:13`.",
+      "recommendation": "Move secrets to environment variables or a secret manager and rotate exposed keys."
+    },
+    {
+      "finding_id": "",
+      "source": "ai",
+      "component": null,
+      "severity": "critical",
+      "category": "security",
+      "rule_id": "common/security",
+      "file_path": "src/main/java/com/example/billing/client/GatewayClient.java",
+      "line": null,
+      "symbol": null,
+      "evidence": "",
+      "description": "GatewayClient.GATEWAY_SECRET embeds a hardcoded live-style secret token literal directly in source code.",
+      "recommendation": "Remove the literal immediately, rotate the credential, and inject it via Spring @ConfigurationProperties backed by a secret manager or environment variable."
+    },
+    {
+      "finding_id": "",
+      "source": "ai",
+      "component": null,
+      "severity": "critical",
+      "category": "security",
+      "rule_id": "common/security_vulnerability",
+      "file_path": "pom.xml",
+      "line": null,
+      "symbol": null,
+      "evidence": "",
+      "description": "Trivy reports CRITICAL CVE-2022-22965 (Spring4Shell) against spring-boot-starter-web@LATEST (is_unpinned_specifier=True: static SCA evaluates full historical CVE range until locked, while live Maven attempts Spring Boot 4.2.0 and fails compilation).",
+      "recommendation": "Pin an explicit patched Spring Boot 3.4.x BOM release in pom.xml and commit Maven Wrapper (mvnw) so both builds and SCA evaluate deterministic artifacts."
+    },
+    {
+      "finding_id": "",
+      "source": "ai",
+      "component": null,
+      "severity": "critical",
+      "category": "security",
+      "rule_id": "common/supply_chain",
+      "file_path": ".github/workflows/build.yml",
+      "line": null,
+      "symbol": null,
+      "evidence": "",
+      "description": ".github/workflows/build.yml triggers on pull_request_target without an explicit permissions block and uses mutable actions/checkout@main, creating a high-severity CI token/supply-chain risk.",
+      "recommendation": "Switch trigger to pull_request, add explicit permissions: { contents: read }, and pin actions/checkout to a full commit SHA."
+    },
+    {
+      "finding_id": "",
+      "source": "ai",
+      "component": null,
+      "severity": "critical",
+      "category": "testing",
+      "rule_id": "common/runtime_verification",
+      "file_path": "pom.xml",
+      "line": null,
+      "symbol": null,
+      "evidence": "",
+      "description": "Live Maven build failed with 'bad class file: spring-boot-4.2.0.jar (class file has wrong version 61.0, should be 52.0)' because pom.xml uses <version>LATEST</version> with Java 1.8, and Dockerfile fails because openjdk:latest no longer exists on Docker Hub. This blocks test execution, coverage, and startup verification.",
+      "recommendation": "Pin Spring Boot 3.4.x BOM with Java 21 LTS in pom.xml, add eclipse-temurin:21 Dockerfile, and verify clean offline mvn test + JaCoCo execution."
+    },
+    {
+      "finding_id": "",
+      "source": "ai",
+      "component": null,
+      "severity": "high",
+      "category": "architecture",
+      "rule_id": "common/architecture",
+      "file_path": "src/main/java/com/example/billing/service/BillingManager.java",
+      "line": null,
+      "symbol": null,
+      "evidence": "",
+      "description": "BillingManager injects BillingController (circularController) via field @Autowired creating a runtime cycle, and stores unbounded request state in static raw Map INVOICE_CACHE.",
+      "recommendation": "Remove circularController upward dependency, adopt constructor injection across Controller/Service/Client, and externalize INVOICE_CACHE to Redis or a typed repository."
+    },
+    {
+      "finding_id": "det-04d20533",
+      "source": "deterministic",
+      "component": null,
+      "severity": "high",
+      "category": "architecture",
+      "rule_id": "common/architecture",
+      "file_path": null,
+      "line": null,
+      "symbol": null,
+      "evidence": "Circular import cycle: com.example.billing.controller.BillingController -> com.example.billing.service.BillingManager -> com.example.billing.controller.BillingController",
+      "description": "Runtime circular dependency detected: com.example.billing.controller.BillingController -> com.example.billing.service.BillingManager -> com.example.billing.controller.BillingController.",
+      "recommendation": "Break the cycle by extracting shared interfaces/models into a lower layer."
+    },
+    {
+      "finding_id": "",
+      "source": "ai",
+      "component": null,
+      "severity": "high",
+      "category": "code_quality",
+      "rule_id": "java/code_quality",
+      "file_path": "src/main/java/com/example/billing/service/BillingManager.java",
+      "line": null,
+      "symbol": null,
+      "evidence": "",
+      "description": "processBatchBilling has cognitive complexity 56, 8 parameters, raw List/Map generics, stale Javadoc (@param obsoleteToken), String == reference equality at lines 52/55/57, empty catch at line 83, and calls private @Transactional saveAuditTrail() (bypassed by Spring AOP proxy and missing spring-tx).",
+      "recommendation": "Decompose processBatchBilling with a typed command record, fix String equality to .equals()/enum (confirming behavior via Stakeholder Decision Log), log/propagate exceptions via SLF4J, and move transactional persistence to a dedicated repository bean."
+    },
+    {
+      "finding_id": "",
+      "source": "ai",
+      "component": null,
+      "severity": "high",
+      "category": "dependencies",
+      "rule_id": "java/dependencies",
+      "file_path": "pom.xml",
+      "line": null,
+      "symbol": null,
+      "evidence": "",
+      "description": "pom.xml targets Java 1.8, resolves spring-boot-starter-web with non-deterministic version LATEST, and depends on deprecated javax.servlet and JUnit 4 without a committed Maven Wrapper.",
+      "recommendation": "Upgrade to Java 21 LTS and Spring Boot 3.4 BOM (Jakarta EE 10, JUnit 5 Jupiter), pin all coordinates deterministically, and commit mvnw."
+    },
+    {
+      "finding_id": "",
+      "source": "ai",
+      "component": null,
+      "severity": "high",
+      "category": "security",
+      "rule_id": "common/security_vulnerability",
+      "file_path": "src/main/java/com/example/billing/controller/BillingController.java",
+      "line": null,
+      "symbol": null,
+      "evidence": "",
+      "description": "Pentest suite (.pni/pentests/examples/java/api_spring_messy) could not execute against BillingController.chargeCustomer (ANY /charge) because container build failed compiling spring-boot-4.2.0.jar under Java 8.",
+      "recommendation": "Restore deterministic Java 21 + Spring Boot 3.4 buildability first, then re-run web_pentest to verify authentication, method restrictions, and HTTP security headers on POST /charge."
+    },
+    {
+      "finding_id": "",
+      "source": "ai",
+      "component": null,
+      "severity": "high",
+      "category": "security",
+      "rule_id": "common/supply_chain",
+      "file_path": "Dockerfile",
+      "line": null,
+      "symbol": null,
+      "evidence": "",
+      "description": "Dockerfile builds from deprecated/mutable openjdk:latest, copies entire workspace without .dockerignore, and runs as root.",
+      "recommendation": "Adopt a multi-stage eclipse-temurin:21-jdk / 21-jre-alpine image with a dedicated non-root USER and .dockerignore."
+    },
+    {
+      "finding_id": "",
+      "source": "ai",
+      "component": null,
+      "severity": "high",
+      "category": "security",
+      "rule_id": "java/frameworks/spring_boot",
+      "file_path": "src/main/java/com/example/billing/controller/BillingController.java",
+      "line": null,
+      "symbol": null,
+      "evidence": "",
+      "description": "BillingController mutates singleton instance field 'channel' on every request (race condition), exposes /charge to ANY HTTP method via @RequestMapping, and binds raw Map without Bean Validation or auth.",
+      "recommendation": "Remove mutable field 'channel', restrict to @PostMapping('/charge') with a typed @Valid ChargeRequest Java record, and add authentication/authorization."
+    },
+    {
+      "finding_id": "",
+      "source": "ai",
+      "component": null,
+      "severity": "high",
+      "category": "testing",
+      "rule_id": "java/testing",
+      "file_path": "src/test/java/com/example/billing/BillingManagerTest.java",
+      "line": null,
+      "symbol": null,
+      "evidence": "",
+      "description": "BillingManagerTest.testSmokeRun only instantiates InvoiceRecord and calls getAmountCents() without any assertEquals/assertThrows or coverage of BillingManager, BillingController, or GatewayClient.",
+      "recommendation": "Migrate to JUnit 5 Jupiter + Mockito + MockMvc characterization tests covering POST /charge, tax calculation, retry flows, and gateway error paths with >=80% JaCoCo line coverage."
+    },
+    {
+      "finding_id": "det-c9a0a1d6",
+      "source": "deterministic",
+      "component": null,
+      "severity": "medium",
+      "category": "code_quality",
+      "rule_id": "common/maintainability",
+      "file_path": "examples/java/api_spring_messy/src/main/java/com/example/billing/service/BillingManager.java",
+      "line": 33,
+      "symbol": "processBatchBilling",
+      "evidence": "length=57 lines, branches=13, cognitive=56",
+      "description": "High cyclomatic complexity or length in `processBatchBilling` (length=57 lines, branches=13, cognitive=56).",
+      "recommendation": "Decompose into cohesive helper functions with clear single responsibilities."
+    },
+    {
+      "finding_id": "",
+      "source": "ai",
+      "component": null,
+      "severity": "medium",
+      "category": "code_quality",
+      "rule_id": "java/modern_stack",
+      "file_path": "src/main/java/com/example/billing/client/GatewayClient.java",
+      "line": null,
+      "symbol": null,
+      "evidence": "",
+      "description": "GatewayClient imports java.net.http (Java 11+) while pom.xml targets 1.8, creates HttpClient.newHttpClient() without connect/read timeouts, calls System.getenv directly, and logs via System.out/printStackTrace.",
+      "recommendation": "Upgrade toolchain to Java 21, configure Spring RestClient/HttpClient with explicit timeouts and @ConfigurationProperties, sort imports without wildcards, and adopt SLF4J."
+    },
+    {
+      "finding_id": "det-a333f294",
+      "source": "deterministic",
+      "component": null,
+      "severity": "medium",
+      "category": "dependencies",
+      "rule_id": "common/supply_chain",
+      "file_path": null,
+      "line": null,
+      "symbol": null,
+      "evidence": "manifests=['pom.xml'], lockfiles=[]",
+      "description": "No dependency lockfile found despite declared dependencies.",
+      "recommendation": "Commit a deterministic lockfile (e.g. uv.lock, package-lock.json, Cargo.lock)."
+    },
+    {
+      "finding_id": "det-c7173d77",
+      "source": "deterministic",
+      "component": null,
+      "severity": "medium",
+      "category": "documentation",
+      "rule_id": "common/documentation",
+      "file_path": null,
+      "line": null,
+      "symbol": null,
+      "evidence": "has_readme=True, lines=2",
+      "description": "README documentation is missing or minimal (< 10 lines).",
+      "recommendation": "Document architecture overview, setup instructions, and usage in README.md."
+    },
+    {
+      "finding_id": "det-e4e6492b",
+      "source": "deterministic",
+      "component": null,
+      "severity": "low",
+      "category": "dependencies",
+      "rule_id": "common/supply_chain",
+      "file_path": null,
+      "line": null,
+      "symbol": null,
+      "evidence": "unpinned=['org.springframework.boot:spring-boot-starter-web:LATEST']",
+      "description": "1 dependency specifiers lack upper/exact bounds.",
+      "recommendation": "Pin dependency versions or enforce lockfile-based reproducible builds."
+    }
+  ],
+  "consolidated_findings": [
+    {
+      "severity": "critical",
+      "file_path": ".github/workflows/build.yml",
+      "line": null,
+      "symbol": null,
+      "rule_ids": [
+        "common/supply_chain"
+      ],
+      "categories": [
+        "security"
+      ],
+      "primary_description": ".github/workflows/build.yml triggers on pull_request_target without an explicit permissions block and uses mutable actions/checkout@main, creating a high-severity CI token/supply-chain risk.",
+      "combined_evidence": ".github/workflows/build.yml triggers on pull_request_target without an explicit permissions block and uses mutable actions/checkout@main, creating a high-severity CI token/supply-chain risk.",
+      "merged_recommendation": "Switch trigger to pull_request, add explicit permissions: { contents: read }, and pin actions/checkout to a full commit SHA."
+    },
+    {
+      "severity": "critical",
+      "file_path": "examples/java/api_spring_messy/src/main/java/com/example/billing/client/GatewayClient.java",
+      "line": 13,
+      "symbol": "GATEWAY_SECRET",
+      "rule_ids": [
+        "common/security"
+      ],
+      "categories": [
+        "security"
+      ],
+      "primary_description": "Potential hardcoded secret detected in `examples/java/api_spring_messy/src/main/java/com/example/billing/client/GatewayClient.java:13`.",
+      "combined_evidence": "Hardcoded secret literal assigned to 'GATEWAY_SECRET' (OWASP ASVS)",
+      "merged_recommendation": "Move secrets to environment variables or a secret manager and rotate exposed keys."
+    },
+    {
+      "severity": "critical",
+      "file_path": "pom.xml",
+      "line": null,
+      "symbol": null,
+      "rule_ids": [
+        "common/security_vulnerability",
+        "common/runtime_verification",
+        "java/dependencies"
+      ],
+      "categories": [
+        "security",
+        "testing",
+        "dependencies"
+      ],
+      "primary_description": "Trivy reports CRITICAL CVE-2022-22965 (Spring4Shell) against spring-boot-starter-web@LATEST (is_unpinned_specifier=True: static SCA evaluates full historical CVE range until locked, while live Maven attempts Spring Boot 4.2.0 and fails compilation).",
+      "combined_evidence": "Trivy reports CRITICAL CVE-2022-22965 (Spring4Shell) against spring-boot-starter-web@LATEST (is_unpinned_specifier=True: static SCA evaluates full historical CVE range until locked, while live Maven attempts Spring Boot 4.2.0 and fails compilation). | Live Maven build failed with 'bad class file: spring-boot-4.2.0.jar (class file has wrong version 61.0, should be 52.0)' because pom.xml uses <version>LATEST</version> with Java 1.8, and Dockerfile fails because openjdk:latest no longer exists on Docker Hub. This blocks test execution, coverage, and startup verification. | pom.xml targets Java 1.8, resolves spring-boot-starter-web with non-deterministic version LATEST, and depends on deprecated javax.servlet and JUnit 4 without a committed Maven Wrapper.",
+      "merged_recommendation": "Pin an explicit patched Spring Boot 3.4.x BOM release in pom.xml and commit Maven Wrapper (mvnw) so both builds and SCA evaluate deterministic artifacts. / Pin Spring Boot 3.4.x BOM with Java 21 LTS in pom.xml, add eclipse-temurin:21 Dockerfile, and verify clean offline mvn test + JaCoCo execution. / Upgrade to Java 21 LTS and Spring Boot 3.4 BOM (Jakarta EE 10, JUnit 5 Jupiter), pin all coordinates deterministically, and commit mvnw."
+    },
+    {
+      "severity": "critical",
+      "file_path": "src/main/java/com/example/billing/client/GatewayClient.java",
+      "line": null,
+      "symbol": null,
+      "rule_ids": [
+        "common/security",
+        "java/modern_stack"
+      ],
+      "categories": [
+        "security",
+        "code_quality"
+      ],
+      "primary_description": "GatewayClient.GATEWAY_SECRET embeds a hardcoded live-style secret token literal directly in source code.",
+      "combined_evidence": "GatewayClient.GATEWAY_SECRET embeds a hardcoded live-style secret token literal directly in source code. | GatewayClient imports java.net.http (Java 11+) while pom.xml targets 1.8, creates HttpClient.newHttpClient() without connect/read timeouts, calls System.getenv directly, and logs via System.out/printStackTrace.",
+      "merged_recommendation": "Remove the literal immediately, rotate the credential, and inject it via Spring @ConfigurationProperties backed by a secret manager or environment variable. / Upgrade toolchain to Java 21, configure Spring RestClient/HttpClient with explicit timeouts and @ConfigurationProperties, sort imports without wildcards, and adopt SLF4J."
+    },
+    {
+      "severity": "critical",
+      "file_path": "",
+      "line": null,
+      "symbol": null,
+      "rule_ids": [
+        "CVE-2022-22965"
+      ],
+      "categories": [
+        "security"
+      ],
+      "primary_description": "Core runtime dependency vulnerability CVE-2022-22965: spring-framework: RCE via Data Binding on JDK 9+",
+      "combined_evidence": "org.springframework.boot:spring-boot-starter-web@LATEST (pom)",
+      "merged_recommendation": "Upgrade `org.springframework.boot:spring-boot-starter-web` to `2.5.12, 2.6.6`."
+    },
+    {
+      "severity": "high",
+      "file_path": "Dockerfile",
+      "line": null,
+      "symbol": null,
+      "rule_ids": [
+        "common/supply_chain"
+      ],
+      "categories": [
+        "security"
+      ],
+      "primary_description": "Dockerfile builds from deprecated/mutable openjdk:latest, copies entire workspace without .dockerignore, and runs as root.",
+      "combined_evidence": "Dockerfile builds from deprecated/mutable openjdk:latest, copies entire workspace without .dockerignore, and runs as root.",
+      "merged_recommendation": "Adopt a multi-stage eclipse-temurin:21-jdk / 21-jre-alpine image with a dedicated non-root USER and .dockerignore."
+    },
+    {
+      "severity": "high",
+      "file_path": "src/main/java/com/example/billing/controller/BillingController.java",
+      "line": null,
+      "symbol": null,
+      "rule_ids": [
+        "common/security_vulnerability",
+        "java/frameworks/spring_boot"
+      ],
+      "categories": [
+        "security"
+      ],
+      "primary_description": "Pentest suite (.pni/pentests/examples/java/api_spring_messy) could not execute against BillingController.chargeCustomer (ANY /charge) because container build failed compiling spring-boot-4.2.0.jar under Java 8.",
+      "combined_evidence": "Pentest suite (.pni/pentests/examples/java/api_spring_messy) could not execute against BillingController.chargeCustomer (ANY /charge) because container build failed compiling spring-boot-4.2.0.jar under Java 8. | BillingController mutates singleton instance field 'channel' on every request (race condition), exposes /charge to ANY HTTP method via @RequestMapping, and binds raw Map without Bean Validation or auth.",
+      "merged_recommendation": "Restore deterministic Java 21 + Spring Boot 3.4 buildability first, then re-run web_pentest to verify authentication, method restrictions, and HTTP security headers on POST /charge. / Remove mutable field 'channel', restrict to @PostMapping('/charge') with a typed @Valid ChargeRequest Java record, and add authentication/authorization."
+    },
+    {
+      "severity": "high",
+      "file_path": "src/main/java/com/example/billing/service/BillingManager.java",
+      "line": null,
+      "symbol": null,
+      "rule_ids": [
+        "common/architecture",
+        "java/code_quality"
+      ],
+      "categories": [
+        "architecture",
+        "code_quality"
+      ],
+      "primary_description": "BillingManager injects BillingController (circularController) via field @Autowired creating a runtime cycle, and stores unbounded request state in static raw Map INVOICE_CACHE.",
+      "combined_evidence": "BillingManager injects BillingController (circularController) via field @Autowired creating a runtime cycle, and stores unbounded request state in static raw Map INVOICE_CACHE. | processBatchBilling has cognitive complexity 56, 8 parameters, raw List/Map generics, stale Javadoc (@param obsoleteToken), String == reference equality at lines 52/55/57, empty catch at line 83, and calls private @Transactional saveAuditTrail() (bypassed by Spring AOP proxy and missing spring-tx).",
+      "merged_recommendation": "Remove circularController upward dependency, adopt constructor injection across Controller/Service/Client, and externalize INVOICE_CACHE to Redis or a typed repository. / Decompose processBatchBilling with a typed command record, fix String equality to .equals()/enum (confirming behavior via Stakeholder Decision Log), log/propagate exceptions via SLF4J, and move transactional persistence to a dedicated repository bean."
+    },
+    {
+      "severity": "high",
+      "file_path": "src/test/java/com/example/billing/BillingManagerTest.java",
+      "line": null,
+      "symbol": null,
+      "rule_ids": [
+        "java/testing"
+      ],
+      "categories": [
+        "testing"
+      ],
+      "primary_description": "BillingManagerTest.testSmokeRun only instantiates InvoiceRecord and calls getAmountCents() without any assertEquals/assertThrows or coverage of BillingManager, BillingController, or GatewayClient.",
+      "combined_evidence": "BillingManagerTest.testSmokeRun only instantiates InvoiceRecord and calls getAmountCents() without any assertEquals/assertThrows or coverage of BillingManager, BillingController, or GatewayClient.",
+      "merged_recommendation": "Migrate to JUnit 5 Jupiter + Mockito + MockMvc characterization tests covering POST /charge, tax calculation, retry flows, and gateway error paths with >=80% JaCoCo line coverage."
+    },
+    {
+      "severity": "high",
+      "file_path": "",
+      "line": null,
+      "symbol": null,
+      "rule_ids": [
+        "common/architecture"
+      ],
+      "categories": [
+        "architecture"
+      ],
+      "primary_description": "Runtime circular dependency detected: com.example.billing.controller.BillingController -> com.example.billing.service.BillingManager -> com.example.billing.controller.BillingController.",
+      "combined_evidence": "Circular import cycle: com.example.billing.controller.BillingController -> com.example.billing.service.BillingManager -> com.example.billing.controller.BillingController",
+      "merged_recommendation": "Break the cycle by extracting shared interfaces/models into a lower layer."
+    },
+    {
+      "severity": "medium",
+      "file_path": "examples/java/api_spring_messy/src/main/java/com/example/billing/service/BillingManager.java",
+      "line": 33,
+      "symbol": "processBatchBilling",
+      "rule_ids": [
+        "common/maintainability"
+      ],
+      "categories": [
+        "code_quality"
+      ],
+      "primary_description": "High cyclomatic complexity or length in `processBatchBilling` (length=57 lines, branches=13, cognitive=56).",
+      "combined_evidence": "length=57 lines, branches=13, cognitive=56",
+      "merged_recommendation": "Decompose into cohesive helper functions with clear single responsibilities."
+    },
+    {
+      "severity": "medium",
+      "file_path": "",
+      "line": null,
+      "symbol": null,
+      "rule_ids": [
+        "common/documentation"
+      ],
+      "categories": [
+        "documentation"
+      ],
+      "primary_description": "README documentation is missing or minimal (< 10 lines).",
+      "combined_evidence": "has_readme=True, lines=2",
+      "merged_recommendation": "Document architecture overview, setup instructions, and usage in README.md."
+    },
+    {
+      "severity": "medium",
+      "file_path": "",
+      "line": null,
+      "symbol": null,
+      "rule_ids": [
+        "common/supply_chain"
+      ],
+      "categories": [
+        "dependencies"
+      ],
+      "primary_description": "No dependency lockfile found despite declared dependencies.",
+      "combined_evidence": "manifests=['pom.xml'], lockfiles=[]",
+      "merged_recommendation": "Commit a deterministic lockfile (e.g. uv.lock, package-lock.json, Cargo.lock)."
+    },
+    {
+      "severity": "low",
+      "file_path": "",
+      "line": null,
+      "symbol": null,
+      "rule_ids": [
+        "common/supply_chain"
+      ],
+      "categories": [
+        "dependencies"
+      ],
+      "primary_description": "1 dependency specifiers lack upper/exact bounds.",
+      "combined_evidence": "unpinned=['org.springframework.boot:spring-boot-starter-web:LATEST']",
+      "merged_recommendation": "Pin dependency versions or enforce lockfile-based reproducible builds."
+    }
+  ],
+  "action_plan": [
+    {
+      "priority": "P0",
+      "title": "Break BillingController<->BillingManager cycle and eliminate mutable singleton/static state",
+      "category": "architecture",
+      "component": null,
+      "target_files": [
+        "src/main/java/com/example/billing/controller/BillingController.java",
+        "src/main/java/com/example/billing/service/BillingManager.java"
+      ],
+      "related_rules": [
+        "common/architecture",
+        "java/frameworks/spring_boot"
+      ],
+      "action": "Remove circularController and BillingController.channel, switch to constructor injection, and externalize INVOICE_CACHE.",
+      "expected_impact": "Eliminates Spring DI circularity and concurrent cross-request data races."
+    },
+    {
+      "priority": "P0",
+      "title": "Fix broken Maven & Docker build by pinning Java 21 LTS + Spring Boot 3.4 BOM + eclipse-temurin:21",
+      "category": "dependencies",
+      "component": null,
+      "target_files": [
+        "pom.xml",
+        "Dockerfile"
+      ],
+      "related_rules": [
+        "common/runtime_verification",
+        "java/dependencies"
+      ],
+      "action": "Replace Java 1.8 + spring-boot-starter-web:LATEST with Java 21 + pinned Spring Boot 3.4.x parent/BOM and replace deprecated openjdk:latest with eclipse-temurin:21-jdk/jre.",
+      "expected_impact": "Restores deterministic compilation, JaCoCo test coverage, and runtime boot verification."
+    },
+    {
+      "priority": "P0",
+      "title": "Harden GitHub Actions CI trigger and root Dockerfile",
+      "category": "security",
+      "component": null,
+      "target_files": [
+        ".github/workflows/build.yml",
+        "Dockerfile"
+      ],
+      "related_rules": [
+        "common/supply_chain",
+        "common/security"
+      ],
+      "action": "Replace pull_request_target with pull_request + minimal permissions + SHA-pinned actions, and migrate Dockerfile to pinned non-root eclipse-temurin:21-jre with .dockerignore.",
+      "expected_impact": "Eliminates CI token hijacking and mutable root container exposure."
+    },
+    {
+      "priority": "P0",
+      "title": "Pin Spring Boot 3.4.x BOM and eliminate Dockerfile root/:latest misconfigurations",
+      "category": "security",
+      "component": null,
+      "target_files": [
+        "pom.xml",
+        "Dockerfile"
+      ],
+      "related_rules": [
+        "common/security_vulnerability",
+        "SEC-01",
+        "SEC-02",
+        "CVE-2022-22965"
+      ],
+      "action": "Lock Spring Boot 3.4.x via parent/BOM (resolving static CVE-2022-22965 unpinned range matching) and harden Dockerfile to resolve DS-0001, DS-0002, and DS-0026.",
+      "expected_impact": "Eliminates CRITICAL unpinned SCA exposure and HIGH root-container misconfiguration."
+    },
+    {
+      "priority": "P0",
+      "title": "Remove hardcoded GATEWAY_SECRET and inject via @ConfigurationProperties",
+      "category": "security",
+      "component": null,
+      "target_files": [
+        "src/main/java/com/example/billing/client/GatewayClient.java"
+      ],
+      "related_rules": [
+        "common/security",
+        "common/supply_chain"
+      ],
+      "action": "Delete the GATEWAY_SECRET string constant at line 13, rotate credentials, and bind secrets via Spring @ConfigurationProperties from externalized environment/vault config.",
+      "expected_impact": "Eliminates CRITICAL credential exposure in source control."
+    },
+    {
+      "priority": "P1",
+      "title": "Configure RestClient timeouts, @ConfigurationProperties, SLF4J logging, and Actuator /healthz",
+      "category": "code_quality",
+      "component": null,
+      "target_files": [
+        "src/main/java/com/example/billing/client/GatewayClient.java",
+        "src/main/java/com/example/billing/service/BillingManager.java"
+      ],
+      "related_rules": [
+        "common/twelve_factor",
+        "common/production_readiness"
+      ],
+      "action": "Replace System.getenv and HttpClient.newHttpClient() with @ConfigurationProperties + timeout-bounded RestClient, replace System.out/printStackTrace and empty catch with SLF4J error logging, and enable Spring Boot Actuator health probes.",
+      "expected_impact": "Prevents thread exhaustion from hung gateway calls and restores 12-Factor observability."
+    },
+    {
+      "priority": "P1",
+      "title": "Refactor processBatchBilling, fix String == / empty catch / private @Transactional, and replace legacy Date/Vector",
+      "category": "code_quality",
+      "component": null,
+      "target_files": [
+        "src/main/java/com/example/billing/service/BillingManager.java",
+        "src/main/java/com/example/billing/util/LegacyDateHelper.java"
+      ],
+      "related_rules": [
+        "common/maintainability",
+        "java/code_quality",
+        "java/typing",
+        "java/modern_stack"
+      ],
+      "action": "Replace raw Map/List with typed DTO records, decompose processBatchBilling (cognitive <=15, params <=6), use .equals() + SLF4J, and replace SimpleDateFormat/Date/Vector with java.time and List.",
+      "expected_impact": "Drastically reduces defect risk and restores type safety and readability."
+    },
+    {
+      "priority": "P1",
+      "title": "Upgrade Maven build to Java 21 LTS, Spring Boot 3.4 BOM, and mvnw",
+      "category": "dependencies",
+      "component": null,
+      "target_files": [
+        "pom.xml"
+      ],
+      "related_rules": [
+        "java/dependencies",
+        "common/supply_chain"
+      ],
+      "action": "Migrate pom.xml from Java 1.8 / LATEST / javax / JUnit 4 to Java 21 LTS + Spring Boot 3.4 BOM + JUnit 5 and commit mvnw.",
+      "expected_impact": "Restores deterministic reproducible builds and supported LTS security updates."
+    },
+    {
+      "priority": "P1",
+      "title": "Re-run web_pentest after restoring Java 21 + Spring Boot 3.4 container build",
+      "category": "security",
+      "component": null,
+      "target_files": [
+        "pom.xml",
+        "src/main/java/com/example/billing/controller/BillingController.java"
+      ],
+      "related_rules": [
+        "common/security_vulnerability",
+        "SEC-06"
+      ],
+      "action": "After fixing pom.xml and Dockerfile buildability, execute .pni/pentests/examples/java/api_spring_messy to verify POST-only enforcement, validation, and security headers.",
+      "expected_impact": "Restores continuous dynamic security verification (SEC-06)."
+    },
+    {
+      "priority": "P1",
+      "title": "Replace assertion-free JUnit 4 smoke test with JUnit 5 + MockMvc characterization suite",
+      "category": "testing",
+      "component": null,
+      "target_files": [
+        "src/test/java/com/example/billing/BillingManagerTest.java"
+      ],
+      "related_rules": [
+        "java/testing"
+      ],
+      "action": "Migrate to JUnit 5 Jupiter and add characterization tests with real assertions for BillingController, BillingManager, and GatewayClient before refactoring.",
+      "expected_impact": "Creates a safety harness for Java 21 / Clean Architecture migration and lifts coverage to >=80%."
+    },
+    {
+      "priority": "P2",
+      "title": "Expand README and add core repository governance files",
+      "category": "documentation",
+      "component": null,
+      "target_files": [
+        "README.md"
+      ],
+      "related_rules": [
+        "common/documentation",
+        "common/git_workflow"
+      ],
+      "action": "Expand README.md with setup, environment config, API endpoints, and test commands, and add LICENSE, SECURITY.md, and .gitignore.",
+      "expected_impact": "Improves onboarding and repository governance compliance."
+    }
+  ],
+  "opt_outs": [],
+  "triaged_adjustments": [],
+  "execution_dag": {
+    "workflow_id": "java_api_spring_messy",
+    "category": "audit",
+    "scope": "repo",
+    "nodes": [
+      {
+        "stage_id": "confirm_plan",
+        "label": "Confirm Audit Plan & Execution DAG",
+        "mode": "ASK",
+        "status": "completed",
+        "needs": [],
+        "rules_count": 0,
+        "highlight": "Plan approved",
+        "skip_reason": ""
+      },
+      {
+        "stage_id": "repo_and_deps",
+        "label": "Repo Structure Audit",
+        "mode": "HYBRID",
+        "status": "completed",
+        "needs": [
+          "confirm_plan"
+        ],
+        "rules_count": 5,
+        "highlight": "6 src / 1 test files, 2 deps",
+        "skip_reason": ""
+      },
+      {
+        "stage_id": "supply_chain",
+        "label": "Evaluate Supply-Chain, CI Permissions, Container...",
+        "mode": "AI",
+        "status": "completed",
+        "needs": [
+          "repo_and_deps"
+        ],
+        "rules_count": 3,
+        "highlight": "completed",
+        "skip_reason": ""
+      },
+      {
+        "stage_id": "ast_and_quality",
+        "label": "Java Ast Audit",
+        "mode": "HYBRID",
+        "status": "completed",
+        "needs": [
+          "repo_and_deps"
+        ],
+        "rules_count": 8,
+        "highlight": "6 files, 187 LOC, 0 sinks",
+        "skip_reason": ""
+      },
+      {
+        "stage_id": "runtime_verification",
+        "label": "Container Runtime Audit",
+        "mode": "HYBRID",
+        "status": "completed",
+        "needs": [
+          "repo_and_deps"
+        ],
+        "rules_count": 2,
+        "highlight": "build=failed, tests=0/0",
+        "skip_reason": ""
+      },
+      {
+        "stage_id": "security_audit",
+        "label": "Security Vulnerability Audit",
+        "mode": "HYBRID",
+        "status": "completed",
+        "needs": [
+          "repo_and_deps"
+        ],
+        "rules_count": 2,
+        "highlight": "Trivy CVEs=1 (CRIT=1, HIGH=0), secrets=0",
+        "skip_reason": ""
+      },
+      {
+        "stage_id": "web_pentest",
+        "label": "Web Penetration Audit",
+        "mode": "HYBRID",
+        "status": "completed",
+        "needs": [
+          "repo_and_deps"
+        ],
+        "rules_count": 1,
+        "highlight": "probes=0/0, findings=0",
+        "skip_reason": ""
+      },
+      {
+        "stage_id": "arch_recording",
+        "label": "Architecture Analysis",
+        "mode": "AI",
+        "status": "completed",
+        "needs": [
+          "ast_and_quality"
+        ],
+        "rules_count": 1,
+        "highlight": "5 layers, 1 flows grounded",
+        "skip_reason": ""
+      },
+      {
+        "stage_id": "service_readiness",
+        "label": "Evaluate 12-Factor Config/Statelessness & SRE PRR...",
+        "mode": "AI",
+        "status": "completed",
+        "needs": [
+          "ast_and_quality"
+        ],
+        "rules_count": 3,
+        "highlight": "completed",
+        "skip_reason": ""
+      },
+      {
+        "stage_id": "test_health",
+        "label": "Evaluate JUnit Test Suite Completeness & Structure",
+        "mode": "AI",
+        "status": "completed",
+        "needs": [
+          "ast_and_quality"
+        ],
+        "rules_count": 1,
+        "highlight": "completed",
+        "skip_reason": ""
+      },
+      {
+        "stage_id": "output_score",
+        "label": "Write Validated Score & AI Context JSON",
+        "mode": "AI",
+        "status": "completed",
+        "needs": [
+          "supply_chain",
+          "arch_recording",
+          "service_readiness",
+          "test_health",
+          "runtime_verification",
+          "security_audit",
+          "web_pentest"
+        ],
+        "rules_count": 0,
+        "highlight": "score=66/100 (C), 16 rules, 19 findings",
+        "skip_reason": ""
+      },
+      {
+        "stage_id": "create_report",
+        "label": "Create Visual Report with drawlib",
+        "mode": "AI",
+        "status": "pending",
+        "needs": [
+          "output_score"
+        ],
+        "rules_count": 0,
+        "highlight": "A4 Drawlib PDF report synthesis",
+        "skip_reason": ""
+      }
+    ],
+    "audit_scope": {
+      "target_root": "examples/java/api_spring_messy",
+      "source_targets": [
+        "src/main/java"
+      ],
+      "test_targets": [
+        "src/test/java"
+      ],
+      "doc_targets": [
+        "README.md"
+      ],
+      "exclude_globs": [],
+      "language": "java",
+      "companion_languages": [],
+      "detected_frameworks": [
+        "spring-boot",
+        "spring-framework",
+        "javax-ee",
+        "junit4"
+      ],
+      "git_branch": "main",
+      "git_sha": "d1e02277",
+      "git_dirty": true,
+      "tools_used": [
+        "project_inspect (java)",
+        "tree-sitter AST (java)",
+        "container runtime harness (docker: java/maven.dockerfile)",
+        "Trivy (docker: fs)",
+        "web_pentest (httpx, 0 probes)"
+      ],
+      "artifact_manifest": {
+        "score_json": "docs/reports/java_api_spring_messy/java_api_spring_messy_score.json",
+        "summary_json": "docs/reports/java_api_spring_messy/java_api_spring_messy_summary.json",
+        "findings_sarif": "docs/reports/java_api_spring_messy/java_api_spring_messy_findings.sarif",
+        "plan_json": "docs_src/reports/java_api_spring_messy/_facts/plan.json",
+        "facts_json": "docs_src/reports/java_api_spring_messy/_facts/facts.json",
+        "architecture_json": "docs_src/reports/java_api_spring_messy/_facts/architecture.json"
+      }
+    }
+  },
+  "components": [],
+  "approved_plan_summary": "Auto-approved via --auto-approve or plan_gate=false.",
+  "report_hints": [
+    "Highlight the AST x Docker x Trivy causal chain: pom.xml LATEST -> Spring Boot 4.2.0 bytecode 61.0 crash on Java 8 + static CVE-2022-22965 range + openjdk:latest not found -> blocked JaCoCo & DAST.",
+    "Contrast BillingManager.java (primary hotspot) against InvoiceRecord.java (clean immutable baseline) on the 2D hotspot diagram.",
+    "Connect P0-P2 remediation roadmap directly to the chained java_api_spring_messy_migration Clean Architecture execution plan."
+  ],
+  "summary": "legacy-billing scores 66/100 (Grade C, with -10pt qualitative deductions across all 7 axes relative to the 76 deterministic AST baseline) due to compounding build, architectural, and security debt. Live Docker runtime verification proved an immediate causal chain: pom.xml's unpinned spring-boot-starter-web:LATEST resolves Spring Boot 4.2.0 (JDK 17+ bytecode 61.0) against a Java 1.8 target (52.0), crashing Maven builds and blocking JaCoCo coverage and DAST pentesting, while Dockerfile fails on deprecated openjdk:latest. Inside the codebase, defects concentrate in BillingManager.java (circular BillingController dependency, cognitive=56, 8 params, static INVOICE_CACHE, String == bugs, empty catch, broken private @Transactional), GatewayClient.java (hardcoded GATEWAY_SECRET, Java 11 API mismatch, missing HTTP timeout), and BillingController.java (mutable singleton channel race condition, unauthenticated ANY /charge)."
+}

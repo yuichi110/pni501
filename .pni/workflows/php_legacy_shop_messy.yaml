@@ -43,14 +43,17 @@ steps:
   - id: output_score
     uses: emit_score
     with:
-      output_dir: "reports/php"
-      target: "legacy_shop_messy"
+      output_dir: "docs/reports/php_legacy_shop_messy"
+      target: "php_legacy_shop_messy"
 
   - id: create_report
     uses: write_drawlib_report
     with:
-      src_dir: "reports_src/php"
-      output_dir: "reports/php"
-      target: "legacy_shop_messy"
-      lang: "ja"
+      src_dir: "docs_src/reports/php_legacy_shop_messy"
+      output_dir: "docs/reports/php_legacy_shop_messy"
+      target: "php_legacy_shop_messy"
+      lang: "en,ja"
       style: "google"
+      formats:
+        - "pdf"
+        - "html"

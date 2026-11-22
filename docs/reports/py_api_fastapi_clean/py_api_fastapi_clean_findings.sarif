@@ -1,0 +1,291 @@
+{
+  "$schema": "https://json.schemastore.org/sarif-2.1.0.json",
+  "version": "2.1.0",
+  "runs": [
+    {
+      "tool": {
+        "driver": {
+          "name": "PNI501",
+          "version": "2.0.0",
+          "informationUri": "https://github.com/yuichi110/pni501",
+          "rules": [
+            {
+              "id": "CVE-2025-8869",
+              "name": "CVE_2025_8869",
+              "shortDescription": {
+                "text": "Core runtime dependency vulnerability CVE-2025-8869: pip: pip missing checks on symbolic link extraction"
+              },
+              "defaultConfiguration": {
+                "level": "note"
+              }
+            },
+            {
+              "id": "CVE-2026-13346",
+              "name": "CVE_2026_13346",
+              "shortDescription": {
+                "text": "Core runtime dependency vulnerability CVE-2026-13346: pip: pip: Arbitrary file installation via malicious package indexes"
+              },
+              "defaultConfiguration": {
+                "level": "note"
+              }
+            },
+            {
+              "id": "CVE-2026-1703",
+              "name": "CVE_2026_1703",
+              "shortDescription": {
+                "text": "Core runtime dependency vulnerability CVE-2026-1703: pip: pip: Information disclosure via path traversal when installing crafted wheel archives"
+              },
+              "defaultConfiguration": {
+                "level": "note"
+              }
+            },
+            {
+              "id": "CVE-2026-3219",
+              "name": "CVE_2026_3219",
+              "shortDescription": {
+                "text": "Core runtime dependency vulnerability CVE-2026-3219: pip: pip: Incorrect file installation due to improper archive handling"
+              },
+              "defaultConfiguration": {
+                "level": "note"
+              }
+            },
+            {
+              "id": "CVE-2026-6357",
+              "name": "CVE_2026_6357",
+              "shortDescription": {
+                "text": "Core runtime dependency vulnerability CVE-2026-6357: pip: pip: Arbitrary code execution or information disclosure via malicious wheel package installation"
+              },
+              "defaultConfiguration": {
+                "level": "note"
+              }
+            },
+            {
+              "id": "CVE-2026-8643",
+              "name": "CVE_2026_8643",
+              "shortDescription": {
+                "text": "Core runtime dependency vulnerability CVE-2026-8643: python-pip: Path traversal via malicious entry point name in pip wheel installation allows arbitrary file o"
+              },
+              "defaultConfiguration": {
+                "level": "note"
+              }
+            },
+            {
+              "id": "common/security_vulnerability",
+              "name": "common_security_vulnerability",
+              "shortDescription": {
+                "text": "Trivy image scan on python:3.12.6-slim-bookworm (Debian 12.7) reports 9 CRITICAL / 158 HIGH Debian OS CVEs (e.g., CVE-2026-42010 in libgnutls30, CVE-2026-31789 "
+              },
+              "defaultConfiguration": {
+                "level": "warning"
+              }
+            },
+            {
+              "id": "common/twelve_factor",
+              "name": "common_twelve_factor",
+              "shortDescription": {
+                "text": "main.py instantiates InMemoryOrderRepository by default during FastAPI lifespan startup, which is clean for local/test execution behind OrderRepository Protocol"
+              },
+              "defaultConfiguration": {
+                "level": "note"
+              }
+            }
+          ]
+        }
+      },
+      "results": [
+        {
+          "ruleId": "common/security_vulnerability",
+          "level": "warning",
+          "message": {
+            "text": "Trivy image scan on python:3.12.6-slim-bookworm (Debian 12.7) reports 9 CRITICAL / 158 HIGH Debian OS CVEs (e.g., CVE-2026-42010 in libgnutls30, CVE-2026-31789 in openssl/libssl3), 6 pip@24.2 CVEs (CVE-2026-8643 et al.), and DS-0026 missing HEALTHCHECK. — Recommendation: Refresh the base image to the latest patched python:3.12.x-slim-bookworm (or distroless/multi-stage uv copy), remove/upgrade pip to >=26.2.0, and add a HEALTHCHECK against /healthz."
+          },
+          "properties": {
+            "severity": "medium",
+            "rule_ids": [
+              "common/security_vulnerability"
+            ],
+            "categories": [
+              "security"
+            ]
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "Dockerfile"
+                },
+                "region": {
+                  "startLine": 1
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "common/security_vulnerability",
+          "level": "warning",
+          "message": {
+            "text": "POST /v1/orders (create_order) and GET /v1/orders/{order_id} (get_order) have no OAuth2/JWT/API-key Depends() guard, matching the TODO(security) marker at line 73. — Recommendation: Add a FastAPI Security/Depends() caller authentication and per-tenant authorization dependency to /v1/orders endpoints. / Require OAuth2/JWT or API-key authentication via FastAPI Depends() on /v1/orders endpoints before public exposure. / Add FastAPI TestClient tests covering /healthz, POST /v1/orders, GET /v1/orders/{id} (200 & 404), and AsyncWebhookClient MockTransport 2xx/error paths."
+          },
+          "properties": {
+            "severity": "medium",
+            "rule_ids": [
+              "common/security_vulnerability",
+              "common/runtime_verification"
+            ],
+            "categories": [
+              "security",
+              "testing"
+            ]
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "src/order_dispatch/api/routes.py"
+                },
+                "region": {
+                  "startLine": 1
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "common/twelve_factor",
+          "level": "note",
+          "message": {
+            "text": "main.py instantiates InMemoryOrderRepository by default during FastAPI lifespan startup, which is clean for local/test execution behind OrderRepository Protocol but will not share order state across multiple replicas. — Recommendation: Provide a durable external OrderRepository implementation (e.g., PostgreSQL/Redis) selectable via ServiceSettings when env == 'prod'. / Disable or protect openapi_url/docs_url in production (env=='prod') and register Starlette middleware setting X-Content-Type-Options: nosniff and X-Frame-Options: DENY."
+          },
+          "properties": {
+            "severity": "low",
+            "rule_ids": [
+              "common/twelve_factor",
+              "common/security_vulnerability"
+            ],
+            "categories": [
+              "architecture",
+              "security"
+            ]
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "src/order_dispatch/main.py"
+                },
+                "region": {
+                  "startLine": 1
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "CVE-2025-8869",
+          "level": "note",
+          "message": {
+            "text": "Core runtime dependency vulnerability CVE-2025-8869: pip: pip missing checks on symbolic link extraction — Recommendation: Upgrade `pip` to `25.3`."
+          },
+          "properties": {
+            "severity": "low",
+            "rule_ids": [
+              "CVE-2025-8869"
+            ],
+            "categories": [
+              "security"
+            ]
+          }
+        },
+        {
+          "ruleId": "CVE-2026-13346",
+          "level": "note",
+          "message": {
+            "text": "Core runtime dependency vulnerability CVE-2026-13346: pip: pip: Arbitrary file installation via malicious package indexes — Recommendation: Upgrade `pip` to `26.2.0`."
+          },
+          "properties": {
+            "severity": "low",
+            "rule_ids": [
+              "CVE-2026-13346"
+            ],
+            "categories": [
+              "security"
+            ]
+          }
+        },
+        {
+          "ruleId": "CVE-2026-1703",
+          "level": "note",
+          "message": {
+            "text": "Core runtime dependency vulnerability CVE-2026-1703: pip: pip: Information disclosure via path traversal when installing crafted wheel archives — Recommendation: Upgrade `pip` to `26.0`."
+          },
+          "properties": {
+            "severity": "low",
+            "rule_ids": [
+              "CVE-2026-1703"
+            ],
+            "categories": [
+              "security"
+            ]
+          }
+        },
+        {
+          "ruleId": "CVE-2026-3219",
+          "level": "note",
+          "message": {
+            "text": "Core runtime dependency vulnerability CVE-2026-3219: pip: pip: Incorrect file installation due to improper archive handling — Recommendation: Upgrade `pip` to `26.1`."
+          },
+          "properties": {
+            "severity": "low",
+            "rule_ids": [
+              "CVE-2026-3219"
+            ],
+            "categories": [
+              "security"
+            ]
+          }
+        },
+        {
+          "ruleId": "CVE-2026-6357",
+          "level": "note",
+          "message": {
+            "text": "Core runtime dependency vulnerability CVE-2026-6357: pip: pip: Arbitrary code execution or information disclosure via malicious wheel package installation — Recommendation: Upgrade `pip` to `26.1`."
+          },
+          "properties": {
+            "severity": "low",
+            "rule_ids": [
+              "CVE-2026-6357"
+            ],
+            "categories": [
+              "security"
+            ]
+          }
+        },
+        {
+          "ruleId": "CVE-2026-8643",
+          "level": "note",
+          "message": {
+            "text": "Core runtime dependency vulnerability CVE-2026-8643: python-pip: Path traversal via malicious entry point name in pip wheel installation allows arbitrary file overwrite — Recommendation: Upgrade `pip` to `26.1.2`."
+          },
+          "properties": {
+            "severity": "low",
+            "rule_ids": [
+              "CVE-2026-8643"
+            ],
+            "categories": [
+              "security"
+            ]
+          }
+        }
+      ],
+      "properties": {
+        "project_name": "order-dispatch",
+        "workflow_id": "py_api_fastapi_clean",
+        "workflow_run_id": "wf-f819234f",
+        "language": "python",
+        "overall_score": 94,
+        "grade": "S"
+      }
+    }
+  ]
+}

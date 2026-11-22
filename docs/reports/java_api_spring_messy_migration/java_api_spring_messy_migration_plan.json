@@ -1,0 +1,931 @@
+{
+  "project_name": "legacy-billing",
+  "workflow_id": "java_api_spring_messy_migration",
+  "workflow_run_id": "wf-b1c19b56",
+  "generated_at": "2026-11-22T11:57:23.102522+00:00",
+  "source_language": "java",
+  "target_root": "examples/java/api_spring_messy",
+  "migration_facts_file": "docs_src/reports/java_api_spring_messy_migration/_facts/migration_facts.json",
+  "transformation_mode": "architectural_restructure",
+  "migration_strategy": "phased_pr",
+  "api_compatibility": "strict",
+  "bug_handling_policy": "ask_human",
+  "executive_summary": "This phased PR execution plan modernizes legacy-billing (Baseline Audit wf-8177454c: Grade C, 66/100) from a broken Java 1.8 / unpinned Spring Boot / cyclic monolith into a deterministic Java 21 LTS + Spring Boot 3.4.x + PostgreSQL 16 (JPA + Flyway) + Redis 7 service organized under Clean Architecture (domain / port / usecase / adapter). Phase 0 resolves the critical Spring Boot 4.2.0 vs Java 8 build crash and establishes JUnit 5 + MockMvc Golden Master tests preserving the strict POST /charge contract (customerId, amountCents, billedCents). Phase 1 severs the BillingController <-> BillingManager cycle and extracts framework-free Java 21 domain records and inbound/outbound Ports. Phase 2 executes OpenRewrite mechanical upgrades and introduces PostgreSQL/Redis/RestClient adapters. Phase 3 hardens inbound @Valid DTOs, removes hardcoded GATEWAY_SECRET, and resolves Stakeholder Decision Log quirks (currency == 'USD', fixed 100L retry, controllerPing). Phase 4 hardens Docker (multi-stage non-root eclipse-temurin:21-jre) and GitHub Actions CI before final PNI verification.",
+  "confirmed_assumptions": [
+    "Target runtime & framework pinned to Java 21 LTS + Spring Boot 3.4.x BOM (Jakarta EE 10, JUnit 5 Jupiter, Mockito, JaCoCo).",
+    "Persistence externalized to PostgreSQL 16 via Spring Data JPA + Flyway versioned DDL migrations.",
+    "Process-local BillingManager.INVOICE_CACHE externalized to Redis 7 (StringRedisTemplate / Spring Data Redis) with explicit TTL.",
+    "Strict external HTTP JSON contract compatibility preserved on POST /charge (customerId, amountCents, billedCents).",
+    "Ambiguous legacy quirks (controllerPing key, String == comparisons, fixed 100L retry charge) isolated into Stakeholder Decision Log under ask_human policy prior to Phase 3."
+  ],
+  "non_goals": [
+    "No microservice decomposition or multi-artifact repository split (retain single deployable Maven artifact).",
+    "No Kafka or RabbitMQ event bus introduction in this migration wave.",
+    "No breaking URL path changes or v2 API versioning on /charge."
+  ],
+  "target_axes": [
+    {
+      "category": "language_runtime",
+      "title": "Java 1.8 -> Java 21 LTS & Legacy Date/Collection Cleanup",
+      "as_is": "pom.xml targets Java 1.8 (colliding with Java 11 java.net.http in GatewayClient and resolved Spring Boot 4.2.0 bytecode 61.0); LegacyDateHelper uses non-thread-safe SimpleDateFormat, java.util.Date, and Vector.",
+      "to_be": "Java 21 LTS toolchain with Maven Wrapper (mvnw), immutable Java 21 records, java.time.Instant/DateTimeFormatter, and List/ArrayList.",
+      "migration_approach": "Fix toolchain in Phase 0, run OpenRewrite UpgradeToJava21 recipe in Phase 2, and replace LegacyDateHelper with Clock/java.time in Wave 1.",
+      "risk_level": "critical",
+      "affected_files": [
+        "pom.xml",
+        "src/main/java/com/example/billing/client/GatewayClient.java",
+        "src/main/java/com/example/billing/util/LegacyDateHelper.java"
+      ]
+    },
+    {
+      "category": "framework",
+      "title": "Unpinned Spring Boot / javax.servlet / JUnit 4 -> Spring Boot 3.4.x (Jakarta EE 10) + JUnit 5",
+      "as_is": "spring-boot-starter-web:LATEST without BOM, javax.servlet:4.0.1, JUnit 4.13.2 assertion-free test, @Autowired field injection, catch-all @RequestMapping, missing spring-tx.",
+      "to_be": "Pinned Spring Boot 3.4.x BOM, jakarta.servlet / jakarta.validation, Spring RestClient, constructor DI, @PostMapping('/charge'), JUnit 5 Jupiter + Mockito + JaCoCo.",
+      "migration_approach": "Pin Spring Boot 3.4.x BOM in Phase 0, apply OpenRewrite UpgradeSpringBoot_3_4 and JUnit4to5Migration in dedicated mechanical PRs during Phase 2.",
+      "risk_level": "critical",
+      "affected_files": [
+        "pom.xml",
+        "src/main/java/com/example/billing/BillingApp.java",
+        "src/main/java/com/example/billing/controller/BillingController.java",
+        "src/main/java/com/example/billing/service/BillingManager.java",
+        "src/test/java/com/example/billing/BillingManagerTest.java"
+      ]
+    },
+    {
+      "category": "architecture_pattern",
+      "title": "Cyclic Layered Monolith -> Clean Architecture (domain / port / usecase / adapter)",
+      "as_is": "Runtime circular dependency BillingController <-> BillingManager (via @Autowired circularController), cognitive=56 god method (8 params), raw Map/List payloads.",
+      "to_be": "Strict inward-only Clean Architecture: framework-free domain records & TaxPolicy, inbound/outbound Port interfaces, pure UseCase orchestrators, and isolated inbound/outbound Adapters.",
+      "migration_approach": "Follow topological Waves 1->4: migrate Wave 1 leaves to domain, sever BillingManager -> BillingController back-edge via explicit DTO inputs in Wave 3, then wrap adapters.",
+      "risk_level": "high",
+      "affected_files": [
+        "src/main/java/com/example/billing/model/InvoiceRecord.java",
+        "src/main/java/com/example/billing/controller/BillingController.java",
+        "src/main/java/com/example/billing/service/BillingManager.java",
+        "src/main/java/com/example/billing/client/GatewayClient.java"
+      ]
+    },
+    {
+      "category": "database_persistence",
+      "title": "Broken private @Transactional Stub -> PostgreSQL 16 + Spring Data JPA + Flyway",
+      "as_is": "BillingManager.saveAuditTrail() uses private @Transactional (bypassed by Spring AOP self-invocation and missing spring-tx) and prints to System.out.",
+      "to_be": "Outbound BillingAuditRepositoryPort implemented by JpaBillingAuditAdapter backed by PostgreSQL 16 and Flyway V1__create_billing_audit.sql.",
+      "migration_approach": "Extract BillingAuditRepositoryPort in Phase 1 (initially backed by an in-memory stub), then wire PostgreSQL JPA + Flyway adapter verified by Testcontainers in Phase 2.",
+      "risk_level": "high",
+      "affected_files": [
+        "pom.xml",
+        "src/main/java/com/example/billing/service/BillingManager.java"
+      ]
+    },
+    {
+      "category": "cache_state",
+      "title": "Static HashMap INVOICE_CACHE & Mutable Singleton Field -> Stateless + Redis 7 TTL",
+      "as_is": "Unsynchronized static raw Map BillingManager.INVOICE_CACHE and mutable singleton field BillingController.channel cause cross-request data races.",
+      "to_be": "Stateless controllers/usecases with InvoiceCachePort implemented by RedisInvoiceCacheAdapter (Redis 7 StringRedisTemplate with explicit TTL).",
+      "migration_approach": "Remove BillingController.channel in Wave 3 (passing HTTP method as a local parameter if controllerPing is retained) and move INVOICE_CACHE behind InvoiceCachePort -> Redis 7 in Phase 2.",
+      "risk_level": "high",
+      "affected_files": [
+        "src/main/java/com/example/billing/controller/BillingController.java",
+        "src/main/java/com/example/billing/service/BillingManager.java"
+      ]
+    },
+    {
+      "category": "auth_security",
+      "title": "Hardcoded Secret, Unbounded HTTP Client & Unvalidated ANY /charge -> Hardened Boundary",
+      "as_is": "Hardcoded GATEWAY_SECRET in GatewayClient.java:13, System.getenv without typed config, unbounded HttpClient.newHttpClient(), unauthenticated ANY /charge with raw Map, unpinned CVE-2022-22965 range.",
+      "to_be": "@ConfigurationProperties secret & endpoint binding, timeout-bounded Spring RestClient adapter, @PostMapping('/charge') with @Valid ChargeRequest DTO, authentication filter, and SLF4J structured logging.",
+      "migration_approach": "Pin BOM in Phase 0 (clearing unpinned CVE range), replace GatewayClient with PaymentGatewayPort + RestClient in Phase 2, and enforce @Valid DTO + secret externalization in Phase 3.",
+      "risk_level": "critical",
+      "affected_files": [
+        "src/main/java/com/example/billing/client/GatewayClient.java",
+        "src/main/java/com/example/billing/controller/BillingController.java",
+        "pom.xml"
+      ]
+    },
+    {
+      "category": "container_cicd",
+      "title": "Broken openjdk:latest Root Dockerfile & Privileged CI -> Hardened Non-Root Temurin 21 + Pinned CI",
+      "as_is": "Dockerfile FROM openjdk:latest (removed on Docker Hub, runs as root, no .dockerignore, no HEALTHCHECK); .github/workflows/build.yml uses pull_request_target + actions/checkout@main without permissions.",
+      "to_be": "Multi-stage eclipse-temurin:21-jdk / eclipse-temurin:21-jre-alpine non-root image with .dockerignore and Actuator HEALTHCHECK; GitHub Actions pull_request workflow with contents: read and full commit-SHA pinning.",
+      "migration_approach": "Harden CI and multi-stage Dockerfile in Phase 4 (or immediately as an unblocking P0 PR alongside Phase 0 build fix), then re-run PNI full audit + Trivy + DAST.",
+      "risk_level": "critical",
+      "affected_files": [
+        "Dockerfile",
+        ".github/workflows/build.yml"
+      ]
+    }
+  ],
+  "target_architecture": {
+    "pattern_name": "Clean Architecture (Hexagonal / Ports & Adapters) on Java 21 + Spring Boot 3.4",
+    "summary": "Four concentric rings with strict inward-only dependencies: pure Java 21 domain records/policies at the core, inbound/outbound Port interfaces, framework-free UseCase orchestrators, and swappable inbound web and outbound gateway/PostgreSQL/Redis adapters.",
+    "dependency_rules": [
+      "domain MUST NOT import org.springframework.*, jakarta.persistence.*, java.net.http.*, or Redis libraries.",
+      "usecase depends ONLY on domain and port interfaces; never on adapter.in.* or adapter.out.*.",
+      "adapter.in.web translates strict external HTTP POST /charge JSON DTOs into domain commands and invokes inbound ports.",
+      "adapter.out.* implements outbound ports (PaymentGatewayPort, InvoiceCachePort, BillingAuditRepositoryPort) with explicit timeouts, TTLs, and @Transactional boundaries."
+    ],
+    "target_layers": [
+      {
+        "layer_name": "Domain Layer",
+        "package_or_dir": "com.example.billing.domain",
+        "responsibility": "Pure Java 21 immutable record models (Invoice, Money, BillingSummary), Currency/InvoiceStatus enums, and deterministic TaxPolicy.",
+        "allowed_dependencies": [],
+        "forbidden_imports": [
+          "org.springframework.*",
+          "jakarta.persistence.*",
+          "jakarta.servlet.*",
+          "java.net.http.*"
+        ]
+      },
+      {
+        "layer_name": "Port Layer",
+        "package_or_dir": "com.example.billing.port",
+        "responsibility": "Inbound use-case contracts (ChargeCustomerUseCase, ProcessBatchBillingUseCase) and outbound SPI contracts (PaymentGatewayPort, InvoiceCachePort, BillingAuditRepositoryPort).",
+        "allowed_dependencies": [
+          "Domain Layer"
+        ],
+        "forbidden_imports": [
+          "org.springframework.web.*",
+          "jakarta.persistence.*"
+        ]
+      },
+      {
+        "layer_name": "UseCase Layer",
+        "package_or_dir": "com.example.billing.usecase",
+        "responsibility": "Pure billing orchestration services (ProcessBatchBillingService) coordinating tax calculation, bounded gateway retries, cache updates, and audit persistence without upward Controller references.",
+        "allowed_dependencies": [
+          "Domain Layer",
+          "Port Layer"
+        ],
+        "forbidden_imports": [
+          "com.example.billing.adapter.*",
+          "org.springframework.web.*"
+        ]
+      },
+      {
+        "layer_name": "Inbound Web Adapter",
+        "package_or_dir": "com.example.billing.adapter.in.web",
+        "responsibility": "Stateless BillingController (@PostMapping('/charge')), @Valid ChargeRequest/ChargeResponse DTOs preserving strict external JSON keys, and exception mapping.",
+        "allowed_dependencies": [
+          "Port Layer",
+          "Domain Layer"
+        ],
+        "forbidden_imports": [
+          "com.example.billing.adapter.out.*"
+        ]
+      },
+      {
+        "layer_name": "Outbound Infrastructure Adapters",
+        "package_or_dir": "com.example.billing.adapter.out",
+        "responsibility": "RestClientPaymentGatewayAdapter (connect/read timeouts + @ConfigurationProperties), JpaBillingAuditAdapter (PostgreSQL 16 + Flyway + public @Transactional), and RedisInvoiceCacheAdapter (Redis 7 with TTL).",
+        "allowed_dependencies": [
+          "Port Layer",
+          "Domain Layer"
+        ],
+        "forbidden_imports": [
+          "com.example.billing.adapter.in.*"
+        ]
+      }
+    ],
+    "component_mappings": [
+      {
+        "source_file": "src/main/java/com/example/billing/model/InvoiceRecord.java",
+        "source_symbol": "InvoiceRecord",
+        "target_layer": "Domain Layer",
+        "target_component": "com.example.billing.domain.Invoice / Money",
+        "port_or_adapter_role": "Pure Java 21 Domain Record",
+        "refactoring_note": "Wave 1 leaf: convert class to immutable Java 21 record with non-negative invariant validation."
+      },
+      {
+        "source_file": "src/main/java/com/example/billing/util/LegacyDateHelper.java",
+        "source_symbol": "LegacyDateHelper",
+        "target_layer": "Domain Layer",
+        "target_component": "com.example.billing.domain.BillingPeriodFormatter",
+        "port_or_adapter_role": "Pure Domain Clock/Time Policy",
+        "refactoring_note": "Wave 1 leaf: replace SimpleDateFormat, java.util.Date, and synchronized Vector with thread-safe DateTimeFormatter, java.time.Clock, and List<String>."
+      },
+      {
+        "source_file": "src/main/java/com/example/billing/client/GatewayClient.java",
+        "source_symbol": "GatewayClient.sendCharge",
+        "target_layer": "Outbound Infrastructure Adapters",
+        "target_component": "com.example.billing.adapter.out.gateway.RestClientPaymentGatewayAdapter",
+        "port_or_adapter_role": "Outbound Gateway Adapter implementing PaymentGatewayPort",
+        "refactoring_note": "Wave 2: externalize LEGACY_PAYMENT_URL & GATEWAY_SECRET into @ConfigurationProperties, enforce connect/read timeouts via Spring RestClient, and log via SLF4J."
+      },
+      {
+        "source_file": "src/main/java/com/example/billing/service/BillingManager.java",
+        "source_symbol": "BillingManager.processBatchBilling",
+        "target_layer": "UseCase Layer",
+        "target_component": "com.example.billing.usecase.ProcessBatchBillingService",
+        "port_or_adapter_role": "Inbound UseCase Implementation (ProcessBatchBillingUseCase)",
+        "refactoring_note": "Wave 3 cycle cut: sever @Autowired circularController, decompose cognitive=56 / 8-param method into BillingCommand + TaxPolicy, and delegate to PaymentGatewayPort, InvoiceCachePort, and BillingAuditRepositoryPort."
+      },
+      {
+        "source_file": "src/main/java/com/example/billing/service/BillingManager.java",
+        "source_symbol": "BillingManager.INVOICE_CACHE",
+        "target_layer": "Outbound Infrastructure Adapters",
+        "target_component": "com.example.billing.adapter.out.cache.RedisInvoiceCacheAdapter",
+        "port_or_adapter_role": "Outbound Cache Adapter implementing InvoiceCachePort",
+        "refactoring_note": "Replace unsynchronized static raw HashMap with Redis 7 StringRedisTemplate and explicit key TTL."
+      },
+      {
+        "source_file": "src/main/java/com/example/billing/service/BillingManager.java",
+        "source_symbol": "BillingManager.saveAuditTrail",
+        "target_layer": "Outbound Infrastructure Adapters",
+        "target_component": "com.example.billing.adapter.out.persistence.JpaBillingAuditAdapter",
+        "port_or_adapter_role": "Outbound Persistence Adapter implementing BillingAuditRepositoryPort",
+        "refactoring_note": "Replace ineffective private @Transactional System.out stub with PostgreSQL 16 Spring Data JPA repository + Flyway DDL and public @Transactional boundary."
+      },
+      {
+        "source_file": "src/main/java/com/example/billing/controller/BillingController.java",
+        "source_symbol": "BillingController.chargeCustomer",
+        "target_layer": "Inbound Web Adapter",
+        "target_component": "com.example.billing.adapter.in.web.BillingController",
+        "port_or_adapter_role": "Inbound HTTP Adapter",
+        "refactoring_note": "Wave 3/4: remove mutable singleton 'channel' field, enforce @PostMapping('/charge') with @Valid ChargeRequest DTO, preserve strict JSON response keys (customerId, billedCents), and wire ChargeCustomerUseCase via constructor DI."
+      },
+      {
+        "source_file": "src/main/java/com/example/billing/BillingApp.java",
+        "source_symbol": "BillingApp",
+        "target_layer": "Outbound Infrastructure Adapters",
+        "target_component": "com.example.billing.BillingApp + BillingConfiguration",
+        "port_or_adapter_role": "Composition Root",
+        "refactoring_note": "Wave 4: enable @ConfigurationPropertiesScan and Spring Boot Actuator health probes."
+      }
+    ]
+  },
+  "decision_log": [
+    {
+      "decision_id": "DEC-JAVA-01",
+      "file_path": "src/main/java/com/example/billing/service/BillingManager.java",
+      "line": 55,
+      "current_behavior": "Lines 52, 55, 57 compare status == \"PAID\", currency == \"USD\", and currency == \"JPY\" using Java reference equality (==), which works only for interned literals and silently skips tax/PAID checks for deserialized HTTP strings.",
+      "impact_if_changed": "Switching to .equals() / typed enums will cause non-interned 'USD'/'JPY' inputs to start incurring 8%/10% tax and 'PAID' invoices to be skipped — potentially changing billedCents for existing callers.",
+      "recommended_option": "Fix to typed Currency/InvoiceStatus enums (.equals()) in Phase 3 after verifying whether any caller relies on untaxed deserialized strings.",
+      "stakeholder_options": [
+        "Option A (Recommended): Fix to .equals()/Enum in Phase 3 with explicit release note and characterization test update.",
+        "Option B: Preserve legacy reference-equality quirk behind a feature flag during rollout."
+      ]
+    },
+    {
+      "decision_id": "DEC-JAVA-02",
+      "file_path": "src/main/java/com/example/billing/service/BillingManager.java",
+      "line": 67,
+      "current_behavior": "When rec.getAmountCents() <= 0 and forceRetry is true, BillingManager loops up to maxRetries calling gatewayClient.sendCharge(customerId, 100L) and adds a hardcoded 100L cent fee.",
+      "impact_if_changed": "Changing or rejecting non-positive amounts alters retry fee revenue/ledger reconciliation for zero-amount invoice payloads.",
+      "recommended_option": "Confirm with billing product owners whether 100L is an intentional minimum authorization hold or a legacy bug before modifying in Phase 3.",
+      "stakeholder_options": [
+        "Option A (Recommended): Keep 100L configurable via BillingProperties (default 100L) until business sign-off, then enforce @Positive validation if confirmed as bug.",
+        "Option B: Reject amountCents <= 0 with HTTP 400 immediately in Phase 3."
+      ]
+    },
+    {
+      "decision_id": "DEC-JAVA-03",
+      "file_path": "src/main/java/com/example/billing/service/BillingManager.java",
+      "line": 81,
+      "current_behavior": "When circularController != null && extraContext != null, response Map conditionally injects internal diagnostic key 'controllerPing' containing mutable BillingController.lastChannel().",
+      "impact_if_changed": "Dropping 'controllerPing' breaks any downstream monitoring script checking that diagnostic key, whereas keeping it requires passing request.getMethod() as a stateless parameter instead of a cyclic bean.",
+      "recommended_option": "Confirm whether any client reads 'controllerPing'; if needed under strict compatibility, pass HTTP method as a request-scoped parameter (zero shared state) and deprecate it.",
+      "stakeholder_options": [
+        "Option A (Recommended): Pass request method as a stateless parameter when traceHint is present and deprecate 'controllerPing' via header.",
+        "Option B: Remove 'controllerPing' completely in Phase 3 after client audit confirms zero consumers."
+      ]
+    },
+    {
+      "decision_id": "DEC-JAVA-04",
+      "file_path": "src/main/java/com/example/billing/service/BillingManager.java",
+      "line": 83,
+      "current_behavior": "Empty catch (Exception e) {} silently swallows audit trail and cache failures, returning HTTP 200 even when persistence fails.",
+      "impact_if_changed": "Propagating persistence/cache exceptions will change failure responses from silent HTTP 200 to HTTP 500/503 unless graceful fallback is defined.",
+      "recommended_option": "Log all exceptions via SLF4J with correlation ID; fail-fast on PostgreSQL audit write errors while degrading gracefully (warn + metric) on Redis cache misses.",
+      "stakeholder_options": [
+        "Option A (Recommended): Fail-fast on PostgreSQL audit failure + graceful warn fallback on Redis cache error.",
+        "Option B: Log via SLF4J while keeping best-effort HTTP 200 during Phase 2 shadow testing."
+      ]
+    }
+  ],
+  "phase_gates": [
+    {
+      "phase_number": 0,
+      "title": "Phase 0 — Green Build Recovery & Golden Master Characterization Harness",
+      "objective": "Unblock broken Maven/Docker compilation (Java 1.8 vs Spring Boot 4.2.0 crash) with minimal behavioral edits and lock POST /charge contracts with JUnit 5 + MockMvc tests.",
+      "key_tasks": [
+        "Pin Spring Boot 3.4.x BOM and Java 21 compiler target in pom.xml and commit Maven Wrapper (mvnw).",
+        "Fix javax.servlet -> jakarta.servlet import in BillingController.java to compile cleanly under Spring Boot 3.4.",
+        "Replace assertion-free BillingManagerTest.testSmokeRun with JUnit 5 + MockMvc Golden Master tests pinning POST /charge (customerId, amountCents, billedCents)."
+      ],
+      "exit_criteria": [
+        "./mvnw test succeeds offline inside Docker with >=80% JaCoCo line coverage on existing billing flows.",
+        "Golden Master tests lock all implicit POST /charge input/output keys before structural refactoring."
+      ],
+      "rollback_or_coexistence_note": "Single reversible build PR; zero runtime schema or endpoint contract changes."
+    },
+    {
+      "phase_number": 1,
+      "title": "Phase 1 — Cycle Cut & Clean Architecture Domain / Port Extraction",
+      "objective": "Execute Wave 1 (leaf models/time utils) and Wave 3 cycle cut to sever BillingController <-> BillingManager and establish framework-free domain, port, and usecase packages.",
+      "key_tasks": [
+        "Migrate InvoiceRecord and LegacyDateHelper to pure Java 21 domain records and DateTimeFormatter/Clock (Wave 1).",
+        "Define inbound (ChargeCustomerUseCase, ProcessBatchBillingUseCase) and outbound (PaymentGatewayPort, InvoiceCachePort, BillingAuditRepositoryPort) Port interfaces.",
+        "Sever @Autowired circularController in BillingManager, remove mutable BillingController.channel, and wrap existing in-memory cache/audit behind temporary adapters."
+      ],
+      "exit_criteria": [
+        "Zero circular dependencies (AstFacts.circular_dependencies == 0) and zero @Autowired field injections.",
+        "All Phase 0 Golden Master characterization tests pass unchanged."
+      ],
+      "rollback_or_coexistence_note": "Behavior-preserving refactor using in-memory adapter shims; safe to revert per PR."
+    },
+    {
+      "phase_number": 2,
+      "title": "Phase 2 — OpenRewrite Codemods & PostgreSQL 16 / Redis 7 / RestClient Adapters",
+      "objective": "Run deterministic OpenRewrite upgrades and swap temporary shims for production PostgreSQL 16 (JPA + Flyway), Redis 7 (TTL), and timeout-bounded Spring RestClient adapters.",
+      "key_tasks": [
+        "Apply OpenRewrite UpgradeToJava21, UpgradeSpringBoot_3_4, and JUnit4to5Migration in a dedicated mechanical PR.",
+        "Implement JpaBillingAuditAdapter with Flyway V1__create_billing_audit.sql and public @Transactional boundary (replacing broken private @Transactional stub).",
+        "Implement RedisInvoiceCacheAdapter (explicit TTL) and RestClientPaymentGatewayAdapter (explicit connect/read timeouts) verified via Testcontainers + WireMock."
+      ],
+      "exit_criteria": [
+        "All PostgreSQL Flyway migrations, Redis TTL integration tests, and RestClient timeout tests pass via Testcontainers/WireMock.",
+        "Zero missing I/O timeouts and zero static mutable state."
+      ],
+      "rollback_or_coexistence_note": "Feature-toggle persistence/cache adapter beans via Spring profiles during staging soak test."
+    },
+    {
+      "phase_number": 3,
+      "title": "Phase 3 — Typed @Valid DTOs, Security Hardening & Approved Decision Log Fixes",
+      "objective": "Harden the HTTP boundary, eliminate hardcoded secrets, and execute stakeholder-approved Decision Log fixes (DEC-JAVA-01..04).",
+      "key_tasks": [
+        "Replace raw Map payload and catch-all @RequestMapping with @PostMapping('/charge') and @Valid ChargeRequest/ChargeResponse Java records preserving strict JSON keys.",
+        "Delete hardcoded GATEWAY_SECRET literal in GatewayClient, rotate credentials, and bind via @ConfigurationProperties.",
+        "Apply stakeholder-approved DEC-JAVA-01..04 resolutions (enum/.equals() comparisons, configurable retry amount, controllerPing disposition, SLF4J + error propagation)."
+      ],
+      "exit_criteria": [
+        "Zero hardcoded secrets, zero raw Map/List generics, zero @SuppressWarnings('unchecked'), and passing authentication/validation MockMvc tests.",
+        "All 4 Stakeholder Decision Log items signed off and covered by unit/integration tests."
+      ],
+      "rollback_or_coexistence_note": "Guard behavioral DEC-JAVA-01/02 changes with explicit canary metrics before full rollout."
+    },
+    {
+      "phase_number": 4,
+      "title": "Phase 4 — Container / CI Hardening & Final PNI Acceptance Audit",
+      "objective": "Replace broken root openjdk:latest Dockerfile and privileged pull_request_target CI, then pass full PNI v2 audit + Trivy + live DAST acceptance gates.",
+      "key_tasks": [
+        "Create multi-stage eclipse-temurin:21-jdk / eclipse-temurin:21-jre-alpine non-root Dockerfile with .dockerignore and Spring Boot Actuator /actuator/health HEALTHCHECK.",
+        "Update .github/workflows/build.yml to pull_request trigger, explicit permissions: { contents: read }, and commit-SHA-pinned actions, plus add LICENSE, SECURITY.md, .gitignore, and Dependabot.",
+        "Re-run PNI java_api_spring_messy audit including Docker runtime verification, Trivy SCA, and live HTTP DAST pentest."
+      ],
+      "exit_criteria": [
+        "Docker image builds cleanly with 0 HIGH/CRITICAL Dockerfile misconfigs and 0 unpinned app CVEs.",
+        "Live DAST pentest (.pni/pentests/examples/java/api_spring_messy) boots cleanly and passes with 0 CRITICAL/HIGH findings; overall PNI score >= 85 (Grade A/S)."
+      ],
+      "rollback_or_coexistence_note": "Blue/green container deployment with /actuator/health readiness probe rollback trigger."
+    }
+  ],
+  "pr_wbs": [
+    {
+      "pr_id": "PR-01",
+      "phase_number": 0,
+      "wave": 1,
+      "axis_category": "framework",
+      "title": "Pin Java 21 LTS + Spring Boot 3.4.x BOM, add mvnw, and fix jakarta.servlet import",
+      "target_files": [
+        "pom.xml",
+        "src/main/java/com/example/billing/controller/BillingController.java"
+      ],
+      "changes_summary": "Replace Java 1.8 and spring-boot-starter-web:LATEST with Spring Boot 3.4.x parent/BOM, Java 21 toolchain, jakarta.servlet import, JUnit 5 Jupiter, and committed Maven Wrapper (mvnw).",
+      "automated_or_manual": "hybrid",
+      "verification_cmd": "./mvnw clean test-compile",
+      "estimated_size": "S",
+      "depends_on_prs": []
+    },
+    {
+      "pr_id": "PR-02",
+      "phase_number": 0,
+      "wave": 1,
+      "axis_category": "framework",
+      "title": "Add JUnit 5 + MockMvc Golden Master characterization tests for POST /charge",
+      "target_files": [
+        "src/test/java/com/example/billing/BillingManagerTest.java"
+      ],
+      "changes_summary": "Replace assertion-free testSmokeRun with JUnit 5 characterization tests locking POST /charge JSON contract (customerId, amountCents, billedCents), tax paths, and retry behavior with JaCoCo coverage.",
+      "automated_or_manual": "manual",
+      "verification_cmd": "./mvnw test jacoco:report",
+      "estimated_size": "M",
+      "depends_on_prs": [
+        "PR-01"
+      ]
+    },
+    {
+      "pr_id": "PR-03",
+      "phase_number": 1,
+      "wave": 1,
+      "axis_category": "language_runtime",
+      "title": "Extract Wave 1 Clean Architecture Domain records and java.time formatter",
+      "target_files": [
+        "src/main/java/com/example/billing/model/InvoiceRecord.java",
+        "src/main/java/com/example/billing/util/LegacyDateHelper.java"
+      ],
+      "changes_summary": "Introduce pure framework-free domain records (Invoice, Money, BillingSummary), TaxPolicy, and thread-safe DateTimeFormatter + Clock replacing Date/SimpleDateFormat/Vector.",
+      "automated_or_manual": "manual",
+      "verification_cmd": "./mvnw test",
+      "estimated_size": "S",
+      "depends_on_prs": [
+        "PR-02"
+      ]
+    },
+    {
+      "pr_id": "PR-04",
+      "phase_number": 1,
+      "wave": 3,
+      "axis_category": "architecture_pattern",
+      "title": "Sever BillingController <-> BillingManager cycle, extract Ports/UseCases & constructor DI",
+      "target_files": [
+        "src/main/java/com/example/billing/controller/BillingController.java",
+        "src/main/java/com/example/billing/service/BillingManager.java"
+      ],
+      "changes_summary": "Delete @Autowired circularController and mutable singleton 'channel' field, define inbound/outbound Ports (ChargeCustomerUseCase, PaymentGatewayPort, InvoiceCachePort, BillingAuditRepositoryPort), decompose processBatchBilling (cognitive <=15, params <=6), and switch to constructor DI.",
+      "automated_or_manual": "manual",
+      "verification_cmd": "./mvnw test",
+      "estimated_size": "M",
+      "depends_on_prs": [
+        "PR-03"
+      ]
+    },
+    {
+      "pr_id": "PR-05",
+      "phase_number": 2,
+      "wave": 2,
+      "axis_category": "framework",
+      "title": "Run OpenRewrite Java 21, Spring Boot 3.4 & JUnit 5 mechanical codemod pass",
+      "target_files": [
+        "pom.xml",
+        "src/main/java/com/example/billing/BillingApp.java"
+      ],
+      "changes_summary": "Execute OpenRewrite UpgradeToJava21, UpgradeSpringBoot_3_4, and JUnit4to5Migration in an isolated mechanical diff with zero manual logic changes.",
+      "automated_or_manual": "codemod",
+      "verification_cmd": "./mvnw rewrite:run && ./mvnw test",
+      "estimated_size": "S",
+      "depends_on_prs": [
+        "PR-04"
+      ]
+    },
+    {
+      "pr_id": "PR-06",
+      "phase_number": 2,
+      "wave": 2,
+      "axis_category": "database_persistence",
+      "title": "Implement PostgreSQL 16 (JPA + Flyway), Redis 7 (TTL) & RestClient outbound adapters",
+      "target_files": [
+        "pom.xml",
+        "src/main/java/com/example/billing/client/GatewayClient.java",
+        "src/main/java/com/example/billing/service/BillingManager.java"
+      ],
+      "changes_summary": "Replace INVOICE_CACHE with RedisInvoiceCacheAdapter (TTL), broken private @Transactional stub with JpaBillingAuditAdapter + Flyway DDL, and unbounded HttpClient with timeout-bounded RestClientPaymentGatewayAdapter + @ConfigurationProperties.",
+      "automated_or_manual": "manual",
+      "verification_cmd": "./mvnw verify",
+      "estimated_size": "L",
+      "depends_on_prs": [
+        "PR-05"
+      ]
+    },
+    {
+      "pr_id": "PR-07",
+      "phase_number": 3,
+      "wave": 3,
+      "axis_category": "auth_security",
+      "title": "Enforce @PostMapping @Valid DTOs, remove GATEWAY_SECRET, and apply DEC-JAVA-01..04",
+      "target_files": [
+        "src/main/java/com/example/billing/controller/BillingController.java",
+        "src/main/java/com/example/billing/client/GatewayClient.java",
+        "src/main/java/com/example/billing/service/BillingManager.java"
+      ],
+      "changes_summary": "Restrict /charge to @PostMapping with @Valid ChargeRequest/ChargeResponse records, remove hardcoded GATEWAY_SECRET, enforce SLF4J structured logging, and implement stakeholder-approved DEC-JAVA-01..04 fixes.",
+      "automated_or_manual": "manual",
+      "verification_cmd": "./mvnw verify",
+      "estimated_size": "M",
+      "depends_on_prs": [
+        "PR-06"
+      ]
+    },
+    {
+      "pr_id": "PR-08",
+      "phase_number": 4,
+      "wave": 4,
+      "axis_category": "container_cicd",
+      "title": "Harden multi-stage Temurin 21 Dockerfile, SHA-pinned CI & pass final PNI audit/DAST",
+      "target_files": [
+        "Dockerfile",
+        ".github/workflows/build.yml",
+        "README.md"
+      ],
+      "changes_summary": "Replace openjdk:latest with multi-stage non-root eclipse-temurin:21-jre-alpine + .dockerignore + Actuator HEALTHCHECK; switch CI to pull_request + contents: read + SHA-pinned actions; expand README and add LICENSE/SECURITY.md/.gitignore/Dependabot; verify with PNI audit + DAST.",
+      "automated_or_manual": "manual",
+      "verification_cmd": "docker build -t legacy-billing:21 . && ./mvnw verify",
+      "estimated_size": "M",
+      "depends_on_prs": [
+        "PR-07"
+      ]
+    }
+  ],
+  "migration_facts": {
+    "project_name": "legacy-billing",
+    "source_language": "java",
+    "base_audit_workflow": "java_api_spring_messy",
+    "resolved_brief": "Target Stack & Infrastructure (Confirmed):\n  - Runtime & Framework: Java 21 LTS + Spring Boot 3.4.x BOM (Jakarta EE 10, JUnit 5 Jupiter, Mockito, JaCoCo)\n  - Database & Persistence: PostgreSQL 16 via Spring Data JPA + Flyway versioned DDL migrations (replace ineffective @Transactional audit stub)\n  - Cache & Session State: Redis 7 (Spring Data Redis / StringRedisTemplate) with explicit TTL (replace BillingManager.INVOICE_CACHE static raw Map and remove mutable BillingController.channel field)\n  - Outbound HTTP Client: Spring RestClient / java.net.http.HttpClient with explicit connect/read timeouts and @ConfigurationProperties secret injection\n  - Container & CI: Multi-stage eclipse-temurin:21-jdk / 21-jre-alpine non-root image with HEALTHCHECK; GitHub Actions pull_request trigger with pinned SHA actions\nTarget Design Philosophy:\n  - Introduce Clean Architecture (`domain` / `usecase` / `port` / `adapter`):\n    * `domain`: Pure Java 21 immutable `record` models (`Invoice`, `Money`, `BillingSummary`) and tax policy with zero Spring/JPA/Redis imports\n    * `port`: Inbound `ChargeCustomerUseCase` / `ProcessBatchBillingUseCase` interfaces and outbound `PaymentGatewayPort`, `InvoiceCachePort`, `BillingAuditRepositoryPort`\n    * `usecase`: Pure orchestration services implementing inbound ports without upward Controller dependencies\n    * `adapter`: `adapter.in.web` (`BillingController` + `@Valid` request/response DTOs) and `adapter.out.{gateway,persistence,cache}`\nCompatibility & Ambiguity Guardrails:\n  - Strictly preserve external HTTP JSON contract on `POST /charge` (`customerId`, `amountCents`, `billedCents`); evaluate `controllerPing` diagnostic key, `currency == \"USD\"` reference comparison, and fixed `100L` retry charge via Stakeholder Decision Log before Phase 3 changes.\nConfirmed Non-Goals:\n  - No microservice split or Kafka/RabbitMQ event bus introduction in this migration wave (keep single deployable Maven artifact).",
+    "effective_options": {
+      "base_audit_workflow": "java_api_spring_messy",
+      "brief": "Target Stack & Infrastructure (Confirmed):\n  - Runtime & Framework: Java 21 LTS + Spring Boot 3.4.x BOM (Jakarta EE 10, JUnit 5 Jupiter, Mockito, JaCoCo)\n  - Database & Persistence: PostgreSQL 16 via Spring Data JPA + Flyway versioned DDL migrations (replace ineffective @Transactional audit stub)\n  - Cache & Session State: Redis 7 (Spring Data Redis / StringRedisTemplate) with explicit TTL (replace BillingManager.INVOICE_CACHE static raw Map and remove mutable BillingController.channel field)\n  - Outbound HTTP Client: Spring RestClient / java.net.http.HttpClient with explicit connect/read timeouts and @ConfigurationProperties secret injection\n  - Container & CI: Multi-stage eclipse-temurin:21-jdk / 21-jre-alpine non-root image with HEALTHCHECK; GitHub Actions pull_request trigger with pinned SHA actions\nTarget Design Philosophy:\n  - Introduce Clean Architecture (`domain` / `usecase` / `port` / `adapter`):\n    * `domain`: Pure Java 21 immutable `record` models (`Invoice`, `Money`, `BillingSummary`) and tax policy with zero Spring/JPA/Redis imports\n    * `port`: Inbound `ChargeCustomerUseCase` / `ProcessBatchBillingUseCase` interfaces and outbound `PaymentGatewayPort`, `InvoiceCachePort`, `BillingAuditRepositoryPort`\n    * `usecase`: Pure orchestration services implementing inbound ports without upward Controller dependencies\n    * `adapter`: `adapter.in.web` (`BillingController` + `@Valid` request/response DTOs) and `adapter.out.{gateway,persistence,cache}`\nCompatibility & Ambiguity Guardrails:\n  - Strictly preserve external HTTP JSON contract on `POST /charge` (`customerId`, `amountCents`, `billedCents`); evaluate `controllerPing` diagnostic key, `currency == \"USD\"` reference comparison, and fixed `100L` retry charge via Stakeholder Decision Log before Phase 3 changes.\nConfirmed Non-Goals:\n  - No microservice split or Kafka/RabbitMQ event bus introduction in this migration wave (keep single deployable Maven artifact).\n",
+      "brief_file": null,
+      "migration_strategy": "phased_pr",
+      "api_compatibility": "strict",
+      "bug_handling_policy": "ask_human",
+      "codemod_tool": "openrewrite",
+      "output_dir": "docs/reports/java_api_spring_messy_migration",
+      "target": "java_api_spring_messy_migration",
+      "plan_path": ""
+    },
+    "transformation_mode": "architectural_restructure",
+    "resolved_strategy": "phased_pr",
+    "preflight_hints": [],
+    "refactoring_waves": [
+      {
+        "wave": 1,
+        "label": "Wave 1: Leaf Models, Value Objects & Pure Utilities",
+        "modules": [
+          "examples/java/api_spring_messy/src/main/java/com/example/billing/model/InvoiceRecord.java",
+          "examples/java/api_spring_messy/src/main/java/com/example/billing/util/LegacyDateHelper.java"
+        ],
+        "rationale": "Zero internal dependencies and zero external I/O; safe to migrate/type first as Domain core."
+      },
+      {
+        "wave": 2,
+        "label": "Wave 2: Outbound Infrastructure & Gateway/DB Clients",
+        "modules": [
+          "examples/java/api_spring_messy/src/main/java/com/example/billing/client/GatewayClient.java"
+        ],
+        "rationale": "Depends only on Wave 1 leaves; prime candidates for Outbound Port & Adapter extraction."
+      },
+      {
+        "wave": 3,
+        "label": "Wave 3: Strongly Connected Components (Cycle Cut Targets)",
+        "modules": [
+          "examples/java/api_spring_messy/src/main/java/com/example/billing/controller/BillingController.java",
+          "examples/java/api_spring_messy/src/main/java/com/example/billing/service/BillingManager.java"
+        ],
+        "rationale": "Bidirectional circular dependencies that must be severed before layered/Clean Arch isolation."
+      },
+      {
+        "wave": 4,
+        "label": "Wave 4: Application Orchestrators, Controllers & Entrypoints",
+        "modules": [
+          "examples/java/api_spring_messy/src/main/java/com/example/billing/BillingApp.java"
+        ],
+        "rationale": "Top-level inbound adapters and boot entrypoints wired after Domain, Ports, and Adapters exist."
+      }
+    ],
+    "cycle_cuts": [
+      {
+        "cycle_modules": [
+          "examples/java/api_spring_messy/src/main/java/com/example/billing/controller/BillingController.java",
+          "examples/java/api_spring_messy/src/main/java/com/example/billing/service/BillingManager.java"
+        ],
+        "recommended_cut_from": "examples/java/api_spring_messy/src/main/java/com/example/billing/service/BillingManager.java",
+        "recommended_cut_to": "examples/java/api_spring_messy/src/main/java/com/example/billing/controller/BillingController.java",
+        "rationale": "Break upward/cyclic back-reference `examples/java/api_spring_messy/src/main/java/com/example/billing/service/BillingManager.java -> examples/java/api_spring_messy/src/main/java/com/example/billing/controller/BillingController.java` by passing required scalar/DTO inputs explicitly or inverting dependency via a Port interface."
+      }
+    ],
+    "implicit_contracts": [
+      {
+        "endpoint_or_file": "/charge",
+        "http_method": "ANY",
+        "handler": "BillingController.chargeCustomer",
+        "input_fields": [
+          {
+            "key": "customerId",
+            "direction": "input",
+            "inferred_type": "string",
+            "default_value": "anon",
+            "file": "examples/java/api_spring_messy/src/main/java/com/example/billing/controller/BillingController.java",
+            "line": 26
+          },
+          {
+            "key": "amountCents",
+            "direction": "input",
+            "inferred_type": "integer",
+            "default_value": "500",
+            "file": "examples/java/api_spring_messy/src/main/java/com/example/billing/controller/BillingController.java",
+            "line": 27
+          }
+        ],
+        "output_fields": [
+          {
+            "key": "controllerPing",
+            "direction": "output",
+            "inferred_type": "string",
+            "default_value": null,
+            "file": "examples/java/api_spring_messy/src/main/java/com/example/billing/service/BillingManager.java",
+            "line": 81
+          },
+          {
+            "key": "customerId",
+            "direction": "output",
+            "inferred_type": "string",
+            "default_value": null,
+            "file": "examples/java/api_spring_messy/src/main/java/com/example/billing/service/BillingManager.java",
+            "line": 86
+          },
+          {
+            "key": "billedCents",
+            "direction": "output",
+            "inferred_type": "integer",
+            "default_value": null,
+            "file": "examples/java/api_spring_messy/src/main/java/com/example/billing/service/BillingManager.java",
+            "line": 87
+          }
+        ]
+      }
+    ],
+    "env_contracts": [
+      {
+        "name": "LEGACY_PAYMENT_URL",
+        "default_value": "https://billing.example.invalid/charge",
+        "file": "examples/java/api_spring_messy/src/main/java/com/example/billing/client/GatewayClient.java",
+        "line": 16,
+        "kind": "env"
+      }
+    ],
+    "boundary_touchpoints": [
+      {
+        "kind": "in_memory_state",
+        "file": "examples/java/api_spring_messy/src/main/java/com/example/billing/controller/BillingController.java",
+        "line": 20,
+        "symbol": "channel",
+        "current_coupling": "Mutable instance field `channel` on singleton Spring bean",
+        "recommended_port_hint": "Convert bean to stateless; pass request-scoped context or externalize state to Redis/DB"
+      },
+      {
+        "kind": "in_memory_state",
+        "file": "examples/java/api_spring_messy/src/main/java/com/example/billing/service/BillingManager.java",
+        "line": 17,
+        "symbol": "INVOICE_CACHE",
+        "current_coupling": "Process-local static mutable collection (INVOICE_CACHE)",
+        "recommended_port_hint": "Externalize into Cache/State Port (e.g. Redis / Caffeine Adapter with explicit TTL)"
+      },
+      {
+        "kind": "persistence_db",
+        "file": "examples/java/api_spring_messy/src/main/java/com/example/billing/service/BillingManager.java",
+        "line": 91,
+        "symbol": "@Transactional",
+        "current_coupling": "@Transactional persistence boundary without dedicated Repository Port",
+        "recommended_port_hint": "Extract Repository Port interface and move transaction/JPA/JDBC logic to Outbound Persistence Adapter"
+      },
+      {
+        "kind": "external_http_rpc",
+        "file": "examples/java/api_spring_messy/src/main/java/com/example/billing/client/GatewayClient.java",
+        "line": 22,
+        "symbol": "HttpClient.newHttpClient",
+        "current_coupling": "Direct outbound HTTP client invocation (HttpClient.newHttpClient)",
+        "recommended_port_hint": "Abstract behind Outbound Gateway Port with explicit connect/read timeout Adapter"
+      }
+    ],
+    "mechanical_codemods": [
+      {
+        "tool": "openrewrite",
+        "recipe_id": "org.openrewrite.java.migrate.UpgradeToJava21",
+        "title": "Upgrade Java Compiler Target & Standard Library Idioms to Java 21 LTS",
+        "applicable_files_count": 6,
+        "rationale": "Automates Java 8->21 POM properties, diamond operators, and deprecated JDK API replacements."
+      },
+      {
+        "tool": "openrewrite",
+        "recipe_id": "org.openrewrite.java.spring.boot3.UpgradeSpringBoot_3_4",
+        "title": "Migrate Spring Boot 2.x (javax.*) to Spring Boot 3.4 (jakarta.*) & Constructor DI",
+        "applicable_files_count": 6,
+        "rationale": "Rewrites javax.servlet/persistence imports to jakarta.* and updates Spring Boot starters."
+      },
+      {
+        "tool": "openrewrite",
+        "recipe_id": "org.openrewrite.java.testing.junit5.JUnit4to5Migration",
+        "title": "Migrate JUnit 4 @Test / Assertions to JUnit 5 Jupiter",
+        "applicable_files_count": 1,
+        "rationale": "Converts org.junit.Test and Assert.* calls to org.junit.jupiter.api.* deterministically."
+      }
+    ],
+    "manual_blockers": [
+      {
+        "blocker_id": "BLK-01",
+        "severity": "critical",
+        "file": "examples/java/api_spring_messy/src/main/java/com/example/billing/client/GatewayClient.java",
+        "line": 4,
+        "description": "Java 11+ 'java.net.http' API imported while declared target is Java 1.8",
+        "resolution_hint": "Align build manifest compiler target/toolchain in Phase 0 so baseline build & OpenRewrite/Rector AST parsers can compile the project."
+      },
+      {
+        "blocker_id": "BLK-02",
+        "severity": "high",
+        "file": "com.example.billing.controller.BillingController",
+        "line": null,
+        "description": "Bidirectional circular dependency across modules: com.example.billing.controller.BillingController <-> com.example.billing.service.BillingManager <-> com.example.billing.controller.BillingController",
+        "resolution_hint": "Break back-edge in Phase 1 before extracting Clean Architecture / domain layers."
+      },
+      {
+        "blocker_id": "BLK-03",
+        "severity": "medium",
+        "file": "examples/java/api_spring_messy/src/main/java/com/example/billing/service/BillingManager.java",
+        "line": 12,
+        "description": "Undeclared or dev-scoped import `org.springframework.transaction.annotation.Transactional`: Spring transaction API imported without 'spring-tx' or data/jdbc starter in manifest",
+        "resolution_hint": "Declare explicit runtime dependency or remove stray import before upgrade."
+      }
+    ],
+    "spec_vs_bug_candidates": [
+      {
+        "candidate_id": "DEC-01",
+        "file": "examples/java/api_spring_messy/src/main/java/com/example/billing/client/GatewayClient.java",
+        "line": 20,
+        "symbol": "System.out",
+        "observed_behavior": "Direct console output via System.out; use structured logger (SLF4J)",
+        "risk_if_changed_silently": "Fixing bug-risk idiom (e.g. Java `==` string reference comparison, swallowed exception, or `extract($_POST)`) alters runtime branch/error behavior(Hyrum's Law).",
+        "options": [
+          "Option A (Recommended): Lock current behavior in Phase 0 characterization test, obtain Product Owner sign-off, and apply fix in dedicated Phase 3 PR.",
+          "Option B: Preserve exact legacy behavior behind feature flag during initial cutover."
+        ]
+      },
+      {
+        "candidate_id": "DEC-02",
+        "file": "examples/java/api_spring_messy/src/main/java/com/example/billing/service/BillingManager.java",
+        "line": 83,
+        "symbol": "e",
+        "observed_behavior": "Empty catch block silently swallows exception",
+        "risk_if_changed_silently": "Fixing bug-risk idiom (e.g. Java `==` string reference comparison, swallowed exception, or `extract($_POST)`) alters runtime branch/error behavior(Hyrum's Law).",
+        "options": [
+          "Option A (Recommended): Lock current behavior in Phase 0 characterization test, obtain Product Owner sign-off, and apply fix in dedicated Phase 3 PR.",
+          "Option B: Preserve exact legacy behavior behind feature flag during initial cutover."
+        ]
+      },
+      {
+        "candidate_id": "DEC-03",
+        "file": "examples/java/api_spring_messy/src/main/java/com/example/billing/service/BillingManager.java",
+        "line": 52,
+        "symbol": "status == \"PAID\"",
+        "observed_behavior": "Reference equality (== / !=) with String literal; use .equals()",
+        "risk_if_changed_silently": "Fixing bug-risk idiom (e.g. Java `==` string reference comparison, swallowed exception, or `extract($_POST)`) alters runtime branch/error behavior(Hyrum's Law).",
+        "options": [
+          "Option A (Recommended): Lock current behavior in Phase 0 characterization test, obtain Product Owner sign-off, and apply fix in dedicated Phase 3 PR.",
+          "Option B: Preserve exact legacy behavior behind feature flag during initial cutover."
+        ]
+      },
+      {
+        "candidate_id": "DEC-04",
+        "file": "examples/java/api_spring_messy/src/main/java/com/example/billing/service/BillingManager.java",
+        "line": 55,
+        "symbol": "currency == \"USD\"",
+        "observed_behavior": "Reference equality (== / !=) with String literal; use .equals()",
+        "risk_if_changed_silently": "Fixing bug-risk idiom (e.g. Java `==` string reference comparison, swallowed exception, or `extract($_POST)`) alters runtime branch/error behavior(Hyrum's Law).",
+        "options": [
+          "Option A (Recommended): Lock current behavior in Phase 0 characterization test, obtain Product Owner sign-off, and apply fix in dedicated Phase 3 PR.",
+          "Option B: Preserve exact legacy behavior behind feature flag during initial cutover."
+        ]
+      },
+      {
+        "candidate_id": "DEC-05",
+        "file": "examples/java/api_spring_messy/src/main/java/com/example/billing/service/BillingManager.java",
+        "line": 57,
+        "symbol": "currency == \"JPY\"",
+        "observed_behavior": "Reference equality (== / !=) with String literal; use .equals()",
+        "risk_if_changed_silently": "Fixing bug-risk idiom (e.g. Java `==` string reference comparison, swallowed exception, or `extract($_POST)`) alters runtime branch/error behavior(Hyrum's Law).",
+        "options": [
+          "Option A (Recommended): Lock current behavior in Phase 0 characterization test, obtain Product Owner sign-off, and apply fix in dedicated Phase 3 PR.",
+          "Option B: Preserve exact legacy behavior behind feature flag during initial cutover."
+        ]
+      },
+      {
+        "candidate_id": "DEC-06",
+        "file": "examples/java/api_spring_messy/src/main/java/com/example/billing/service/BillingManager.java",
+        "line": 53,
+        "symbol": "System.out",
+        "observed_behavior": "Direct console output via System.out; use structured logger (SLF4J)",
+        "risk_if_changed_silently": "Fixing bug-risk idiom (e.g. Java `==` string reference comparison, swallowed exception, or `extract($_POST)`) alters runtime branch/error behavior(Hyrum's Law).",
+        "options": [
+          "Option A (Recommended): Lock current behavior in Phase 0 characterization test, obtain Product Owner sign-off, and apply fix in dedicated Phase 3 PR.",
+          "Option B: Preserve exact legacy behavior behind feature flag during initial cutover."
+        ]
+      },
+      {
+        "candidate_id": "DEC-07",
+        "file": "examples/java/api_spring_messy/src/main/java/com/example/billing/service/BillingManager.java",
+        "line": 93,
+        "symbol": "System.out",
+        "observed_behavior": "Direct console output via System.out; use structured logger (SLF4J)",
+        "risk_if_changed_silently": "Fixing bug-risk idiom (e.g. Java `==` string reference comparison, swallowed exception, or `extract($_POST)`) alters runtime branch/error behavior(Hyrum's Law).",
+        "options": [
+          "Option A (Recommended): Lock current behavior in Phase 0 characterization test, obtain Product Owner sign-off, and apply fix in dedicated Phase 3 PR.",
+          "Option B: Preserve exact legacy behavior behind feature flag during initial cutover."
+        ]
+      },
+      {
+        "candidate_id": "DEC-08",
+        "file": "examples/java/api_spring_messy/src/main/java/com/example/billing/service/BillingManager.java",
+        "line": 67,
+        "symbol": "sendCharge",
+        "observed_behavior": "Non-positive invoice retry path charges fixed literal `100L` instead of invoice amount.",
+        "risk_if_changed_silently": "Downstream settlement or minimum-authorization verification flows may rely on this fixed authorization probe amount.",
+        "options": [
+          "Option A (Recommended): Preserve in Phase 0-2 characterization tests; confirm with Billing Product Owner before changing in Phase 3.",
+          "Option B: Treat as intentional authorization probe and extract named domain policy."
+        ]
+      },
+      {
+        "candidate_id": "DEC-09",
+        "file": "examples/java/api_spring_messy/src/main/java/com/example/billing/service/BillingManager.java",
+        "line": 81,
+        "symbol": "controllerPing",
+        "observed_behavior": "Response payload conditionally includes internal diagnostic key `controllerPing`.",
+        "risk_if_changed_silently": "Removing internal diagnostic field when severing controller back-reference may break strict schema consumers if they read this key.",
+        "options": [
+          "Option A (Recommended): Populate `controllerPing` from request metadata passed into UseCase DTO if strict compatibility is required, or deprecate after client audit.",
+          "Option B: Drop `controllerPing` once external consumers confirm unused."
+        ]
+      }
+    ]
+  },
+  "execution_dag": {
+    "workflow_id": "java_api_spring_messy_migration",
+    "category": "migration",
+    "scope": "repo",
+    "nodes": [
+      {
+        "stage_id": "confirm_plan",
+        "label": "Confirm Audit Plan & Execution DAG",
+        "mode": "ASK",
+        "status": "completed",
+        "needs": [],
+        "rules_count": 0,
+        "highlight": "Plan approved",
+        "skip_reason": ""
+      },
+      {
+        "stage_id": "migration_intelligence_and_plan",
+        "label": "Migration Proposal",
+        "mode": "HYBRID",
+        "status": "completed",
+        "needs": [
+          "confirm_plan"
+        ],
+        "rules_count": 1,
+        "highlight": "7 axes, 8 PRs, 4 decisions",
+        "skip_reason": ""
+      },
+      {
+        "stage_id": "compile_migration_report",
+        "label": "Author & Compile Drawlib Migration Execution Plan...",
+        "mode": "AI",
+        "status": "pending",
+        "needs": [
+          "migration_intelligence_and_plan"
+        ],
+        "rules_count": 0,
+        "highlight": "A4 Drawlib PDF report synthesis",
+        "skip_reason": ""
+      }
+    ],
+    "audit_scope": {
+      "target_root": "examples/java/api_spring_messy",
+      "source_targets": [
+        "src/main/java"
+      ],
+      "test_targets": [
+        "src/test/java"
+      ],
+      "doc_targets": [
+        "README.md"
+      ],
+      "exclude_globs": [],
+      "language": "java",
+      "companion_languages": [],
+      "detected_frameworks": [
+        "spring-boot",
+        "spring-framework",
+        "javax-ee",
+        "junit4"
+      ],
+      "git_branch": "main",
+      "git_sha": "d1e02277",
+      "git_dirty": true,
+      "tools_used": [
+        "project_inspect (java)",
+        "tree-sitter AST (java)",
+        "container runtime harness (docker: java/maven.dockerfile)",
+        "Trivy (docker: fs)",
+        "web_pentest (httpx, 0 probes)",
+        "migration_analyze (import DAG + boundary AST + codemods)"
+      ],
+      "artifact_manifest": {
+        "migration_plan_json": "docs/reports/java_api_spring_messy_migration/java_api_spring_messy_migration_plan.json",
+        "migration_facts_json": "docs_src/reports/java_api_spring_messy_migration/_facts/migration_facts.json",
+        "plan_json": "docs_src/reports/java_api_spring_messy_migration/_facts/plan.json",
+        "based_on_audit_score": "pni_report/java_api_spring_messy_score.json"
+      }
+    }
+  }
+}

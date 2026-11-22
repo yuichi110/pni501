@@ -37,14 +37,17 @@ steps:
   - id: output_score
     uses: emit_score
     with:
-      output_dir: "reports/python"
-      target: "lib_clean"
+      output_dir: "docs/reports/py_lib_clean"
+      target: "py_lib_clean"
 
   - id: create_report
     uses: write_drawlib_report
     with:
-      src_dir: "reports_src/python"
-      output_dir: "reports/python"
-      target: "lib_clean"
-      lang: "ja"
+      src_dir: "docs_src/reports/py_lib_clean"
+      output_dir: "docs/reports/py_lib_clean"
+      target: "py_lib_clean"
+      lang: "en,ja"
       style: "google"
+      formats:
+        - "pdf"
+        - "html"

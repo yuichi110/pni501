@@ -1,0 +1,448 @@
+{
+  "$schema": "https://json.schemastore.org/sarif-2.1.0.json",
+  "version": "2.1.0",
+  "runs": [
+    {
+      "tool": {
+        "driver": {
+          "name": "PNI501",
+          "version": "2.0.0",
+          "informationUri": "https://github.com/yuichi110/pni501",
+          "rules": [
+            {
+              "id": "CVE-2022-22965",
+              "name": "CVE_2022_22965",
+              "shortDescription": {
+                "text": "Core runtime dependency vulnerability CVE-2022-22965: spring-framework: RCE via Data Binding on JDK 9+"
+              },
+              "defaultConfiguration": {
+                "level": "error"
+              }
+            },
+            {
+              "id": "common/architecture",
+              "name": "common_architecture",
+              "shortDescription": {
+                "text": "BillingManager injects BillingController (circularController) via field @Autowired creating a runtime cycle, and stores unbounded request state in static raw Ma"
+              },
+              "defaultConfiguration": {
+                "level": "error"
+              }
+            },
+            {
+              "id": "common/documentation",
+              "name": "common_documentation",
+              "shortDescription": {
+                "text": "README documentation is missing or minimal (< 10 lines)."
+              },
+              "defaultConfiguration": {
+                "level": "warning"
+              }
+            },
+            {
+              "id": "common/maintainability",
+              "name": "common_maintainability",
+              "shortDescription": {
+                "text": "High cyclomatic complexity or length in `processBatchBilling` (length=57 lines, branches=13, cognitive=56)."
+              },
+              "defaultConfiguration": {
+                "level": "warning"
+              }
+            },
+            {
+              "id": "common/security",
+              "name": "common_security",
+              "shortDescription": {
+                "text": "Potential hardcoded secret detected in `examples/java/api_spring_messy/src/main/java/com/example/billing/client/GatewayClient.java:13`."
+              },
+              "defaultConfiguration": {
+                "level": "error"
+              }
+            },
+            {
+              "id": "common/security_vulnerability",
+              "name": "common_security_vulnerability",
+              "shortDescription": {
+                "text": "Trivy reports CRITICAL CVE-2022-22965 (Spring4Shell) against spring-boot-starter-web@LATEST (is_unpinned_specifier=True: static SCA evaluates full historical CV"
+              },
+              "defaultConfiguration": {
+                "level": "error"
+              }
+            },
+            {
+              "id": "common/supply_chain",
+              "name": "common_supply_chain",
+              "shortDescription": {
+                "text": ".github/workflows/build.yml triggers on pull_request_target without an explicit permissions block and uses mutable actions/checkout@main, creating a high-severi"
+              },
+              "defaultConfiguration": {
+                "level": "error"
+              }
+            },
+            {
+              "id": "java/testing",
+              "name": "java_testing",
+              "shortDescription": {
+                "text": "BillingManagerTest.testSmokeRun only instantiates InvoiceRecord and calls getAmountCents() without any assertEquals/assertThrows or coverage of BillingManager, "
+              },
+              "defaultConfiguration": {
+                "level": "error"
+              }
+            }
+          ]
+        }
+      },
+      "results": [
+        {
+          "ruleId": "common/supply_chain",
+          "level": "error",
+          "message": {
+            "text": ".github/workflows/build.yml triggers on pull_request_target without an explicit permissions block and uses mutable actions/checkout@main, creating a high-severity CI token/supply-chain risk. — Recommendation: Switch trigger to pull_request, add explicit permissions: { contents: read }, and pin actions/checkout to a full commit SHA."
+          },
+          "properties": {
+            "severity": "critical",
+            "rule_ids": [
+              "common/supply_chain"
+            ],
+            "categories": [
+              "security"
+            ]
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": ".github/workflows/build.yml"
+                },
+                "region": {
+                  "startLine": 1
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "common/security",
+          "level": "error",
+          "message": {
+            "text": "Potential hardcoded secret detected in `examples/java/api_spring_messy/src/main/java/com/example/billing/client/GatewayClient.java:13`. — Recommendation: Move secrets to environment variables or a secret manager and rotate exposed keys."
+          },
+          "properties": {
+            "severity": "critical",
+            "rule_ids": [
+              "common/security"
+            ],
+            "categories": [
+              "security"
+            ]
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "examples/java/api_spring_messy/src/main/java/com/example/billing/client/GatewayClient.java"
+                },
+                "region": {
+                  "startLine": 13
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "common/security_vulnerability",
+          "level": "error",
+          "message": {
+            "text": "Trivy reports CRITICAL CVE-2022-22965 (Spring4Shell) against spring-boot-starter-web@LATEST (is_unpinned_specifier=True: static SCA evaluates full historical CVE range until locked, while live Maven attempts Spring Boot 4.2.0 and fails compilation). — Recommendation: Pin an explicit patched Spring Boot 3.4.x BOM release in pom.xml and commit Maven Wrapper (mvnw) so both builds and SCA evaluate deterministic artifacts. / Pin Spring Boot 3.4.x BOM with Java 21 LTS in pom.xml, add eclipse-temurin:21 Dockerfile, and verify clean offline mvn test + JaCoCo execution. / Upgrade to Java 21 LTS and Spring Boot 3.4 BOM (Jakarta EE 10, JUnit 5 Jupiter), pin all coordinates deterministically, and commit mvnw."
+          },
+          "properties": {
+            "severity": "critical",
+            "rule_ids": [
+              "common/security_vulnerability",
+              "common/runtime_verification",
+              "java/dependencies"
+            ],
+            "categories": [
+              "security",
+              "testing",
+              "dependencies"
+            ]
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "pom.xml"
+                },
+                "region": {
+                  "startLine": 1
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "common/security",
+          "level": "error",
+          "message": {
+            "text": "GatewayClient.GATEWAY_SECRET embeds a hardcoded live-style secret token literal directly in source code. — Recommendation: Remove the literal immediately, rotate the credential, and inject it via Spring @ConfigurationProperties backed by a secret manager or environment variable. / Upgrade toolchain to Java 21, configure Spring RestClient/HttpClient with explicit timeouts and @ConfigurationProperties, sort imports without wildcards, and adopt SLF4J."
+          },
+          "properties": {
+            "severity": "critical",
+            "rule_ids": [
+              "common/security",
+              "java/modern_stack"
+            ],
+            "categories": [
+              "security",
+              "code_quality"
+            ]
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "src/main/java/com/example/billing/client/GatewayClient.java"
+                },
+                "region": {
+                  "startLine": 1
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "CVE-2022-22965",
+          "level": "error",
+          "message": {
+            "text": "Core runtime dependency vulnerability CVE-2022-22965: spring-framework: RCE via Data Binding on JDK 9+ — Recommendation: Upgrade `org.springframework.boot:spring-boot-starter-web` to `2.5.12, 2.6.6`."
+          },
+          "properties": {
+            "severity": "critical",
+            "rule_ids": [
+              "CVE-2022-22965"
+            ],
+            "categories": [
+              "security"
+            ]
+          }
+        },
+        {
+          "ruleId": "common/supply_chain",
+          "level": "error",
+          "message": {
+            "text": "Dockerfile builds from deprecated/mutable openjdk:latest, copies entire workspace without .dockerignore, and runs as root. — Recommendation: Adopt a multi-stage eclipse-temurin:21-jdk / 21-jre-alpine image with a dedicated non-root USER and .dockerignore."
+          },
+          "properties": {
+            "severity": "high",
+            "rule_ids": [
+              "common/supply_chain"
+            ],
+            "categories": [
+              "security"
+            ]
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "Dockerfile"
+                },
+                "region": {
+                  "startLine": 1
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "common/security_vulnerability",
+          "level": "error",
+          "message": {
+            "text": "Pentest suite (.pni/pentests/examples/java/api_spring_messy) could not execute against BillingController.chargeCustomer (ANY /charge) because container build failed compiling spring-boot-4.2.0.jar under Java 8. — Recommendation: Restore deterministic Java 21 + Spring Boot 3.4 buildability first, then re-run web_pentest to verify authentication, method restrictions, and HTTP security headers on POST /charge. / Remove mutable field 'channel', restrict to @PostMapping('/charge') with a typed @Valid ChargeRequest Java record, and add authentication/authorization."
+          },
+          "properties": {
+            "severity": "high",
+            "rule_ids": [
+              "common/security_vulnerability",
+              "java/frameworks/spring_boot"
+            ],
+            "categories": [
+              "security"
+            ]
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "src/main/java/com/example/billing/controller/BillingController.java"
+                },
+                "region": {
+                  "startLine": 1
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "common/architecture",
+          "level": "error",
+          "message": {
+            "text": "BillingManager injects BillingController (circularController) via field @Autowired creating a runtime cycle, and stores unbounded request state in static raw Map INVOICE_CACHE. — Recommendation: Remove circularController upward dependency, adopt constructor injection across Controller/Service/Client, and externalize INVOICE_CACHE to Redis or a typed repository. / Decompose processBatchBilling with a typed command record, fix String equality to .equals()/enum (confirming behavior via Stakeholder Decision Log), log/propagate exceptions via SLF4J, and move transactional persistence to a dedicated repository bean."
+          },
+          "properties": {
+            "severity": "high",
+            "rule_ids": [
+              "common/architecture",
+              "java/code_quality"
+            ],
+            "categories": [
+              "architecture",
+              "code_quality"
+            ]
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "src/main/java/com/example/billing/service/BillingManager.java"
+                },
+                "region": {
+                  "startLine": 1
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "java/testing",
+          "level": "error",
+          "message": {
+            "text": "BillingManagerTest.testSmokeRun only instantiates InvoiceRecord and calls getAmountCents() without any assertEquals/assertThrows or coverage of BillingManager, BillingController, or GatewayClient. — Recommendation: Migrate to JUnit 5 Jupiter + Mockito + MockMvc characterization tests covering POST /charge, tax calculation, retry flows, and gateway error paths with >=80% JaCoCo line coverage."
+          },
+          "properties": {
+            "severity": "high",
+            "rule_ids": [
+              "java/testing"
+            ],
+            "categories": [
+              "testing"
+            ]
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "src/test/java/com/example/billing/BillingManagerTest.java"
+                },
+                "region": {
+                  "startLine": 1
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "common/architecture",
+          "level": "error",
+          "message": {
+            "text": "Runtime circular dependency detected: com.example.billing.controller.BillingController -> com.example.billing.service.BillingManager -> com.example.billing.controller.BillingController. — Recommendation: Break the cycle by extracting shared interfaces/models into a lower layer."
+          },
+          "properties": {
+            "severity": "high",
+            "rule_ids": [
+              "common/architecture"
+            ],
+            "categories": [
+              "architecture"
+            ]
+          }
+        },
+        {
+          "ruleId": "common/maintainability",
+          "level": "warning",
+          "message": {
+            "text": "High cyclomatic complexity or length in `processBatchBilling` (length=57 lines, branches=13, cognitive=56). — Recommendation: Decompose into cohesive helper functions with clear single responsibilities."
+          },
+          "properties": {
+            "severity": "medium",
+            "rule_ids": [
+              "common/maintainability"
+            ],
+            "categories": [
+              "code_quality"
+            ]
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "examples/java/api_spring_messy/src/main/java/com/example/billing/service/BillingManager.java"
+                },
+                "region": {
+                  "startLine": 33
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "common/documentation",
+          "level": "warning",
+          "message": {
+            "text": "README documentation is missing or minimal (< 10 lines). — Recommendation: Document architecture overview, setup instructions, and usage in README.md."
+          },
+          "properties": {
+            "severity": "medium",
+            "rule_ids": [
+              "common/documentation"
+            ],
+            "categories": [
+              "documentation"
+            ]
+          }
+        },
+        {
+          "ruleId": "common/supply_chain",
+          "level": "warning",
+          "message": {
+            "text": "No dependency lockfile found despite declared dependencies. — Recommendation: Commit a deterministic lockfile (e.g. uv.lock, package-lock.json, Cargo.lock)."
+          },
+          "properties": {
+            "severity": "medium",
+            "rule_ids": [
+              "common/supply_chain"
+            ],
+            "categories": [
+              "dependencies"
+            ]
+          }
+        },
+        {
+          "ruleId": "common/supply_chain",
+          "level": "note",
+          "message": {
+            "text": "1 dependency specifiers lack upper/exact bounds. — Recommendation: Pin dependency versions or enforce lockfile-based reproducible builds."
+          },
+          "properties": {
+            "severity": "low",
+            "rule_ids": [
+              "common/supply_chain"
+            ],
+            "categories": [
+              "dependencies"
+            ]
+          }
+        }
+      ],
+      "properties": {
+        "project_name": "legacy-billing",
+        "workflow_id": "java_api_spring_messy",
+        "workflow_run_id": "wf-8177454c",
+        "language": "java",
+        "overall_score": 66,
+        "grade": "C"
+      }
+    }
+  ]
+}

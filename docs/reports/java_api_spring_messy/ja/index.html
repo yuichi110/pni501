@@ -1,0 +1,1228 @@
+<!--
+ Copyright (c) 2026 Yuichi Ito (yuichi@yuichi.com)
+
+ This software is licensed under the Apache License, Version 2.0.
+ For more information, please visit: https://github.com/yuichi110/drawlib
+
+ This software is provided "as is", without warranty of any kind,
+ express or implied, including but not limited to the warranties of
+ merchantability, fitness for a particular purpose and noninfringement.
+-->
+<!DOCTYPE html>
+<html lang="ja" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PNI ソフトウェア健全性診断レポート: `legacy-billing`</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+    
+    
+    <link rel="alternate" hreflang="en" href="../en/index.html">
+    
+    <link rel="alternate" hreflang="ja" href="index.html">
+    
+    <link rel="alternate" hreflang="x-default" href="../index.html">
+    
+    
+    
+    
+    <link rel="icon" type="image/png" href="../_assets/favicon.png">
+    
+    
+    <link rel="stylesheet" href="style.css">
+    
+    
+</head>
+<body class="doc-body">
+    <main class="main-container">
+        
+        <div class="doc-topbar">
+            <div class="lang-switcher">
+                <details class="lang-dropdown">
+                    <summary class="lang-dropdown-btn" aria-label="Select language">
+                        <svg class="lang-globe-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+                        <span class="lang-current-label">日本語</span>
+                        <svg class="lang-caret-icon" viewBox="0 0 24 24" aria-hidden="true"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                    </summary>
+                    <div class="lang-dropdown-menu" role="menu">
+                        
+                        <a href="../en/index.html" class="lang-option" lang="en" hreflang="en" >
+                            <span>English</span>
+                            
+                        </a>
+                        
+                        <a href="index.html" class="lang-option active" lang="ja" hreflang="ja" aria-current="page">
+                            <span>日本語</span>
+                            
+                            <svg class="lang-check-icon" viewBox="0 0 24 24" aria-hidden="true"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                            
+                        </a>
+                        
+                    </div>
+                </details>
+            </div>
+        </div>
+        
+        <section id="chapter-1-00_cover" class="doc-chapter pdf-chapter">
+<h1>PNI ソフトウェア健全性診断レポート: <code>legacy-billing</code></h1>
+<p><strong>監査対象リポジトリ</strong>: <code>examples/java/api_spring_messy</code> (<code>java_api_spring_messy</code>)<br />
+<strong>言語・技術スタック</strong>: Java 1.8（宣言値） / Spring Boot Web Starter (<code>LATEST</code>) / <code>javax.servlet-api</code> 4.0.1 / JUnit 4.13.2 / Maven</p>
+<figure class="drawlib-image" style="text-align: center;">
+  <img src="../images/00_cover/cover_scorecard.png" alt="00_cover_1" />
+  <figcaption class="drawlib-caption">legacy-billing の PNI501 ソフトウェア健全性診断スコアカード（グレード C・66/100）</figcaption>
+</figure>
+<hr />
+<h2>監査メタデータ・証跡プロベナンス</h2>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">項目</th>
+<th style="text-align:left">値</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left"><strong>プロジェクト名</strong></td>
+<td style="text-align:left"><code>legacy-billing</code> (<code>com.example:legacy-billing:0.0.1-SNAPSHOT</code>)</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>対象ルート</strong></td>
+<td style="text-align:left"><code>examples/java/api_spring_messy</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>主言語・規模</strong></td>
+<td style="text-align:left"><code>java</code>（Maven、本番コード 6 ファイル / 187 LOC、テスト 1 ファイル）</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>ワークフロー ID・スコープ</strong></td>
+<td style="text-align:left"><code>java_api_spring_messy</code>（<code>category=audit</code>, <code>scope=repo</code>）</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>実行 ID (<code>Run ID</code>)</strong></td>
+<td style="text-align:left"><code>wf-8177454c</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>評価日時 (UTC)</strong></td>
+<td style="text-align:left"><code>2026-11-22T11:29:02.337544+00:00</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>Git リビジョン</strong></td>
+<td style="text-align:left"><code>main@d1e02277 (dirty)</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>総合スコア・グレード</strong></td>
+<td style="text-align:left"><strong>66 / 100（グレード C）</strong> <em>（決定論的ベースライン: 76、AI 定性調整: -10）</em></td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>ルール準拠率</strong></td>
+<td style="text-align:left"><code>0 / 16</code> ルール合格（<code>15 FAIL</code>、<code>1 WARN</code>、<code>0 PASS</code>）</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>検出事項サマリー</strong></td>
+<td style="text-align:left">計 <code>19</code> 件（決定論的 <code>7</code> 件・AI 定性 <code>12</code> 件）／統合済み <code>14</code> 箇所（<code>CRITICAL 6</code>、<code>HIGH 8</code>、<code>MEDIUM 4</code>、<code>LOW 1</code>）</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>後続連携計画</strong></td>
+<td style="text-align:left">Clean Architecture 移行実行計画 <code>java_api_spring_messy_migration</code> へ直接連携</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p><strong>監査範囲と機密保護について</strong>: 本レポートは、PNI501 Workflow v2 の下で実行された決定論的 AST 解析（<code>tree-sitter</code>）、マニフェスト診断、コンテナ化された Maven/Docker ビルド・ランタイム検証、Trivy ファイルシステム SCA/IaC スキャン、および動的 HTTP ペネトレーション検証準備の結果を統合したものです。ソースコード上で検出された認証情報リテラルはすべて <code>&lt;REDACTED_SECRET&gt;</code> としてマスク済みです。</p>
+</blockquote>
+
+</section>
+
+<nav class="doc-toc pdf-toc">
+  <h2>目次</h2>
+  <ul>
+    <li><a href="#chapter-2-01_executive_summary">1. エグゼクティブサマリー</a></li>
+    <li><a href="#chapter-3-02_architecture_and_structure">2. アーキテクチャとソースコード構造</a></li>
+    <li><a href="#chapter-4-03_remediation_roadmap">3. 推奨改善ロードマップ</a></li>
+    <li><a href="#chapter-5-04_standards_and_findings">4. 監査パイプライン（DAG）・評価基準・検出事項一覧</a></li>
+    <li><a href="#chapter-6-05_code_and_runtime_analysis">5. 詳細分析: コード品質・テスト・ランタイム検証</a></li>
+    <li><a href="#chapter-7-06_security_and_supply_chain">6. 詳細分析: セキュリティ・サプライチェーン・API 攻撃面</a></li>
+  </ul>
+</nav>
+
+<section id="chapter-2-01_executive_summary" class="doc-chapter pdf-chapter">
+<h1>1. エグゼクティブサマリー</h1>
+<p><code>legacy-billing</code>（<code>examples/java/api_spring_messy</code>）の総合スコアは <strong>66/100（グレード C）</strong>、ルール合格率は <strong><code>0/16</code>（<code>15 FAIL</code>・<code>1 WARN</code>）</strong> であり、決定論的 AST ベースライン <strong>76/100</strong> に対して全 7 軸で <code>-10pt</code> の定性減点が適用されました。実 Docker ランタイム検証・tree-sitter AST 解析・Trivy SCA の横断検証により、<strong><code>pom.xml</code> の未固定指定 <code>spring-boot-starter-web:LATEST</code> が Java 1.8 ビルドを即座にクラッシュさせると同時に CRITICAL な Spring4Shell 静的範囲アラートを発火し、JaCoCo カバレッジ計測および動的 HTTP ペネトレーションテスト（DAST）を連鎖的にブロックしている</strong>という明確な因果鎖が実証されました。</p>
+<figure class="drawlib-image" style="text-align: center;">
+  <img src="../images/01_executive_summary/exec_7axis_radar.png" alt="01_executive_summary_1" />
+  <figcaption class="drawlib-caption">7軸エンジニアリング健全性レーダー（決定論的ベースライン vs. 最終監査スコア）と主要 KPI</figcaption>
+</figure>
+<hr />
+<h2>AST × Docker × Trivy が実証した根本原因チェーン</h2>
+<p>本監査で最も重要な発見は、ビルド不能・検証不能・深刻なサプライチェーン脆弱性がすべて同一の未固定マニフェストおよび廃止コンテナ基盤に起因している点です。</p>
+<ol>
+<li><strong>未固定マニフェスト（<code>pom.xml</code>）</strong>: <code>org.springframework.boot:spring-boot-starter-web</code> に <code>&lt;version&gt;LATEST&lt;/version&gt;</code> を指定したまま、EOL の Java <code>1.8</code>（バイトコード <code>52.0</code>）をターゲットとしており、Maven Wrapper（<code>mvnw</code>）も未整備です。</li>
+<li><strong>実コンパイラクラッシュ（<code>harness_build</code>）</strong>: コンテナ化ビルド検証（<code>java/maven.dockerfile</code>, <code>JAVA_VERSION=8</code>）において Maven は動的に <code>spring-boot-4.2.0.jar</code>（<code>SpringApplication.class</code>、JDK 17+ 向けバイトコード <code>61.0</code>）を取得し、<code>class file has wrong version 61.0, should be 52.0</code> で即座に失敗しました。同時にプロジェクト <code>Dockerfile</code> も、Docker Hub から廃止された <code>docker.io/library/openjdk:latest</code> の取得失敗（<code>not found</code>）により <code>1.21s</code> で失敗しました。</li>
+<li><strong>検証ゲートの連鎖ブロックと静的 SCA 露出</strong>: ビルド失敗により、オフライン JUnit 実行（<code>0/0</code> 件）、JaCoCo カバレッジ計測（<code>N/A</code>）、Spring Boot 起動スモーク確認（<code>blocked</code>）、動的 Web ペネトレーションテスト（<code>web_pentest</code>, <code>0/0</code> プローブ）が全面的にブロックされました。一方で Trivy ファイルシステム SCA は未固定の <code>LATEST</code> 指定子を全過去バージョン範囲として評価（<code>is_unpinned_specifier=True</code>）し、<strong>CRITICAL <code>CVE-2022-22965</code></strong>（Spring4Shell, CVSS 9.8）を検出しました。</li>
+<li><strong>ソースコード内の集中ホットスポット</strong>: 187 LOC のコードベース内部では、<code>BillingManager.java</code>（<code>BillingController</code> との循環依存、<code>cognitive=56</code>、引数 8 個、静的 <code>INVOICE_CACHE</code>、<code>String ==</code> バグ、空 <code>catch</code>、無効な <code>private @Transactional</code>）、<code>GatewayClient.java</code>（ハードコードされた <code>GATEWAY_SECRET</code> <code>&lt;REDACTED_SECRET&gt;</code>、Java 1.8 上での Java 11 <code>java.net.http</code> 不整合、HTTP タイムアウト欠如）、<code>BillingController.java</code>（可変シングルトン <code>channel</code> の競合状態、未認証 <code>ANY /charge</code>）の 3 クラスに負債が集中しています。</li>
+</ol>
+<figure class="drawlib-image" style="text-align: center;">
+  <img src="../images/01_executive_summary/exec_causal_chain_risks.png" alt="01_executive_summary_2" />
+  <figcaption class="drawlib-caption">AST × Docker × Trivy 障害因果チェーン（上段）および強み vs. 最優先リスク（下段）</figcaption>
+</figure>
+<hr />
+<h2>エグゼクティブ・スコアカード総括</h2>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">検証ゲート</th>
+<th style="text-align:left">判定</th>
+<th style="text-align:left">主な観測証跡</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left"><strong>総合健全性スコア</strong></td>
+<td style="text-align:left"><strong>66 / 100（グレード C）</strong></td>
+<td style="text-align:left">7 軸スコア: <code>architecture=80</code>, <code>code_quality=86</code>, <code>typing=77</code>, <code>testing=51</code>, <code>dependencies=72</code>, <code>security=50</code>, <code>documentation=44</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>最低スコア監査ステップ</strong></td>
+<td style="text-align:left"><strong>10 – 15 / 100（グレード D）</strong></td>
+<td style="text-align:left"><code>container_runtime_audit=10 (D)</code>, <code>supply_chain_audit=15 (D)</code>, <code>java_test_audit=15 (D)</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>コンテナランタイム (<code>RV-01..04</code>)</strong></td>
+<td style="text-align:left"><strong><code>failed</code></strong></td>
+<td style="text-align:left"><code>build=failed</code>, <code>tests=0/0 (blocked)</code>, <code>line_cov=N/A</code>, <code>smoke=blocked (web_api)</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>Trivy SCA &amp; IaC (<code>SEC-01..03</code>)</strong></td>
+<td style="text-align:left"><strong><code>failed</code></strong></td>
+<td style="text-align:left"><code>app_cves=1</code>（<code>CRITICAL=1</code>, <code>HIGH=0</code>）、Dockerfile 設定不備 <code>3</code> 件（<code>HIGH=1</code>, <code>MED=1</code>, <code>LOW=1</code>）、Trivy シークレット <code>0</code> 件（AST ハードコード秘密鍵 <code>1</code> 件）</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>動的 Web ペネトレーション (<code>SEC-06</code>)</strong></td>
+<td style="text-align:left"><strong><code>error</code>（ブロック）</strong></td>
+<td style="text-align:left"><code>probes=0/0</code> 合格、<code>findings=0</code>。スイートは <code>.pni/pentests/examples/java/api_spring_messy</code> に生成済みだが、対象コンテナビルド失敗により未実行</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>承認済み監査スコープ</strong></td>
+<td style="text-align:left"><strong>リポジトリ全体</strong></td>
+<td style="text-align:left"><code>--auto-approve</code>（<code>plan_gate=false</code>）にて自動承認。本番 6 ファイル（<code>src/main/java</code>）、テスト 1 ファイル（<code>src/test/java</code>）、<code>README.md</code></td>
+</tr>
+</tbody>
+</table>
+
+</section>
+
+<section id="chapter-3-02_architecture_and_structure" class="doc-chapter pdf-chapter">
+<h1>2. アーキテクチャとソースコード構造</h1>
+<p><code>legacy-billing</code> は、本番 Java コード 6 ファイル（<code>187 LOC</code>）と JUnit 4 スモークテスト 1 ファイルから成る**「共有可変グローバル／シングルトン状態を抱える循環型レガシー Spring Boot レイヤードモノリス」**です。<code>InvoiceRecord.java</code> にはクリーンな不変 DTO パターンが存在する一方、中核の課金処理と HTTP 受付層は実行時循環依存（<code>BillingController &lt;-&gt; BillingManager</code>）およびスレッド非安全な共有状態に陥っています。</p>
+<figure class="drawlib-image" style="text-align: center;">
+  <img src="../images/02_architecture_and_structure/arch_module_tree.png" alt="02_architecture_and_structure_1" />
+  <figcaption class="drawlib-caption">物理リポジトリのディレクトリ構成（左）と検出された 5 層モノリス構造および境界違反（右）</figcaption>
+</figure>
+<hr />
+<h2>システムプロファイルとソースモジュール棚卸し</h2>
+<ul>
+<li><strong>ランタイム種別とスタック</strong>: <code>web_api</code>。<code>pom.xml</code> は Java <code>1.8</code> を宣言（<code>GatewayClient.java</code> の Java 11 <code>java.net.http</code> と矛盾）、未固定 <code>spring-boot-starter-web:LATEST</code>、<code>javax.servlet-api:4.0.1</code>、<code>junit:4.13.2</code>、およびラッパー（<code>mvnw</code>）なしの Maven 構成。</li>
+<li><strong>外部連携</strong>: 実行時に <code>System.getenv(&quot;LEGACY_PAYMENT_URL&quot;)</code>（既定値 <code>https://billing.example.invalid/charge</code>）を参照して外部決済ゲートウェイへ HTTP <code>POST</code> 送信。</li>
+<li><strong>エントリポイント</strong>: <code>src/main/java/com/example/billing/BillingApp.java:main</code> および <code>src/main/java/com/example/billing/controller/BillingController.java:chargeCustomer</code>。</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">ソースファイル</th>
+<th style="text-align:center">LOC</th>
+<th style="text-align:left">レイヤー</th>
+<th style="text-align:left">公開型</th>
+<th style="text-align:left">公開メソッド／コンストラクタ</th>
+<th style="text-align:left">健全性評価</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left"><code>src/main/java/com/example/billing/BillingApp.java</code></td>
+<td style="text-align:center">9</td>
+<td style="text-align:left">Bootstrap</td>
+<td style="text-align:left"><code>BillingApp</code></td>
+<td style="text-align:left"><code>main</code></td>
+<td style="text-align:left">簡潔な Spring Boot 起動クラス（クラス Javadoc のみ欠落）</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>src/main/java/com/example/billing/controller/BillingController.java</code></td>
+<td style="text-align:center">38</td>
+<td style="text-align:left">Controller</td>
+<td style="text-align:left"><code>BillingController</code></td>
+<td style="text-align:left"><code>chargeCustomer</code>, <code>lastChannel</code></td>
+<td style="text-align:left">循環依存、可変シングルトン <code>channel</code>、生 <code>Map</code>、未認証 <code>ANY /charge</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>src/main/java/com/example/billing/service/BillingManager.java</code></td>
+<td style="text-align:center">78</td>
+<td style="text-align:left">Service</td>
+<td style="text-align:left"><code>BillingManager</code></td>
+<td style="text-align:left"><code>processBatchBilling</code></td>
+<td style="text-align:left">最大コードホットスポット: 上向き循環依存、<code>cognitive=56</code>、引数 8 個、静的 <code>INVOICE_CACHE</code>、<code>String ==</code>、空 catch</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>src/main/java/com/example/billing/client/GatewayClient.java</code></td>
+<td style="text-align:center">32</td>
+<td style="text-align:left">External Client</td>
+<td style="text-align:left"><code>GatewayClient</code></td>
+<td style="text-align:left"><code>sendCharge</code></td>
+<td style="text-align:left">ハードコード <code>&lt;REDACTED_SECRET&gt;</code>、Java 1.8 上での Java 11 <code>HttpClient</code>、タイムアウト欠如、<code>System.getenv</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>src/main/java/com/example/billing/model/InvoiceRecord.java</code></td>
+<td style="text-align:center">15</td>
+<td style="text-align:left">Model &amp; Utility</td>
+<td style="text-align:left"><code>InvoiceRecord</code></td>
+<td style="text-align:left"><code>InvoiceRecord</code>, <code>getAmountCents</code>, <code>getInvoiceId</code></td>
+<td style="text-align:left"><strong>リポジトリ内で最も健全なモジュール</strong>: 不変 DTO、完全 Javadoc、AST 違反 0 件</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>src/main/java/com/example/billing/util/LegacyDateHelper.java</code></td>
+<td style="text-align:center">15</td>
+<td style="text-align:left">Model &amp; Utility</td>
+<td style="text-align:left"><code>LegacyDateHelper</code></td>
+<td style="text-align:left"><code>collectAuditTags</code>, <code>formatTimestamp</code></td>
+<td style="text-align:left">非推奨 <code>SimpleDateFormat</code>・<code>java.util.Date</code>・生 <code>Vector</code> を使用、Javadoc 欠落</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2>循環依存とサーマル・リスク・ホットスポット分析</h2>
+<p>以下のクラス依存関係図＋サーマルヒートマップは、リスクが集中するホットスポット（<code>GatewayClient</code> <code>0.70</code>、<code>BillingManager</code> <code>0.56</code>、<code>BillingController</code> <code>0.56</code>）と、クリーンな不変ベースライン（<code>InvoiceRecord</code> <code>0.06</code>）の対比を可視化したものです。<code>BillingManager</code> から <code>BillingController</code> へ向かう赤色の上向き依存（<code>circularController</code>）が、Spring Boot 2.6+ / 3.x で既定禁止される DI 循環を引き起こしています。</p>
+<figure class="drawlib-image" style="text-align: center;">
+  <img src="../images/02_architecture_and_structure/arch_class_heatmap.png" alt="02_architecture_and_structure_2" />
+  <figcaption class="drawlib-caption">UML クラス依存構造とサーマル・リスク・オーバーレイ（ホットスポット BillingManager / Controller / GatewayClient とクリーンな InvoiceRecord の対比）</figcaption>
+</figure>
+<h3>事前ソート済みモジュール・リスク・ホットスポット一覧</h3>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">ファイルパス</th>
+<th style="text-align:center">LOC</th>
+<th style="text-align:center">リスクスコア</th>
+<th style="text-align:left">重要度別検出数</th>
+<th style="text-align:left">該当ルール</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left"><code>pom.xml</code></td>
+<td style="text-align:center">—</td>
+<td style="text-align:center"><strong><code>1.00</code></strong></td>
+<td style="text-align:left"><code>2 CRIT</code>, <code>1 HIGH</code></td>
+<td style="text-align:left"><code>common/security_vulnerability</code>, <code>common/runtime_verification</code>, <code>java/dependencies</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>examples/java/api_spring_messy/src/main/java/com/example/billing/client/GatewayClient.java</code></td>
+<td style="text-align:center">32</td>
+<td style="text-align:center"><strong><code>0.70</code></strong></td>
+<td style="text-align:left"><code>1 CRIT</code></td>
+<td style="text-align:left"><code>common/security</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>src/main/java/com/example/billing/client/GatewayClient.java</code></td>
+<td style="text-align:center">—</td>
+<td style="text-align:center"><strong><code>0.60</code></strong></td>
+<td style="text-align:left"><code>1 CRIT</code>, <code>1 MED</code></td>
+<td style="text-align:left"><code>common/security</code>, <code>java/modern_stack</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>Dockerfile</code></td>
+<td style="text-align:center">—</td>
+<td style="text-align:center"><strong><code>0.58</code></strong></td>
+<td style="text-align:left"><code>1 HIGH</code></td>
+<td style="text-align:left"><code>common/supply_chain</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>src/main/java/com/example/billing/controller/BillingController.java</code></td>
+<td style="text-align:center">—</td>
+<td style="text-align:center"><strong><code>0.56</code></strong></td>
+<td style="text-align:left"><code>2 HIGH</code></td>
+<td style="text-align:left"><code>common/security_vulnerability</code>, <code>java/frameworks/spring_boot</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>src/main/java/com/example/billing/service/BillingManager.java</code></td>
+<td style="text-align:center">—</td>
+<td style="text-align:center"><strong><code>0.56</code></strong></td>
+<td style="text-align:left"><code>2 HIGH</code></td>
+<td style="text-align:left"><code>common/architecture</code>, <code>java/code_quality</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>.github/workflows/build.yml</code></td>
+<td style="text-align:center">—</td>
+<td style="text-align:center"><strong><code>0.45</code></strong></td>
+<td style="text-align:left"><code>1 CRIT</code></td>
+<td style="text-align:left"><code>common/supply_chain</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>examples/java/api_spring_messy/src/main/java/com/example/billing/service/BillingManager.java</code></td>
+<td style="text-align:center">78</td>
+<td style="text-align:center"><strong><code>0.41</code></strong></td>
+<td style="text-align:left"><code>1 MED</code></td>
+<td style="text-align:left"><code>common/maintainability</code></td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2><code>/charge</code> 実行フローと並行性・エラーモデル</h2>
+<p><code>/charge</code> への各 HTTP リクエストは、共有可変状態への競合と無音例外握りつぶしを伴う 4 段階の処理を通過します。</p>
+<figure class="drawlib-image" style="text-align: center;">
+  <img src="../images/02_architecture_and_structure/arch_charge_flow.png" alt="02_architecture_and_structure_3" />
+  <figcaption class="drawlib-caption">顧客課金・バッチ請求処理の実行フロー（トリガー: 制限なしの HTTP ANY /charge）</figcaption>
+</figure>
+<h3>状態管理・境界違反・並行性評価</h3>
+<ul>
+<li><strong>深刻な境界違反</strong>: <code>BillingManager</code> が <code>BillingController</code> を import し <code>@Autowired</code> フィールド注入（<code>circularController</code>, 23 行目）しているため、<code>lastChannel()</code> 参照のためだけに実行時循環（<code>BillingController -&gt; BillingManager -&gt; BillingController</code>）が発生しています。</li>
+<li><strong>共有可変状態</strong>:
+<ul>
+<li><code>BillingManager.INVOICE_CACHE</code>（<code>src/main/java/com/example/billing/service/BillingManager.java:17</code>）: 同期化・サイズ上限なしのプロセス内静的生 <code>HashMap</code>。</li>
+<li><code>BillingController.channel</code>（<code>src/main/java/com/example/billing/controller/BillingController.java:20</code>）: HTTP リクエストごとに <code>servletRequest.getMethod()</code> で上書きされる可変シングルトンフィールド。</li>
+</ul>
+</li>
+<li><strong>エラー・並行性モデル</strong>: 複数リクエストが同時到着する Servlet コンテナ環境では <code>BillingController.channel</code> と <code>INVOICE_CACHE</code> でデータ競合が発生します。さらに <code>BillingManager</code> は空の <code>catch (Exception e) {}</code>（83 行目）で監査・キャッシュ例外を無音で握りつぶし、<code>GatewayClient</code> はタイムアウト未設定の <code>HttpClient.newHttpClient()</code> でワーカースレッドを無期限ブロックしつつ標準エラーへ <code>printStackTrace()</code> を出力します。</li>
+</ul>
+
+</section>
+
+<section id="chapter-4-03_remediation_roadmap" class="doc-chapter pdf-chapter">
+<h1>3. 推奨改善ロードマップ</h1>
+<p><code>legacy-billing</code> の改善計画は、<strong>全 11 件の優先度付きアクション（<code>P0: 5 件</code>、<code>P1: 5 件</code>、<code>P2: 1 件</code>）</strong> に段階化されています。まず最優先の <code>P0</code> で Java 21 / Spring Boot 3.4 の決定論的ビルド復旧・重大セキュリティ除去・DI 循環解消を達成し、続く <code>P1</code> で JUnit 5 特性テストによる安全網を構築した上でリファクタリングおよび DAST 再検証を実施します。</p>
+<figure class="drawlib-image" style="text-align: center;">
+  <img src="../images/03_remediation_roadmap/remediation_roadmap.png" alt="03_remediation_roadmap_1" />
+  <figcaption class="drawlib-caption">段階的改善ロードマップ（P0 -> P1 -> P2）および後続移行計画 java_api_spring_messy_migration への連携</figcaption>
+</figure>
+<hr />
+<h2>改善対象ドメイン分布とフェーズ完了基準</h2>
+<p>全 11 件のバックログのうち <strong>55%（6 件）</strong> をセキュリティおよび依存関係安定化が占めており、すべての <code>P0</code> 項目が Maven/Docker コンパイル復旧（<code>RV-01</code>）、重大な SCA/シークレット解消（<code>SEC-01..03</code>）、または Spring Boot 3.x 起動要件（循環依存の排除）の直接のブロッカーとなっています。</p>
+<figure class="drawlib-image" style="text-align: center;">
+  <img src="../images/03_remediation_roadmap/remediation_priority_breakdown.png" alt="03_remediation_roadmap_2" />
+  <figcaption class="drawlib-caption">対象ドメイン別の改善アクション分布（左）とフェーズ別完了基準（右）</figcaption>
+</figure>
+<hr />
+<h2>アクションプラン・トレーサビリティマトリクス（<code>P0 -&gt; P1 -&gt; P2</code>）</h2>
+<p>下表は <code>java_api_spring_messy_score.json</code> の事前ソート順（<code>P0 -&gt; P1 -&gt; P2</code> 全 11 件）を厳密に保持し、対象ファイル・期待効果・関連ルール／CVE を対応付けたものです。</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:center">#</th>
+<th style="text-align:center">優先度</th>
+<th style="text-align:left">カテゴリ</th>
+<th style="text-align:left">アクション内容</th>
+<th style="text-align:left">対象ファイル</th>
+<th style="text-align:left">期待効果</th>
+<th style="text-align:left">関連ルール / CVE</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">1</td>
+<td style="text-align:center"><strong><code>P0</code></strong></td>
+<td style="text-align:left"><code>architecture</code></td>
+<td style="text-align:left"><strong><code>BillingController&lt;-&gt;BillingManager</code> 循環解消と可変シングルトン／静的状態の排除</strong>: <code>circularController</code> と <code>BillingController.channel</code> を削除し、コンストラクタ注入へ移行するとともに <code>INVOICE_CACHE</code> を外部化する。</td>
+<td style="text-align:left"><code>src/main/java/com/example/billing/controller/BillingController.java</code>, <code>src/main/java/com/example/billing/service/BillingManager.java</code></td>
+<td style="text-align:left">Spring DI 循環依存および並列リクエスト間のデータ競合を解消。</td>
+<td style="text-align:left"><code>common/architecture</code>, <code>java/frameworks/spring_boot</code></td>
+</tr>
+<tr>
+<td style="text-align:center">2</td>
+<td style="text-align:center"><strong><code>P0</code></strong></td>
+<td style="text-align:left"><code>dependencies</code></td>
+<td style="text-align:left"><strong>Java 21 LTS + Spring Boot 3.4 BOM + <code>eclipse-temurin:21</code> 固定による Maven / Docker ビルド復旧</strong>: Java 1.8 と <code>spring-boot-starter-web:LATEST</code> を Java 21 + 固定版 Spring Boot 3.4.x 親 POM/BOM へ置換し、廃止された <code>openjdk:latest</code> を <code>eclipse-temurin:21-jdk/jre</code> へ移行する。</td>
+<td style="text-align:left"><code>pom.xml</code>, <code>Dockerfile</code></td>
+<td style="text-align:left">決定論的コンパイル、JaCoCo カバレッジ計測、起動検証を復旧。</td>
+<td style="text-align:left"><code>common/runtime_verification</code>, <code>java/dependencies</code></td>
+</tr>
+<tr>
+<td style="text-align:center">3</td>
+<td style="text-align:center"><strong><code>P0</code></strong></td>
+<td style="text-align:left"><code>security</code></td>
+<td style="text-align:left"><strong>GitHub Actions CI トリガーと root <code>Dockerfile</code> の堅牢化</strong>: <code>pull_request_target</code> を <code>pull_request</code> + 最小権限 <code>permissions:</code> + SHA 固定アクションへ置換し、<code>Dockerfile</code> を非 root <code>eclipse-temurin:21-jre</code> と <code>.dockerignore</code> 構成へ移行する。</td>
+<td style="text-align:left"><code>.github/workflows/build.yml</code>, <code>Dockerfile</code></td>
+<td style="text-align:left">CI トークン奪取および可変 root コンテナ露出リスクを解消。</td>
+<td style="text-align:left"><code>common/supply_chain</code>, <code>common/security</code></td>
+</tr>
+<tr>
+<td style="text-align:center">4</td>
+<td style="text-align:center"><strong><code>P0</code></strong></td>
+<td style="text-align:left"><code>security</code></td>
+<td style="text-align:left"><strong>Spring Boot 3.4.x BOM 固定と <code>Dockerfile</code> root/<code>:latest</code> 設定不備の解消</strong>: 親 POM/BOM により Spring Boot 3.4.x を固定して <code>CVE-2022-22965</code> 範囲一致を解消し、<code>Dockerfile</code> の <code>DS-0001</code>・<code>DS-0002</code>・<code>DS-0026</code> を是正する。</td>
+<td style="text-align:left"><code>pom.xml</code>, <code>Dockerfile</code></td>
+<td style="text-align:left">CRITICAL の未固定 SCA 露出と HIGH の root コンテナ設定不備を解消。</td>
+<td style="text-align:left"><code>common/security_vulnerability</code>, <code>SEC-01</code>, <code>SEC-02</code>, <code>CVE-2022-22965</code></td>
+</tr>
+<tr>
+<td style="text-align:center">5</td>
+<td style="text-align:center"><strong><code>P0</code></strong></td>
+<td style="text-align:left"><code>security</code></td>
+<td style="text-align:left"><strong>ハードコードされた <code>GATEWAY_SECRET</code> の削除と <code>@ConfigurationProperties</code> 注入</strong>: 13 行目の定数を削除し認証情報をローテーションした上で、外部環境変数／Vault から <code>@ConfigurationProperties</code> 経由で注入する。</td>
+<td style="text-align:left"><code>src/main/java/com/example/billing/client/GatewayClient.java</code></td>
+<td style="text-align:left">ソースコード管理上の CRITICAL 認証情報漏えいを解消。</td>
+<td style="text-align:left"><code>common/security</code>, <code>common/supply_chain</code></td>
+</tr>
+<tr>
+<td style="text-align:center">6</td>
+<td style="text-align:center"><strong><code>P1</code></strong></td>
+<td style="text-align:left"><code>code_quality</code></td>
+<td style="text-align:left"><strong><code>RestClient</code> タイムアウト、<code>@ConfigurationProperties</code>、SLF4J ログ、Actuator <code>/healthz</code> の導入</strong>: <code>System.getenv</code> と <code>HttpClient.newHttpClient()</code> をタイムアウト付き <code>RestClient</code> へ置換し、<code>System.out</code>/<code>printStackTrace</code>・空 catch を SLF4J へ統一し、Actuator ヘルスプローブを有効化する。</td>
+<td style="text-align:left"><code>src/main/java/com/example/billing/client/GatewayClient.java</code>, <code>src/main/java/com/example/billing/service/BillingManager.java</code></td>
+<td style="text-align:left">外部ゲートウェイ応答遅延時のスレッド枯渇を防ぎ 12-Factor 可観測性を回復。</td>
+<td style="text-align:left"><code>common/twelve_factor</code>, <code>common/production_readiness</code></td>
+</tr>
+<tr>
+<td style="text-align:center">7</td>
+<td style="text-align:center"><strong><code>P1</code></strong></td>
+<td style="text-align:left"><code>code_quality</code></td>
+<td style="text-align:left"><strong><code>processBatchBilling</code> 分割、<code>String ==</code>・空 catch・<code>private @Transactional</code> 修正、レガシー <code>Date</code>/<code>Vector</code> 置換</strong>: 生 <code>Map</code>/<code>List</code> を型付き Java <code>record</code> DTO へ置換し、<code>processBatchBilling</code> を分割（<code>cognitive &lt;=15</code>, <code>params &lt;=6</code>）、<code>.equals()</code> と SLF4J、および <code>java.time</code>/<code>List</code> を適用する。</td>
+<td style="text-align:left"><code>src/main/java/com/example/billing/service/BillingManager.java</code>, <code>src/main/java/com/example/billing/util/LegacyDateHelper.java</code></td>
+<td style="text-align:left">バグ混入リスクを大幅に低減し、型安全性と可読性を回復。</td>
+<td style="text-align:left"><code>common/maintainability</code>, <code>java/code_quality</code>, <code>java/typing</code>, <code>java/modern_stack</code></td>
+</tr>
+<tr>
+<td style="text-align:center">8</td>
+<td style="text-align:center"><strong><code>P1</code></strong></td>
+<td style="text-align:left"><code>dependencies</code></td>
+<td style="text-align:left"><strong>Maven ビルドの Java 21 LTS・Spring Boot 3.4 BOM・<code>mvnw</code> 刷新</strong>: <code>pom.xml</code> を Java 1.8 / <code>LATEST</code> / <code>javax</code> / JUnit 4 から Java 21 LTS + Spring Boot 3.4 BOM + JUnit 5 へ移行し、<code>mvnw</code> をコミットする。</td>
+<td style="text-align:left"><code>pom.xml</code></td>
+<td style="text-align:left">再現可能なビルドと長期サポート（LTS）セキュリティ更新基盤を確立。</td>
+<td style="text-align:left"><code>java/dependencies</code>, <code>common/supply_chain</code></td>
+</tr>
+<tr>
+<td style="text-align:center">9</td>
+<td style="text-align:center"><strong><code>P1</code></strong></td>
+<td style="text-align:left"><code>security</code></td>
+<td style="text-align:left"><strong>Java 21 + Spring Boot 3.4 コンテナ復旧後の <code>web_pentest</code> 再実行</strong>: <code>pom.xml</code> と <code>Dockerfile</code> のビルド復旧後、<code>.pni/pentests/examples/java/api_spring_messy</code> を実行し、POST 限定・入力検証・セキュリティヘッダーを動的検証する。</td>
+<td style="text-align:left"><code>pom.xml</code>, <code>src/main/java/com/example/billing/controller/BillingController.java</code></td>
+<td style="text-align:left">継続的な動的セキュリティ検証（<code>SEC-06</code>）を復旧。</td>
+<td style="text-align:left"><code>common/security_vulnerability</code>, <code>SEC-06</code></td>
+</tr>
+<tr>
+<td style="text-align:center">10</td>
+<td style="text-align:center"><strong><code>P1</code></strong></td>
+<td style="text-align:left"><code>testing</code></td>
+<td style="text-align:left"><strong>アサーションなし JUnit 4 スモークテストを JUnit 5 + <code>MockMvc</code> 特性テスト群へ刷新</strong>: リファクタリング着手前に JUnit 5 Jupiter へ移行し、<code>BillingController</code>・<code>BillingManager</code>・<code>GatewayClient</code> に対する実アサーション付き特性テストを追加する。</td>
+<td style="text-align:left"><code>src/test/java/com/example/billing/BillingManagerTest.java</code></td>
+<td style="text-align:left">Java 21 / Clean Architecture 移行の安全網を構築しカバレッジ <code>&gt;=80%</code> を達成。</td>
+<td style="text-align:left"><code>java/testing</code></td>
+</tr>
+<tr>
+<td style="text-align:center">11</td>
+<td style="text-align:center"><strong><code>P2</code></strong></td>
+<td style="text-align:left"><code>documentation</code></td>
+<td style="text-align:left"><strong><code>README.md</code> 拡充とリポジトリ基本ガバナンスファイルの追加</strong>: セットアップ・環境変数・API エンドポイント・テスト実行手順を <code>README.md</code> に整備し、<code>LICENSE</code>・<code>SECURITY.md</code>・<code>.gitignore</code> を追加する。</td>
+<td style="text-align:left"><code>README.md</code></td>
+<td style="text-align:left">オンボーディング品質とリポジトリガバナンス準拠を向上。</td>
+<td style="text-align:left"><code>common/documentation</code>, <code>common/git_workflow</code></td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2>後続マイグレーション計画（<code>java_api_spring_messy_migration</code>）への接続</h2>
+<p>本診断ロードマップは、Clean Architecture 移行実行計画 <strong><code>java_api_spring_messy_migration</code></strong> へ以下の 3 ウェーブ構成で直接引き継がれます。</p>
+<ol>
+<li><strong>Wave 1（安定化とバージョン固定 — アクション #2, #3, #4, #5）</strong>: Java 21 LTS + Spring Boot 3.4.x BOM + <code>mvnw</code> の固定、<code>.github/workflows/build.yml</code> および <code>Dockerfile</code> の堅牢化、<code>GATEWAY_SECRET</code> の外部化を実施。</li>
+<li><strong>Wave 2（安全網と仕様合意 — アクション #10, #7）</strong>: JUnit 5 + <code>MockMvc</code> 特性テストを確立し、<code>String ==</code> 税率分岐（<code>PAID</code>, <code>USD</code>, <code>JPY</code>）の仕様変更についてステークホルダー合意ログ（Stakeholder Decision Log）で確認。</li>
+<li><strong>Wave 3（Clean Architecture 移行と PRR — アクション #1, #6, #7, #8, #9, #11）</strong>: <code>BillingController &lt;-&gt; BillingManager</code> 循環の解消、Java <code>record</code> DTO とリポジトリ／ゲートウェイポートの抽出、<code>@PostMapping(&quot;/charge&quot;)</code> + <code>@Valid</code> + 認証の導入、<code>web_pentest</code> と JaCoCo（<code>&gt;=80%</code>）の実測検証、ガバナンス文書整備を完了。</li>
+</ol>
+
+</section>
+
+<section id="chapter-5-04_standards_and_findings" class="doc-chapter pdf-chapter">
+<h1>4. 監査パイプライン（DAG）・評価基準・検出事項一覧</h1>
+<p>本章では本監査の完全な透明性と再現性を担保するため、アクションレベルの<strong>実行済み監査パイプライン DAG</strong>、検査対象スコープと決定論的ツール一覧、<strong>7 軸の決定論的ベースライン vs. AI 定性調整（<code>±10pt</code>）テーブル</strong>、弱点順の監査ステップ別スコア、全 16 ルールの準拠マトリクス（<code>FAIL -&gt; WARN</code>）、重複排除済みの箇所別検出事項一覧、および機械可読アーティファクト参照一覧を提示します。</p>
+<figure class="drawlib-image" style="text-align: center;">
+  <img src="../images/04_standards_and_findings/audit_pipeline_dag.png" alt="04_standards_and_findings_1" />
+  <figcaption class="drawlib-caption">実行済み PNI Workflow v2 監査パイプライン DAG（9 論理ステージ、ASK / HYBRID / AI モードバッジおよび障害ハイライト）</figcaption>
+</figure>
+<hr />
+<h2>検査スコープおよび実行済み決定論的ツール</h2>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">スコープ項目</th>
+<th style="text-align:left">記録された監査構成・実行実績</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left"><strong>対象ルート・パス</strong></td>
+<td style="text-align:left">ルート: <code>examples/java/api_spring_messy</code> | ソース: <code>['src/main/java']</code> | テスト: <code>['src/test/java']</code> | ドキュメント: <code>['README.md']</code> | 除外: <code>['none']</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>言語・フレームワーク</strong></td>
+<td style="text-align:left">主言語: <code>java</code> | 補助言語: <code>['none']</code> | 検出フレームワーク: <code>spring-boot</code>, <code>spring-framework</code>, <code>javax-ee</code>, <code>junit4</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>リポジトリ証跡</strong></td>
+<td style="text-align:left">Git ブランチ・コミット: <code>main@d1e02277 (dirty)</code> | 実行 ID: <code>wf-8177454c</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>実行済み決定論的ツール</strong></td>
+<td style="text-align:left"><code>project_inspect (java)</code>、<code>tree-sitter AST (java)</code>、<code>container runtime harness (docker: java/maven.dockerfile)</code>、<code>Trivy (docker: fs, ghcr.io/aquasecurity/trivy:0.69.3)</code>、<code>web_pentest (httpx, 0 probes — ビルド失敗によりブロック)</code></td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2>7 軸の決定論的ベースライン vs. AI 定性調整（<code>±10pt</code>）</h2>
+<p>PNI Workflow v2 では、すべての評価軸を決定論的ツール由来のベースラインスコアにアンカー固定した上で、上限 <code>±10pt</code> の AI 定性調整を適用します。<code>legacy-billing</code> ではビルド不能・循環依存・セキュリティ欠陥が静的指標以上に複合悪化しているため、全 7 軸で最大減点 <code>-10pt</code> が適用され、総合スコアは <strong>76 -&gt; 66（グレード C）</strong> となりました。</p>
+<figure class="drawlib-image" style="text-align: center;">
+  <img src="../images/04_standards_and_findings/baseline_vs_final_comparison.png" alt="04_standards_and_findings_2" />
+  <figcaption class="drawlib-caption">7 軸の決定論的 AST ベースラインと上限 -10pt の AI 定性調整後スコアの比較</figcaption>
+</figure>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">評価軸</th>
+<th style="text-align:center">決定論的ベースライン</th>
+<th style="text-align:center">AI 調整 (<code>±10pt</code>)</th>
+<th style="text-align:center">最終スコア</th>
+<th style="text-align:left">定性調整の根拠</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left"><strong>アーキテクチャ (<code>Architecture</code>)</strong></td>
+<td style="text-align:center"><code>90</code></td>
+<td style="text-align:center"><strong><code>-10</code></strong></td>
+<td style="text-align:center"><strong><code>80</code></strong></td>
+<td style="text-align:left"><code>BillingController &lt;-&gt; BillingManager</code> 実行時循環依存、<code>@Autowired</code> フィールド注入、可変シングルトン <code>BillingController.channel</code>、プロセス内静的 <code>HashMap INVOICE_CACHE</code>。</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>コード品質 (<code>Code Quality</code>)</strong></td>
+<td style="text-align:center"><code>96</code></td>
+<td style="text-align:center"><strong><code>-10</code></strong></td>
+<td style="text-align:center"><strong><code>86</code></strong></td>
+<td style="text-align:left"><code>BillingManager.processBatchBilling</code> 巨大メソッド（<code>cognitive=56</code>, 引数 8 個, 57 LOC）、<code>String ==</code> 参照比較バグ 3 箇所、空 <code>catch</code>、無効な <code>private @Transactional</code> 自己呼び出し、<code>System.out</code>/<code>printStackTrace</code> 4 箇所。</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>型安全性 (<code>Typing</code>)</strong></td>
+<td style="text-align:center"><code>87</code></td>
+<td style="text-align:center"><strong><code>-10</code></strong></td>
+<td style="text-align:center"><strong><code>77</code></strong></td>
+<td style="text-align:left"><code>BillingController</code> / <code>BillingManager</code> の生 <code>Map</code>/<code>List</code> ジェネリクス、未型付け <code>Object</code> 引数（<code>traceHint</code>, <code>extraContext</code>）、<code>@SuppressWarnings(&quot;unchecked&quot;)</code>、Java 1.8 上での Java 11 <code>java.net.http</code> 不整合。</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>テスト (<code>Testing</code>)</strong></td>
+<td style="text-align:center"><code>61</code></td>
+<td style="text-align:center"><strong><code>-10</code></strong></td>
+<td style="text-align:center"><strong><code>51</code></strong></td>
+<td style="text-align:left">唯一の JUnit 4 テスト（<code>BillingManagerTest.testSmokeRun</code>）がアサーションなし、静的モジュール網羅率 <code>33.3%</code>、Java 8 vs. Spring Boot 4.2.0 ビルド失敗により Maven/JaCoCo 実行が完全ブロック。</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>依存関係 (<code>Dependencies</code>)</strong></td>
+<td style="text-align:center"><code>82</code></td>
+<td style="text-align:center"><strong><code>-10</code></strong></td>
+<td style="text-align:center"><strong><code>72</code></strong></td>
+<td style="text-align:left">未固定 <code>spring-boot-starter-web:LATEST</code>（Spring Boot 4.2.0 バイトコード <code>61.0</code> を取得し Java 1.8 ビルドを破壊）、EOL <code>javax.servlet</code>/JUnit 4、<code>mvnw</code> および Dependabot 欠如。</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>セキュリティ (<code>Security</code>)</strong></td>
+<td style="text-align:center"><code>60</code></td>
+<td style="text-align:center"><strong><code>-10</code></strong></td>
+<td style="text-align:center"><strong><code>50</code></strong></td>
+<td style="text-align:left">ハードコード <code>GATEWAY_SECRET</code>（<code>&lt;REDACTED_SECRET&gt;</code>）、特権 <code>pull_request_target</code> + <code>actions/checkout@main</code> CI、root <code>openjdk:latest</code> Dockerfile（<code>DS-0001</code>/<code>DS-0002</code>/<code>DS-0026</code>）、未固定 CRITICAL <code>CVE-2022-22965</code> 範囲露出、未認証 <code>ANY /charge</code>、DAST ブロック。</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>ドキュメント (<code>Documentation</code>)</strong></td>
+<td style="text-align:center"><code>54</code></td>
+<td style="text-align:center"><strong><code>-10</code></strong></td>
+<td style="text-align:center"><strong><code>44</code></strong></td>
+<td style="text-align:left">わずか 2 行の <code>README.md</code>、<code>33.3%</code> の Javadoc 網羅率（公開 Javadoc 10 件欠落）、陳腐化した <code>@param obsoleteToken</code> 不一致、<code>LICENSE</code>/<code>SECURITY.md</code> 欠如。</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>総合スコア</strong></td>
+<td style="text-align:center"><strong><code>76</code></strong></td>
+<td style="text-align:center"><strong><code>-10</code></strong></td>
+<td style="text-align:center"><strong><code>66 (C)</code></strong></td>
+<td style="text-align:left"><strong>ビルド・セキュリティ・アーキテクチャの複合欠陥により総合評価はグレード C。</strong></td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2>実行済み監査ステップ別スコアと検出ソース内訳</h2>
+<p>全 8 つの実行済み監査ステップはいずれも <strong>グレード D（<code>10</code>〜<code>25 / 100</code>）</strong> となり、<code>container_runtime_audit (10)</code>、<code>supply_chain_audit (15)</code>、<code>java_test_audit (15)</code> が特に低い結果となりました。</p>
+<figure class="drawlib-image" style="text-align: center;">
+  <img src="../images/04_standards_and_findings/audit_step_scores_bar.png" alt="04_standards_and_findings_3" />
+  <figcaption class="drawlib-caption">弱点順に並んだ監査ステップ別スコア（左）および検出ソース・トリアージ証跡（右）</figcaption>
+</figure>
+<h3>検出ソース内訳・誤検知トリアージ・例外承認ログ</h3>
+<ul>
+<li><strong>検出ソース内訳</strong>: 決定論的アナライザー = <code>7</code> 件、AI 定性評価 = <code>12</code> 件、合計 = <code>19</code> 件（統合後 <code>14</code> 固有箇所）。</li>
+<li><strong>AI 誤検知トリアージログ</strong>: 決定論的事前検出の除外・再分類 = <code>0</code> 件。</li>
+<li><strong>設定済み設計例外（<code>pni.toml [[opt_out]]</code>）</strong>: アクティブな例外設定 = <code>0</code> 件。</li>
+</ul>
+<hr />
+<h2>ルール準拠マトリクス（<code>FAIL -&gt; WARN</code> 全 16 ルール）</h2>
+<table>
+<thead>
+<tr>
+<th style="text-align:center">判定</th>
+<th style="text-align:left">ルール ID</th>
+<th style="text-align:left">評価元アクション</th>
+<th style="text-align:left">根拠サマリー</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center"><strong><code>FAIL</code></strong></td>
+<td style="text-align:left"><code>common/architecture</code></td>
+<td style="text-align:left"><code>java_ast_audit</code></td>
+<td style="text-align:left">実行時循環依存 1 件（<code>BillingController -&gt; BillingManager -&gt; BillingController</code>）、<code>@Autowired circularController</code> による上向き結合、可変静的 <code>INVOICE_CACHE</code>。</td>
+</tr>
+<tr>
+<td style="text-align:center"><strong><code>FAIL</code></strong></td>
+<td style="text-align:left"><code>common/documentation</code></td>
+<td style="text-align:left"><code>repo_structure_audit</code></td>
+<td style="text-align:left"><code>README.md</code> がわずか 2 行（<code># Legacy Billing</code> / <code>Run mvn spring-boot:run</code>）のみで、設計・環境設定・API 仕様・テスト手順が欠落。</td>
+</tr>
+<tr>
+<td style="text-align:center"><strong><code>FAIL</code></strong></td>
+<td style="text-align:left"><code>common/maintainability</code></td>
+<td style="text-align:left"><code>java_ast_audit</code></td>
+<td style="text-align:left"><code>BillingManager.processBatchBilling</code> が SIG 単位サイズ（57 行）・複雑度（<code>branches=13</code>, <code>cognitive=56</code>）・引数数（8 &gt; 6）を超過し、静的 <code>INVOICE_CACHE</code> と 83 行目の空 catch を内包。</td>
+</tr>
+<tr>
+<td style="text-align:center"><strong><code>FAIL</code></strong></td>
+<td style="text-align:left"><code>common/production_readiness</code></td>
+<td style="text-align:left"><code>container_runtime_audit</code></td>
+<td style="text-align:left">ビルド・起動不可。<code>GatewayClient.java:22</code> の <code>connectTimeout</code> 欠如、<code>BillingManager.java:83</code> の空 catch、非構造ログ 4 箇所、Actuator <code>/healthz</code> 欠如、未認証 <code>ANY /charge</code>。</td>
+</tr>
+<tr>
+<td style="text-align:center"><strong><code>FAIL</code></strong></td>
+<td style="text-align:left"><code>common/runtime_verification</code></td>
+<td style="text-align:left"><code>deterministic_baseline</code></td>
+<td style="text-align:left"><code>harness_build=failed</code>。<code>RV-01</code> 失敗（<code>openjdk:latest not found</code> および Java 8 Maven での <code>spring-boot-4.2.0.jar</code> バイトコード <code>61.0</code> vs <code>52.0</code> 衝突）により <code>RV-02</code>/<code>RV-03</code>/<code>RV-04</code> がブロック。</td>
+</tr>
+<tr>
+<td style="text-align:center"><strong><code>FAIL</code></strong></td>
+<td style="text-align:left"><code>common/security</code></td>
+<td style="text-align:left"><code>repo_structure_audit</code></td>
+<td style="text-align:left"><code>GatewayClient.java:13</code> のハードコード <code>GATEWAY_SECRET</code>（<code>&lt;REDACTED_SECRET&gt;</code>）、特権 <code>pull_request_target</code> CI、root <code>openjdk:latest</code> コンテナ、未検証生 <code>Map</code> 入力、未認証 <code>ANY /charge</code>。</td>
+</tr>
+<tr>
+<td style="text-align:center"><strong><code>FAIL</code></strong></td>
+<td style="text-align:left"><code>common/security_vulnerability</code></td>
+<td style="text-align:left"><code>java_ast_audit</code></td>
+<td style="text-align:left"><code>SEC-01</code>: 未固定 <code>spring-boot-starter-web:LATEST</code> の CRITICAL <code>CVE-2022-22965</code>（CVSS 9.8）。<code>SEC-02</code>: Dockerfile <code>DS-0002</code>/<code>DS-0001</code>/<code>DS-0026</code>。<code>SEC-03</code>: ハードコード秘密鍵。<code>SEC-05</code>: 未認証 <code>ANY /charge</code>。<code>SEC-06</code>: DAST <code>error</code>（ビルド失敗で 0 プローブ）。</td>
+</tr>
+<tr>
+<td style="text-align:center"><strong><code>FAIL</code></strong></td>
+<td style="text-align:left"><code>common/supply_chain</code></td>
+<td style="text-align:left"><code>repo_structure_audit</code></td>
+<td style="text-align:left"><code>LICENSE</code>・<code>SECURITY.md</code>・Dependabot・<code>mvnw</code>/ロックファイル欠如、未固定 <code>LATEST</code>、<code>pull_request_target</code> + <code>@main</code>（<code>permissions:</code> 欠如）、root <code>openjdk:latest</code>（<code>.dockerignore</code> 欠如）。</td>
+</tr>
+<tr>
+<td style="text-align:center"><strong><code>FAIL</code></strong></td>
+<td style="text-align:left"><code>common/twelve_factor</code></td>
+<td style="text-align:left"><code>service_readiness_audit</code></td>
+<td style="text-align:left">Factor III 違反（<code>GatewayClient.java:16</code> の直接 <code>System.getenv</code>）、Factor VI 違反（静的 <code>INVOICE_CACHE</code> とシングルトン <code>channel</code>）、Factor XI 違反（<code>System.out</code>/<code>printStackTrace</code> 4 箇所）。</td>
+</tr>
+<tr>
+<td style="text-align:center"><strong><code>FAIL</code></strong></td>
+<td style="text-align:left"><code>java/code_quality</code></td>
+<td style="text-align:left"><code>java_ast_audit</code></td>
+<td style="text-align:left">Javadoc 網羅率 <code>33.3%</code>（欠落 10 件、陳腐化 <code>@param obsoleteToken</code> 1 件）、<code>String ==</code> リテラル比較バグ 3 箇所（<code>&quot;PAID&quot;</code>, <code>&quot;USD&quot;</code>, <code>&quot;JPY&quot;</code>）、空 catch、<code>System.out</code>/<code>printStackTrace</code> 4 箇所。</td>
+</tr>
+<tr>
+<td style="text-align:center"><strong><code>FAIL</code></strong></td>
+<td style="text-align:left"><code>java/dependencies</code></td>
+<td style="text-align:left"><code>repo_structure_audit</code></td>
+<td style="text-align:left"><code>pom.xml</code> が EOL Java <code>1.8</code> を指定、<code>spring-boot-starter-web:LATEST</code> の動的参照、レガシー <code>javax.servlet:4.0.1</code>・JUnit 4（<code>4.13.2</code>）、<code>mvnw</code> 欠如。</td>
+</tr>
+<tr>
+<td style="text-align:center"><strong><code>FAIL</code></strong></td>
+<td style="text-align:left"><code>java/frameworks/spring_boot</code></td>
+<td style="text-align:left"><code>java_ast_audit</code></td>
+<td style="text-align:left"><code>@Autowired</code> フィールド注入 3 箇所、リクエスト毎に書き換わるシングルトン <code>channel</code>、無制限 <code>@RequestMapping(&quot;/charge&quot;)</code>、<code>spring-tx</code> 欠如の <code>private @Transactional</code>、レガシー <code>javax.servlet</code>。</td>
+</tr>
+<tr>
+<td style="text-align:center"><strong><code>FAIL</code></strong></td>
+<td style="text-align:left"><code>java/modern_stack</code></td>
+<td style="text-align:left"><code>java_ast_audit</code></td>
+<td style="text-align:left">Java <code>1.8</code> 宣言と <code>GatewayClient.java:4</code> の Java 11 <code>java.net.http.HttpClient</code> の矛盾、<code>LegacyDateHelper</code> の非スレッド安全 <code>SimpleDateFormat</code>・<code>Date</code>・<code>Vector</code>、未整列 import 4 件＋ワイルドカード import 1 件。</td>
+</tr>
+<tr>
+<td style="text-align:center"><strong><code>FAIL</code></strong></td>
+<td style="text-align:left"><code>java/testing</code></td>
+<td style="text-align:left"><code>java_test_audit</code></td>
+<td style="text-align:left">レガシー JUnit 4、アサーションなしのテストメソッド 1 件（<code>BillingManagerTest.testSmokeRun</code>）、静的モジュール網羅率 <code>33.3%</code>、ビルド失敗による JUnit/JaCoCo 実行ブロック。</td>
+</tr>
+<tr>
+<td style="text-align:center"><strong><code>FAIL</code></strong></td>
+<td style="text-align:left"><code>java/typing</code></td>
+<td style="text-align:left"><code>java_ast_audit</code></td>
+<td style="text-align:left">型安全網羅率 <code>81.8%</code>：<code>BillingController</code>/<code>BillingManager</code> の生 <code>Map</code>/<code>List</code>、未型付け <code>Object</code> 引数（<code>traceHint</code>, <code>extraContext</code>）、<code>@SuppressWarnings(&quot;unchecked&quot;)</code>。</td>
+</tr>
+<tr>
+<td style="text-align:center"><strong><code>WARN</code></strong></td>
+<td style="text-align:left"><code>common/git_workflow</code></td>
+<td style="text-align:left"><code>repo_structure_audit</code></td>
+<td style="text-align:left"><code>.gitignore</code> 欠如、および <code>.github/workflows/build.yml</code> が安全な <code>pull_request</code> ではなく <code>pull_request_target</code> 上で <code>mvn package</code> を実行。</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2>統合済み箇所別検出事項インデックス（固有 14 箇所）</h2>
+<table>
+<thead>
+<tr>
+<th style="text-align:center">#</th>
+<th style="text-align:center">重要度</th>
+<th style="text-align:left">対象箇所</th>
+<th style="text-align:left">関連ルール</th>
+<th style="text-align:left">証跡および推奨対策</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">1</td>
+<td style="text-align:center"><strong><code>CRITICAL</code></strong></td>
+<td style="text-align:left"><code>.github/workflows/build.yml</code></td>
+<td style="text-align:left"><code>common/supply_chain</code></td>
+<td style="text-align:left"><code>permissions:</code> なしで <code>pull_request_target</code> を起動し可変 <code>actions/checkout@main</code> を使用。<strong>対策</strong>: <code>pull_request</code> へ切替、<code>permissions: { contents: read }</code> 追加、フル SHA 固定。</td>
+</tr>
+<tr>
+<td style="text-align:center">2</td>
+<td style="text-align:center"><strong><code>CRITICAL</code></strong></td>
+<td style="text-align:left"><code>examples/java/api_spring_messy/src/main/java/com/example/billing/client/GatewayClient.java:13</code></td>
+<td style="text-align:left"><code>common/security</code></td>
+<td style="text-align:left"><code>GATEWAY_SECRET</code> にハードコードされた秘密鍵リテラル（<code>&lt;REDACTED_SECRET&gt;</code>, OWASP ASVS）。<strong>対策</strong>: 環境変数またはシークレットマネージャへ移行し鍵をローテーション。</td>
+</tr>
+<tr>
+<td style="text-align:center">3</td>
+<td style="text-align:center"><strong><code>CRITICAL</code></strong></td>
+<td style="text-align:left"><code>pom.xml</code></td>
+<td style="text-align:left"><code>common/security_vulnerability</code>, <code>common/runtime_verification</code>, <code>java/dependencies</code></td>
+<td style="text-align:left">未固定 <code>spring-boot-starter-web@LATEST</code> が Trivy <code>CVE-2022-22965</code> 範囲一致と Maven コンパイル失敗（<code>spring-boot-4.2.0.jar</code> バイトコード <code>61.0</code> vs Java 1.8 <code>52.0</code>）を同時誘発。<code>javax.servlet</code>/JUnit 4・<code>mvnw</code> 欠如も併存。<strong>対策</strong>: Java 21 LTS + Spring Boot 3.4.x BOM + JUnit 5 へ固定し <code>mvnw</code> をコミット。</td>
+</tr>
+<tr>
+<td style="text-align:center">4</td>
+<td style="text-align:center"><strong><code>CRITICAL</code></strong></td>
+<td style="text-align:left"><code>src/main/java/com/example/billing/client/GatewayClient.java</code></td>
+<td style="text-align:left"><code>common/security</code>, <code>java/modern_stack</code></td>
+<td style="text-align:left">ハードコード <code>GATEWAY_SECRET</code>（<code>&lt;REDACTED_SECRET&gt;</code>）、Java 1.8 上の Java 11 <code>java.net.http</code> 矛盾、タイムアウト欠如、<code>System.getenv</code>、スタックトレース出力。<strong>対策</strong>: 秘密鍵削除・外部化、Java 21 + タイムアウト付き <code>RestClient</code>、<code>@ConfigurationProperties</code>、SLF4J、import 整列。</td>
+</tr>
+<tr>
+<td style="text-align:center">5</td>
+<td style="text-align:center"><strong><code>CRITICAL</code></strong></td>
+<td style="text-align:left"><code>—</code> <em>（依存 SCA）</em></td>
+<td style="text-align:left"><code>CVE-2022-22965</code></td>
+<td style="text-align:left"><code>org.springframework.boot:spring-boot-starter-web@LATEST (pom)</code> が Spring4Shell 履歴範囲に一致。<strong>対策</strong>: 修正済み版（最小 <code>2.5.12, 2.6.6</code>、推奨 Spring Boot 3.4.x BOM）へ固定。</td>
+</tr>
+<tr>
+<td style="text-align:center">6</td>
+<td style="text-align:center"><strong><code>HIGH</code></strong></td>
+<td style="text-align:left"><code>Dockerfile</code></td>
+<td style="text-align:left"><code>common/supply_chain</code></td>
+<td style="text-align:left">廃止・可変 <code>openjdk:latest</code> を使用し、<code>.dockerignore</code> なしで全ファイルをコピーし <code>root</code> で実行。<strong>対策</strong>: マルチステージ <code>eclipse-temurin:21-jdk</code> / <code>21-jre-alpine</code>、非 root <code>USER</code>、<code>.dockerignore</code> を導入。</td>
+</tr>
+<tr>
+<td style="text-align:center">7</td>
+<td style="text-align:center"><strong><code>HIGH</code></strong></td>
+<td style="text-align:left"><code>src/main/java/com/example/billing/controller/BillingController.java</code></td>
+<td style="text-align:left"><code>common/security_vulnerability</code>, <code>java/frameworks/spring_boot</code></td>
+<td style="text-align:left">ビルド失敗により <code>ANY /charge</code> への <code>web_pentest</code> がブロック。シングルトン <code>channel</code> の毎リクエスト書き換え、無制限 <code>@RequestMapping</code>、生 <code>Map</code> の無検証受付。<strong>対策</strong>: <code>channel</code> 削除、<code>@PostMapping(&quot;/charge&quot;)</code> + <code>@Valid</code> Java <code>record</code> + 認証導入後、<code>web_pentest</code> を再実行。</td>
+</tr>
+<tr>
+<td style="text-align:center">8</td>
+<td style="text-align:center"><strong><code>HIGH</code></strong></td>
+<td style="text-align:left"><code>src/main/java/com/example/billing/service/BillingManager.java</code></td>
+<td style="text-align:left"><code>common/architecture</code>, <code>java/code_quality</code></td>
+<td style="text-align:left"><code>@Autowired circularController</code> 循環依存、静的生 <code>INVOICE_CACHE</code>、<code>processBatchBilling</code>（<code>cognitive=56</code>, 引数 8 個, 陳腐化 <code>@param obsoleteToken</code>, 52/55/57 行目の <code>String ==</code>, 83 行目の空 catch, 無効な <code>private @Transactional</code>）。<strong>対策</strong>: コンストラクタ注入、キャッシュ外部化、メソッド分割、<code>.equals()</code>、SLF4J、専用リポジトリ Bean 化。</td>
+</tr>
+<tr>
+<td style="text-align:center">9</td>
+<td style="text-align:center"><strong><code>HIGH</code></strong></td>
+<td style="text-align:left"><code>src/test/java/com/example/billing/BillingManagerTest.java</code></td>
+<td style="text-align:left"><code>java/testing</code></td>
+<td style="text-align:left"><code>testSmokeRun</code> が <code>InvoiceRecord</code> 生成と <code>getAmountCents()</code> 呼出のみでアサーションも主要クラス検証も皆無。<strong>対策</strong>: JUnit 5 + Mockito + <code>MockMvc</code> 特性テスト群へ移行し JaCoCo <code>&gt;=80%</code> を達成。</td>
+</tr>
+<tr>
+<td style="text-align:center">10</td>
+<td style="text-align:center"><strong><code>HIGH</code></strong></td>
+<td style="text-align:left"><code>—</code> <em>（Import グラフ）</em></td>
+<td style="text-align:left"><code>common/architecture</code></td>
+<td style="text-align:left">循環インポート: <code>BillingController -&gt; BillingManager -&gt; BillingController</code>。<strong>対策</strong>: 上向き依存を除去し共通モデル／インタフェースを下位層へ抽出。</td>
+</tr>
+<tr>
+<td style="text-align:center">11</td>
+<td style="text-align:center"><strong><code>MEDIUM</code></strong></td>
+<td style="text-align:left"><code>examples/java/api_spring_messy/src/main/java/com/example/billing/service/BillingManager.java:33</code></td>
+<td style="text-align:left"><code>common/maintainability</code></td>
+<td style="text-align:left"><code>processBatchBilling</code>: <code>length=57 lines</code>, <code>branches=13</code>, <code>cognitive=56</code>。<strong>対策</strong>: 単一責務ヘルパーへ分割（<code>cognitive &lt;= 15</code>）。</td>
+</tr>
+<tr>
+<td style="text-align:center">12</td>
+<td style="text-align:center"><strong><code>MEDIUM</code></strong></td>
+<td style="text-align:left"><code>—</code> <em>（ドキュメント）</em></td>
+<td style="text-align:left"><code>common/documentation</code></td>
+<td style="text-align:left"><code>has_readme=True</code>, <code>lines=2</code>。<strong>対策</strong>: <code>README.md</code> にアーキテクチャ、環境構築、API 仕様、テスト手順を記載。</td>
+</tr>
+<tr>
+<td style="text-align:center">13</td>
+<td style="text-align:center"><strong><code>MEDIUM</code></strong></td>
+<td style="text-align:left"><code>—</code> <em>（ロックファイル）</em></td>
+<td style="text-align:left"><code>common/supply_chain</code></td>
+<td style="text-align:left"><code>manifests=['pom.xml']</code>, <code>lockfiles=[]</code>。<strong>対策</strong>: BOM 固定および Maven Wrapper（<code>mvnw</code>）／依存検証メタデータをコミット。</td>
+</tr>
+<tr>
+<td style="text-align:center">14</td>
+<td style="text-align:center"><strong><code>LOW</code></strong></td>
+<td style="text-align:left"><code>—</code> <em>（バージョン境界）</em></td>
+<td style="text-align:left"><code>common/supply_chain</code></td>
+<td style="text-align:left"><code>unpinned=['org.springframework.boot:spring-boot-starter-web:LATEST']</code>。<strong>対策</strong>: 明示的なバージョン固定により再現可能なビルドを担保。</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2>機械可読アーティファクト参照一覧</h2>
+<p>CI ゲート連携および IDE 診断向けに、すべての構造化メトリクス・検出事項・DAG・決定論的スキャン出力は以下の機械可読ファイルへ永続化されています。</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">アーティファクトパス</th>
+<th style="text-align:left">形式 / スキーマ</th>
+<th style="text-align:left">用途</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left"><code>docs/reports/java_api_spring_messy/java_api_spring_messy_score.json</code></td>
+<td style="text-align:left"><code>ScoreResult</code> v2.0 (JSON)</td>
+<td style="text-align:left">7 軸スコア・ルール準拠・検出事項・改善計画の完全構造化データ</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>docs/reports/java_api_spring_messy/java_api_spring_messy_summary.json</code></td>
+<td style="text-align:left"><code>ScoreSummary</code> (JSON)</td>
+<td style="text-align:left">CI / ポータル表示用の軽量サマリーメトリクス</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>docs/reports/java_api_spring_messy/java_api_spring_messy_findings.sarif</code></td>
+<td style="text-align:left"><code>SARIF 2.1.0</code></td>
+<td style="text-align:left">GitHub Code Scanning および IDE 向けインライン診断結果</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>docs_src/reports/java_api_spring_messy/_facts/plan.json</code></td>
+<td style="text-align:left">PNI Plan v2.0 (JSON)</td>
+<td style="text-align:left">事前偵察計画および検証済みワークフロー DAG</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>docs_src/reports/java_api_spring_messy/_facts/facts.json</code></td>
+<td style="text-align:left">決定論的ファクト束 (JSON)</td>
+<td style="text-align:left">AST・Maven/Docker ランタイム・Trivy SCA・ペネトレーション生証跡</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>docs_src/reports/java_api_spring_messy/_facts/architecture.json</code></td>
+<td style="text-align:left"><code>ArchitectureRecord</code> (JSON)</td>
+<td style="text-align:left">コード裏付け済みの 5 層アーキテクチャ・シンボル・実行フロー記録</td>
+</tr>
+</tbody>
+</table>
+
+</section>
+
+<section id="chapter-6-05_code_and_runtime_analysis" class="doc-chapter pdf-chapter">
+<h1>5. 詳細分析: コード品質・テスト・ランタイム検証</h1>
+<p>Java ソース 6 モジュール（<code>187 LOC</code>, <code>11</code> 関数）に対する tree-sitter AST 解析と Docker コンテナ実機検証により、クリーンな不変値オブジェクト（<code>InvoiceRecord.java</code>）と深刻に劣化した中核処理（<code>BillingManager.java</code>・<code>BillingController.java</code>・<code>GatewayClient.java</code>）との鮮明な乖離が明らかになりました。加えて、Maven/Docker の二重コンパイル失敗によりオフライン単体テストと JaCoCo カバレッジ計測が完全にブロックされています。</p>
+<figure class="drawlib-image" style="text-align: center;">
+  <img src="../images/05_code_and_runtime_analysis/code_module_fitness_heatmap.png" alt="05_code_and_runtime_analysis_1" />
+  <figcaption class="drawlib-caption">モジュール × 品質軸フィットネスマトリクス（ファイル別 AST 検出に基づく 0–100 評価：クリーンな InvoiceRecord vs. 集中ホットスポット BillingManager）</figcaption>
+</figure>
+<hr />
+<h2>静的 AST 品質・SIG 保守性・12-Factor テレメトリ</h2>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">メトリクス区分</th>
+<th style="text-align:left">指標名</th>
+<th style="text-align:center">計測値</th>
+<th style="text-align:left">診断所見</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left"><strong>コードベース規模</strong></td>
+<td style="text-align:left"><code>total_files</code> / <code>total_loc</code> / <code>total_functions</code></td>
+<td style="text-align:center"><code>6</code> / <code>187</code> / <code>11</code></td>
+<td style="text-align:left">小規模ながら主要 3 ファイルに重大欠陥が極端に集中</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>静的網羅率</strong></td>
+<td style="text-align:left"><code>import_hygiene_coverage_pct</code></td>
+<td style="text-align:center"><code>83.3%</code></td>
+<td style="text-align:left"><code>GatewayClient.java</code> に未整列 import 4 件＋ワイルドカード <code>import java.util.*;</code> 1 件</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>静的網羅率</strong></td>
+<td style="text-align:left"><code>type_safety_coverage_pct</code></td>
+<td style="text-align:center"><code>81.8%</code></td>
+<td style="text-align:left">生ジェネリクス署名（<code>Map</code>/<code>List</code>）2 件、未型付け <code>Object</code> 引数 2 件、<code>@SuppressWarnings(&quot;unchecked&quot;)</code> 2 件</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>静的網羅率</strong></td>
+<td style="text-align:left"><code>docstring_coverage_pct</code></td>
+<td style="text-align:center"><code>33.3%</code></td>
+<td style="text-align:left">公開 Javadoc 欠落 10 件＋<code>processBatchBilling</code> の陳腐化 <code>@param obsoleteToken</code> 不一致 1 件</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>静的網羅率</strong></td>
+<td style="text-align:left"><code>module_test_coverage_pct</code></td>
+<td style="text-align:center"><code>33.3%</code></td>
+<td style="text-align:left">アサーションなしの JUnit 4 スモークテスト 1 件が <code>InvoiceRecord</code> に触れるのみ</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>SIG 保守性</strong></td>
+<td style="text-align:left"><code>complex_functions</code> / <code>excessive_parameters</code></td>
+<td style="text-align:center"><code>1</code> / <code>1</code></td>
+<td style="text-align:left"><code>BillingManager.processBatchBilling</code>: <code>57 行</code>, <code>branches=13</code>, <code>cognitive=56</code>, <code>引数 8 個 (&gt; 6)</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>結合・バグ指標</strong></td>
+<td style="text-align:left"><code>circular_dependencies</code> / <code>global_state</code> / <code>bug_risk_idioms</code></td>
+<td style="text-align:center"><code>1</code> / <code>1</code> / <code>7</code></td>
+<td style="text-align:left"><code>BillingController &lt;-&gt; BillingManager</code>、静的 <code>INVOICE_CACHE</code>、<code>String ==</code> 3 件、空 catch、<code>System.out</code> 3 件</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>互換性</strong></td>
+<td style="text-align:left"><code>undeclared_dependencies</code> / <code>language_version_mismatches</code></td>
+<td style="text-align:center"><code>1</code> / <code>1</code></td>
+<td style="text-align:left"><code>spring-tx</code> 未宣言の <code>@Transactional</code>、Java 1.8 上での Java 11 <code>java.net.http.HttpResponse</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>12-Factor / SRE PRR</strong></td>
+<td style="text-align:left"><code>missing_io_timeouts</code> / <code>scattered_env</code> / <code>unstructured_logging</code></td>
+<td style="text-align:center"><code>1</code> / <code>1</code> / <code>4</code></td>
+<td style="text-align:left">タイムアウトなしの <code>HttpClient.newHttpClient()</code>、<code>System.getenv()</code>、<code>System.out</code> 3 件＋<code>printStackTrace()</code> 1 件</td>
+</tr>
+</tbody>
+</table>
+<h3>主要ソースコード欠陥の内訳</h3>
+<ol>
+<li><strong><code>BillingManager.processBatchBilling</code>（<code>src/main/java/com/example/billing/service/BillingManager.java:33</code>）</strong>:
+<ul>
+<li><strong>SIG 単位サイズ・複雑度・引数過多</strong>: <code>57</code> 行、<code>13</code> 分岐、認知複雑度 <strong><code>56</code></strong>（基準 <code>&lt;= 15</code>）、引数 <strong><code>8</code> 個</strong>（基準 <code>&lt;= 6</code>）にわたり、生 <code>List items</code>・複数の真偽フラグ・未型付け <code>Object extraContext</code> を混在させています。</li>
+<li><strong>文字列参照比較バグ（<code>String ==</code>）</strong>: 52 行目（<code>status == &quot;PAID&quot;</code>）、55 行目（<code>currency == &quot;USD&quot;</code>）、57 行目（<code>currency == &quot;JPY&quot;</code>）で <code>.equals()</code> ではなく参照同値性 <code>==</code> を使用しており、実行時 JSON デシリアライズ文字列で税率計算分岐が意図せずスキップされる欠陥があります。</li>
+<li><strong>無音失敗と無効なトランザクション制御</strong>: 83 行目の空 <code>catch (Exception e) {}</code> が監査・キャッシュ・コントローラ参照時の例外をすべて握りつぶします（79 行目の未定義メソッド <code>dateHelper.currentPeriodLabel()</code> 呼出を含む）。また 91 行目の <code>private void saveAuditTrail(...)</code> への <code>@Transactional</code> 付与は、Spring AOP プロキシを自己呼び出しおよび <code>private</code> 修飾でバイパスし、さらに <code>pom.xml</code> に <code>spring-tx</code> 依存自体が未宣言です。</li>
+<li><strong>Javadoc 署名不一致</strong>: 存在しない <code>@param obsoleteToken</code> が残存し、実際の引数 7 個が未記載です。</li>
+</ul>
+</li>
+<li><strong><code>GatewayClient.java</code>（<code>src/main/java/com/example/billing/client/GatewayClient.java</code>）</strong>:
+<ul>
+<li><strong>言語バージョン API 不整合</strong>: <code>pom.xml</code> が <code>1.8</code> を宣言する一方で、4〜6 行目で Java 11+ の <code>java.net.http.{HttpResponse, HttpRequest, HttpClient}</code> を import しています。</li>
+<li><strong>運用・ログ欠陥</strong>: 22 行目の <code>HttpClient.newHttpClient()</code> に接続／読み取りタイムアウトがなく、16 行目で直接 <code>System.getenv(&quot;LEGACY_PAYMENT_URL&quot;)</code> を参照し、20 行目の <code>System.out.println</code> と 32 行目の <code>e.printStackTrace()</code> で非構造出力を行っています。</li>
+</ul>
+</li>
+<li><strong><code>LegacyDateHelper.java</code>（<code>src/main/java/com/example/billing/util/LegacyDateHelper.java</code>）</strong>:
+<ul>
+<li>スレッド非安全な <code>SimpleDateFormat</code>、旧 <code>java.util.Date</code>、同期化レガシーコレクション生 <code>Vector</code> を使用しており、<code>java.time.Instant</code>/<code>DateTimeFormatter</code> と型付き <code>List&lt;String&gt;</code> への置換が必要です。</li>
+</ul>
+</li>
+</ol>
+<hr />
+<h2>コンテナランタイム検証とビルド失敗の診断</h2>
+<p>2 系統のコンテナビルドがいずれもゲート <strong><code>RV-01</code>（ビルド可能性）</strong> で失敗したため、オフライン単体テスト（<code>RV-02</code>）、JaCoCo カバレッジ計測（<code>RV-03</code>）、Web API 起動スモーク検証（<code>RV-04</code>）がすべてブロックされました。</p>
+<figure class="drawlib-image" style="text-align: center;">
+  <img src="../images/05_code_and_runtime_analysis/runtime_build_failure_diag.png" alt="05_code_and_runtime_analysis_2" />
+  <figcaption class="drawlib-caption">RV-01 における二重コンテナビルド失敗と JUnit / JaCoCo / スモーク検証の連鎖ブロック診断</figcaption>
+</figure>
+<h3>コンパイラおよび Docker エラー出力抜粋（原文）</h3>
+<p><strong>1. プロジェクト Dockerfile ビルド失敗（<code>examples/java/api_spring_messy/Dockerfile</code>, <code>1.21s</code>, 終了コード <code>1</code>）</strong>:</p>
+<pre><code class="language-text">#2 ERROR: docker.io/library/openjdk:latest: not found
+Dockerfile:1
+   1 | &gt;&gt;&gt; FROM openjdk:latest
+ERROR: failed to build: failed to solve: openjdk:latest: failed to resolve source metadata
+for docker.io/library/openjdk:latest: docker.io/library/openjdk:latest: not found
+</code></pre>
+<p><strong>2. Java 8 Maven ハーネスコンパイル失敗（<code>.pni/dockerfiles/examples/java/api_spring_messy/Dockerfile</code>, <code>23.98s</code>, 終了コード <code>1</code>）</strong>:</p>
+<pre><code class="language-text">9.861 [ERROR]   bad class file: /m2repo/org/springframework/boot/spring-boot/4.2.0/spring-boot-4.2.0.jar(org/springframework/boot/SpringApplication.class)
+9.861 [ERROR]     class file has wrong version 61.0, should be 52.0
+9.861 [ERROR]     Please remove or make sure it appears in the correct subdirectory of the classpath.
+ERROR: failed to build: failed to solve: process "/bin/sh -c mvn -B -Dmaven.repo.local=/m2repo
+  org.jacoco:jacoco-maven-plugin:${JACOCO_VERSION}:prepare-agent test ...
+  org.jacoco:jacoco-maven-plugin:${JACOCO_VERSION}:report ..." did not complete successfully: exit code: 1
+</code></pre>
+<hr />
+<h2>テストスイート健全性評価（<code>java/testing</code>）</h2>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">テスト評価項目</th>
+<th style="text-align:center">観測値</th>
+<th style="text-align:left">評価</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left"><strong>テストフレームワーク</strong></td>
+<td style="text-align:center">JUnit 4（<code>junit:4.13.2</code>, <code>&lt;scope&gt;test&lt;/scope&gt;</code>）</td>
+<td style="text-align:left">レガシー JUnit 4。JUnit 5（<code>junit-jupiter</code>）への移行が必要</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>テストファイル／メソッド数</strong></td>
+<td style="text-align:center"><code>1</code> ファイル（<code>BillingManagerTest.java</code>）／<code>1</code> メソッド（<code>testSmokeRun</code>）</td>
+<td style="text-align:left">本番 6 クラスに対してテストが極端に不足</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>アサーションなしテスト</strong></td>
+<td style="text-align:center"><code>1 / 1</code>（<code>100%</code>）</td>
+<td style="text-align:left"><code>testSmokeRun</code> は <code>InvoiceRecord</code> を生成し <code>getAmountCents()</code> を呼ぶだけで <code>assert*</code> 検証が皆無</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>静的／実測カバレッジ</strong></td>
+<td style="text-align:center">静的 <code>33.3%</code> ／ 実測 <code>N/A</code></td>
+<td style="text-align:left"><code>BillingManager</code>・<code>BillingController</code>・<code>GatewayClient</code>・<code>LegacyDateHelper</code> への直接検証がなく、JaCoCo は <code>RV-01</code> 失敗でブロック</td>
+</tr>
+</tbody>
+</table>
+
+</section>
+
+<section id="chapter-7-06_security_and_supply_chain" class="doc-chapter pdf-chapter">
+<h1>6. 詳細分析: セキュリティ・サプライチェーン・API 攻撃面</h1>
+<p><code>legacy-billing</code> はセキュリティおよびサプライチェーン関連の主要ゲートすべてに不合格です（<code>security=50/100</code>, <code>security_vulnerability_audit=18/100</code>, <code>supply_chain_audit=15/100</code>, <code>web_penetration_audit=20/100</code>）。未固定 Spring Boot 依存による CRITICAL CVE 範囲露出、特権 GitHub Actions ワークフロー、廃止 root Dockerfile、ハードコードされたゲートウェイ秘密鍵（<code>&lt;REDACTED_SECRET&gt;</code>）、および Maven ビルド失敗で DAST 検証が封じられた未認証エンドポイントが、開発から配信までの全層にまたがっています。</p>
+<figure class="drawlib-image" style="text-align: center;">
+  <img src="../images/06_security_and_supply_chain/sec_supply_chain_breakdown.png" alt="06_security_and_supply_chain_1" />
+  <figcaption class="drawlib-caption">領域・重要度別のセキュリティ検出事項内訳（左）および静的 Trivy SCA と実 Maven 解決の整合整理（右）</figcaption>
+</figure>
+<hr />
+<h2>サプライチェーン・SCA・コンテナ堅牢化監査</h2>
+<h3>ガバナンスおよびサプライチェーン基準値</h3>
+<ul>
+<li><strong>ロックファイルと依存衛生</strong>: <code>has_lockfile=False</code>（<code>mvnw</code> および依存検証なし）、<code>dependencies_count=2</code>、<code>unpinned_dependencies_count=1</code>（<code>org.springframework.boot:spring-boot-starter-web:LATEST</code>）。</li>
+<li><strong>ガバナンスと自動化</strong>: <code>has_license=False</code>、<code>has_security_policy=False</code>、<code>has_dependency_automation=False</code>（Dependabot/Renovate 未設定）、<code>has_gitignore=False</code>。</li>
+<li><strong>Trivy スキャナー構成</strong>: <code>ghcr.io/aquasecurity/trivy:0.69.3</code>（<code>docker</code>）、<code>scanned_filesystem=True</code>、<code>scanned_resolved_image=False</code>（<code>openjdk:latest not found</code> によりプロジェクトイメージ構築が失敗したため、OS ベースイメージ CVE は <code>0</code>／未検証状態）。</li>
+</ul>
+<h3>アプリケーション CVE および Dockerfile IaC 設定不備</h3>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">区分</th>
+<th style="text-align:left">ID</th>
+<th style="text-align:center">重要度</th>
+<th style="text-align:left">対象</th>
+<th style="text-align:left">観測状況・詳細</th>
+<th style="text-align:left">推奨対策</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left"><strong>アプリ CVE (<code>runtime_core</code>)</strong></td>
+<td style="text-align:left"><strong><code>CVE-2022-22965</code></strong></td>
+<td style="text-align:center"><strong><code>CRITICAL</code></strong> <em>（CVSS 9.8）</em></td>
+<td style="text-align:left"><code>pom.xml</code> (<code>spring-boot-starter-web@LATEST</code>)</td>
+<td style="text-align:left"><code>spring-framework: RCE via Data Binding on JDK 9+</code>（<code>is_unpinned_specifier=True</code> — 未固定のため静的 SCA が過去全範囲を評価。一方、実 Maven ビルドは <code>4.2.0</code> を取得し Java 1.8 でクラッシュ）</td>
+<td style="text-align:left">修正済み BOM 版を明示固定（最小 <code>&gt;= 2.5.12 / 2.6.6</code>、推奨 Spring Boot <code>3.4.x</code> BOM + Java 21 LTS）</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>コンテナ OS CVE</strong></td>
+<td style="text-align:left"><code>—</code></td>
+<td style="text-align:center"><code>INFO</code></td>
+<td style="text-align:left">プロジェクト Docker イメージ</td>
+<td style="text-align:left"><code>0</code> 件（<code>openjdk:latest</code> 取得失敗のため <code>scanned_resolved_image=False</code>）</td>
+<td style="text-align:left"><code>eclipse-temurin:21-jre-alpine</code> へ移行しビルド済みイメージを再スキャン</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>Dockerfile IaC</strong></td>
+<td style="text-align:left"><strong><code>DS-0002</code></strong></td>
+<td style="text-align:center"><strong><code>HIGH</code></strong></td>
+<td style="text-align:left"><code>Dockerfile</code></td>
+<td style="text-align:left">コンテナ実行ユーザーが <code>root</code> のまま（非 root <code>USER</code> 命令が欠落）</td>
+<td style="text-align:left">非 root ユーザーを作成し <code>USER appuser</code> を指定</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>Dockerfile IaC</strong></td>
+<td style="text-align:left"><strong><code>DS-0001</code></strong></td>
+<td style="text-align:center"><strong><code>MEDIUM</code></strong></td>
+<td style="text-align:left"><code>Dockerfile:1</code></td>
+<td style="text-align:left"><code>FROM openjdk:latest</code> で可変 <code>:latest</code> タグを使用（さらにイメージ自体が廃止済み）</td>
+<td style="text-align:left">明示タグまたはダイジェスト固定（<code>eclipse-temurin:21-jre-alpine</code>）</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>Dockerfile IaC</strong></td>
+<td style="text-align:left"><strong><code>DS-0026</code></strong></td>
+<td style="text-align:center"><strong><code>LOW</code></strong></td>
+<td style="text-align:left"><code>Dockerfile</code></td>
+<td style="text-align:left"><code>HEALTHCHECK</code> 命令が未定義、かつ <code>.dockerignore</code> も欠如</td>
+<td style="text-align:left">Spring Actuator <code>/actuator/health</code> を検査する <code>HEALTHCHECK</code> と <code>.dockerignore</code> を追加</td>
+</tr>
+</tbody>
+</table>
+<h3>CI/CD サプライチェーン露出（<code>.github/workflows/build.yml</code>）</h3>
+<ol>
+<li><strong>特権 <code>pull_request_target</code> トリガー</strong>: 外部フォーク PR に対してベースリポジトリの特権トークン権限下で <code>mvn package</code> を実行する危険な構成です。<code>pull_request</code> トリガーへ置き換えてください。</li>
+<li><strong>明示的 <code>permissions:</code> ブロックの欠如</strong>: OpenSSF Token-Permissions の最小権限原則に違反しています。<code>permissions: { contents: read }</code> を明示してください。</li>
+<li><strong>可変ブランチ参照（<code>actions/checkout@main</code>）</strong>: 変動するブランチ先端を参照しておりサプライチェーン改ざん耐性がありません。検証済みの 40 桁フルコミット SHA で固定してください。</li>
+</ol>
+<hr />
+<h2>シークレット衛生・API 攻撃面・DAST ブロック状況</h2>
+<figure class="drawlib-image" style="text-align: center;">
+  <img src="../images/06_security_and_supply_chain/sec_attack_surface_map.png" alt="06_security_and_supply_chain_2" />
+  <figcaption class="drawlib-caption">エンドツーエンドのセキュリティ境界と攻撃面マップ（CI/ビルド供給網、未認証 ANY /charge 入口、マスク済みハードコード秘密鍵）</figcaption>
+</figure>
+<h3>シークレット検出・AST CWE シンク・HTTP 攻撃面マトリクス</h3>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">セキュリティ領域</th>
+<th style="text-align:left">対象 / シンボル</th>
+<th style="text-align:center">状態</th>
+<th style="text-align:left">監査証跡の詳細</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left"><strong>ハードコード秘密鍵 (<code>SEC-03</code>)</strong></td>
+<td style="text-align:left"><code>GatewayClient.GATEWAY_SECRET</code>（<code>GatewayClient.java:13</code>）</td>
+<td style="text-align:center"><strong><code>CRITICAL</code></strong></td>
+<td style="text-align:left">AST の OWASP ASVS ヒューリスティックにより、本番形式のハードコード秘密鍵リテラル（<code>&lt;REDACTED_SECRET&gt;</code>）を検出。Trivy の汎用正規表現スキャンは <code>0</code> 件（ベンダー固有プレフィックス外のため）であり、AST と SCA の多層防御の有効性を示す結果となりました。直ちに削除・ローテーションし <code>@ConfigurationProperties</code> 注入へ移行してください。</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>AST 危険シンク (CWE SAST)</strong></td>
+<td style="text-align:left">本番 Java ソース（<code>187 LOC</code>）</td>
+<td style="text-align:center"><strong><code>PASS (0)</code></strong></td>
+<td style="text-align:left">SQL インジェクション、コマンド実行、安全でないデシリアライズ、XXE 等の CWE 危険シンクは <code>0</code> 件。</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>抽出 HTTP API 攻撃面 (<code>SEC-05</code>)</strong></td>
+<td style="text-align:left"><code>ANY /charge</code> -&gt; <code>BillingController.chargeCustomer</code>（<code>BillingController.java:22</code>）</td>
+<td style="text-align:center"><strong><code>HIGH</code></strong></td>
+<td style="text-align:left">無制限 <code>@RequestMapping(&quot;/charge&quot;)</code> が <code>GET</code>/<code>POST</code>/<code>PUT</code>/<code>DELETE</code> 等すべての HTTP メソッドを <code>auth_hint=NONE</code>（認証なし）・生 <code>@RequestBody Map</code>・Bean Validation（<code>@Valid</code>）なしで受け付けます。</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>動的 Web ペネトレーション (<code>SEC-06</code>)</strong></td>
+<td style="text-align:left"><code>.pni/pentests/examples/java/api_spring_messy</code></td>
+<td style="text-align:center"><strong><code>ERROR</code>（ブロック）</strong></td>
+<td style="text-align:left">4 つの pytest/httpx プローブ（<code>conftest.py</code>, <code>test_app_probes.py</code>, <code>test_baseline_http.py</code>, <code>test_target_surface.py</code>）を生成済みですが、Java 8 下での <code>spring-boot-4.2.0.jar</code> ビルド失敗によりコンテナ起動不可（<code>server_booted=False</code>, <code>0/0</code> プローブ実行）となりました。<code>P0</code> ビルド復旧後、直ちに再実行してください。</td>
+</tr>
+</tbody>
+</table>
+
+</section>
+    </main>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const langDropdowns = document.querySelectorAll('.lang-dropdown');
+            if (langDropdowns.length > 0) {
+                document.addEventListener('click', function(e) {
+                    langDropdowns.forEach(function(dd) {
+                        if (dd.hasAttribute('open') && !dd.contains(e.target)) {
+                            dd.removeAttribute('open');
+                        }
+                    });
+                });
+                document.addEventListener('keydown', function(e) {
+                    if (e.key === 'Escape') {
+                        langDropdowns.forEach(function(dd) {
+                            dd.removeAttribute('open');
+                        });
+                    }
+                });
+            }
+        });
+    </script>
+    
+</body>
+</html>

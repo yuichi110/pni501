@@ -1,0 +1,390 @@
+{
+  "$schema": "https://json.schemastore.org/sarif-2.1.0.json",
+  "version": "2.1.0",
+  "runs": [
+    {
+      "tool": {
+        "driver": {
+          "name": "PNI501",
+          "version": "2.0.0",
+          "informationUri": "https://github.com/yuichi110/pni501",
+          "rules": [
+            {
+              "id": "CWE-79",
+              "name": "CWE_79",
+              "shortDescription": {
+                "text": "Dangerous sink (CWE-79 xss): Unescaped request input rendered directly via 'echo $_GET['tab'] ?? 'general';'"
+              },
+              "defaultConfiguration": {
+                "level": "error"
+              }
+            },
+            {
+              "id": "CWE-89",
+              "name": "CWE_89",
+              "shortDescription": {
+                "text": "Dangerous sink (CWE-89 sql_injection): Unparameterized SQL in '$wpdb->get_results(\"SELECT ID, display_name, user_email FROM {$w)' — use prepared placeholders"
+              },
+              "defaultConfiguration": {
+                "level": "error"
+              }
+            },
+            {
+              "id": "common/documentation",
+              "name": "common_documentation",
+              "shortDescription": {
+                "text": "README documentation is missing or minimal (< 10 lines)."
+              },
+              "defaultConfiguration": {
+                "level": "warning"
+              }
+            },
+            {
+              "id": "common/security",
+              "name": "common_security",
+              "shortDescription": {
+                "text": "Potential hardcoded secret detected in `examples/php/wp_plugin_messy/includes/rest-endpoints.php:3`."
+              },
+              "defaultConfiguration": {
+                "level": "error"
+              }
+            },
+            {
+              "id": "php/dependencies",
+              "name": "php_dependencies",
+              "shortDescription": {
+                "text": "Plugin header declares Requires PHP: 7.4 (EOL since Nov 2022) and loads files via manual require_once without composer.json, PSR-4 autoloading, or automated tes"
+              },
+              "defaultConfiguration": {
+                "level": "error"
+              }
+            },
+            {
+              "id": "php/frameworks/wordpress",
+              "name": "php_frameworks_wordpress",
+              "shortDescription": {
+                "text": "map_ajax_search_members exposes wp_users via wp_ajax_nopriv with raw $_POST['term'] SQLi; map_ajax_purge_logs executes unparameterized DELETE FROM wp_map_events"
+              },
+              "defaultConfiguration": {
+                "level": "error"
+              }
+            }
+          ]
+        }
+      },
+      "results": [
+        {
+          "ruleId": "common/security",
+          "level": "error",
+          "message": {
+            "text": "Potential hardcoded secret detected in `examples/php/wp_plugin_messy/includes/rest-endpoints.php:3`. — Recommendation: Move secrets to environment variables or a secret manager and rotate exposed keys."
+          },
+          "properties": {
+            "severity": "critical",
+            "rule_ids": [
+              "common/security"
+            ],
+            "categories": [
+              "security"
+            ]
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "examples/php/wp_plugin_messy/includes/rest-endpoints.php"
+                },
+                "region": {
+                  "startLine": 3
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "php/frameworks/wordpress",
+          "level": "error",
+          "message": {
+            "text": "map_ajax_search_members exposes wp_users via wp_ajax_nopriv with raw $_POST['term'] SQLi; map_ajax_purge_logs executes unparameterized DELETE FROM wp_map_events without check_ajax_referer() or current_user_can('manage_options') and echoes raw $_POST['category'] (CWE-79). — Recommendation: Remove wp_ajax_nopriv hook, enforce check_ajax_referer() + current_user_can('manage_options'), parameterize all queries with $wpdb->prepare(), and use wp_send_json_success() with esc_html()."
+          },
+          "properties": {
+            "severity": "critical",
+            "rule_ids": [
+              "php/frameworks/wordpress"
+            ],
+            "categories": [
+              "security"
+            ]
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "includes/ajax-handlers.php"
+                },
+                "region": {
+                  "startLine": 1
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "common/security",
+          "level": "error",
+          "message": {
+            "text": "includes/rest-endpoints.php line 3 assigns a hardcoded live-style webhook secret string directly to global variable $map_webhook_secret. — Recommendation: Remove the hardcoded secret immediately, rotate the key, and read it from a secure WordPress environment constant or encrypted option. / Enforce current_user_can('manage_options') in permission_callback, sanitize input via $request->get_param('role_filter'), parameterize with $wpdb->prepare() + $wpdb->esc_like(), and remove print_r()."
+          },
+          "properties": {
+            "severity": "critical",
+            "rule_ids": [
+              "common/security",
+              "php/frameworks/wordpress"
+            ],
+            "categories": [
+              "security"
+            ]
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "includes/rest-endpoints.php"
+                },
+                "region": {
+                  "startLine": 1
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "php/frameworks/wordpress",
+          "level": "error",
+          "message": {
+            "text": "add_options_page grants access to 'read' capability (any subscriber), mutates update_option('map_telemetry_url') without check_admin_referer() or current_user_can('manage_options'), calls @file_get_contents() without timeout (should use wp_remote_get), echoes unescaped $_GET['tab'] and $active_tab, and hardcodes <script src=...>. — Recommendation: Restrict capability to 'manage_options', verify nonce via check_admin_referer(), validate URL with esc_url_raw(), use wp_remote_get(['timeout'=>5]), escape with esc_html()/esc_attr(), and register JS via wp_enqueue_script()."
+          },
+          "properties": {
+            "severity": "high",
+            "rule_ids": [
+              "php/frameworks/wordpress"
+            ],
+            "categories": [
+              "security"
+            ]
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "admin/settings-page.php"
+                },
+                "region": {
+                  "startLine": 1
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "CWE-79",
+          "level": "error",
+          "message": {
+            "text": "Dangerous sink (CWE-79 xss): Unescaped request input rendered directly via 'echo $_GET['tab'] ?? 'general';' — Recommendation: Replace with parameterized/safe APIs or enforce strict allow-list validation."
+          },
+          "properties": {
+            "severity": "high",
+            "rule_ids": [
+              "CWE-79"
+            ],
+            "categories": [
+              "security"
+            ]
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "examples/php/wp_plugin_messy/admin/settings-page.php"
+                },
+                "region": {
+                  "startLine": 26
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "CWE-89",
+          "level": "error",
+          "message": {
+            "text": "Dangerous sink (CWE-89 sql_injection): Unparameterized SQL in '$wpdb->get_results(\"SELECT ID, display_name, user_email FROM {$w)' — use prepared placeholders — Recommendation: Replace with parameterized/safe APIs or enforce strict allow-list validation."
+          },
+          "properties": {
+            "severity": "high",
+            "rule_ids": [
+              "CWE-89"
+            ],
+            "categories": [
+              "security"
+            ]
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "examples/php/wp_plugin_messy/includes/ajax-handlers.php"
+                },
+                "region": {
+                  "startLine": 10
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "CWE-89",
+          "level": "error",
+          "message": {
+            "text": "Dangerous sink (CWE-89 sql_injection): Unparameterized SQL in '$wpdb->query(\"DELETE FROM wp_map_events WHERE category = ')' — use prepared placeholders — Recommendation: Replace with parameterized/safe APIs or enforce strict allow-list validation."
+          },
+          "properties": {
+            "severity": "high",
+            "rule_ids": [
+              "CWE-89"
+            ],
+            "categories": [
+              "security"
+            ]
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "examples/php/wp_plugin_messy/includes/ajax-handlers.php"
+                },
+                "region": {
+                  "startLine": 21
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "CWE-79",
+          "level": "error",
+          "message": {
+            "text": "Dangerous sink (CWE-79 xss): Unescaped request input rendered directly via 'echo \"Purged category: \" . $_POST['category'];' — Recommendation: Replace with parameterized/safe APIs or enforce strict allow-list validation."
+          },
+          "properties": {
+            "severity": "high",
+            "rule_ids": [
+              "CWE-79"
+            ],
+            "categories": [
+              "security"
+            ]
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "examples/php/wp_plugin_messy/includes/ajax-handlers.php"
+                },
+                "region": {
+                  "startLine": 22
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "CWE-89",
+          "level": "error",
+          "message": {
+            "text": "Dangerous sink (CWE-89 sql_injection): Unparameterized SQL in '$wpdb->get_results($sql)' — use prepared placeholders — Recommendation: Replace with parameterized/safe APIs or enforce strict allow-list validation."
+          },
+          "properties": {
+            "severity": "high",
+            "rule_ids": [
+              "CWE-89"
+            ],
+            "categories": [
+              "security"
+            ]
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "examples/php/wp_plugin_messy/includes/rest-endpoints.php"
+                },
+                "region": {
+                  "startLine": 19
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "php/dependencies",
+          "level": "error",
+          "message": {
+            "text": "Plugin header declares Requires PHP: 7.4 (EOL since Nov 2022) and loads files via manual require_once without composer.json, PSR-4 autoloading, or automated test configuration. — Recommendation: Add composer.json with php ^8.2|^8.3, PSR-4 autoloading, PHPUnit + PHPStan dev dependencies, and update the plugin header to Requires PHP: 8.2+. / Add defined('ABSPATH') || exit at top of file, read badge label from shortcode_atts(), and escape output with esc_html(). / Configure Composer + PHPUnit (with WP_Mock or Brain Monkey) and write unit/security regression tests covering REST permission_callback, AJAX nonces, SQL preparation, and HTML escaping. / Add declare(strict_types=1) and defined('ABSPATH') || exit to every PHP file, migrate to typed PSR-4 classes, and add complete PHPDoc annotations."
+          },
+          "properties": {
+            "severity": "high",
+            "rule_ids": [
+              "php/dependencies",
+              "common/security",
+              "common/runtime_verification",
+              "php/typing"
+            ],
+            "categories": [
+              "dependencies",
+              "security",
+              "testing",
+              "typing"
+            ]
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "member-analytics-portal.php"
+                },
+                "region": {
+                  "startLine": 1
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "common/documentation",
+          "level": "warning",
+          "message": {
+            "text": "README documentation is missing or minimal (< 10 lines). — Recommendation: Document architecture overview, setup instructions, and usage in README.md."
+          },
+          "properties": {
+            "severity": "medium",
+            "rule_ids": [
+              "common/documentation"
+            ],
+            "categories": [
+              "documentation"
+            ]
+          }
+        }
+      ],
+      "properties": {
+        "project_name": "wp_plugin_messy",
+        "workflow_id": "php_wp_plugin_messy",
+        "workflow_run_id": "wf-3389d5e7",
+        "language": "php",
+        "overall_score": 60,
+        "grade": "C"
+      }
+    }
+  ]
+}

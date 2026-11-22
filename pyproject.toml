@@ -87,6 +87,20 @@ pni501 = "pni.cli:main"
 
 [tool.uv.build-backend]
 module-name = "pni"
+source-exclude = [
+    "src/pni/_cached_grammars/grammars-v*",
+    "src/pni/_cached_grammars/.locks",
+    "src/pni/_cached_grammars/**/*.so",
+    "src/pni/_cached_grammars/**/*.pyd",
+    "src/pni/_cached_grammars/**/*.dylib",
+]
+wheel-exclude = [
+    "pni/_cached_grammars/grammars-v*",
+    "pni/_cached_grammars/.locks",
+    "**/*.so",
+    "**/*.pyd",
+    "**/*.dylib",
+]
 
 [[tool.uv.index]]
 name = "pypi"

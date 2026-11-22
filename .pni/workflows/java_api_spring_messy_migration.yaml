@@ -8,8 +8,8 @@ steps:
   - id: migration_intelligence_and_plan
     uses: migration_proposal
     with:
-      output_dir: "reports/java"
-      target: "api_spring_messy_migration"
+      output_dir: "docs/reports/java_api_spring_messy_migration"
+      target: "java_api_spring_messy_migration"
       migration_strategy: "phased_pr"
       api_compatibility: "strict"
       bug_handling_policy: "ask_human"
@@ -34,9 +34,13 @@ steps:
 
   - id: compile_migration_report
     uses: write_migration_report
+    needs: [migration_intelligence_and_plan]
     with:
-      src_dir: "reports_src/java"
-      output_dir: "reports/java"
-      target: "api_spring_messy_migration"
-      lang: "ja"
+      src_dir: "docs_src/reports/java_api_spring_messy_migration"
+      output_dir: "docs/reports/java_api_spring_messy_migration"
+      target: "java_api_spring_messy_migration"
+      lang: "en,ja"
       style: "google"
+      formats:
+        - "pdf"
+        - "html"

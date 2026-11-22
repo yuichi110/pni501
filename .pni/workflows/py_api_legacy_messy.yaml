@@ -43,14 +43,17 @@ steps:
   - id: output_score
     uses: emit_score
     with:
-      output_dir: "reports/python"
-      target: "api_legacy_messy"
+      output_dir: "docs/reports/py_api_legacy_messy"
+      target: "py_api_legacy_messy"
 
   - id: create_report
     uses: write_drawlib_report
     with:
-      src_dir: "reports_src/python"
-      output_dir: "reports/python"
-      target: "api_legacy_messy"
-      lang: "ja"
+      src_dir: "docs_src/reports/py_api_legacy_messy"
+      output_dir: "docs/reports/py_api_legacy_messy"
+      target: "py_api_legacy_messy"
+      lang: "en,ja"
       style: "google"
+      formats:
+        - "pdf"
+        - "html"

@@ -1,0 +1,385 @@
+{
+  "schema_version": "2.0",
+  "workflow_id": "py_api_fastapi_clean",
+  "category": "audit",
+  "scope": "repo",
+  "target_root": "examples/python/api_fastapi_clean",
+  "language": "python",
+  "runtime_types": [
+    "web_api",
+    "library"
+  ],
+  "detected_frameworks": [
+    "fastapi",
+    "pydantic",
+    "pytest",
+    "httpx"
+  ],
+  "container_engine": null,
+  "harness_template": "python/uv.dockerfile",
+  "components": [
+    {
+      "id": "python",
+      "root": ".",
+      "language": "python",
+      "file_count": 161,
+      "approx_loc": 55986,
+      "has_runtime_harness": true,
+      "recommended_dockerfile": "python/..."
+    },
+    {
+      "id": "objc",
+      "root": ".",
+      "language": "objc",
+      "file_count": 18,
+      "approx_loc": 1267,
+      "has_runtime_harness": false,
+      "recommended_dockerfile": ""
+    },
+    {
+      "id": "php",
+      "root": ".",
+      "language": "php",
+      "file_count": 24,
+      "approx_loc": 1149,
+      "has_runtime_harness": true,
+      "recommended_dockerfile": "php/..."
+    },
+    {
+      "id": "haskell",
+      "root": ".",
+      "language": "haskell",
+      "file_count": 9,
+      "approx_loc": 1083,
+      "has_runtime_harness": true,
+      "recommended_dockerfile": "haskell/..."
+    }
+  ],
+  "companion_languages": [
+    "bicep",
+    "css",
+    "dockerfile",
+    "hcl",
+    "html",
+    "json",
+    "make",
+    "nix",
+    "protobuf",
+    "scss",
+    "sql",
+    "starlark",
+    "toml",
+    "xml",
+    "yaml"
+  ],
+  "nodes": [
+    {
+      "action_id": "act-01",
+      "step_key": "confirm_plan",
+      "name": "Confirm Audit Plan & Execution DAG",
+      "primitive_type": "confirm_plan",
+      "source_action": null,
+      "needs": [],
+      "when": null,
+      "status": "ask",
+      "badge": "ASK",
+      "detail": "",
+      "skip_reason": ""
+    },
+    {
+      "action_id": "act-02",
+      "step_key": "repo_and_deps",
+      "name": "Extract Repository, Supply-Chain & Dependency Facts",
+      "primitive_type": "project_inspect",
+      "source_action": "repo_structure_audit",
+      "needs": [
+        "confirm_plan"
+      ],
+      "when": null,
+      "status": "run",
+      "badge": "AUTO",
+      "detail": "rules=common/supply_chain, common/documentation, common/git_workflow, common/security",
+      "skip_reason": ""
+    },
+    {
+      "action_id": "act-03",
+      "step_key": "repo_and_deps",
+      "name": "Evaluate Repository Structure, Supply Chain & Dependencies",
+      "primitive_type": "ai_interpret",
+      "source_action": "repo_structure_audit",
+      "needs": [
+        "act-02"
+      ],
+      "when": null,
+      "status": "run",
+      "badge": "AI",
+      "detail": "rules=common/supply_chain, common/documentation, common/git_workflow, common/security",
+      "skip_reason": ""
+    },
+    {
+      "action_id": "act-04",
+      "step_key": "supply_chain",
+      "name": "Evaluate Supply-Chain, CI Permissions, Container & Secret Hygiene",
+      "primitive_type": "ai_interpret",
+      "source_action": "supply_chain_audit",
+      "needs": [
+        "repo_and_deps"
+      ],
+      "when": null,
+      "status": "run",
+      "badge": "AI",
+      "detail": "rules=common/supply_chain, common/security, common/git_workflow",
+      "skip_reason": ""
+    },
+    {
+      "action_id": "act-05",
+      "step_key": "ast_and_quality",
+      "name": "Extract Deterministic Python AST & Framework Metrics",
+      "primitive_type": "ast_analyze",
+      "source_action": "python_ast_audit",
+      "needs": [
+        "repo_and_deps"
+      ],
+      "when": null,
+      "status": "run",
+      "badge": "AUTO",
+      "detail": "rules=common/architecture, common/maintainability, common/security, common/security_vulnerability",
+      "skip_reason": ""
+    },
+    {
+      "action_id": "act-06",
+      "step_key": "ast_and_quality",
+      "name": "Interpret Python AST Facts & Evaluate Quality/Typing/Imports/Security",
+      "primitive_type": "ai_interpret",
+      "source_action": "python_ast_audit",
+      "needs": [
+        "act-05"
+      ],
+      "when": null,
+      "status": "run",
+      "badge": "AI",
+      "detail": "rules=common/architecture, common/maintainability, common/security, common/security_vulnerability",
+      "skip_reason": ""
+    },
+    {
+      "action_id": "act-07",
+      "step_key": "runtime_verification",
+      "name": "Execute Containerized Build, Offline Unit Tests, Coverage & Smoke Probe",
+      "primitive_type": "run_check",
+      "source_action": "container_runtime_audit",
+      "needs": [
+        "repo_and_deps"
+      ],
+      "when": "has_runtime_harness",
+      "status": "run",
+      "badge": "AUTO",
+      "detail": "harness=python/uv.dockerfile, engine=unavailable",
+      "skip_reason": ""
+    },
+    {
+      "action_id": "act-08",
+      "step_key": "runtime_verification",
+      "name": "Evaluate Buildability, Offline Test Results, Measured Coverage & Startup Health",
+      "primitive_type": "ai_interpret",
+      "source_action": "container_runtime_audit",
+      "needs": [
+        "act-07"
+      ],
+      "when": "has_runtime_harness",
+      "status": "run",
+      "badge": "AI",
+      "detail": "rules=common/runtime_verification, common/production_readiness",
+      "skip_reason": ""
+    },
+    {
+      "action_id": "act-09",
+      "step_key": "security_audit",
+      "name": "Execute Trivy Filesystem & Resolved Container Image Security Scan",
+      "primitive_type": "security_scan",
+      "source_action": "security_vulnerability_audit",
+      "needs": [
+        "repo_and_deps"
+      ],
+      "when": null,
+      "status": "run",
+      "badge": "AUTO",
+      "detail": "rules=common/security_vulnerability, common/supply_chain",
+      "skip_reason": ""
+    },
+    {
+      "action_id": "act-10",
+      "step_key": "security_audit",
+      "name": "Evaluate Supply-Chain CVEs, Container Misconfigs, Secrets, Dangerous Sinks & API Boundaries",
+      "primitive_type": "ai_interpret",
+      "source_action": "security_vulnerability_audit",
+      "needs": [
+        "act-09"
+      ],
+      "when": null,
+      "status": "run",
+      "badge": "AI",
+      "detail": "rules=common/security_vulnerability, common/supply_chain",
+      "skip_reason": ""
+    },
+    {
+      "action_id": "act-11",
+      "step_key": "web_pentest",
+      "name": "Verify .pni/pentests Suite & Execute Isolated Loopback HTTP Penetration Probes",
+      "primitive_type": "web_pentest",
+      "source_action": "web_penetration_audit",
+      "needs": [
+        "repo_and_deps"
+      ],
+      "when": null,
+      "status": "run",
+      "badge": "AUTO",
+      "detail": "rules=common/security_vulnerability",
+      "skip_reason": ""
+    },
+    {
+      "action_id": "act-12",
+      "step_key": "web_pentest",
+      "name": "Evaluate Live HTTP Penetration Findings, Security Headers & Endpoint Defenses",
+      "primitive_type": "ai_interpret",
+      "source_action": "web_penetration_audit",
+      "needs": [
+        "act-11"
+      ],
+      "when": null,
+      "status": "run",
+      "badge": "AI",
+      "detail": "rules=common/security_vulnerability",
+      "skip_reason": ""
+    },
+    {
+      "action_id": "act-13",
+      "step_key": "arch_recording",
+      "name": "Record Architecture Aspect 1: System Purpose & Stack",
+      "primitive_type": "record_architecture",
+      "source_action": "architecture_analysis",
+      "needs": [
+        "ast_and_quality"
+      ],
+      "when": null,
+      "status": "run",
+      "badge": "AI",
+      "detail": "rules=common/architecture",
+      "skip_reason": ""
+    },
+    {
+      "action_id": "act-14",
+      "step_key": "arch_recording",
+      "name": "Record Architecture Aspect 2: Layers, Modules & Boundaries",
+      "primitive_type": "record_architecture",
+      "source_action": "architecture_analysis",
+      "needs": [
+        "act-13"
+      ],
+      "when": null,
+      "status": "run",
+      "badge": "AI",
+      "detail": "rules=common/architecture",
+      "skip_reason": ""
+    },
+    {
+      "action_id": "act-15",
+      "step_key": "arch_recording",
+      "name": "Record Architecture Aspect 3: Entry Points, Execution Flows & State",
+      "primitive_type": "record_architecture",
+      "source_action": "architecture_analysis",
+      "needs": [
+        "act-14"
+      ],
+      "when": null,
+      "status": "run",
+      "badge": "AI",
+      "detail": "rules=common/architecture",
+      "skip_reason": ""
+    },
+    {
+      "action_id": "act-16",
+      "step_key": "service_readiness",
+      "name": "Evaluate 12-Factor Config/Statelessness & SRE PRR Timeouts/Observability",
+      "primitive_type": "ai_interpret",
+      "source_action": "service_readiness_audit",
+      "needs": [
+        "ast_and_quality"
+      ],
+      "when": null,
+      "status": "run",
+      "badge": "AI",
+      "detail": "rules=common/twelve_factor, common/production_readiness, common/security",
+      "skip_reason": ""
+    },
+    {
+      "action_id": "act-17",
+      "step_key": "test_health",
+      "name": "Evaluate Test Suite Completeness & Structure",
+      "primitive_type": "ai_interpret",
+      "source_action": "python_test_audit",
+      "needs": [
+        "ast_and_quality"
+      ],
+      "when": null,
+      "status": "run",
+      "badge": "AI",
+      "detail": "rules=python/testing",
+      "skip_reason": ""
+    },
+    {
+      "action_id": "act-18",
+      "step_key": "output_score",
+      "name": "Write Validated Score & AI Context JSON",
+      "primitive_type": "emit_score",
+      "source_action": "emit_score",
+      "needs": [
+        "supply_chain",
+        "arch_recording",
+        "service_readiness",
+        "test_health",
+        "runtime_verification",
+        "security_audit",
+        "web_pentest"
+      ],
+      "when": null,
+      "status": "run",
+      "badge": "AI",
+      "detail": "",
+      "skip_reason": ""
+    },
+    {
+      "action_id": "act-19",
+      "step_key": "create_report",
+      "name": "Create Visual Report with drawlib",
+      "primitive_type": "write_drawlib_report",
+      "source_action": "write_drawlib_report",
+      "needs": [
+        "output_score"
+      ],
+      "when": null,
+      "status": "run",
+      "badge": "AI",
+      "detail": "",
+      "skip_reason": ""
+    }
+  ],
+  "mermaid_dag": "flowchart TD\n    act_01[\"[ASK] act-01: Confirm Audit Plan & Execution DAG\"]\n    act_02[\"[AUTO] act-02: Extract Repository, Supply-Chain & Dependency Facts\"]\n    act_03[\"[AI] act-03: Evaluate Repository Structure, Supply Chain & Dependencies\"]\n    act_04[\"[AI] act-04: Evaluate Supply-Chain, CI Permissions, Container & Secret Hygiene\"]\n    act_05[\"[AUTO] act-05: Extract Deterministic Python AST & Framework Metrics\"]\n    act_06[\"[AI] act-06: Interpret Python AST Facts & Evaluate Quality/Typing/Imports/Security\"]\n    act_07[\"[AUTO] act-07: Execute Containerized Build, Offline Unit Tests, Coverage & Smoke Probe\"]\n    act_08[\"[AI] act-08: Evaluate Buildability, Offline Test Results, Measured Coverage & Startup Health\"]\n    act_09[\"[AUTO] act-09: Execute Trivy Filesystem & Resolved Container Image Security Scan\"]\n    act_10[\"[AI] act-10: Evaluate Supply-Chain CVEs, Container Misconfigs, Secrets, Dangerous Sinks & API Boundaries\"]\n    act_11[\"[AUTO] act-11: Verify .pni/pentests Suite & Execute Isolated Loopback HTTP Penetration Probes\"]\n    act_12[\"[AI] act-12: Evaluate Live HTTP Penetration Findings, Security Headers & Endpoint Defenses\"]\n    act_13[\"[AI] act-13: Record Architecture Aspect 1: System Purpose & Stack\"]\n    act_14[\"[AI] act-14: Record Architecture Aspect 2: Layers, Modules & Boundaries\"]\n    act_15[\"[AI] act-15: Record Architecture Aspect 3: Entry Points, Execution Flows & State\"]\n    act_16[\"[AI] act-16: Evaluate 12-Factor Config/Statelessness & SRE PRR Timeouts/Observability\"]\n    act_17[\"[AI] act-17: Evaluate Test Suite Completeness & Structure\"]\n    act_18[\"[AI] act-18: Write Validated Score & AI Context JSON\"]\n    act_19[\"[AI] act-19: Create Visual Report with drawlib\"]\n    act_01 --> act_02\n    act_02 --> act_03\n    act_03 --> act_04\n    act_03 --> act_05\n    act_05 --> act_06\n    act_03 --> act_07\n    act_07 --> act_08\n    act_03 --> act_09\n    act_09 --> act_10\n    act_03 --> act_11\n    act_11 --> act_12\n    act_06 --> act_13\n    act_13 --> act_14\n    act_14 --> act_15\n    act_06 --> act_16\n    act_06 --> act_17\n    act_04 --> act_18\n    act_15 --> act_18\n    act_16 --> act_18\n    act_17 --> act_18\n    act_08 --> act_18\n    act_10 --> act_18\n    act_12 --> act_18\n    act_18 --> act_19\n    classDef auto fill:#e8f0fe,stroke:#1a73e8,color:#174ea6\n    classDef ai fill:#fef7e0,stroke:#f9ab00,color:#b06000\n    classDef skip fill:#f1f3f4,stroke:#9aa0a6,color:#5f6368\n    classDef ask fill:#e6f4ea,stroke:#1e8e3e,color:#137333\n    class act_01 ask\n    class act_02 auto\n    class act_03 ai\n    class act_04 ai\n    class act_05 auto\n    class act_06 ai\n    class act_07 auto\n    class act_08 ai\n    class act_09 auto\n    class act_10 ai\n    class act_11 auto\n    class act_12 ai\n    class act_13 ai\n    class act_14 ai\n    class act_15 ai\n    class act_16 ai\n    class act_17 ai\n    class act_18 ai\n    class act_19 ai",
+  "alignment_questions": [
+    "Target scope check: `root=examples/python/api_fastapi_clean`, `source=['src']`, `tests=['tests']` (14 source / 3 test files detected for `python`). Any directories to add or exclude?",
+    "Multi-language repository detected (`python` (python, .), `objc` (objc, .), `php` (php, .), `haskell` (haskell, .)). Proceed with single-language audit or switch to a Multi-Audit Rollup workflow (`category: rollup`)?",
+    "Containerized runtime tests & security scan are planned (no container engine detected (will skip)). Should all active stages run or should any optional stage be disabled?",
+    "Any focus areas (e.g. security, refactoring, test coverage), design waivers (`opt_out`), or preferred report language/format (`en`/`ja`, `pdf`/`html`)?"
+  ],
+  "approval": {
+    "approved": true,
+    "confirmed_targets": null,
+    "enabled_steps": [],
+    "disabled_steps": [],
+    "focus_areas": [],
+    "extra_opt_outs": [],
+    "report_lang": null,
+    "report_formats": [],
+    "report_mode": "unified",
+    "alignment_summary": "Auto-approved via --auto-approve or plan_gate=false."
+  }
+}

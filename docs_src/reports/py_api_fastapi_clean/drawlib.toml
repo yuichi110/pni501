@@ -1,0 +1,18 @@
+[project]
+name = "py_api_fastapi_clean"
+type = "doc"
+title = "PNI Audit Report: order-dispatch (Python FastAPI Clean)"
+description = "Workflow v2 deterministic + AI health audit, Docker runtime verification, Trivy SCA, and live HTTP DAST report for examples/python/api_fastapi_clean."
+style = "google"
+
+[i18n]
+default_lang = "en"
+langs = ["en", "ja"]
+
+[i18n.labels]
+en = "English"
+ja = "日本語"
+
+[i18n.descriptions]
+en = "PNI501 Workflow v2 Health Audit Report for order-dispatch (Python FastAPI Clean — Grade S, 94/100)."
+ja = "order-dispatch（Python FastAPI Clean — グレード S・94/100）PNI501 Workflow v2 健全性監査レポート。"

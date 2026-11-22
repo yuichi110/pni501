@@ -1,0 +1,18 @@
+[project]
+name = "java_api_spring_messy"
+type = "doc"
+title = "PNI Audit Report: legacy-billing (Java Legacy Spring)"
+description = "Workflow v2 deterministic + AI health audit, Docker Maven build diagnosis, Trivy SCA, and architecture hotspot report for examples/java/api_spring_messy."
+style = "google"
+
+[i18n]
+default_lang = "en"
+langs = ["en", "ja"]
+
+[i18n.labels]
+en = "English"
+ja = "日本語"
+
+[i18n.descriptions]
+en = "PNI501 Workflow v2 Health Audit Report for legacy-billing (Java 8 / Spring Boot Legacy — Grade C, 66/100)."
+ja = "legacy-billing（Java 8 / Spring Boot レガシー — グレード C・66/100）PNI501 Workflow v2 健全性監査レポート。"

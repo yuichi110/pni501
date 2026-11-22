@@ -8,8 +8,8 @@ steps:
   - id: migration_intelligence_and_plan
     uses: migration_proposal
     with:
-      output_dir: "reports/php"
-      target: "legacy_shop_messy_migration"
+      output_dir: "docs/reports/php_legacy_shop_messy_migration"
+      target: "php_legacy_shop_messy_migration"
       migration_strategy: "strangler_fig"
       api_compatibility: "strict"
       bug_handling_policy: "ask_human"
@@ -31,8 +31,11 @@ steps:
   - id: compile_migration_report
     uses: write_migration_report
     with:
-      src_dir: "reports_src/php"
-      output_dir: "reports/php"
-      target: "legacy_shop_messy_migration"
-      lang: "ja"
+      src_dir: "docs_src/reports/php_legacy_shop_messy_migration"
+      output_dir: "docs/reports/php_legacy_shop_messy_migration"
+      target: "php_legacy_shop_messy_migration"
+      lang: "en,ja"
       style: "google"
+      formats:
+        - "pdf"
+        - "html"

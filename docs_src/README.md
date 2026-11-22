@@ -1,60 +1,41 @@
-# pni501 Official Documentation Website (`drawlib site`)
+# pni501 Documentation & Sample Reports Portal (`docs_src/` -> `docs/`)
 
-This directory contains the source Markdown pages, embedded Drawlib Python diagrams, and shared styling assets for the official **`pni501` (Project Nemesis Index)** bilingual (`en` + `ja`) documentation website published at **[https://www.pni501.com](https://www.pni501.com)**.
+This directory is the **Single Source of Truth (SSOT)** for the official **`pni501` (Project Nemesis Index)** bilingual (`en` + `ja`) website and published sample audit / migration reports served on GitHub Pages at **[https://www.pni501.com](https://www.pni501.com)**.
 
-> **Source of Truth**: Edit only files inside `docs_src/`. Never manually edit the compiled HTML files in `docs/`.
+> **Source of Truth**: Edit only files inside `docs_src/`. Never manually edit compiled HTML/PDF artifacts in `docs/`.
 
 ---
 
-## 1. Directory Structure
+## Directory Layout
 
 ```text
 docs_src/
-├── drawlib.toml                         # Project manifest (type = "site", style = "default", [i18n] en/ja, [seo])
-├── styles.py                            # Global Drawlib style & color tokens (DefaultStyles / DefaultColors)
-├── utils.py                             # Reusable drawing helper functions (`service_card`, `connect`)
-├── style.css                            # Responsive sidebar & documentation page stylesheet
-├── template.html                        # Jinja2 multi-page HTML layout template
-├── _assets/                             # Official pni501 brand logos & browser tab favicon
-│   ├── logo.png
-│   ├── logo_dark.png
-│   └── favicon.png
-├── build.sh                             # Master build script (compiles HTML into ../docs/)
-├── build_html.sh                        # Compiles docs_src/ -> ../docs/ and preserves CNAME & .nojekyll
-├── build_markdown.sh                    # Optional GitHub-flavored Markdown export (../docs_markdown/)
-├── build_image.sh                       # Optional standalone diagram image export (../docs_images/)
-├── serve.sh                             # Local preview server & link checker (`drawlib serve ../docs/ --check`)
-├── en/                                  # English documentation pages (default_lang = "en")
-│   ├── navbar.md                        # Sidebar navigation hierarchy
-│   ├── index.md                         # Home / Overview
-│   ├── 01_getting_started/              # Background & Core Concepts, Quickstart, Use Cases, Release Notes
-│   ├── 02_architecture/                 # Domain Architecture & Cascade, Stateful Pull-Push Engine
-│   ├── 03_workflows_and_actions/        # Workflows & Pre-Flight Gates, 15 Actions & 12 Primitives, Analyzers & Pentest
-│   ├── 04_scoring_and_reports/          # 7-Axis Scoring Model, Drawlib Visual Reporter
-│   └── 05_languages_and_reference/      # Supported 6 Languages, Rules & CLI Reference
-└── ja/                                  # Japanese documentation pages (strict skeleton & diagram parity with en/)
-    ├── navbar.md
-    ├── index.md
-    ├── 01_getting_started/
-    ├── 02_architecture/
-    ├── 03_workflows_and_actions/
-    ├── 04_scoring_and_reports/
-    └── 05_languages_and_reference/
+├── build.sh                                # Master build: site + all sample reports + portal link check
+├── serve.sh                                # Local preview server on docs/
+├── site/                                   # Official bilingual site (drawlib type = "site") -> docs/
+│   ├── drawlib.toml
+│   ├── en/
+│   └── ja/
+└── reports/                                # Published PNI Workflow v2 sample reports -> docs/reports/<slug>/
+    ├── py_api_fastapi_clean/               # drawlib.toml + _facts/*.json + en/*.md + ja/*.md
+    ├── java_api_spring_messy/              # drawlib.toml + _facts/*.json + en/*.md + ja/*.md
+    ├── java_api_spring_messy_migration/    # drawlib.toml + _facts/*.json + en/*.md + ja/*.md
+    └── php_wp_plugin_messy/                # drawlib.toml + _facts/*.json + en/*.md + ja/*.md
 ```
+
+Each report under `docs_src/reports/<slug>/` compiles into `docs/reports/<slug>/`:
+- `index.html`, `en/index.html`, `ja/index.html` (bilingual interactive HTML report)
+- `<slug>_en.pdf`, `<slug>_ja.pdf`, `<slug>.pdf` (A4 vector PDFs with Table of Contents)
+- `<slug>_score.json` (v2.0), `<slug>_summary.json`, `<slug>_findings.sarif` (or `<slug>_migration_plan.json`)
 
 ---
 
-## 2. Building & Verifying
-
-From the repository root:
+## Building & Verifying
 
 ```bash
-# Compile static HTML website into docs/ (preserves docs/CNAME and docs/.nojekyll)
+# Build site + all sample reports + verify zero broken links across docs/
 ./docs_src/build.sh
 
-# Verify zero broken links or missing assets in compiled docs/
-uv run drawlib serve docs/ --check
-
-# Launch local preview server
+# Launch local preview server (http://127.0.0.1:8000)
 ./docs_src/serve.sh
 ```

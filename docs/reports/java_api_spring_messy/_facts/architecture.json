@@ -1,0 +1,164 @@
+{
+  "workflow_id": "java_api_spring_messy",
+  "workflow_run_id": "wf-8177454c",
+  "recorded_at": "2026-11-22T11:27:46.672357+00:00",
+  "target_root": "examples/java/api_spring_messy",
+  "system_profile": {
+    "system_purpose": "legacy-billing is a Java 8 / Spring Boot web API that accepts HTTP billing requests on /charge, computes invoice totals with tax rules, invokes an external payment gateway for retries, caches billed totals in a static HashMap, and prints audit trails to stdout.",
+    "domain_context": "Customer invoice charging, multi-currency tax calculation (USD/JPY), payment gateway retry integration, and ledger audit logging.",
+    "runtime_types": [
+      "web_api"
+    ],
+    "tech_stack": [
+      "Java 1.8 (pom.xml target, mismatched with Java 11 java.net.http usage)",
+      "Spring Boot Web Starter (unpinned LATEST in pom.xml)",
+      "javax.servlet-api 4.0.1",
+      "JUnit 4.13.2",
+      "Maven (no wrapper)"
+    ],
+    "external_integrations": [
+      "External payment gateway HTTP POST endpoint read via System.getenv('LEGACY_PAYMENT_URL') (default https://billing.example.invalid/charge)"
+    ]
+  },
+  "structure_map": {
+    "architecture_pattern": "Cyclic Legacy Spring Boot Layered Monolith with Shared Mutable Global/Singleton State",
+    "layers": [
+      {
+        "name": "Bootstrap Layer",
+        "responsibility": "Spring Boot application entrypoint.",
+        "paths": [
+          "src/main/java/com/example/billing/BillingApp.java"
+        ],
+        "allowed_dependencies": [
+          "Controller Layer",
+          "Service Layer",
+          "Client Layer"
+        ]
+      },
+      {
+        "name": "Controller Layer",
+        "responsibility": "HTTP /charge intake using raw Map payloads, @Autowired field injection, and mutable singleton state.",
+        "paths": [
+          "src/main/java/com/example/billing/controller/BillingController.java"
+        ],
+        "allowed_dependencies": [
+          "Service Layer",
+          "Model Layer"
+        ]
+      },
+      {
+        "name": "Service Layer",
+        "responsibility": "Batch billing calculation, tax rules, retry orchestration, static INVOICE_CACHE, and audit logging (improperly depends upward on BillingController).",
+        "paths": [
+          "src/main/java/com/example/billing/service/BillingManager.java"
+        ],
+        "allowed_dependencies": [
+          "Model Layer",
+          "Client Layer",
+          "Utility Layer"
+        ]
+      },
+      {
+        "name": "Model & Utility Layer",
+        "responsibility": "Immutable InvoiceRecord DTO and legacy date/tag helper using SimpleDateFormat and Vector.",
+        "paths": [
+          "src/main/java/com/example/billing/model/InvoiceRecord.java",
+          "src/main/java/com/example/billing/util/LegacyDateHelper.java"
+        ],
+        "allowed_dependencies": []
+      },
+      {
+        "name": "External Client Layer",
+        "responsibility": "Outbound payment gateway HTTP POST client using Java 11 HttpClient without timeouts and hardcoded GATEWAY_SECRET.",
+        "paths": [
+          "src/main/java/com/example/billing/client/GatewayClient.java"
+        ],
+        "allowed_dependencies": []
+      }
+    ],
+    "modules": [
+      {
+        "path": "src/main/java/com/example/billing/controller/BillingController.java",
+        "role": "REST controller exposing ANY /charge with raw Map and mutable 'channel' field",
+        "key_symbols": [
+          "BillingController",
+          "chargeCustomer",
+          "lastChannel"
+        ],
+        "depends_on": [
+          "src/main/java/com/example/billing/service/BillingManager.java",
+          "src/main/java/com/example/billing/model/InvoiceRecord.java"
+        ],
+        "health_note": "Part of runtime cycle with BillingManager; mutable singleton field race condition."
+      },
+      {
+        "path": "src/main/java/com/example/billing/service/BillingManager.java",
+        "role": "Core billing god-service with static INVOICE_CACHE and circular controller injection",
+        "key_symbols": [
+          "BillingManager",
+          "INVOICE_CACHE",
+          "processBatchBilling"
+        ],
+        "depends_on": [
+          "src/main/java/com/example/billing/controller/BillingController.java",
+          "src/main/java/com/example/billing/client/GatewayClient.java",
+          "src/main/java/com/example/billing/model/InvoiceRecord.java",
+          "src/main/java/com/example/billing/util/LegacyDateHelper.java"
+        ],
+        "health_note": "Primary risk hotspot: cognitive=56, 8 params, String ==, empty catch, broken private @Transactional."
+      },
+      {
+        "path": "src/main/java/com/example/billing/client/GatewayClient.java",
+        "role": "Payment gateway HTTP client",
+        "key_symbols": [
+          "GatewayClient",
+          "sendCharge"
+        ],
+        "depends_on": [],
+        "health_note": "Hardcoded secret, Java 11 API on Java 1.8 target, missing timeout, System.getenv."
+      },
+      {
+        "path": "src/main/java/com/example/billing/model/InvoiceRecord.java",
+        "role": "Immutable invoice value object",
+        "key_symbols": [
+          "InvoiceRecord",
+          "getInvoiceId",
+          "getAmountCents"
+        ],
+        "depends_on": [],
+        "health_note": "Cleanest module in repo; 0 AST issues."
+      }
+    ],
+    "boundary_assessment": "Severe boundary violation: BillingManager imports and @Autowired-injects BillingController, creating a runtime cycle (BillingController <-> BillingManager). Mutable static HashMap INVOICE_CACHE and singleton field BillingController.channel violate statelessness and thread safety."
+  },
+  "execution_flow_map": {
+    "entry_points": [
+      "src/main/java/com/example/billing/BillingApp.java:main",
+      "src/main/java/com/example/billing/controller/BillingController.java:chargeCustomer"
+    ],
+    "execution_flows": [
+      {
+        "name": "Customer Charge & Batch Billing Flow",
+        "trigger": "HTTP ANY /charge (unrestricted @RequestMapping)",
+        "steps": [
+          "BillingController.chargeCustomer() overwrites shared singleton field 'channel' with HTTP method and extracts customerId/amountCents from raw Map payload.",
+          "Constructs raw ArrayList containing one InvoiceRecord and calls BillingManager.processBatchBilling() with 8 arguments.",
+          "processBatchBilling() checks status=='PAID' and currency=='USD'/'JPY' via == reference equality to apply 8%/10% tax, or invokes GatewayClient.sendCharge(customerId, 100L) in a retry loop for non-positive amounts.",
+          "Calls private @Transactional saveAuditTrail() (self-invocation bypasses Spring proxy), writes to static raw HashMap INVOICE_CACHE using LegacyDateHelper, optionally reads circularController.lastChannel(), and swallows exceptions in an empty catch block."
+        ],
+        "involved_files": [
+          "src/main/java/com/example/billing/controller/BillingController.java",
+          "src/main/java/com/example/billing/service/BillingManager.java",
+          "src/main/java/com/example/billing/client/GatewayClient.java",
+          "src/main/java/com/example/billing/model/InvoiceRecord.java",
+          "src/main/java/com/example/billing/util/LegacyDateHelper.java"
+        ]
+      }
+    ],
+    "state_and_storage": [
+      "Unsynchronized process-local static raw HashMap BillingManager.INVOICE_CACHE (src/main/java/com/example/billing/service/BillingManager.java:17).",
+      "Mutable singleton controller field BillingController.channel overwritten on every HTTP request (src/main/java/com/example/billing/controller/BillingController.java:20)."
+    ],
+    "error_and_concurrency_model": "Thread-unsafe Servlet container execution: concurrent requests race on BillingController.channel and unsynchronized HashMap INVOICE_CACHE; BillingManager swallows all audit/cache exceptions in an empty catch block (line 83) and GatewayClient prints stack traces to stderr while blocking indefinitely without HTTP timeouts."
+  }
+}

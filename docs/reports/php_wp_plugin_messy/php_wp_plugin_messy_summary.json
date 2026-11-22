@@ -1,0 +1,44 @@
+{
+  "schema_version": "2.0",
+  "project_name": "wp_plugin_messy",
+  "workflow_id": "php_wp_plugin_messy",
+  "workflow_run_id": "wf-3389d5e7",
+  "evaluated_at": "2026-11-22T11:29:03.792183+00:00",
+  "language": "php",
+  "target_root": "examples/php/wp_plugin_messy",
+  "overall_score": 60,
+  "grade": "C",
+  "category_scores": {
+    "architecture": 90,
+    "code_quality": 90,
+    "typing": 36,
+    "testing": 55,
+    "dependencies": 90,
+    "security": 30,
+    "documentation": 27
+  },
+  "baseline_scores": {
+    "architecture": 100,
+    "code_quality": 100,
+    "typing": 46,
+    "testing": 65,
+    "dependencies": 100,
+    "security": 40,
+    "documentation": 37
+  },
+  "total_loc": 84,
+  "measured_line_coverage_pct": null,
+  "passed_rules": 0,
+  "applicable_rules": 16,
+  "finding_counts": {
+    "critical": 4,
+    "high": 10,
+    "medium": 1,
+    "low": 0,
+    "info": 0
+  },
+  "components": [],
+  "score_file": "docs/reports/php_wp_plugin_messy/php_wp_plugin_messy_score.json",
+  "sarif_file": "docs/reports/php_wp_plugin_messy/php_wp_plugin_messy_findings.sarif",
+  "summary": "wp_plugin_messy (Member Analytics Portal v1.3.0) scores 60/100 (Grade C overall, Security 30/100 Grade D, Documentation 27/100 Grade D, Typing 36/100 Grade D) due to systemic WordPress security failures across every module. While isolated PHP 8.2 runtime syntax checks (php -l) and WordPress hook loading (5 hooks) succeeded with 0 declared Composer CVEs, SAST and AST inspection uncovered 1 hardcoded webhook secret ($map_webhook_secret), 5 HIGH CWE dangerous sinks (3x CWE-89 unparameterized $wpdb SQL injection querying wp_users and deleting wp_map_events, 2x CWE-79 unescaped XSS plus shortcode $_GET XSS), unauthenticated PII exposure via REST permission_callback=>'__return_true' and wp_ajax_nopriv, subscriber-level ('read') admin settings privilege escalation without nonces, missing ABSPATH guards in all 4 files, 0% typing/PHPDoc, and 0 automated tests."
+}

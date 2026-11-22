@@ -87,7 +87,7 @@
                 
                 <a href="../01_getting_started/release_notes.html" class="sidebar-version-badge" title="View Release Notes">
                     <span class="sidebar-version-dot" aria-hidden="true"></span>
-                    <span class="sidebar-version-text">v0.1.4</span>
+                    <span class="sidebar-version-text">v0.2.0</span>
                 </a>
                 <a href="https://github.com/yuichi110/pni501" target="_blank" rel="noopener noreferrer" class="sidebar-github-link" aria-label="GitHub Repository" title="GitHub Repository">
                     <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg>
@@ -153,7 +153,7 @@
                             </li>
                             
                             <li class="nav-item ">
-                                <a href="../03_workflows_and_actions/actions_pipeline.html" >15 アクションと 12 プリミティブ</a>
+                                <a href="../03_workflows_and_actions/actions_pipeline.html" >182 アクションと 16 プリミティブ</a>
                             </li>
                             
                             <li class="nav-item ">
@@ -175,6 +175,10 @@
                                 <a href="../04_scoring_and_reports/drawlib_reporter.html" >Drawlib ビジュアルレポーター</a>
                             </li>
                             
+                            <li class="nav-item ">
+                                <a href="../04_scoring_and_reports/sample_reports.html" >サンプルレポートギャラリー</a>
+                            </li>
+                            
                         </ul>
                     
                         
@@ -183,7 +187,7 @@
                         <ul class="nav-list">
                             
                             <li class="nav-item ">
-                                <a href="../05_languages_and_reference/supported_languages.html" >対応 6 言語マトリクス</a>
+                                <a href="../05_languages_and_reference/supported_languages.html" >対応55言語マトリクス</a>
                             </li>
                             
                             <li class="nav-item ">
@@ -247,6 +251,71 @@
             <main class="main-content">
                 <h1>リリースノート (Release Notes)</h1>
 <p><strong>Project Nemesis Index (<code>pni501</code>)</strong> のリリース履歴、アーキテクチャの拡張、および各バージョンの主な新機能一覧です。</p>
+<hr />
+<h2>Version 0.2.0</h2>
+<p><em>Release Date: 2026/11/22</em></p>
+<p>バージョン <code>0.2.0</code> は、<code>pni501</code> の対応言語を従来の 6 言語から <strong>55 言語</strong>（57 のネイティブ <code>tree-sitter</code> CST 文法、<code>ast-grep-py</code> からの完全移行）へ大幅拡張し、<strong>Workflow v2 条件付き DAG エンジン</strong>（<code>needs:</code>・<code>when:</code>・<code>pni workflows plan</code>・<code>confirm_plan</code>・<code>pni validate-mermaid</code>）、<strong>Executed Audit DAG と 7 軸エビデンス Δ / 誤検知（FP）トリアージ</strong>、<strong>フラットで凝集度の高い Drawlib レポート構成</strong>（<code>pni_report_src -&gt; pni_report</code> と <code>_facts/</code> 自動同期）、および <strong>GitHub Releases 経由のオンデマンド <code>abi3</code> 文法キャッシュ</strong>（<code>pni grammars</code>）を導入するメジャーアップデートです。</p>
+<h3>1. 55 言語マルチランゲージ対応とネイティブ Tree-sitter CST エンジン</h3>
+<ul>
+<li><strong>3 ティア 55 言語レジストリ (<code>src/pni/_languages/registry.py</code>)</strong>:
+<ul>
+<li><strong>Tier A — フル監査（<code>20</code> 言語）</strong>: <code>Python</code>, <code>Java</code>, <code>PHP</code>, <code>Go</code>, <code>TypeScript</code>, <code>JavaScript</code>, <code>C#</code>, <code>Rust</code>, <code>Ruby</code>, <code>Kotlin</code>, <code>Swift</code>, <code>C</code>, <code>C++</code>, <code>Scala</code>, <code>Dart</code>, <code>Elixir</code>, <code>Vue</code>, <code>Perl</code>, <code>COBOL</code>, <code>R</code>。</li>
+<li><strong>Tier B — 宣言的静的 AST 監査（<code>20</code> 言語）</strong>: <code>Bash/Shell</code>, <code>PowerShell</code>, <code>Groovy</code>, <code>Objective-C</code>, <code>Lua</code>, <code>Haskell</code>, <code>F#</code>, <code>OCaml</code>, <code>Zig</code>, <code>Julia</code>, <code>Fortran</code>, <code>MATLAB</code>, <code>Svelte</code>, <code>Solidity</code>, <code>CUDA</code>, <code>Verilog/SystemVerilog</code>, <code>VHDL</code>, <code>Ada</code>, <code>Odin</code>, <code>Common Lisp</code>。</li>
+<li><strong>Tier C — コンパニオン IaC / スキーマ / ビルド / 設定（<code>15</code> 言語）</strong>: <code>Dockerfile</code>, <code>HCL/Terraform</code>, <code>Bicep</code>, <code>Nix</code>, <code>Makefile</code>, <code>Starlark/Bazel</code>, <code>Protocol Buffers</code>, <code>SQL</code>, <code>HTML</code>, <code>CSS</code>, <code>SCSS</code>, <code>YAML</code>, <code>JSON</code>, <code>TOML</code>, <code>XML</code>。</li>
+<li>カスケードルール体系に <strong>356 個のビルトインルールファイル</strong>、<strong>182 個のアクションテンプレート</strong>、<strong>112 個のワークフローテンプレート</strong> を同梱しました。</li>
+</ul>
+</li>
+<li><strong>ネイティブ <code>tree-sitter&gt;=0.25.0</code> 単一パス CST エンジン</strong>:
+<ul>
+<li><code>ast-grep-py</code> を廃止し、52 個の公式 PyPI <code>abi3</code> wheel と 5 個のオンデマンド GitHub Releases 文法を統一的に扱う <code>src/pni/_actions/ast_analyze/_cst.py</code> へ移行しました。</li>
+</ul>
+</li>
+<li><strong>GitHub Releases 経由のオンデマンド文法キャッシュ (<code>pni grammars</code>)</strong>:
+<ul>
+<li><code>pni501</code> 本体は軽量な pure-Python (<code>py3-none-any</code>) wheel のまま維持しつつ、PyPI に 3-OS 公式 wheel がない MIT ライセンス 5 言語（<code>COBOL</code>, <code>R</code>, <code>Vue</code>, <code>Protocol Buffers</code>, <code>Dockerfile</code>）を GitHub Actions で 5 ターゲット（<code>linux_x86_64</code>, <code>linux_aarch64</code>, <code>macos_arm64</code>, <code>macos_x86_64</code>, <code>windows_amd64</code>）向けに事前ビルドし、初回利用時に SHA-256 検証付きで自動ダウンロード＆キャッシュします（read-only 環境時は <code>~/.cache/pni501/grammars</code> へ自動フォールバック）。</li>
+<li><code>pni grammars status</code>、<code>pni grammars prefetch [LANG ...] [--all] [--force]</code>、<code>pni grammars clear</code> を新設しました。</li>
+</ul>
+</li>
+</ul>
+<h3>2. Workflow v2 条件付き DAG エンジンと単一コマンド CLI 改善</h3>
+<ul>
+<li><strong>DAG 依存関係と条件付き実行 (<code>needs:</code> / <code>when:</code>)</strong>:
+<ul>
+<li>並列実行可能な DAG ステップ（<code>needs: [...]</code>）、決定論的条件ガード（<code>when:</code>）、Phase 0 軽量偵察と検証済み Mermaid DAG プレビュー（<code>pni workflows plan &lt;id&gt;</code>）、承認ゲート（<code>confirm_plan</code>）、並列実行可能フロンティア取得（<code>pni workflows get-actions &lt;run_id&gt;</code>）、およびモノレポ統合ロールアップワークフロー（<code>category: rollup</code>）を追加しました。</li>
+</ul>
+</li>
+<li><strong>2 層 Mermaid 構文バリデーター (<code>pni validate-mermaid</code>)</strong>:
+<ul>
+<li>Layer 1 静的パーサーとオプションの Layer 2 Playwright <code>mermaid.parse()</code>（<code>--browser</code>）で AI 生成 Mermaid 図の構文エラーを事前防止します。</li>
+</ul>
+</li>
+<li><strong>単一コマンド完結型 CLI オプション</strong>:
+<ul>
+<li><code>pni workflows start --pull</code> (<code>-p</code>)、<code>pni workflows push-action --file</code> (<code>-f</code>) / <code>--next</code> (<code>-n</code>)、および各サブコマンドの <code>-o</code> / <code>--output</code> オプションを追加し、シェルリダイレクトや <code>&amp;&amp;</code> 連結なしで安全に実行できるようになりました。</li>
+</ul>
+</li>
+</ul>
+<h3>3. Executed Audit DAG・7 軸エビデンス Δ・誤検知（FP）トリアージ</h3>
+<ul>
+<li><strong>監査 DAG 実績記録とエビデンス Δ</strong>:
+<ul>
+<li><code>ScoreResult</code> に実行済みワークフロー DAG、各軸のベースライン対調整後 Δ、および明示的根拠付きの <code>finding_adjustments</code>（コンテナビルド時ツールチェーン CVE 等の誤検知トリアージ記録）を保持し、レポートおよび JSON 出力へ透明に反映します。</li>
+</ul>
+</li>
+</ul>
+<h3>4. フラットな自己完結型レポート構成とバイリンガル・サンプルポータル</h3>
+<ul>
+<li><strong>フラットな <code>pni_report_src -&gt; pni_report</code> と <code>_facts/</code> 自動同期</strong>:
+<ul>
+<li>従来のネスト構造 (<code>&lt;src_dir&gt;/&lt;target&gt;_src/</code>) を廃止し、<code>--src-dir</code>（デフォルト <code>pni_report_src</code>）直下に <code>drawlib.toml</code>・<code>styles.py</code>・<code>utils.py</code>・<code>&lt;lang&gt;/00..06.md</code>・<code>_facts/</code>（検証済みファクト JSON 群を自動同期）を配置する高凝集構造へ刷新しました。</li>
+</ul>
+</li>
+<li><strong>統合ドキュメントポータルと 4 本の Workflow v2 バイリンガル・サンプルレポート</strong>:
+<ul>
+<li>公式サイトを <code>docs_src/site -&gt; docs/</code> 構成へ移行し、<code>docs_src/reports/&lt;slug&gt; -&gt; docs/reports/&lt;slug&gt;</code> として日英 HTML &amp; A4 PDF サンプルレポート 4 本を統合公開しました（<a href="../04_scoring_and_reports/sample_reports.html">サンプルレポート一覧</a>）。</li>
+</ul>
+</li>
+</ul>
 <hr />
 <h2>Version 0.1.4</h2>
 <p><em>Release Date: 2026/11/10</em></p>

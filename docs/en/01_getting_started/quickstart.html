@@ -35,19 +35,19 @@
     
     
     
-    <meta name="description" content="Get up and running with pni501 (v0.1.4) in minutes. This guide walks through installing the CLI, initializing .pni/ in a target repository, verifying…">
+    <meta name="description" content="Get up and running with pni501 (v0.2.0) in minutes. This guide walks through installing the pure-Python CLI, inspecting on-demand Tree-sitter grammars (pni…">
     <link rel="canonical" href="https://www.pni501.com/en/01_getting_started/quickstart.html">
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="pni501 Documentation">
     <meta property="og:title" content="Quickstart Guide — pni501 Documentation">
-    <meta property="og:description" content="Get up and running with pni501 (v0.1.4) in minutes. This guide walks through installing the CLI, initializing .pni/ in a target repository, verifying…">
+    <meta property="og:description" content="Get up and running with pni501 (v0.2.0) in minutes. This guide walks through installing the pure-Python CLI, inspecting on-demand Tree-sitter grammars (pni…">
     <meta property="og:url" content="https://www.pni501.com/en/01_getting_started/quickstart.html">
     <meta property="og:image" content="https://www.pni501.com/_assets/logo.png">
     <meta property="og:locale" content="en_US">
     <meta property="og:locale:alternate" content="ja_JP">
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="Quickstart Guide — pni501 Documentation">
-    <meta name="twitter:description" content="Get up and running with pni501 (v0.1.4) in minutes. This guide walks through installing the CLI, initializing .pni/ in a target repository, verifying…">
+    <meta name="twitter:description" content="Get up and running with pni501 (v0.2.0) in minutes. This guide walks through installing the pure-Python CLI, inspecting on-demand Tree-sitter grammars (pni…">
     <meta name="twitter:image" content="https://www.pni501.com/_assets/logo.png">
     
     
@@ -85,7 +85,7 @@
                 
                 <a href="../01_getting_started/release_notes.html" class="sidebar-version-badge" title="View Release Notes">
                     <span class="sidebar-version-dot" aria-hidden="true"></span>
-                    <span class="sidebar-version-text">v0.1.4</span>
+                    <span class="sidebar-version-text">v0.2.0</span>
                 </a>
                 <a href="https://github.com/yuichi110/pni501" target="_blank" rel="noopener noreferrer" class="sidebar-github-link" aria-label="GitHub Repository" title="GitHub Repository">
                     <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg>
@@ -151,7 +151,7 @@
                             </li>
                             
                             <li class="nav-item ">
-                                <a href="../03_workflows_and_actions/actions_pipeline.html" >15 Actions &amp; 12 Primitives</a>
+                                <a href="../03_workflows_and_actions/actions_pipeline.html" >182 Actions &amp; 16 Primitives</a>
                             </li>
                             
                             <li class="nav-item ">
@@ -173,6 +173,10 @@
                                 <a href="../04_scoring_and_reports/drawlib_reporter.html" >Drawlib Visual Reporter</a>
                             </li>
                             
+                            <li class="nav-item ">
+                                <a href="../04_scoring_and_reports/sample_reports.html" >Sample Reports Gallery</a>
+                            </li>
+                            
                         </ul>
                     
                         
@@ -181,7 +185,7 @@
                         <ul class="nav-list">
                             
                             <li class="nav-item ">
-                                <a href="../05_languages_and_reference/supported_languages.html" >Supported 6 Languages</a>
+                                <a href="../05_languages_and_reference/supported_languages.html" >Supported 55 Languages</a>
                             </li>
                             
                             <li class="nav-item ">
@@ -244,10 +248,10 @@
             </header>
             <main class="main-content">
                 <h1>Quickstart Guide</h1>
-<p>Get up and running with <code>pni501</code> (<code>v0.1.4</code>) in minutes. This guide walks through installing the CLI, initializing <code>.pni/</code> in a target repository, verifying pre-flight readiness gates, and executing the stateful Pull-Push workflow loop to generate a 7-axis score JSON and a 7-chapter A4 PDF report.</p>
+<p>Get up and running with <code>pni501</code> (<code>v0.2.0</code>) in minutes. This guide walks through installing the pure-Python CLI, inspecting on-demand Tree-sitter grammars (<code>pni grammars</code>), initializing <code>.pni/</code> in any of the <strong>55 supported languages</strong>, previewing the Phase 0 recon plan &amp; Mermaid DAG (<code>pni workflows plan</code>), executing the single-command <strong>Workflow v2</strong> Pull-Push loop (<code>--pull</code>, <code>--file</code>, <code>--next</code>, <code>-o</code>), and building a flat, self-contained A4 PDF report (<code>pni_report_src -&gt; pni_report</code>).</p>
 <figure class="drawlib-image" style="text-align: center;">
   <img src="../../images/01_getting_started/quickstart/pni_quickstart_flow.png" alt="quickstart_1" />
-  <figcaption class="drawlib-caption">Four-Step Quickstart Lifecycle: From pni init to Validated 7-Axis Score & 7-Chapter A4 PDF Report</figcaption>
+  <figcaption class="drawlib-caption">Four-Step Workflow v2 Quickstart Lifecycle: From pni init & Plan Gate to Validated Score + Delta & Flat A4 PDF Report</figcaption>
 </figure>
 <details class="drawlib-code-details">
 <summary>Source Code</summary>
@@ -271,20 +275,20 @@
     <span class="n">description</span><span class="o">=</span><span class="s2">"pip install pni501</span><span class="se">\n</span><span class="s2">pni init"</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="n">pipeline</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
-    <span class="s2">"2. Inspect &amp; Tailor"</span><span class="p">,</span>
-    <span class="n">description</span><span class="o">=</span><span class="s2">"Edit .pni/workflows/</span><span class="se">\n</span><span class="s2">pni workflows show"</span><span class="p">,</span>
+    <span class="s2">"2. Plan &amp; Gates"</span><span class="p">,</span>
+    <span class="n">description</span><span class="o">=</span><span class="s2">"pni workflows plan</span><span class="se">\n</span><span class="s2">&amp; confirm_plan"</span><span class="p">,</span>
     <span class="n">style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">Neutral</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="n">pipeline</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
-    <span class="s2">"3. Pull-Push Loop"</span><span class="p">,</span>
-    <span class="n">description</span><span class="o">=</span><span class="s2">"start -&gt; get-action</span><span class="se">\n</span><span class="s2">&lt;-&gt; push-action"</span><span class="p">,</span>
+    <span class="s2">"3. Single-Cmd Loop"</span><span class="p">,</span>
+    <span class="n">description</span><span class="o">=</span><span class="s2">"start --pull -&gt;</span><span class="se">\n</span><span class="s2">push-action --next"</span><span class="p">,</span>
     <span class="n">style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">PrimaryFlat</span><span class="p">,</span>
     <span class="n">text_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">WhiteBold</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">text_size</span><span class="o">=</span><span class="mf">10.5</span><span class="p">),</span>
     <span class="n">description_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">White</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">text_size</span><span class="o">=</span><span class="mf">10.0</span><span class="p">),</span>
 <span class="p">)</span>
 <span class="n">pipeline</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
-    <span class="s2">"4. Build PDF Report"</span><span class="p">,</span>
-    <span class="n">description</span><span class="o">=</span><span class="s2">"pni report init/build</span><span class="se">\n</span><span class="s2">reports/&lt;target&gt;.pdf"</span><span class="p">,</span>
+    <span class="s2">"4. Flat PDF Report"</span><span class="p">,</span>
+    <span class="n">description</span><span class="o">=</span><span class="s2">"pni report init/build</span><span class="se">\n</span><span class="s2">pni_report/&lt;t&gt;.pdf"</span><span class="p">,</span>
     <span class="n">style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">SuccessFlat</span><span class="p">,</span>
     <span class="n">text_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">WhiteBold</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">text_size</span><span class="o">=</span><span class="mf">10.5</span><span class="p">),</span>
     <span class="n">description_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">White</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">text_size</span><span class="o">=</span><span class="mf">10.0</span><span class="p">),</span>
@@ -293,8 +297,8 @@
 
 <span class="n">commands</span> <span class="o">=</span> <span class="n">CardList</span><span class="p">(</span>
     <span class="n">style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">Neutral</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">shape_r</span><span class="o">=</span><span class="mf">1.6</span><span class="p">),</span>
-    <span class="n">text_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">DarkBold</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">text_size</span><span class="o">=</span><span class="mf">10.5</span><span class="p">),</span>
-    <span class="n">description_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">Dark</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">text_size</span><span class="o">=</span><span class="mf">10.0</span><span class="p">),</span>
+    <span class="n">text_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">DarkBold</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">text_size</span><span class="o">=</span><span class="mf">10.4</span><span class="p">),</span>
+    <span class="n">description_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">Dark</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">text_size</span><span class="o">=</span><span class="mf">9.8</span><span class="p">),</span>
     <span class="n">badge_shape</span><span class="o">=</span><span class="s2">"circle"</span><span class="p">,</span>
     <span class="n">badge_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">PrimaryFlat</span><span class="p">,</span>
     <span class="n">badge_text_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">WhiteBold</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">text_size</span><span class="o">=</span><span class="mf">10.0</span><span class="p">),</span>
@@ -306,22 +310,22 @@
 <span class="p">)</span>
 <span class="n">commands</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
     <span class="s2">"Scaffold .pni/"</span><span class="p">,</span>
-    <span class="s2">"Auto-detects 6 languages</span><span class="se">\n</span><span class="s2">Creates rules &amp; workflows"</span><span class="p">,</span>
+    <span class="s2">"55-lang auto-detect + lazy</span><span class="se">\n</span><span class="s2">ABI3 grammars (pni grammars)"</span><span class="p">,</span>
     <span class="n">icon</span><span class="o">=</span><span class="n">phosphor</span><span class="o">.</span><span class="n">folder_plus</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="n">commands</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
-    <span class="s2">"Verify Pre-Flight"</span><span class="p">,</span>
-    <span class="s2">"Checks target dirs, pentests</span><span class="se">\n</span><span class="s2">&amp; based_on prerequisites"</span><span class="p">,</span>
+    <span class="s2">"Plan &amp; Pre-Flight"</span><span class="p">,</span>
+    <span class="s2">"Phase 0 recon, Mermaid DAG</span><span class="se">\n</span><span class="s2">&amp; confirm_plan approval"</span><span class="p">,</span>
     <span class="n">icon</span><span class="o">=</span><span class="n">phosphor</span><span class="o">.</span><span class="n">magnifying_glass</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="n">commands</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
-    <span class="s2">"Execute Primitives"</span><span class="p">,</span>
-    <span class="s2">"Auto-runs AST/Docker/Trivy</span><span class="se">\n</span><span class="s2">Validates AI JSON schemas"</span><span class="p">,</span>
+    <span class="s2">"Parallel DAG Exec"</span><span class="p">,</span>
+    <span class="s2">"Auto-runs CST/Docker/Trivy</span><span class="se">\n</span><span class="s2">Triage FPs &amp; Evidence Delta"</span><span class="p">,</span>
     <span class="n">icon</span><span class="o">=</span><span class="n">phosphor</span><span class="o">.</span><span class="n">arrows_left_right</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="n">commands</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
-    <span class="s2">"Deliver Artifacts"</span><span class="p">,</span>
-    <span class="s2">"Outputs *_score.json &amp;</span><span class="se">\n</span><span class="s2">7-chapter A4 vector PDF"</span><span class="p">,</span>
+    <span class="s2">"Flat Deliverables"</span><span class="p">,</span>
+    <span class="s2">"pni_report_src/_facts/ -&gt;</span><span class="se">\n</span><span class="s2">Score, SARIF &amp; A4 PDF"</span><span class="p">,</span>
     <span class="n">badge_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">SuccessFlat</span><span class="p">,</span>
     <span class="n">icon</span><span class="o">=</span><span class="n">phosphor</span><span class="o">.</span><span class="n">file_pdf</span><span class="p">,</span>
 <span class="p">)</span>
@@ -329,39 +333,50 @@
 <span class="n">save</span><span class="p">()</span>
 </code></pre>
 </details>
-<h2>1. Prerequisites &amp; Installation</h2>
-<p><code>pni501</code> requires <strong>Python 3.11+</strong> (<code>&gt;=3.11</code>). For containerized runtime checks (<code>run_check</code>), vulnerability scans (<code>security_scan</code>), and loopback penetration tests (<code>web_pentest</code>), <strong>Docker</strong> should also be available on the host machine.</p>
-<p>Install <code>pni501</code> from PyPI using <code>pip</code> or <code>uv</code> and verify the CLI version:</p>
+<h2>1. Prerequisites, Installation &amp; On-Demand Grammars</h2>
+<p><code>pni501</code> requires <strong>Python 3.11+</strong> (<code>&gt;=3.11</code>). For containerized runtime checks (<code>run_check</code>), vulnerability scans (<code>security_scan</code>), and loopback penetration tests (<code>web_pentest</code>), <strong>Docker</strong> (or Podman) should also be available on the host machine.</p>
+<p><code>pni501</code> ships as a pure-Python (<code>py3-none-any</code>) wheel backed by <strong>52 official PyPI <code>tree-sitter-*</code> <code>abi3</code> wheels</strong>. The remaining <strong>5 MIT-licensed grammars</strong> (<code>COBOL</code>, <code>R</code>, <code>Vue</code>, <code>Protocol Buffers</code>, and <code>Dockerfile</code>) are downloaded lazily on first use from GitHub Releases with pinned SHA-256 verification—or prefetched upfront for air-gapped / offline environments:</p>
 <pre><code class="language-bash"><span class="c1"># Option A: Install via pip</span>
 pip<span class="w"> </span>install<span class="w"> </span>pni501
 
 <span class="c1"># Option B: Add to a uv project or tool environment</span>
 uv<span class="w"> </span>add<span class="w"> </span>pni501
 
-<span class="c1"># Verify installation and inspect top-level CLI subcommands</span>
+<span class="c1"># Verify installation and inspect CLI subcommands</span>
 pni<span class="w"> </span>--version<span class="w">   </span><span class="c1"># or: pni version</span>
 pni<span class="w"> </span>--help
+
+<span class="c1"># Optional: inspect or prefetch the 5 GitHub Releases ABI3 grammars for offline use</span>
+pni<span class="w"> </span>grammars<span class="w"> </span>status
+pni<span class="w"> </span>grammars<span class="w"> </span>prefetch<span class="w"> </span>--all
 </code></pre>
 <h2>2. Step 1: Initialize <code>.pni/</code> in Your Repository</h2>
 <p>Navigate to the root of the repository you want to evaluate and run <code>pni init</code>:</p>
 <pre><code class="language-bash">pni<span class="w"> </span>init
 </code></pre>
-<p><code>pni init</code> automatically detects the primary language of the repository (<strong>Python</strong>, <strong>Java</strong>, <strong>PHP</strong>, <strong>Go</strong>, <strong>TypeScript</strong>, or <strong>JavaScript</strong>) from manifest files (<code>pyproject.toml</code>, <code>pom.xml</code>, <code>build.gradle</code>, <code>composer.json</code>, <code>go.mod</code>, <code>package.json</code>, <code>tsconfig.json</code>) and scaffolds the <code>.pni/</code> workspace directory:</p>
+<p><code>pni init</code> automatically detects the primary language across the <strong>55-language registry</strong> (20 Tier A Full Audit, 20 Tier B Declarative Static Audit, plus 15 Tier C Companion IaC/Schema/Build/Config languages) from repository manifests and source files, then scaffolds <code>.pni/</code>:</p>
 <ul>
-<li><code>.pni/pni.toml</code> — Project-wide configuration for default target directories (<code>[targets]</code>) and Drawlib report settings (<code>[report]</code>).</li>
-<li><code>.pni/workflows/full_audit.yaml</code> &amp; <code>quick_check.yaml</code> — Language-tailored stateful workflow definitions (from the <strong>6 built-in language workflow sets</strong>).</li>
-<li><code>.pni/rules/</code> &amp; <code>.pni/actions/</code> — Local override directories for custom rules and composite actions.</li>
-<li><code>.pni/instructions.md</code> — Bootstrap instructions for Code AI Agents.</li>
+<li><code>.pni/pni.toml</code> — Project-wide configuration for default target directories (<code>[targets]</code>) and flat Drawlib report settings (<code>[report]</code>, defaulting to <code>pni_report_src -&gt; pni_report</code>).</li>
+<li><code>.pni/workflows/full_audit.yaml</code> &amp; <code>quick_check.yaml</code> — Language-tailored <strong>Workflow v2</strong> conditional DAG definitions (<code>needs:</code> / <code>when:</code>), sourced from the <strong>112 built-in workflow templates</strong>.</li>
+<li><code>.pni/rules/</code> &amp; <code>.pni/actions/</code> — Local override directories layering over the <strong>356 built-in rules</strong> and <strong>182 action templates</strong>.</li>
+<li><code>.pni/instructions.md</code> — Workflow v2 bootstrap instructions for Code AI Agents.</li>
 </ul>
-<h2>3. Step 2: Inspect Targets &amp; Verify Pre-Flight Gates</h2>
-<p>Before starting a workflow run, always verify that <code>targets.root</code>, <code>targets.source</code>, <code>targets.tests</code>, and <code>targets.docs</code> in <code>.pni/workflows/&lt;id&gt;.yaml</code> match your repository's real directory layout, and run <code>pni workflows show &lt;id&gt;</code> to inspect the normalized primitive pipeline and pre-flight readiness gates:</p>
-<pre><code class="language-bash"><span class="c1"># List available workflows and inspect normalized steps &amp; pre-flight status</span>
+<h2>3. Step 2: Preview Phase 0 Plan, Mermaid DAG &amp; Pre-Flight Gates</h2>
+<p>Before launching a stateful run, verify that <code>targets.root</code>, <code>targets.source</code>, <code>targets.tests</code>, and <code>targets.docs</code> in <code>.pni/workflows/&lt;id&gt;.yaml</code> match your repository layout. Then run <strong><code>pni workflows plan &lt;id&gt;</code></strong> to execute lightweight Phase 0 reconnaissance, inspect pre-flight readiness gates, and render a Python-validated Mermaid Execution DAG:</p>
+<pre><code class="language-bash"><span class="c1"># List available workflows (audit, rollup, migration, progress) and inspect steps</span>
 pni<span class="w"> </span>workflows<span class="w"> </span>list
 pni<span class="w"> </span>workflows<span class="w"> </span>show<span class="w"> </span>full_audit
+
+<span class="c1"># Phase 0 recon + validated Mermaid Execution DAG preview (save with -o if needed)</span>
+pni<span class="w"> </span>workflows<span class="w"> </span>plan<span class="w"> </span>full_audit
+pni<span class="w"> </span>workflows<span class="w"> </span>plan<span class="w"> </span>full_audit<span class="w"> </span>-o<span class="w"> </span>.pni/cache/plan_preview.md
+
+<span class="c1"># Validate any custom or AI-authored Mermaid diagram (Layer 1 static + optional Layer 2 Playwright)</span>
+pni<span class="w"> </span>validate-mermaid<span class="w"> </span>.pni/cache/plan_preview.md
 </code></pre>
 <figure class="drawlib-image" style="text-align: center;">
   <img src="../../images/01_getting_started/quickstart/pni_preflight_gates_flow.png" alt="quickstart_2" />
-  <figcaption class="drawlib-caption">Pre-Flight Readiness Gates & Stateful Execution Flowchart in pni workflows</figcaption>
+  <figcaption class="drawlib-caption">Workflow v2 Pre-Flight Gates, confirm_plan Alignment & Auto-Advance DAG Flowchart</figcaption>
 </figure>
 <details class="drawlib-code-details">
 <summary>Source Code</summary>
@@ -381,9 +396,9 @@ pni<span class="w"> </span>workflows<span class="w"> </span>show<span class="w">
     <span class="n">height</span><span class="o">=</span><span class="mf">90.0</span><span class="p">,</span>
 <span class="p">)</span>
 
-<span class="n">flow</span><span class="o">.</span><span class="n">add_lane</span><span class="p">(</span><span class="s2">"1. Setup &amp; Inspect"</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mf">44.0</span><span class="p">)</span>
-<span class="n">flow</span><span class="o">.</span><span class="n">add_lane</span><span class="p">(</span><span class="s2">"2. Pre-Flight Readiness Gates"</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mf">52.0</span><span class="p">)</span>
-<span class="n">flow</span><span class="o">.</span><span class="n">add_lane</span><span class="p">(</span><span class="s2">"3. Remedies &amp; Execution"</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mf">62.0</span><span class="p">)</span>
+<span class="n">flow</span><span class="o">.</span><span class="n">add_lane</span><span class="p">(</span><span class="s2">"1. Setup &amp; Plan"</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mf">44.0</span><span class="p">)</span>
+<span class="n">flow</span><span class="o">.</span><span class="n">add_lane</span><span class="p">(</span><span class="s2">"2. Gates &amp; Approval"</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mf">52.0</span><span class="p">)</span>
+<span class="n">flow</span><span class="o">.</span><span class="n">add_lane</span><span class="p">(</span><span class="s2">"3. Remedies &amp; Output"</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mf">62.0</span><span class="p">)</span>
 
 <span class="n">n_init</span> <span class="o">=</span> <span class="n">flow</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
     <span class="n">Start</span><span class="p">(</span>
@@ -398,7 +413,7 @@ pni<span class="w"> </span>workflows<span class="w"> </span>show<span class="w">
 
 <span class="n">n_show</span> <span class="o">=</span> <span class="n">flow</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
     <span class="n">Process</span><span class="p">(</span>
-        <span class="s2">"pni workflows show &lt;id&gt;</span><span class="se">\n</span><span class="s2">(Expand &amp; Check Gates)"</span><span class="p">,</span>
+        <span class="s2">"pni workflows plan &lt;id&gt;</span><span class="se">\n</span><span class="s2">(Recon + Mermaid DAG)"</span><span class="p">,</span>
         <span class="n">width</span><span class="o">=</span><span class="mf">37.0</span><span class="p">,</span>
         <span class="n">height</span><span class="o">=</span><span class="mf">14.0</span><span class="p">,</span>
         <span class="n">style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">Neutral</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">shape_r</span><span class="o">=</span><span class="mf">1.6</span><span class="p">),</span>
@@ -407,20 +422,20 @@ pni<span class="w"> </span>workflows<span class="w"> </span>show<span class="w">
     <span class="n">xy</span><span class="o">=</span><span class="p">(</span><span class="mf">22.0</span><span class="p">,</span> <span class="mf">46.0</span><span class="p">),</span>
 <span class="p">)</span>
 
-<span class="n">g_pentest</span> <span class="o">=</span> <span class="n">flow</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+<span class="n">g_preflight</span> <span class="o">=</span> <span class="n">flow</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
     <span class="n">Decision</span><span class="p">(</span>
-        <span class="s2">"Gate 1: web_pentest</span><span class="se">\n</span><span class="s2">Suite Ready?"</span><span class="p">,</span>
-        <span class="n">width</span><span class="o">=</span><span class="mf">39.0</span><span class="p">,</span>
+        <span class="s2">"Gate 1: Pre-Flight</span><span class="se">\n</span><span class="s2">(Pentest/based_on)?"</span><span class="p">,</span>
+        <span class="n">width</span><span class="o">=</span><span class="mf">40.0</span><span class="p">,</span>
         <span class="n">height</span><span class="o">=</span><span class="mf">16.5</span><span class="p">,</span>
         <span class="n">style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">SecondaryNeutral</span><span class="p">,</span>
-        <span class="n">text_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">DarkBold</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">text_size</span><span class="o">=</span><span class="mf">10.0</span><span class="p">),</span>
+        <span class="n">text_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">DarkBold</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">text_size</span><span class="o">=</span><span class="mf">9.8</span><span class="p">),</span>
     <span class="p">),</span>
     <span class="n">xy</span><span class="o">=</span><span class="p">(</span><span class="mf">70.0</span><span class="p">,</span> <span class="mf">70.0</span><span class="p">),</span>
 <span class="p">)</span>
 
-<span class="n">r_pentest</span> <span class="o">=</span> <span class="n">flow</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+<span class="n">r_preflight</span> <span class="o">=</span> <span class="n">flow</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
     <span class="n">Process</span><span class="p">(</span>
-        <span class="s2">"pni pentests init -w &lt;id&gt;</span><span class="se">\n</span><span class="s2">-&gt; run-action &lt;id&gt; web_pentest"</span><span class="p">,</span>
+        <span class="s2">"pni pentests init -w &lt;id&gt;</span><span class="se">\n</span><span class="s2">or Complete Base Audit"</span><span class="p">,</span>
         <span class="n">width</span><span class="o">=</span><span class="mf">46.0</span><span class="p">,</span>
         <span class="n">height</span><span class="o">=</span><span class="mf">14.0</span><span class="p">,</span>
         <span class="n">style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">DangerNeutral</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">shape_r</span><span class="o">=</span><span class="mf">1.6</span><span class="p">),</span>
@@ -429,10 +444,10 @@ pni<span class="w"> </span>workflows<span class="w"> </span>show<span class="w">
     <span class="n">xy</span><span class="o">=</span><span class="p">(</span><span class="mf">131.0</span><span class="p">,</span> <span class="mf">70.0</span><span class="p">),</span>
 <span class="p">)</span>
 
-<span class="n">g_based</span> <span class="o">=</span> <span class="n">flow</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+<span class="n">g_confirm</span> <span class="o">=</span> <span class="n">flow</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
     <span class="n">Decision</span><span class="p">(</span>
-        <span class="s2">"Gate 2: based_on &amp;</span><span class="se">\n</span><span class="s2">Brief Ready?"</span><span class="p">,</span>
-        <span class="n">width</span><span class="o">=</span><span class="mf">39.0</span><span class="p">,</span>
+        <span class="s2">"Gate 2: confirm_plan</span><span class="se">\n</span><span class="s2">Approved?"</span><span class="p">,</span>
+        <span class="n">width</span><span class="o">=</span><span class="mf">40.0</span><span class="p">,</span>
         <span class="n">height</span><span class="o">=</span><span class="mf">16.5</span><span class="p">,</span>
         <span class="n">style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">SecondaryNeutral</span><span class="p">,</span>
         <span class="n">text_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">DarkBold</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">text_size</span><span class="o">=</span><span class="mf">10.0</span><span class="p">),</span>
@@ -440,9 +455,9 @@ pni<span class="w"> </span>workflows<span class="w"> </span>show<span class="w">
     <span class="n">xy</span><span class="o">=</span><span class="p">(</span><span class="mf">70.0</span><span class="p">,</span> <span class="mf">44.0</span><span class="p">),</span>
 <span class="p">)</span>
 
-<span class="n">r_based</span> <span class="o">=</span> <span class="n">flow</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+<span class="n">r_confirm</span> <span class="o">=</span> <span class="n">flow</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
     <span class="n">Process</span><span class="p">(</span>
-        <span class="s2">"Complete Base Audit First</span><span class="se">\n</span><span class="s2">&amp; Pin Migration Brief YAML"</span><span class="p">,</span>
+        <span class="s2">"Align Scope / Answers or</span><span class="se">\n</span><span class="s2">Pass --auto-approve"</span><span class="p">,</span>
         <span class="n">width</span><span class="o">=</span><span class="mf">46.0</span><span class="p">,</span>
         <span class="n">height</span><span class="o">=</span><span class="mf">14.0</span><span class="p">,</span>
         <span class="n">style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">WarningNeutral</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">shape_r</span><span class="o">=</span><span class="mf">1.6</span><span class="p">),</span>
@@ -453,8 +468,8 @@ pni<span class="w"> </span>workflows<span class="w"> </span>show<span class="w">
 
 <span class="n">n_start</span> <span class="o">=</span> <span class="n">flow</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
     <span class="n">Process</span><span class="p">(</span>
-        <span class="s2">"pni workflows start &lt;id&gt;</span><span class="se">\n</span><span class="s2">-&gt; Pull-Push Loop"</span><span class="p">,</span>
-        <span class="n">width</span><span class="o">=</span><span class="mf">39.0</span><span class="p">,</span>
+        <span class="s2">"Auto-Advance DAG</span><span class="se">\n</span><span class="s2">(start --pull / --next)"</span><span class="p">,</span>
+        <span class="n">width</span><span class="o">=</span><span class="mf">40.0</span><span class="p">,</span>
         <span class="n">height</span><span class="o">=</span><span class="mf">14.0</span><span class="p">,</span>
         <span class="n">style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">PrimaryFlat</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">shape_r</span><span class="o">=</span><span class="mf">1.6</span><span class="p">),</span>
         <span class="n">text_style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">WhiteBold</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">text_size</span><span class="o">=</span><span class="mf">10.0</span><span class="p">),</span>
@@ -464,7 +479,7 @@ pni<span class="w"> </span>workflows<span class="w"> </span>show<span class="w">
 
 <span class="n">n_done</span> <span class="o">=</span> <span class="n">flow</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
     <span class="n">End</span><span class="p">(</span>
-        <span class="s2">"COMPLETED</span><span class="se">\n</span><span class="s2">(JSON + A4 PDF)"</span><span class="p">,</span>
+        <span class="s2">"COMPLETED</span><span class="se">\n</span><span class="s2">(pni_report/ + PDF)"</span><span class="p">,</span>
         <span class="n">width</span><span class="o">=</span><span class="mf">42.0</span><span class="p">,</span>
         <span class="n">height</span><span class="o">=</span><span class="mf">13.0</span><span class="p">,</span>
         <span class="n">style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">SuccessNeutral</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span><span class="n">shape_r</span><span class="o">=</span><span class="mf">6.0</span><span class="p">),</span>
@@ -474,11 +489,11 @@ pni<span class="w"> </span>workflows<span class="w"> </span>show<span class="w">
 <span class="p">)</span>
 
 <span class="n">n_init</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">n_show</span><span class="p">,</span> <span class="n">start_side</span><span class="o">=</span><span class="s2">"bottom"</span><span class="p">,</span> <span class="n">end_side</span><span class="o">=</span><span class="s2">"top"</span><span class="p">)</span>
-<span class="n">n_show</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">g_pentest</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">"Check"</span><span class="p">,</span> <span class="n">start_side</span><span class="o">=</span><span class="s2">"right"</span><span class="p">,</span> <span class="n">end_side</span><span class="o">=</span><span class="s2">"left"</span><span class="p">)</span>
-<span class="n">g_pentest</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">r_pentest</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">"Missing"</span><span class="p">,</span> <span class="n">start_side</span><span class="o">=</span><span class="s2">"right"</span><span class="p">,</span> <span class="n">end_side</span><span class="o">=</span><span class="s2">"left"</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">DangerBold</span><span class="p">)</span>
-<span class="n">g_pentest</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">g_based</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">"Pass"</span><span class="p">,</span> <span class="n">start_side</span><span class="o">=</span><span class="s2">"bottom"</span><span class="p">,</span> <span class="n">end_side</span><span class="o">=</span><span class="s2">"top"</span><span class="p">)</span>
-<span class="n">g_based</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">r_based</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">"Blocked"</span><span class="p">,</span> <span class="n">start_side</span><span class="o">=</span><span class="s2">"right"</span><span class="p">,</span> <span class="n">end_side</span><span class="o">=</span><span class="s2">"left"</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">WarningBold</span><span class="p">)</span>
-<span class="n">g_based</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">n_start</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">"Ready"</span><span class="p">,</span> <span class="n">start_side</span><span class="o">=</span><span class="s2">"bottom"</span><span class="p">,</span> <span class="n">end_side</span><span class="o">=</span><span class="s2">"top"</span><span class="p">)</span>
+<span class="n">n_show</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">g_preflight</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">"Check"</span><span class="p">,</span> <span class="n">start_side</span><span class="o">=</span><span class="s2">"right"</span><span class="p">,</span> <span class="n">end_side</span><span class="o">=</span><span class="s2">"left"</span><span class="p">)</span>
+<span class="n">g_preflight</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">r_preflight</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">"Missing"</span><span class="p">,</span> <span class="n">start_side</span><span class="o">=</span><span class="s2">"right"</span><span class="p">,</span> <span class="n">end_side</span><span class="o">=</span><span class="s2">"left"</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">DangerBold</span><span class="p">)</span>
+<span class="n">g_preflight</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">g_confirm</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">"Pass"</span><span class="p">,</span> <span class="n">start_side</span><span class="o">=</span><span class="s2">"bottom"</span><span class="p">,</span> <span class="n">end_side</span><span class="o">=</span><span class="s2">"top"</span><span class="p">)</span>
+<span class="n">g_confirm</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">r_confirm</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">"Pending"</span><span class="p">,</span> <span class="n">start_side</span><span class="o">=</span><span class="s2">"right"</span><span class="p">,</span> <span class="n">end_side</span><span class="o">=</span><span class="s2">"left"</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">WarningBold</span><span class="p">)</span>
+<span class="n">g_confirm</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">n_start</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">"Ready"</span><span class="p">,</span> <span class="n">start_side</span><span class="o">=</span><span class="s2">"bottom"</span><span class="p">,</span> <span class="n">end_side</span><span class="o">=</span><span class="s2">"top"</span><span class="p">)</span>
 <span class="n">n_start</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">n_done</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">"Done"</span><span class="p">,</span> <span class="n">start_side</span><span class="o">=</span><span class="s2">"right"</span><span class="p">,</span> <span class="n">end_side</span><span class="o">=</span><span class="s2">"left"</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="n">Styles</span><span class="o">.</span><span class="n">SuccessBold</span><span class="p">)</span>
 
 <span class="n">flow</span><span class="o">.</span><span class="n">draw</span><span class="p">(</span><span class="n">xy</span><span class="o">=</span><span class="p">(</span><span class="mf">3.0</span><span class="p">,</span> <span class="mf">3.0</span><span class="p">))</span>
@@ -490,34 +505,36 @@ pni<span class="w"> </span>workflows<span class="w"> </span>show<span class="w">
 pni<span class="w"> </span>pentests<span class="w"> </span>init<span class="w"> </span>-w<span class="w"> </span>full_audit
 pni<span class="w"> </span>workflows<span class="w"> </span>run-action<span class="w"> </span>full_audit<span class="w"> </span>web_pentest
 </code></pre>
-<h2>4. Step 3: Execute the Stateful Pull-Push Loop</h2>
-<p>Start the workflow to create a stateful session (<code>wf-&lt;8hex&gt;</code>) in <code>.pni/cache/workflow_state.db</code>, then iterate through <code>get-action</code> and <code>push-action</code>:</p>
-<pre><code class="language-bash"><span class="c1"># 1. Start a stateful workflow run (use --supersede to cancel older unfinished runs)</span>
-pni<span class="w"> </span>workflows<span class="w"> </span>start<span class="w"> </span>full_audit<span class="w"> </span>--supersede
+<h2>4. Step 3: Execute the Single-Command Workflow v2 Loop</h2>
+<p>Workflow v2 provides single-command ergonomics (<code>--pull</code>, <code>--file</code>, <code>--next</code>, and <code>-o/--output</code>) that eliminate shell pipes, redirects, and <code>&amp;&amp;</code> chaining while enabling parallel deterministic collection:</p>
+<pre><code class="language-bash"><span class="c1"># 1a. Interactive start: starts run &amp; pulls act-01 (confirm_plan) in one command</span>
+pni<span class="w"> </span>workflows<span class="w"> </span>start<span class="w"> </span>full_audit<span class="w"> </span>--pull
 
-<span class="c1"># 2. Pull the current action (auto-runs deterministic analyzers and outputs required JSON Schema)</span>
-pni<span class="w"> </span>workflows<span class="w"> </span>get-action<span class="w"> </span>wf-1a2b3c4d
+<span class="c1"># 1b. Or CI / non-interactive start: auto-approve confirm_plan and immediately auto-advance collectors</span>
+pni<span class="w"> </span>workflows<span class="w"> </span>start<span class="w"> </span>full_audit<span class="w"> </span>--auto-approve<span class="w"> </span>--pull<span class="w"> </span>-o<span class="w"> </span>.pni/cache/action_next.md
 
-<span class="c1"># 3. Push the validated AI JSON payload for the current action ID (e.g. act-01)</span>
-pni<span class="w"> </span>workflows<span class="w"> </span>push-action<span class="w"> </span>wf-1a2b3c4d<span class="w"> </span>act-01<span class="w"> </span>--file<span class="w"> </span>payload.json
+<span class="c1"># 2. Push validated JSON from file and auto-advance straight to the next ready AI step</span>
+pni<span class="w"> </span>workflows<span class="w"> </span>push-action<span class="w"> </span>wf-1a2b3c4d<span class="w"> </span>act-01<span class="w"> </span>--file<span class="w"> </span>.pni/cache/wf-1a2b3c4d/input_act-01.json<span class="w"> </span>--next
 
-<span class="c1"># 4. Monitor progress across steps at any time</span>
+<span class="c1"># 3. Inspect all parallel DAG-ready actions or overall status at any time</span>
+pni<span class="w"> </span>workflows<span class="w"> </span>get-actions<span class="w"> </span>wf-1a2b3c4d<span class="w"> </span>--ready<span class="w"> </span>--json<span class="w"> </span>-o<span class="w"> </span>.pni/cache/ready_actions.json
 pni<span class="w"> </span>workflows<span class="w"> </span>status<span class="w"> </span>wf-1a2b3c4d
 </code></pre>
 <p>During the loop:</p>
 <ol>
-<li><strong>Deterministic Primitives Run Automatically</strong>: Whenever <code>get-action</code> encounters <code>project_inspect</code>, <code>ast_analyze</code>, <code>run_check</code>, <code>security_scan</code>, <code>web_pentest</code>, <code>migration_analyze</code>, or <code>progress_analyze</code>, <code>pni</code> executes the analyzer immediately, caches the telemetry in <code>.pni/cache/&lt;workflow_id&gt;/facts.json</code>, and advances to the next AI step.</li>
-<li><strong>Schema &amp; Path Validation on Push</strong>: On <code>record_architecture</code>, <code>ai_interpret</code>, <code>emit_score</code>, <code>emit_migration_plan</code>, and <code>emit_progress</code>, <code>push-action</code> validates the JSON payload against Pydantic models and verifies every referenced file path against the repository's <code>module_inventory</code>.</li>
+<li><strong>Zero Empty ACKs &amp; Parallel Collection</strong>: Whenever the DAG reaches deterministic steps (<code>project_inspect</code>, <code>ast_analyze</code>, <code>run_check</code>, <code>security_scan</code>, <code>web_pentest</code>, <code>migration_analyze</code>, <code>progress_analyze</code>), <code>pni</code> runs all DAG-ready collectors in parallel, writes <code>.pni/cache/&lt;workflow_id&gt;/facts.json</code>, and advances straight to the next AI step.</li>
+<li><strong>Schema, Path &amp; FP Triage Validation on Push</strong>: On <code>record_architecture</code>, <code>ai_interpret</code>, <code>emit_score</code>, <code>synthesize_rollup</code>, <code>emit_migration_plan</code>, and <code>emit_progress</code>, <code>push-action</code> validates Pydantic models, checks every file path against <code>module_inventory</code>, records auditable <code>finding_adjustments</code> (<code>waive</code> / <code>reclassify</code>), and emits <code>pni_report/&lt;target&gt;_score.json</code> (with Executed Audit DAG and 7-Axis Evidence Delta Δ), <code>*_summary.json</code>, and <code>*_findings.sarif</code>.</li>
 </ol>
-<h2>5. Step 4: Compile the Visual Drawlib PDF Report</h2>
-<p>On the final <code>write_drawlib_report</code> step, scaffold the 7-chapter Drawlib report project, visually verify diagrams with the coordinate grid (<code>-g</code>), compile the A4 vector PDF, and push the completion record:</p>
-<pre><code class="language-bash"><span class="c1"># Scaffold reports_src/full_audit_src/ and compile reports/full_audit.pdf</span>
-pni<span class="w"> </span>report<span class="w"> </span>init<span class="w"> </span>full_audit<span class="w"> </span>--src-dir<span class="w"> </span>reports_src<span class="w"> </span>--lang<span class="w"> </span>en<span class="w"> </span>--style<span class="w"> </span>google
-pni<span class="w"> </span>report<span class="w"> </span>build<span class="w"> </span>full_audit<span class="w"> </span>--src-dir<span class="w"> </span>reports_src<span class="w"> </span>--output-dir<span class="w"> </span>reports
+<h2>5. Step 4: Compile the Flat Self-Contained Drawlib Report</h2>
+<p>When <code>emit_score</code> finishes, PNI automatically syncs verified JSON evidence (<code>plan.json</code>, <code>facts.json</code>, <code>architecture.json</code>, <code>score.json</code>) into <strong><code>pni_report_src/_facts/</code></strong>. On the final <code>write_drawlib_report</code> step, scaffold the flat report project (<code>pni_report_src -&gt; pni_report</code> by default, with no nested <code>&lt;target&gt;_src/</code> directory), verify diagrams with the coordinate grid (<code>-g</code>), compile the A4 vector PDF (and optional HTML), and push completion:</p>
+<pre><code class="language-bash"><span class="c1"># Scaffold pni_report_src/ (default flat layout) and compile pni_report/full_audit.pdf</span>
+pni<span class="w"> </span>report<span class="w"> </span>init<span class="w"> </span>full_audit<span class="w"> </span>--lang<span class="w"> </span>en<span class="w"> </span>--style<span class="w"> </span>google
+pni<span class="w"> </span>report<span class="w"> </span>build<span class="w"> </span>full_audit
 
-<span class="c1"># Push the final completion payload to mark the workflow COMPLETED</span>
-pni<span class="w"> </span>workflows<span class="w"> </span>push-action<span class="w"> </span>wf-1a2b3c4d<span class="w"> </span>act-12<span class="w"> </span><span class="s1">'{"generated_files": ["reports/full_audit.pdf"], "summary": "Compiled 7-chapter A4 PDF report."}'</span>
+<span class="c1"># Push the final completion payload from file to mark the workflow COMPLETED</span>
+pni<span class="w"> </span>workflows<span class="w"> </span>push-action<span class="w"> </span>wf-1a2b3c4d<span class="w"> </span>act-12<span class="w"> </span>--file<span class="w"> </span>.pni/cache/wf-1a2b3c4d/input_act-12.json
 </code></pre>
+<p><em>(For multi-target portals such as this documentation site, pass custom flat paths like <code>--src-dir docs_src/reports/&lt;slug&gt; --output-dir docs/reports/&lt;slug&gt;</code>.)</em></p>
 <p>Next, explore the <a href="use_cases.html">Primary Use Cases</a> or dive into <a href="../03_workflows_and_actions/workflows_guide.html">Workflows &amp; Pre-Flight Gates</a>.</p>
 
             </main>

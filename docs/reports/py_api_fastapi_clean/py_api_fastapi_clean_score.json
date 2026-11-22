@@ -1,0 +1,2835 @@
+{
+  "schema_version": "2.0",
+  "project_name": "order-dispatch",
+  "workflow_id": "py_api_fastapi_clean",
+  "workflow_run_id": "wf-f819234f",
+  "evaluated_at": "2026-11-22T11:29:00.803894+00:00",
+  "language": "python",
+  "target_root": "examples/python/api_fastapi_clean",
+  "facts_file": "docs_src/reports/py_api_fastapi_clean/_facts/facts.json",
+  "key_files_inspected": [
+    "pyproject.toml",
+    "Dockerfile",
+    ".github/workflows/ci.yml",
+    "README.md",
+    "src/order_dispatch/main.py",
+    "src/order_dispatch/settings.py",
+    "src/order_dispatch/api/routes.py",
+    "src/order_dispatch/api/schemas.py",
+    "src/order_dispatch/services/dispatcher.py",
+    "src/order_dispatch/domain/models.py",
+    "src/order_dispatch/domain/pricing.py",
+    "src/order_dispatch/infra/repository.py",
+    "src/order_dispatch/infra/webhook_client.py",
+    "tests/test_routes.py",
+    "tests/test_dispatcher.py",
+    "tests/test_pricing.py"
+  ],
+  "overall_score": 94,
+  "grade": "S",
+  "category_scores": {
+    "architecture": 96,
+    "code_quality": 98,
+    "typing": 100,
+    "testing": 90,
+    "dependencies": 95,
+    "security": 84,
+    "documentation": 98
+  },
+  "baseline_scores": {
+    "architecture": 100,
+    "code_quality": 100,
+    "typing": 100,
+    "testing": 100,
+    "dependencies": 100,
+    "security": 85,
+    "documentation": 100
+  },
+  "category_rationales": {
+    "architecture": "Strict 4-layer acyclic Clean/Hexagonal layout (api -> services -> domain + infra) with zero circular dependencies and pure domain core; -4pt reflects default process-local InMemoryOrderRepository under 12-Factor VI.",
+    "code_quality": "100% import hygiene, 0 complexity hotspots, 0 bug-risk idioms, structured logging, and modern FastAPI lifespan/Pydantic v2 idioms; -2pt reflects minor Starlette TestClient deprecation warning.",
+    "typing": "100% type safety coverage with py.typed marker, from __future__ import annotations, zero Any usages, and zero unscoped type ignores.",
+    "testing": "4/4 offline Docker pytest tests pass with 85.2% line coverage and 100% core domain/service coverage; -10pt reflects 62.5% branch coverage with untested routes.py (56.0%) and webhook_client.py (55.6%) branches.",
+    "dependencies": "PEP 621 pyproject.toml + uv.lock with 0 unpinned deps, 0 declared app CVEs, Dependabot, and SHA-pinned CI; -5pt reflects aged python:3.12.6-slim-bookworm base image bundling pip@24.2.",
+    "security": "0 declared app CVEs, 0 secrets, 0 dangerous sinks, non-root Dockerfile, and 15/19 live DAST probes passed; deducted for live DAST CWE-306 unauthenticated POST /v1/orders, CWE-200 /openapi.json, CWE-693 header gap, and Debian 12.7 OS CVEs (5 build-time pip CVEs reclassified to low).",
+    "documentation": "Diataxis-structured README (Quickstart, How-To, API Reference, Architecture) and 100% Google-style docstrings across all public symbols."
+  },
+  "metrics_snapshot": {
+    "language": "python",
+    "runtime_types": [
+      "web_api",
+      "library"
+    ],
+    "build_system": "uv",
+    "has_manifest": true,
+    "has_lockfile": true,
+    "has_license": true,
+    "has_security_policy": true,
+    "has_dependency_automation": true,
+    "has_type_marker": true,
+    "dependencies_count": 5,
+    "unpinned_dependencies_count": 0,
+    "source_files_count": 14,
+    "test_files_count": 3,
+    "readme_line_count": 23,
+    "ci_supply_chain_issues_count": 0,
+    "committed_secret_files_count": 0,
+    "container_hygiene_issues_count": 0,
+    "legacy_language_findings_count": 0,
+    "total_files": 14,
+    "total_loc": 435,
+    "total_classes": 14,
+    "total_functions": 23,
+    "import_hygiene_coverage_pct": 100.0,
+    "type_safety_coverage_pct": 100.0,
+    "docstring_coverage_pct": 100.0,
+    "module_test_coverage_pct": 100.0,
+    "unsorted_imports_count": 0,
+    "wildcard_imports_count": 0,
+    "type_safety_issues_count": 0,
+    "omitted_init_return_count": 0,
+    "weak_type_usages_count": 0,
+    "annotated_doc_functions_count": 0,
+    "empty_docstrings_count": 0,
+    "doc_signature_mismatches_count": 0,
+    "complex_functions_count": 0,
+    "excessive_parameters_count": 0,
+    "global_state_usages_count": 0,
+    "bug_risk_idioms_count": 0,
+    "circular_dependencies_count": 0,
+    "type_checking_cycles_count": 0,
+    "unused_dependencies_count": 0,
+    "undeclared_dependencies_count": 0,
+    "test_functions_count": 4,
+    "assertion_free_tests_count": 0,
+    "has_conftest_assertion_hook": false,
+    "framework_issues_count": 0,
+    "modernization_hints_count": 0,
+    "language_version_mismatches_count": 0,
+    "missing_io_timeouts_count": 0,
+    "scattered_env_access_count": 0,
+    "unstructured_logging_count": 0,
+    "hardcoded_secrets_count": 0,
+    "ast_dangerous_sinks_count": 0,
+    "api_endpoints_count": 3,
+    "runtime_status": "passed",
+    "harness_build_status": "passed",
+    "tests_status": "passed",
+    "tests_total": 4,
+    "tests_passed": 4,
+    "tests_failed": 0,
+    "measured_line_coverage_pct": 85.2,
+    "measured_branch_coverage_pct": 62.5,
+    "smoke_check_status": "passed",
+    "security_scan_status": "passed",
+    "app_vuln_critical": 0,
+    "app_vuln_high": 0,
+    "app_vuln_total": 6,
+    "core_app_vuln_total": 6,
+    "core_app_vuln_high_or_crit": 0,
+    "dev_app_vuln_total": 0,
+    "app_vuln_unpinned_range_matches": 0,
+    "os_vuln_high_or_crit": 167,
+    "harness_os_vuln_total": 0,
+    "misconfig_count": 1,
+    "secret_leak_count": 0,
+    "pentest_status": "passed",
+    "pentest_probes_total": 19,
+    "pentest_probes_passed": 15,
+    "pentest_probes_failed": 3,
+    "pentest_findings_count": 3,
+    "pentest_high_or_crit_count": 0
+  },
+  "runtime_facts": {
+    "status": "passed",
+    "container_engine": "docker",
+    "engine_available": true,
+    "skip_reason": "",
+    "language": "python",
+    "selected_dockerfile_template": "python/uv.dockerfile",
+    "harness_dockerfile_path": ".pni/dockerfiles/examples/python/api_fastapi_clean/Dockerfile",
+    "build_args": {
+      "PYTHON_VERSION": "3.12"
+    },
+    "artifacts_dir": ".pni/cache/py_api_fastapi_clean/runtime",
+    "project_dockerfile_build": {
+      "attempted": true,
+      "status": "passed",
+      "dockerfile_used": "examples/python/api_fastapi_clean/Dockerfile",
+      "duration_sec": 31.33,
+      "exit_code": 0,
+      "error_tail": []
+    },
+    "harness_build": {
+      "attempted": true,
+      "status": "passed",
+      "dockerfile_used": ".pni/dockerfiles/examples/python/api_fastapi_clean/Dockerfile",
+      "duration_sec": 0.48,
+      "exit_code": 0,
+      "error_tail": []
+    },
+    "test_execution": {
+      "attempted": true,
+      "status": "passed",
+      "command": "pytest -o junit_family=xunit2 --junitxml=/out/junit.xml",
+      "duration_sec": 5.05,
+      "exit_code": 0,
+      "total_tests": 4,
+      "passed_tests": 4,
+      "failed_tests": 0,
+      "error_tests": 0,
+      "skipped_tests": 0,
+      "failures": [],
+      "log_tail": []
+    },
+    "coverage": {
+      "measured": true,
+      "tool": "pytest-cov",
+      "line_coverage_pct": 85.2,
+      "branch_coverage_pct": 62.5,
+      "covered_lines": 178,
+      "total_statements": 209,
+      "lowest_covered_modules": [
+        {
+          "file_path": "src/order_dispatch/infra/webhook_client.py",
+          "line_coverage_pct": 55.6,
+          "branch_coverage_pct": null,
+          "covered_lines": 10,
+          "total_statements": 18,
+          "missing_lines_preview": [
+            36,
+            41,
+            42,
+            43,
+            44,
+            45,
+            46,
+            47
+          ]
+        },
+        {
+          "file_path": "src/order_dispatch/api/routes.py",
+          "line_coverage_pct": 56.0,
+          "branch_coverage_pct": 0.0,
+          "covered_lines": 14,
+          "total_statements": 25,
+          "missing_lines_preview": [
+            29,
+            30,
+            42,
+            43,
+            56,
+            74,
+            79,
+            96,
+            97,
+            98
+          ]
+        },
+        {
+          "file_path": "src/order_dispatch/main.py",
+          "line_coverage_pct": 67.9,
+          "branch_coverage_pct": 0.0,
+          "covered_lines": 19,
+          "total_statements": 28,
+          "missing_lines_preview": [
+            30,
+            31,
+            32,
+            33,
+            34,
+            38,
+            43,
+            44,
+            45
+          ]
+        },
+        {
+          "file_path": "src/order_dispatch/api/schemas.py",
+          "line_coverage_pct": 94.6,
+          "branch_coverage_pct": 50.0,
+          "covered_lines": 35,
+          "total_statements": 37,
+          "missing_lines_preview": [
+            32,
+            90
+          ]
+        },
+        {
+          "file_path": "src/order_dispatch/domain/pricing.py",
+          "line_coverage_pct": 95.2,
+          "branch_coverage_pct": 90.0,
+          "covered_lines": 20,
+          "total_statements": 21,
+          "missing_lines_preview": [
+            49
+          ]
+        },
+        {
+          "file_path": "src/order_dispatch/services/dispatcher.py",
+          "line_coverage_pct": 100.0,
+          "branch_coverage_pct": null,
+          "covered_lines": 26,
+          "total_statements": 26,
+          "missing_lines_preview": []
+        },
+        {
+          "file_path": "src/order_dispatch/domain/models.py",
+          "line_coverage_pct": 100.0,
+          "branch_coverage_pct": null,
+          "covered_lines": 24,
+          "total_statements": 24,
+          "missing_lines_preview": []
+        },
+        {
+          "file_path": "src/order_dispatch/infra/repository.py",
+          "line_coverage_pct": 100.0,
+          "branch_coverage_pct": null,
+          "covered_lines": 13,
+          "total_statements": 13,
+          "missing_lines_preview": []
+        },
+        {
+          "file_path": "src/order_dispatch/settings.py",
+          "line_coverage_pct": 100.0,
+          "branch_coverage_pct": null,
+          "covered_lines": 12,
+          "total_statements": 12,
+          "missing_lines_preview": []
+        },
+        {
+          "file_path": "src/order_dispatch/__init__.py",
+          "line_coverage_pct": 100.0,
+          "branch_coverage_pct": null,
+          "covered_lines": 1,
+          "total_statements": 1,
+          "missing_lines_preview": []
+        },
+        {
+          "file_path": "src/order_dispatch/api/__init__.py",
+          "line_coverage_pct": 100.0,
+          "branch_coverage_pct": null,
+          "covered_lines": 1,
+          "total_statements": 1,
+          "missing_lines_preview": []
+        },
+        {
+          "file_path": "src/order_dispatch/domain/__init__.py",
+          "line_coverage_pct": 100.0,
+          "branch_coverage_pct": null,
+          "covered_lines": 1,
+          "total_statements": 1,
+          "missing_lines_preview": []
+        },
+        {
+          "file_path": "src/order_dispatch/infra/__init__.py",
+          "line_coverage_pct": 100.0,
+          "branch_coverage_pct": null,
+          "covered_lines": 1,
+          "total_statements": 1,
+          "missing_lines_preview": []
+        },
+        {
+          "file_path": "src/order_dispatch/services/__init__.py",
+          "line_coverage_pct": 100.0,
+          "branch_coverage_pct": null,
+          "covered_lines": 1,
+          "total_statements": 1,
+          "missing_lines_preview": []
+        }
+      ]
+    },
+    "smoke_check": {
+      "attempted": true,
+      "archetype": "web_api+library",
+      "status": "passed",
+      "command": "python -c import importlib, json, pathlib; mod = importlib.import_module('order_dispatch.main'); factory = getattr(mod, 'create_app', None); app = getattr(mod, 'app', None) or (factory() if callable(factory) else None); assert app is not None, 'No app or create_app() found'; paths = ('/healthz', '/health', '/api/v1/health', '/openapi.json', '/'); status, hit = None, None\nif callable(getattr(app, 'test_client', None)):\n    c = app.test_client()\n    for p in paths:\n        r = c.get(p)\n        status, hit = r.status_code, p\n        if r.status_code < 400: break\nelse:\n    from fastapi.testclient import TestClient\n    with TestClient(app) as c:\n        for p in paths:\n            r = c.get(p)\n            status, hit = r.status_code, p\n            if r.status_code < 400: break\nassert status is not None and status < 500, f'Unexpected status {status} on {hit}'; pathlib.Path('/out/smoke.json').write_text(json.dumps({'probed_endpoint': hit, 'http_status': status, 'detail': f'ASGI/WSGI app order_dispatch.main booted cleanly ({hit} -> {status})'}))",
+      "duration_sec": 2.25,
+      "exit_code": 0,
+      "http_status": 200,
+      "probed_endpoint": "/healthz",
+      "failure_kind": "none",
+      "detail": "ASGI/WSGI app order_dispatch.main booted cleanly (/healthz -> 200)",
+      "log_tail": [
+        "/opt/pni-venv/lib/python3.12/site-packages/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.",
+        "  from starlette.testclient import TestClient as TestClient  # noqa"
+      ]
+    }
+  },
+  "security_facts": {
+    "status": "passed",
+    "scanner": "trivy",
+    "container_engine": "docker",
+    "engine_available": true,
+    "skip_reason": "",
+    "trivy_image": "ghcr.io/aquasecurity/trivy:0.69.3",
+    "scanned_filesystem": true,
+    "scanned_resolved_image": true,
+    "resolved_image_source": "examples/python/api_fastapi_clean/Dockerfile",
+    "artifacts_dir": ".pni/cache/py_api_fastapi_clean/security",
+    "vuln_counts": {
+      "critical": 9,
+      "high": 158,
+      "medium": 258,
+      "low": 174,
+      "total": 618
+    },
+    "app_vuln_counts": {
+      "critical": 0,
+      "high": 0,
+      "medium": 5,
+      "low": 1,
+      "total": 6
+    },
+    "core_app_vuln_counts": {
+      "critical": 0,
+      "high": 0,
+      "medium": 5,
+      "low": 1,
+      "total": 6
+    },
+    "dev_app_vuln_counts": {
+      "critical": 0,
+      "high": 0,
+      "medium": 0,
+      "low": 0,
+      "total": 0
+    },
+    "os_vuln_counts": {
+      "critical": 9,
+      "high": 158,
+      "medium": 253,
+      "low": 173,
+      "total": 612
+    },
+    "harness_os_vuln_counts": {
+      "critical": 0,
+      "high": 0,
+      "medium": 0,
+      "low": 0,
+      "total": 0
+    },
+    "vulnerabilities": [
+      {
+        "vuln_id": "CVE-2026-8643",
+        "pkg_name": "pip",
+        "pkg_type": "python-pkg",
+        "installed_version": "24.2",
+        "fixed_version": "26.1.2",
+        "severity": "MEDIUM",
+        "scope": "runtime_core",
+        "title": "python-pip: Path traversal via malicious entry point name in pip wheel installation allows arbitrary file overwrite",
+        "target": "Python",
+        "cvss_score": 8.0,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      },
+      {
+        "vuln_id": "CVE-2026-13346",
+        "pkg_name": "pip",
+        "pkg_type": "python-pkg",
+        "installed_version": "24.2",
+        "fixed_version": "26.2.0",
+        "severity": "MEDIUM",
+        "scope": "runtime_core",
+        "title": "pip: pip: Arbitrary file installation via malicious package indexes",
+        "target": "Python",
+        "cvss_score": 6.5,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      },
+      {
+        "vuln_id": "CVE-2026-6357",
+        "pkg_name": "pip",
+        "pkg_type": "python-pkg",
+        "installed_version": "24.2",
+        "fixed_version": "26.1",
+        "severity": "MEDIUM",
+        "scope": "runtime_core",
+        "title": "pip: pip: Arbitrary code execution or information disclosure via malicious wheel package installation",
+        "target": "Python",
+        "cvss_score": 5.8,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      },
+      {
+        "vuln_id": "CVE-2025-8869",
+        "pkg_name": "pip",
+        "pkg_type": "python-pkg",
+        "installed_version": "24.2",
+        "fixed_version": "25.3",
+        "severity": "MEDIUM",
+        "scope": "runtime_core",
+        "title": "pip: pip missing checks on symbolic link extraction",
+        "target": "Python",
+        "cvss_score": 5.3,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      },
+      {
+        "vuln_id": "CVE-2026-3219",
+        "pkg_name": "pip",
+        "pkg_type": "python-pkg",
+        "installed_version": "24.2",
+        "fixed_version": "26.1",
+        "severity": "MEDIUM",
+        "scope": "runtime_core",
+        "title": "pip: pip: Incorrect file installation due to improper archive handling",
+        "target": "Python",
+        "cvss_score": 5.0,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      },
+      {
+        "vuln_id": "CVE-2026-1703",
+        "pkg_name": "pip",
+        "pkg_type": "python-pkg",
+        "installed_version": "24.2",
+        "fixed_version": "26.0",
+        "severity": "LOW",
+        "scope": "runtime_core",
+        "title": "pip: pip: Information disclosure via path traversal when installing crafted wheel archives",
+        "target": "Python",
+        "cvss_score": 3.9,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      },
+      {
+        "vuln_id": "CVE-2026-42010",
+        "pkg_name": "libgnutls30",
+        "pkg_type": "debian",
+        "installed_version": "3.7.9-2+deb12u3",
+        "fixed_version": "3.7.9-2+deb12u7",
+        "severity": "CRITICAL",
+        "scope": "os_package",
+        "title": "gnutls: gnutls: Authentication Bypass via NUL Character in Username",
+        "target": "/out/image.tar (debian 12.7)",
+        "cvss_score": 9.8,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      },
+      {
+        "vuln_id": "CVE-2026-31789",
+        "pkg_name": "libssl3",
+        "pkg_type": "debian",
+        "installed_version": "3.0.14-1~deb12u2",
+        "fixed_version": "3.0.19-1~deb12u2",
+        "severity": "CRITICAL",
+        "scope": "os_package",
+        "title": "openssl: OpenSSL: Heap buffer overflow on 32-bit systems from large X.509 certificate processing",
+        "target": "/out/image.tar (debian 12.7)",
+        "cvss_score": 9.8,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      },
+      {
+        "vuln_id": "CVE-2026-31789",
+        "pkg_name": "openssl",
+        "pkg_type": "debian",
+        "installed_version": "3.0.14-1~deb12u2",
+        "fixed_version": "3.0.19-1~deb12u2",
+        "severity": "CRITICAL",
+        "scope": "os_package",
+        "title": "openssl: OpenSSL: Heap buffer overflow on 32-bit systems from large X.509 certificate processing",
+        "target": "/out/image.tar (debian 12.7)",
+        "cvss_score": 9.8,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      },
+      {
+        "vuln_id": "CVE-2026-8376",
+        "pkg_name": "perl-base",
+        "pkg_type": "debian",
+        "installed_version": "5.36.0-7+deb12u1",
+        "fixed_version": "5.36.0-7+deb12u4",
+        "severity": "CRITICAL",
+        "scope": "os_package",
+        "title": "perl: Perl: Heap buffer overflow when compiling regular expressions on 32-bit builds",
+        "target": "/out/image.tar (debian 12.7)",
+        "cvss_score": 9.8,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      },
+      {
+        "vuln_id": "CVE-2023-45853",
+        "pkg_name": "zlib1g",
+        "pkg_type": "debian",
+        "installed_version": "1:1.2.13.dfsg-1",
+        "fixed_version": "",
+        "severity": "CRITICAL",
+        "scope": "os_package",
+        "title": "zlib: integer overflow and resultant heap-based buffer overflow in zipOpenNewFileInZip4_6",
+        "target": "/out/image.tar (debian 12.7)",
+        "cvss_score": 9.8,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      },
+      {
+        "vuln_id": "CVE-2026-33845",
+        "pkg_name": "libgnutls30",
+        "pkg_type": "debian",
+        "installed_version": "3.7.9-2+deb12u3",
+        "fixed_version": "3.7.9-2+deb12u7",
+        "severity": "CRITICAL",
+        "scope": "os_package",
+        "title": "gnutls: GnuTLS: Denial of Service via DTLS zero-length fragment",
+        "target": "/out/image.tar (debian 12.7)",
+        "cvss_score": 9.1,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      },
+      {
+        "vuln_id": "CVE-2025-7458",
+        "pkg_name": "libsqlite3-0",
+        "pkg_type": "debian",
+        "installed_version": "3.40.1-2",
+        "fixed_version": "",
+        "severity": "CRITICAL",
+        "scope": "os_package",
+        "title": "sqlite: SQLite integer overflow",
+        "target": "/out/image.tar (debian 12.7)",
+        "cvss_score": 9.1,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      },
+      {
+        "vuln_id": "CVE-2026-13221",
+        "pkg_name": "perl-base",
+        "pkg_type": "debian",
+        "installed_version": "5.36.0-7+deb12u1",
+        "fixed_version": "5.36.0-7+deb12u4",
+        "severity": "CRITICAL",
+        "scope": "os_package",
+        "title": "perl: Perl: Incorrect regular expression processing via large regular expressions",
+        "target": "/out/image.tar (debian 12.7)",
+        "cvss_score": 9.1,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      },
+      {
+        "vuln_id": "CVE-2026-42496",
+        "pkg_name": "perl-base",
+        "pkg_type": "debian",
+        "installed_version": "5.36.0-7+deb12u1",
+        "fixed_version": "5.36.0-7+deb12u4",
+        "severity": "CRITICAL",
+        "scope": "os_package",
+        "title": "perl-archive-tar: perl-archive-tar: Path traversal via crafted symlinks allows arbitrary file access",
+        "target": "/out/image.tar (debian 12.7)",
+        "cvss_score": 9.1,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      },
+      {
+        "vuln_id": "CVE-2025-6965",
+        "pkg_name": "libsqlite3-0",
+        "pkg_type": "debian",
+        "installed_version": "3.40.1-2",
+        "fixed_version": "3.40.1-2+deb12u2",
+        "severity": "HIGH",
+        "scope": "os_package",
+        "title": "sqlite: Integer Truncation in SQLite",
+        "target": "/out/image.tar (debian 12.7)",
+        "cvss_score": 9.8,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      },
+      {
+        "vuln_id": "CVE-2025-15467",
+        "pkg_name": "libssl3",
+        "pkg_type": "debian",
+        "installed_version": "3.0.14-1~deb12u2",
+        "fixed_version": "3.0.18-1~deb12u2",
+        "severity": "HIGH",
+        "scope": "os_package",
+        "title": "openssl: OpenSSL: Remote code execution or Denial of Service via oversized Initialization Vector in CMS parsing",
+        "target": "/out/image.tar (debian 12.7)",
+        "cvss_score": 9.8,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      },
+      {
+        "vuln_id": "CVE-2025-15467",
+        "pkg_name": "openssl",
+        "pkg_type": "debian",
+        "installed_version": "3.0.14-1~deb12u2",
+        "fixed_version": "3.0.18-1~deb12u2",
+        "severity": "HIGH",
+        "scope": "os_package",
+        "title": "openssl: OpenSSL: Remote code execution or Denial of Service via oversized Initialization Vector in CMS parsing",
+        "target": "/out/image.tar (debian 12.7)",
+        "cvss_score": 9.8,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      },
+      {
+        "vuln_id": "CVE-2026-45447",
+        "pkg_name": "libssl3",
+        "pkg_type": "debian",
+        "installed_version": "3.0.14-1~deb12u2",
+        "fixed_version": "3.0.20-1~deb12u2",
+        "severity": "HIGH",
+        "scope": "os_package",
+        "title": "openssl: Heap Use-After-Free in OpenSSL PKCS7_verify()",
+        "target": "/out/image.tar (debian 12.7)",
+        "cvss_score": 8.8,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      },
+      {
+        "vuln_id": "CVE-2026-16742",
+        "pkg_name": "libsystemd0",
+        "pkg_type": "debian",
+        "installed_version": "252.30-1~deb12u2",
+        "fixed_version": "",
+        "severity": "HIGH",
+        "scope": "os_package",
+        "title": "systemd: systemd-homed: Local privilege escalation via missing home-record signature verification",
+        "target": "/out/image.tar (debian 12.7)",
+        "cvss_score": 8.8,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      },
+      {
+        "vuln_id": "CVE-2026-16742",
+        "pkg_name": "libudev1",
+        "pkg_type": "debian",
+        "installed_version": "252.30-1~deb12u2",
+        "fixed_version": "",
+        "severity": "HIGH",
+        "scope": "os_package",
+        "title": "systemd: systemd-homed: Local privilege escalation via missing home-record signature verification",
+        "target": "/out/image.tar (debian 12.7)",
+        "cvss_score": 8.8,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      },
+      {
+        "vuln_id": "CVE-2026-45447",
+        "pkg_name": "openssl",
+        "pkg_type": "debian",
+        "installed_version": "3.0.14-1~deb12u2",
+        "fixed_version": "3.0.20-1~deb12u2",
+        "severity": "HIGH",
+        "scope": "os_package",
+        "title": "openssl: Heap Use-After-Free in OpenSSL PKCS7_verify()",
+        "target": "/out/image.tar (debian 12.7)",
+        "cvss_score": 8.8,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      },
+      {
+        "vuln_id": "CVE-2026-57432",
+        "pkg_name": "perl-base",
+        "pkg_type": "debian",
+        "installed_version": "5.36.0-7+deb12u1",
+        "fixed_version": "5.36.0-7+deb12u4",
+        "severity": "HIGH",
+        "scope": "os_package",
+        "title": "perl: Perl: Information disclosure via integer overflow in pack/unpack operations",
+        "target": "/out/image.tar (debian 12.7)",
+        "cvss_score": 8.4,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      },
+      {
+        "vuln_id": "CVE-2026-118370",
+        "pkg_name": "libexpat1",
+        "pkg_type": "debian",
+        "installed_version": "2.5.0-1+deb12u1",
+        "fixed_version": "",
+        "severity": "HIGH",
+        "scope": "os_package",
+        "title": "expat: expat: Denial of Service via integer overflow during XML attribute parsing",
+        "target": "/out/image.tar (debian 12.7)",
+        "cvss_score": 8.2,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      },
+      {
+        "vuln_id": "CVE-2026-77214",
+        "pkg_name": "libexpat1",
+        "pkg_type": "debian",
+        "installed_version": "2.5.0-1+deb12u1",
+        "fixed_version": "2.5.0-1+deb12u5",
+        "severity": "HIGH",
+        "scope": "os_package",
+        "title": "expat: expat: Information disclosure via heap buffer over-read in XML_ParseBuffer",
+        "target": "/out/image.tar (debian 12.7)",
+        "cvss_score": 8.2,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      },
+      {
+        "vuln_id": "CVE-2025-32988",
+        "pkg_name": "libgnutls30",
+        "pkg_type": "debian",
+        "installed_version": "3.7.9-2+deb12u3",
+        "fixed_version": "3.7.9-2+deb12u5",
+        "severity": "HIGH",
+        "scope": "os_package",
+        "title": "gnutls: Vulnerability in GnuTLS otherName SAN export",
+        "target": "/out/image.tar (debian 12.7)",
+        "cvss_score": 8.2,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      },
+      {
+        "vuln_id": "CVE-2025-32990",
+        "pkg_name": "libgnutls30",
+        "pkg_type": "debian",
+        "installed_version": "3.7.9-2+deb12u3",
+        "fixed_version": "3.7.9-2+deb12u5",
+        "severity": "HIGH",
+        "scope": "os_package",
+        "title": "gnutls: Vulnerability in GnuTLS certtool template parsing",
+        "target": "/out/image.tar (debian 12.7)",
+        "cvss_score": 8.2,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      },
+      {
+        "vuln_id": "CVE-2026-86145",
+        "pkg_name": "libpcre2-8-0",
+        "pkg_type": "debian",
+        "installed_version": "10.42-1",
+        "fixed_version": "10.42-1+deb12u1",
+        "severity": "HIGH",
+        "scope": "os_package",
+        "title": "pcre2: PCRE2: Out-of-bounds write allows arbitrary code execution via crafted regular expressions",
+        "target": "/out/image.tar (debian 12.7)",
+        "cvss_score": 8.2,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      },
+      {
+        "vuln_id": "CVE-2026-109518",
+        "pkg_name": "apt",
+        "pkg_type": "debian",
+        "installed_version": "2.6.1",
+        "fixed_version": "2.6.2",
+        "severity": "HIGH",
+        "scope": "os_package",
+        "title": "apt: apt: Remote code execution via hard link reuse during package download retries",
+        "target": "/out/image.tar (debian 12.7)",
+        "cvss_score": 8.1,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      },
+      {
+        "vuln_id": "CVE-2026-109518",
+        "pkg_name": "libapt-pkg6.0",
+        "pkg_type": "debian",
+        "installed_version": "2.6.1",
+        "fixed_version": "2.6.2",
+        "severity": "HIGH",
+        "scope": "os_package",
+        "title": "apt: apt: Remote code execution via hard link reuse during package download retries",
+        "target": "/out/image.tar (debian 12.7)",
+        "cvss_score": 8.1,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      },
+      {
+        "vuln_id": "CVE-2026-71199",
+        "pkg_name": "libgssapi-krb5-2",
+        "pkg_type": "debian",
+        "installed_version": "1.20.1-2+deb12u2",
+        "fixed_version": "",
+        "severity": "HIGH",
+        "scope": "os_package",
+        "title": "krb5: Alteration of authentication indicators in CAMMAC container",
+        "target": "/out/image.tar (debian 12.7)",
+        "cvss_score": 8.1,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      }
+    ],
+    "app_vulnerabilities": [
+      {
+        "vuln_id": "CVE-2026-8643",
+        "pkg_name": "pip",
+        "pkg_type": "python-pkg",
+        "installed_version": "24.2",
+        "fixed_version": "26.1.2",
+        "severity": "MEDIUM",
+        "scope": "runtime_core",
+        "title": "python-pip: Path traversal via malicious entry point name in pip wheel installation allows arbitrary file overwrite",
+        "target": "Python",
+        "cvss_score": 8.0,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      },
+      {
+        "vuln_id": "CVE-2026-13346",
+        "pkg_name": "pip",
+        "pkg_type": "python-pkg",
+        "installed_version": "24.2",
+        "fixed_version": "26.2.0",
+        "severity": "MEDIUM",
+        "scope": "runtime_core",
+        "title": "pip: pip: Arbitrary file installation via malicious package indexes",
+        "target": "Python",
+        "cvss_score": 6.5,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      },
+      {
+        "vuln_id": "CVE-2026-6357",
+        "pkg_name": "pip",
+        "pkg_type": "python-pkg",
+        "installed_version": "24.2",
+        "fixed_version": "26.1",
+        "severity": "MEDIUM",
+        "scope": "runtime_core",
+        "title": "pip: pip: Arbitrary code execution or information disclosure via malicious wheel package installation",
+        "target": "Python",
+        "cvss_score": 5.8,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      },
+      {
+        "vuln_id": "CVE-2025-8869",
+        "pkg_name": "pip",
+        "pkg_type": "python-pkg",
+        "installed_version": "24.2",
+        "fixed_version": "25.3",
+        "severity": "MEDIUM",
+        "scope": "runtime_core",
+        "title": "pip: pip missing checks on symbolic link extraction",
+        "target": "Python",
+        "cvss_score": 5.3,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      },
+      {
+        "vuln_id": "CVE-2026-3219",
+        "pkg_name": "pip",
+        "pkg_type": "python-pkg",
+        "installed_version": "24.2",
+        "fixed_version": "26.1",
+        "severity": "MEDIUM",
+        "scope": "runtime_core",
+        "title": "pip: pip: Incorrect file installation due to improper archive handling",
+        "target": "Python",
+        "cvss_score": 5.0,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      },
+      {
+        "vuln_id": "CVE-2026-1703",
+        "pkg_name": "pip",
+        "pkg_type": "python-pkg",
+        "installed_version": "24.2",
+        "fixed_version": "26.0",
+        "severity": "LOW",
+        "scope": "runtime_core",
+        "title": "pip: pip: Information disclosure via path traversal when installing crafted wheel archives",
+        "target": "Python",
+        "cvss_score": 3.9,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      }
+    ],
+    "os_vulnerabilities": [
+      {
+        "vuln_id": "CVE-2026-42010",
+        "pkg_name": "libgnutls30",
+        "pkg_type": "debian",
+        "installed_version": "3.7.9-2+deb12u3",
+        "fixed_version": "3.7.9-2+deb12u7",
+        "severity": "CRITICAL",
+        "scope": "os_package",
+        "title": "gnutls: gnutls: Authentication Bypass via NUL Character in Username",
+        "target": "/out/image.tar (debian 12.7)",
+        "cvss_score": 9.8,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      },
+      {
+        "vuln_id": "CVE-2026-31789",
+        "pkg_name": "libssl3",
+        "pkg_type": "debian",
+        "installed_version": "3.0.14-1~deb12u2",
+        "fixed_version": "3.0.19-1~deb12u2",
+        "severity": "CRITICAL",
+        "scope": "os_package",
+        "title": "openssl: OpenSSL: Heap buffer overflow on 32-bit systems from large X.509 certificate processing",
+        "target": "/out/image.tar (debian 12.7)",
+        "cvss_score": 9.8,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      },
+      {
+        "vuln_id": "CVE-2026-31789",
+        "pkg_name": "openssl",
+        "pkg_type": "debian",
+        "installed_version": "3.0.14-1~deb12u2",
+        "fixed_version": "3.0.19-1~deb12u2",
+        "severity": "CRITICAL",
+        "scope": "os_package",
+        "title": "openssl: OpenSSL: Heap buffer overflow on 32-bit systems from large X.509 certificate processing",
+        "target": "/out/image.tar (debian 12.7)",
+        "cvss_score": 9.8,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      },
+      {
+        "vuln_id": "CVE-2026-8376",
+        "pkg_name": "perl-base",
+        "pkg_type": "debian",
+        "installed_version": "5.36.0-7+deb12u1",
+        "fixed_version": "5.36.0-7+deb12u4",
+        "severity": "CRITICAL",
+        "scope": "os_package",
+        "title": "perl: Perl: Heap buffer overflow when compiling regular expressions on 32-bit builds",
+        "target": "/out/image.tar (debian 12.7)",
+        "cvss_score": 9.8,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      },
+      {
+        "vuln_id": "CVE-2023-45853",
+        "pkg_name": "zlib1g",
+        "pkg_type": "debian",
+        "installed_version": "1:1.2.13.dfsg-1",
+        "fixed_version": "",
+        "severity": "CRITICAL",
+        "scope": "os_package",
+        "title": "zlib: integer overflow and resultant heap-based buffer overflow in zipOpenNewFileInZip4_6",
+        "target": "/out/image.tar (debian 12.7)",
+        "cvss_score": 9.8,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      },
+      {
+        "vuln_id": "CVE-2026-33845",
+        "pkg_name": "libgnutls30",
+        "pkg_type": "debian",
+        "installed_version": "3.7.9-2+deb12u3",
+        "fixed_version": "3.7.9-2+deb12u7",
+        "severity": "CRITICAL",
+        "scope": "os_package",
+        "title": "gnutls: GnuTLS: Denial of Service via DTLS zero-length fragment",
+        "target": "/out/image.tar (debian 12.7)",
+        "cvss_score": 9.1,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      },
+      {
+        "vuln_id": "CVE-2025-7458",
+        "pkg_name": "libsqlite3-0",
+        "pkg_type": "debian",
+        "installed_version": "3.40.1-2",
+        "fixed_version": "",
+        "severity": "CRITICAL",
+        "scope": "os_package",
+        "title": "sqlite: SQLite integer overflow",
+        "target": "/out/image.tar (debian 12.7)",
+        "cvss_score": 9.1,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      },
+      {
+        "vuln_id": "CVE-2026-13221",
+        "pkg_name": "perl-base",
+        "pkg_type": "debian",
+        "installed_version": "5.36.0-7+deb12u1",
+        "fixed_version": "5.36.0-7+deb12u4",
+        "severity": "CRITICAL",
+        "scope": "os_package",
+        "title": "perl: Perl: Incorrect regular expression processing via large regular expressions",
+        "target": "/out/image.tar (debian 12.7)",
+        "cvss_score": 9.1,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      },
+      {
+        "vuln_id": "CVE-2026-42496",
+        "pkg_name": "perl-base",
+        "pkg_type": "debian",
+        "installed_version": "5.36.0-7+deb12u1",
+        "fixed_version": "5.36.0-7+deb12u4",
+        "severity": "CRITICAL",
+        "scope": "os_package",
+        "title": "perl-archive-tar: perl-archive-tar: Path traversal via crafted symlinks allows arbitrary file access",
+        "target": "/out/image.tar (debian 12.7)",
+        "cvss_score": 9.1,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      },
+      {
+        "vuln_id": "CVE-2025-6965",
+        "pkg_name": "libsqlite3-0",
+        "pkg_type": "debian",
+        "installed_version": "3.40.1-2",
+        "fixed_version": "3.40.1-2+deb12u2",
+        "severity": "HIGH",
+        "scope": "os_package",
+        "title": "sqlite: Integer Truncation in SQLite",
+        "target": "/out/image.tar (debian 12.7)",
+        "cvss_score": 9.8,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      },
+      {
+        "vuln_id": "CVE-2025-15467",
+        "pkg_name": "libssl3",
+        "pkg_type": "debian",
+        "installed_version": "3.0.14-1~deb12u2",
+        "fixed_version": "3.0.18-1~deb12u2",
+        "severity": "HIGH",
+        "scope": "os_package",
+        "title": "openssl: OpenSSL: Remote code execution or Denial of Service via oversized Initialization Vector in CMS parsing",
+        "target": "/out/image.tar (debian 12.7)",
+        "cvss_score": 9.8,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      },
+      {
+        "vuln_id": "CVE-2025-15467",
+        "pkg_name": "openssl",
+        "pkg_type": "debian",
+        "installed_version": "3.0.14-1~deb12u2",
+        "fixed_version": "3.0.18-1~deb12u2",
+        "severity": "HIGH",
+        "scope": "os_package",
+        "title": "openssl: OpenSSL: Remote code execution or Denial of Service via oversized Initialization Vector in CMS parsing",
+        "target": "/out/image.tar (debian 12.7)",
+        "cvss_score": 9.8,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      },
+      {
+        "vuln_id": "CVE-2026-45447",
+        "pkg_name": "libssl3",
+        "pkg_type": "debian",
+        "installed_version": "3.0.14-1~deb12u2",
+        "fixed_version": "3.0.20-1~deb12u2",
+        "severity": "HIGH",
+        "scope": "os_package",
+        "title": "openssl: Heap Use-After-Free in OpenSSL PKCS7_verify()",
+        "target": "/out/image.tar (debian 12.7)",
+        "cvss_score": 8.8,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      },
+      {
+        "vuln_id": "CVE-2026-16742",
+        "pkg_name": "libsystemd0",
+        "pkg_type": "debian",
+        "installed_version": "252.30-1~deb12u2",
+        "fixed_version": "",
+        "severity": "HIGH",
+        "scope": "os_package",
+        "title": "systemd: systemd-homed: Local privilege escalation via missing home-record signature verification",
+        "target": "/out/image.tar (debian 12.7)",
+        "cvss_score": 8.8,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      },
+      {
+        "vuln_id": "CVE-2026-16742",
+        "pkg_name": "libudev1",
+        "pkg_type": "debian",
+        "installed_version": "252.30-1~deb12u2",
+        "fixed_version": "",
+        "severity": "HIGH",
+        "scope": "os_package",
+        "title": "systemd: systemd-homed: Local privilege escalation via missing home-record signature verification",
+        "target": "/out/image.tar (debian 12.7)",
+        "cvss_score": 8.8,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      },
+      {
+        "vuln_id": "CVE-2026-45447",
+        "pkg_name": "openssl",
+        "pkg_type": "debian",
+        "installed_version": "3.0.14-1~deb12u2",
+        "fixed_version": "3.0.20-1~deb12u2",
+        "severity": "HIGH",
+        "scope": "os_package",
+        "title": "openssl: Heap Use-After-Free in OpenSSL PKCS7_verify()",
+        "target": "/out/image.tar (debian 12.7)",
+        "cvss_score": 8.8,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      },
+      {
+        "vuln_id": "CVE-2026-57432",
+        "pkg_name": "perl-base",
+        "pkg_type": "debian",
+        "installed_version": "5.36.0-7+deb12u1",
+        "fixed_version": "5.36.0-7+deb12u4",
+        "severity": "HIGH",
+        "scope": "os_package",
+        "title": "perl: Perl: Information disclosure via integer overflow in pack/unpack operations",
+        "target": "/out/image.tar (debian 12.7)",
+        "cvss_score": 8.4,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      },
+      {
+        "vuln_id": "CVE-2026-118370",
+        "pkg_name": "libexpat1",
+        "pkg_type": "debian",
+        "installed_version": "2.5.0-1+deb12u1",
+        "fixed_version": "",
+        "severity": "HIGH",
+        "scope": "os_package",
+        "title": "expat: expat: Denial of Service via integer overflow during XML attribute parsing",
+        "target": "/out/image.tar (debian 12.7)",
+        "cvss_score": 8.2,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      },
+      {
+        "vuln_id": "CVE-2026-77214",
+        "pkg_name": "libexpat1",
+        "pkg_type": "debian",
+        "installed_version": "2.5.0-1+deb12u1",
+        "fixed_version": "2.5.0-1+deb12u5",
+        "severity": "HIGH",
+        "scope": "os_package",
+        "title": "expat: expat: Information disclosure via heap buffer over-read in XML_ParseBuffer",
+        "target": "/out/image.tar (debian 12.7)",
+        "cvss_score": 8.2,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      },
+      {
+        "vuln_id": "CVE-2025-32988",
+        "pkg_name": "libgnutls30",
+        "pkg_type": "debian",
+        "installed_version": "3.7.9-2+deb12u3",
+        "fixed_version": "3.7.9-2+deb12u5",
+        "severity": "HIGH",
+        "scope": "os_package",
+        "title": "gnutls: Vulnerability in GnuTLS otherName SAN export",
+        "target": "/out/image.tar (debian 12.7)",
+        "cvss_score": 8.2,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      },
+      {
+        "vuln_id": "CVE-2025-32990",
+        "pkg_name": "libgnutls30",
+        "pkg_type": "debian",
+        "installed_version": "3.7.9-2+deb12u3",
+        "fixed_version": "3.7.9-2+deb12u5",
+        "severity": "HIGH",
+        "scope": "os_package",
+        "title": "gnutls: Vulnerability in GnuTLS certtool template parsing",
+        "target": "/out/image.tar (debian 12.7)",
+        "cvss_score": 8.2,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      },
+      {
+        "vuln_id": "CVE-2026-86145",
+        "pkg_name": "libpcre2-8-0",
+        "pkg_type": "debian",
+        "installed_version": "10.42-1",
+        "fixed_version": "10.42-1+deb12u1",
+        "severity": "HIGH",
+        "scope": "os_package",
+        "title": "pcre2: PCRE2: Out-of-bounds write allows arbitrary code execution via crafted regular expressions",
+        "target": "/out/image.tar (debian 12.7)",
+        "cvss_score": 8.2,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      },
+      {
+        "vuln_id": "CVE-2026-109518",
+        "pkg_name": "apt",
+        "pkg_type": "debian",
+        "installed_version": "2.6.1",
+        "fixed_version": "2.6.2",
+        "severity": "HIGH",
+        "scope": "os_package",
+        "title": "apt: apt: Remote code execution via hard link reuse during package download retries",
+        "target": "/out/image.tar (debian 12.7)",
+        "cvss_score": 8.1,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      },
+      {
+        "vuln_id": "CVE-2026-109518",
+        "pkg_name": "libapt-pkg6.0",
+        "pkg_type": "debian",
+        "installed_version": "2.6.1",
+        "fixed_version": "2.6.2",
+        "severity": "HIGH",
+        "scope": "os_package",
+        "title": "apt: apt: Remote code execution via hard link reuse during package download retries",
+        "target": "/out/image.tar (debian 12.7)",
+        "cvss_score": 8.1,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      },
+      {
+        "vuln_id": "CVE-2026-71199",
+        "pkg_name": "libgssapi-krb5-2",
+        "pkg_type": "debian",
+        "installed_version": "1.20.1-2+deb12u2",
+        "fixed_version": "",
+        "severity": "HIGH",
+        "scope": "os_package",
+        "title": "krb5: Alteration of authentication indicators in CAMMAC container",
+        "target": "/out/image.tar (debian 12.7)",
+        "cvss_score": 8.1,
+        "is_unpinned_specifier": false,
+        "version_resolution_note": ""
+      }
+    ],
+    "misconfigurations": [
+      {
+        "check_id": "DS-0026",
+        "severity": "LOW",
+        "title": "No HEALTHCHECK defined",
+        "file_path": "Dockerfile",
+        "start_line": null,
+        "message": "Add HEALTHCHECK instruction in your Dockerfile",
+        "resolution": "Add HEALTHCHECK instruction in Dockerfile"
+      }
+    ],
+    "secrets": [],
+    "opt_out_counts": {}
+  },
+  "pentest_facts": {
+    "status": "passed",
+    "container_engine": "docker",
+    "engine_available": true,
+    "skip_reason": "",
+    "pentests_dir": ".pni/pentests/examples/python/api_fastapi_clean",
+    "materialized_files": [
+      ".pni/pentests/examples/python/api_fastapi_clean/conftest.py",
+      ".pni/pentests/examples/python/api_fastapi_clean/test_app_probes.py",
+      ".pni/pentests/examples/python/api_fastapi_clean/test_baseline_http.py",
+      ".pni/pentests/examples/python/api_fastapi_clean/test_target_surface.py"
+    ],
+    "target_base_url": "http://127.0.0.1:55857",
+    "server_booted": true,
+    "boot_failure_reason": "",
+    "duration_sec": 28.04,
+    "artifacts_dir": ".pni/cache/py_api_fastapi_clean/pentest",
+    "probe_summary": {
+      "total_probes": 19,
+      "passed_probes": 15,
+      "failed_probes": 3,
+      "skipped_probes": 1,
+      "error_probes": 0
+    },
+    "findings": [
+      {
+        "test_id": "test_app_probes::test_create_order_enforces_authentication_guard",
+        "test_file": "test_app_probes.py",
+        "cwe_id": "CWE-306",
+        "category": "missing_authentication",
+        "severity": "medium",
+        "endpoint": "/v1/orders",
+        "title": "State-mutating POST /v1/orders accepts unauthenticated order creation (HTTP 201)",
+        "evidence": "Unauthenticated POST /v1/orders returned 201: {\"order_id\":\"ord-94b1ebabb3\",\"customer_id\":\"unauth-caller\",\"tier\":\"vip\",\"subtotal_cents\":2000,\"total_cents\":1800,\"status\":\"webhook_deferred\""
+      },
+      {
+        "test_id": "test_app_probes::test_openapi_schema_not_publicly_exposed_without_auth",
+        "test_file": "test_app_probes.py",
+        "cwe_id": "CWE-200",
+        "category": "api_schema_exposure",
+        "severity": "low",
+        "endpoint": "/openapi.json",
+        "title": "Unauthenticated OpenAPI specification (/openapi.json) exposed by default",
+        "evidence": "GET /openapi.json returned 200 (4753 bytes)"
+      },
+      {
+        "test_id": "test_baseline_http::test_x_content_type_options_nosniff",
+        "test_file": "test_baseline_http.py",
+        "cwe_id": "CWE-693",
+        "category": "missing_security_headers",
+        "severity": "low",
+        "endpoint": "/healthz",
+        "title": "Missing X-Content-Type-Options: nosniff response header",
+        "evidence": "GET /healthz -> 200, X-Content-Type-Options=<absent>"
+      }
+    ]
+  },
+  "module_inventory": [
+    {
+      "file": "examples/python/api_fastapi_clean/src/order_dispatch/__init__.py",
+      "loc": 2,
+      "public_types": [],
+      "public_callables": []
+    },
+    {
+      "file": "examples/python/api_fastapi_clean/src/order_dispatch/api/__init__.py",
+      "loc": 2,
+      "public_types": [],
+      "public_callables": []
+    },
+    {
+      "file": "examples/python/api_fastapi_clean/src/order_dispatch/api/routes.py",
+      "loc": 74,
+      "public_types": [],
+      "public_callables": [
+        "get_dispatcher",
+        "get_settings",
+        "health_check",
+        "create_order",
+        "get_order"
+      ]
+    },
+    {
+      "file": "examples/python/api_fastapi_clean/src/order_dispatch/api/schemas.py",
+      "loc": 67,
+      "public_types": [
+        "CreateOrderRequest",
+        "HealthResponse",
+        "OrderLineInput",
+        "OrderResponse"
+      ],
+      "public_callables": [
+        "to_domain_lines",
+        "to_order_response"
+      ]
+    },
+    {
+      "file": "examples/python/api_fastapi_clean/src/order_dispatch/domain/__init__.py",
+      "loc": 2,
+      "public_types": [],
+      "public_callables": []
+    },
+    {
+      "file": "examples/python/api_fastapi_clean/src/order_dispatch/domain/models.py",
+      "loc": 29,
+      "public_types": [
+        "CustomerTier",
+        "OrderLine",
+        "OrderRecord",
+        "OrderStatus"
+      ],
+      "public_callables": []
+    },
+    {
+      "file": "examples/python/api_fastapi_clean/src/order_dispatch/domain/pricing.py",
+      "loc": 41,
+      "public_types": [
+        "PricingError"
+      ],
+      "public_callables": [
+        "calculate_subtotal_cents",
+        "compute_order_total_cents"
+      ]
+    },
+    {
+      "file": "examples/python/api_fastapi_clean/src/order_dispatch/infra/__init__.py",
+      "loc": 2,
+      "public_types": [],
+      "public_callables": []
+    },
+    {
+      "file": "examples/python/api_fastapi_clean/src/order_dispatch/infra/repository.py",
+      "loc": 39,
+      "public_types": [
+        "InMemoryOrderRepository",
+        "OrderRepository"
+      ],
+      "public_callables": []
+    },
+    {
+      "file": "examples/python/api_fastapi_clean/src/order_dispatch/infra/webhook_client.py",
+      "loc": 35,
+      "public_types": [
+        "AsyncWebhookClient"
+      ],
+      "public_callables": []
+    },
+    {
+      "file": "examples/python/api_fastapi_clean/src/order_dispatch/main.py",
+      "loc": 48,
+      "public_types": [],
+      "public_callables": [
+        "lifespan",
+        "create_app"
+      ]
+    },
+    {
+      "file": "examples/python/api_fastapi_clean/src/order_dispatch/services/__init__.py",
+      "loc": 2,
+      "public_types": [],
+      "public_callables": []
+    },
+    {
+      "file": "examples/python/api_fastapi_clean/src/order_dispatch/services/dispatcher.py",
+      "loc": 74,
+      "public_types": [
+        "OrderDispatcherService"
+      ],
+      "public_callables": []
+    },
+    {
+      "file": "examples/python/api_fastapi_clean/src/order_dispatch/settings.py",
+      "loc": 18,
+      "public_types": [
+        "ServiceSettings"
+      ],
+      "public_callables": [
+        "load_settings"
+      ]
+    }
+  ],
+  "dangerous_sinks": [],
+  "api_endpoints": [
+    {
+      "http_method": "GET",
+      "path": "/healthz",
+      "handler": "health_check",
+      "file": "examples/python/api_fastapi_clean/src/order_dispatch/api/routes.py",
+      "line": 47,
+      "has_auth_hint": false,
+      "auth_mechanisms": []
+    },
+    {
+      "http_method": "POST",
+      "path": "/v1/orders",
+      "handler": "create_order",
+      "file": "examples/python/api_fastapi_clean/src/order_dispatch/api/routes.py",
+      "line": 60,
+      "has_auth_hint": false,
+      "auth_mechanisms": []
+    },
+    {
+      "http_method": "GET",
+      "path": "/v1/orders/{order_id}",
+      "handler": "get_order",
+      "file": "examples/python/api_fastapi_clean/src/order_dispatch/api/routes.py",
+      "line": 83,
+      "has_auth_hint": false,
+      "auth_mechanisms": []
+    }
+  ],
+  "language_version_mismatches": [],
+  "architecture_overview": {
+    "pattern": "Strict 4-Layer Acyclic Clean/Hexagonal Microservice (api -> services -> domain + infra)",
+    "entry_points": [
+      "src/order_dispatch/main.py:create_app",
+      "src/order_dispatch/api/routes.py:health_check",
+      "src/order_dispatch/api/routes.py:create_order",
+      "src/order_dispatch/api/routes.py:get_order"
+    ],
+    "modules": [
+      {
+        "path": "src/order_dispatch/main.py",
+        "role": "FastAPI factory and async lifespan dependency composition",
+        "key_symbols": [
+          "lifespan",
+          "create_app"
+        ],
+        "depends_on": [
+          "src/order_dispatch/api/routes.py",
+          "src/order_dispatch/services/dispatcher.py",
+          "src/order_dispatch/infra/repository.py",
+          "src/order_dispatch/infra/webhook_client.py",
+          "src/order_dispatch/settings.py"
+        ],
+        "health_note": "Clean wiring; defaults to InMemoryOrderRepository in lifespan."
+      },
+      {
+        "path": "src/order_dispatch/api/routes.py",
+        "role": "FastAPI HTTP endpoints (/healthz, POST /v1/orders, GET /v1/orders/{order_id})",
+        "key_symbols": [
+          "health_check",
+          "create_order",
+          "get_order"
+        ],
+        "depends_on": [
+          "src/order_dispatch/api/schemas.py",
+          "src/order_dispatch/services/dispatcher.py",
+          "src/order_dispatch/settings.py"
+        ],
+        "health_note": "Typed response_model and Depends(); /v1/orders lacks auth dependency."
+      },
+      {
+        "path": "src/order_dispatch/services/dispatcher.py",
+        "role": "OrderDispatcherService application orchestrator",
+        "key_symbols": [
+          "OrderDispatcherService"
+        ],
+        "depends_on": [
+          "src/order_dispatch/domain/models.py",
+          "src/order_dispatch/domain/pricing.py",
+          "src/order_dispatch/infra/repository.py",
+          "src/order_dispatch/infra/webhook_client.py"
+        ],
+        "health_note": "100% line coverage; pure constructor DI."
+      },
+      {
+        "path": "src/order_dispatch/domain/pricing.py",
+        "role": "Pure integer-cents subtotal and VIP discount calculator",
+        "key_symbols": [
+          "PricingError",
+          "calculate_subtotal_cents",
+          "compute_order_total_cents"
+        ],
+        "depends_on": [
+          "src/order_dispatch/domain/models.py"
+        ],
+        "health_note": "Zero framework or I/O imports; 95.2% line / 90.0% branch coverage."
+      },
+      {
+        "path": "src/order_dispatch/infra/webhook_client.py",
+        "role": "Async httpx webhook client with bounded timeout and graceful fallback",
+        "key_symbols": [
+          "AsyncWebhookClient"
+        ],
+        "depends_on": [
+          "src/order_dispatch/domain/models.py"
+        ],
+        "health_note": "Explicit timeout_sec=5.0; needs MockTransport branch tests (55.6% line cov)."
+      }
+    ],
+    "dependency_notes": "Exemplary downward-only acyclic layering with 0 circular dependencies and 0 boundary violations; domain package is completely free of FastAPI/httpx/Pydantic imports."
+  },
+  "architecture_record": {
+    "workflow_id": "py_api_fastapi_clean",
+    "workflow_run_id": "wf-f819234f",
+    "recorded_at": "2026-11-22T11:27:44.177540+00:00",
+    "target_root": "examples/python/api_fastapi_clean",
+    "system_profile": {
+      "system_purpose": "order-dispatch is an async FastAPI + Pydantic v2 microservice that prices multi-line customer orders in integer cents, persists fulfillment records via a repository Protocol port, and dispatches non-blocking outbound partner webhooks with bounded timeouts.",
+      "domain_context": "E-commerce order intake, loyalty-tier pricing (Standard vs. VIP), order persistence, and asynchronous fulfillment webhook notification.",
+      "runtime_types": [
+        "web_api",
+        "library"
+      ],
+      "tech_stack": [
+        "Python >=3.11 (uv_build + uv.lock)",
+        "FastAPI >=0.115.0 + Uvicorn >=0.30.0",
+        "Pydantic v2 >=2.8.0 + pydantic-settings >=2.4.0",
+        "httpx >=0.27.0 (AsyncClient)",
+        "pytest + pytest-cov + Ruff + Ty"
+      ],
+      "external_integrations": [
+        "Partner fulfillment webhook HTTP endpoint configured via ORDER_DISPATCH_WEBHOOK_URL (default https://partner-gateway.internal/v1/events)"
+      ]
+    },
+    "structure_map": {
+      "architecture_pattern": "Strict 4-Layer Acyclic Clean/Hexagonal Microservice (api -> services -> domain + infra)",
+      "layers": [
+        {
+          "name": "Composition & Config Root",
+          "responsibility": "FastAPI application factory, asynccontextmanager lifespan wiring, and centralized pydantic-settings configuration.",
+          "paths": [
+            "src/order_dispatch/main.py",
+            "src/order_dispatch/settings.py"
+          ],
+          "allowed_dependencies": [
+            "API Layer",
+            "Application Service Layer",
+            "Infrastructure Layer"
+          ]
+        },
+        {
+          "name": "API Layer",
+          "responsibility": "HTTP routing, dependency injection, and strict Pydantic v2 request/response DTO serialization.",
+          "paths": [
+            "src/order_dispatch/api/routes.py",
+            "src/order_dispatch/api/schemas.py"
+          ],
+          "allowed_dependencies": [
+            "Application Service Layer",
+            "Domain Layer",
+            "Composition & Config Root"
+          ]
+        },
+        {
+          "name": "Application Service Layer",
+          "responsibility": "Stateless orchestration of order pricing, async webhook dispatch, and repository persistence.",
+          "paths": [
+            "src/order_dispatch/services/dispatcher.py"
+          ],
+          "allowed_dependencies": [
+            "Domain Layer",
+            "Infrastructure Layer"
+          ]
+        },
+        {
+          "name": "Domain Layer",
+          "responsibility": "Pure immutable order value objects, enums, and integer-cents pricing/VIP discount invariants with zero external dependencies.",
+          "paths": [
+            "src/order_dispatch/domain/models.py",
+            "src/order_dispatch/domain/pricing.py"
+          ],
+          "allowed_dependencies": []
+        },
+        {
+          "name": "Infrastructure Layer",
+          "responsibility": "OrderRepository Protocol + in-memory adapter and timeout-bounded async httpx webhook notifier.",
+          "paths": [
+            "src/order_dispatch/infra/repository.py",
+            "src/order_dispatch/infra/webhook_client.py"
+          ],
+          "allowed_dependencies": [
+            "Domain Layer"
+          ]
+        }
+      ],
+      "modules": [
+        {
+          "path": "src/order_dispatch/main.py",
+          "role": "FastAPI factory and async lifespan dependency composition",
+          "key_symbols": [
+            "lifespan",
+            "create_app"
+          ],
+          "depends_on": [
+            "src/order_dispatch/api/routes.py",
+            "src/order_dispatch/services/dispatcher.py",
+            "src/order_dispatch/infra/repository.py",
+            "src/order_dispatch/infra/webhook_client.py",
+            "src/order_dispatch/settings.py"
+          ],
+          "health_note": "Clean wiring; defaults to InMemoryOrderRepository in lifespan."
+        },
+        {
+          "path": "src/order_dispatch/api/routes.py",
+          "role": "FastAPI HTTP endpoints (/healthz, POST /v1/orders, GET /v1/orders/{order_id})",
+          "key_symbols": [
+            "health_check",
+            "create_order",
+            "get_order"
+          ],
+          "depends_on": [
+            "src/order_dispatch/api/schemas.py",
+            "src/order_dispatch/services/dispatcher.py",
+            "src/order_dispatch/settings.py"
+          ],
+          "health_note": "Typed response_model and Depends(); /v1/orders lacks auth dependency."
+        },
+        {
+          "path": "src/order_dispatch/services/dispatcher.py",
+          "role": "OrderDispatcherService application orchestrator",
+          "key_symbols": [
+            "OrderDispatcherService"
+          ],
+          "depends_on": [
+            "src/order_dispatch/domain/models.py",
+            "src/order_dispatch/domain/pricing.py",
+            "src/order_dispatch/infra/repository.py",
+            "src/order_dispatch/infra/webhook_client.py"
+          ],
+          "health_note": "100% line coverage; pure constructor DI."
+        },
+        {
+          "path": "src/order_dispatch/domain/pricing.py",
+          "role": "Pure integer-cents subtotal and VIP discount calculator",
+          "key_symbols": [
+            "PricingError",
+            "calculate_subtotal_cents",
+            "compute_order_total_cents"
+          ],
+          "depends_on": [
+            "src/order_dispatch/domain/models.py"
+          ],
+          "health_note": "Zero framework or I/O imports; 95.2% line / 90.0% branch coverage."
+        },
+        {
+          "path": "src/order_dispatch/infra/webhook_client.py",
+          "role": "Async httpx webhook client with bounded timeout and graceful fallback",
+          "key_symbols": [
+            "AsyncWebhookClient"
+          ],
+          "depends_on": [
+            "src/order_dispatch/domain/models.py"
+          ],
+          "health_note": "Explicit timeout_sec=5.0; needs MockTransport branch tests (55.6% line cov)."
+        }
+      ],
+      "boundary_assessment": "Exemplary downward-only acyclic layering with 0 circular dependencies and 0 boundary violations; domain package is completely free of FastAPI/httpx/Pydantic imports."
+    },
+    "execution_flow_map": {
+      "entry_points": [
+        "src/order_dispatch/main.py:create_app",
+        "src/order_dispatch/api/routes.py:health_check",
+        "src/order_dispatch/api/routes.py:create_order",
+        "src/order_dispatch/api/routes.py:get_order"
+      ],
+      "execution_flows": [
+        {
+          "name": "Order Creation & Async Webhook Dispatch",
+          "trigger": "HTTP POST /v1/orders",
+          "steps": [
+            "FastAPI validates inbound JSON via CreateOrderRequest (extra='forbid', normalized uppercase SKU).",
+            "create_order() resolves OrderDispatcherService via Depends(get_dispatcher) and converts lines via to_domain_lines().",
+            "OrderDispatcherService.place_order() calls compute_order_total_cents() for integer-cent subtotal and VIP discount.",
+            "AsyncWebhookClient.notify_order_accepted() posts event with explicit timeout_sec=5.0, degrading to WEBHOOK_DEFERRED on httpx.HTTPError.",
+            "OrderRepository.save() persists finalized OrderRecord and to_order_response() returns HTTP 201 JSON."
+          ],
+          "involved_files": [
+            "src/order_dispatch/api/routes.py",
+            "src/order_dispatch/api/schemas.py",
+            "src/order_dispatch/services/dispatcher.py",
+            "src/order_dispatch/domain/pricing.py",
+            "src/order_dispatch/infra/webhook_client.py",
+            "src/order_dispatch/infra/repository.py"
+          ]
+        },
+        {
+          "name": "Readiness Probe & Order Lookup",
+          "trigger": "HTTP GET /healthz or GET /v1/orders/{order_id}",
+          "steps": [
+            "GET /healthz returns ServiceSettings metadata as frozen HealthResponse (HTTP 200).",
+            "GET /v1/orders/{order_id} queries OrderDispatcherService.find_order() -> OrderRepository.get() and raises HTTP 404 when absent."
+          ],
+          "involved_files": [
+            "src/order_dispatch/api/routes.py",
+            "src/order_dispatch/services/dispatcher.py",
+            "src/order_dispatch/infra/repository.py"
+          ]
+        }
+      ],
+      "state_and_storage": [
+        "Application-scoped dependencies stored on FastAPI app.state during asynccontextmanager lifespan (src/order_dispatch/main.py).",
+        "Default persistence adapter is process-local InMemoryOrderRepository behind OrderRepository Protocol (src/order_dispatch/infra/repository.py)."
+      ],
+      "error_and_concurrency_model": "Asyncio event loop via Uvicorn + FastAPI with non-blocking httpx.AsyncClient; domain invariant violations raise PricingError, missing lookups raise HTTPException(404), and outbound webhook httpx.HTTPError failures degrade gracefully to OrderStatus.WEBHOOK_DEFERRED with warning logs."
+    }
+  },
+  "audit_dimensions": [
+    {
+      "action_id": "act-10",
+      "audit_id": "security_vulnerability_audit",
+      "title": "Evaluate Supply-Chain CVEs, Container Misconfigs, Secrets, Dangerous Sinks & API Boundaries",
+      "score": 82,
+      "grade": "A",
+      "rules_evaluated": [
+        "common/security_vulnerability",
+        "common/supply_chain"
+      ],
+      "pass_count": 0,
+      "warn_count": 2,
+      "fail_count": 0,
+      "summary": "Trivy SCA across filesystem and the built python:3.12.6-slim-bookworm image found 0 CRITICAL/HIGH CVEs in order-dispatch's declared application dependencies (fastapi, pydantic, uvicorn, httpx), 0 secrets, and only 1 LOW IaC warning (DS-0026 missing HEALTHCHECK). However, the pinned Debian 12.7 base image bundles outdated pip@24.2 (5 MEDIUM + 1 LOW CVEs) and 612 OS package CVEs (9 CRITICAL, 158 HIGH) fixable by refreshing the base image and upgrading/removing build-time pip in a multi-stage Dockerfile."
+    },
+    {
+      "action_id": "act-12",
+      "audit_id": "web_penetration_audit",
+      "title": "Evaluate Live HTTP Penetration Findings, Security Headers & Endpoint Defenses",
+      "score": 86,
+      "grade": "A",
+      "rules_evaluated": [
+        "common/security_vulnerability"
+      ],
+      "pass_count": 0,
+      "warn_count": 1,
+      "fail_count": 0,
+      "summary": "Live HTTP DAST penetration test against the isolated Docker container (19 probes: 15 passed, 3 failed, 1 skipped) confirmed zero critical or high exploitable vulnerabilities (XSS, SQLi, path traversal, secret leaks all resisted). Three medium/low defense-in-depth findings were verified live: unauthenticated POST /v1/orders returning HTTP 201 (CWE-306), publicly accessible /openapi.json (CWE-200), and missing X-Content-Type-Options: nosniff header (CWE-693)."
+    },
+    {
+      "action_id": "act-17",
+      "audit_id": "python_test_audit",
+      "title": "Evaluate Test Suite Completeness & Structure",
+      "score": 88,
+      "grade": "A",
+      "rules_evaluated": [
+        "python/testing"
+      ],
+      "pass_count": 1,
+      "warn_count": 0,
+      "fail_count": 0,
+      "summary": "order-dispatch provides a clean, deterministic, offline-safe pytest suite (3 test files, 4 test functions, 0 assertion-free tests, 100.0% static module coverage, 85.2% measured line coverage, 62.5% branch coverage) using an explicit _StubWebhookClient to avoid external network calls. Expanding tests/test_routes.py with FastAPI TestClient calls and AsyncWebhookClient MockTransport tests will lift branch coverage from 62.5% above 80%."
+    },
+    {
+      "action_id": "act-08",
+      "audit_id": "container_runtime_audit",
+      "title": "Evaluate Buildability, Offline Test Results, Measured Coverage & Startup Health",
+      "score": 90,
+      "grade": "S",
+      "rules_evaluated": [
+        "common/runtime_verification",
+        "common/production_readiness"
+      ],
+      "pass_count": 2,
+      "warn_count": 0,
+      "fail_count": 0,
+      "summary": "Isolated Docker runtime verification passed all 4 gates: both project Dockerfile (31.33s) and uv harness (0.48s) built cleanly, 4/4 offline pytest tests passed (--network=none, 5.05s), measured pytest-cov reached 85.2% line / 62.5% branch coverage, and ASGI lifespan smoke check booted cleanly (/healthz -> 200). Targeted branch tests for routes.py (56.0% line), webhook_client.py (55.6% line), and main.py lifespan (67.9% line) will raise branch coverage above 80%."
+    },
+    {
+      "action_id": "act-16",
+      "audit_id": "service_readiness_audit",
+      "title": "Evaluate 12-Factor Config/Statelessness & SRE PRR Timeouts/Observability",
+      "score": 91,
+      "grade": "S",
+      "rules_evaluated": [
+        "common/twelve_factor",
+        "common/production_readiness",
+        "common/security"
+      ],
+      "pass_count": 1,
+      "warn_count": 2,
+      "fail_count": 0,
+      "summary": "order-dispatch demonstrates strong 12-Factor and SRE Production Readiness compliance: centralized pydantic-settings configuration (ORDER_DISPATCH_*), swappable OrderRepository Protocol and AsyncWebhookClient ports, explicit 5.0s httpx timeout, structured stdlib logging, asynccontextmanager lifespan, and /healthz readiness endpoint. Production hardening requires replacing InMemoryOrderRepository with a durable backing store for horizontal stateless scaling and adding authentication on /v1/orders."
+    },
+    {
+      "action_id": "act-04",
+      "audit_id": "supply_chain_audit",
+      "title": "Evaluate Supply-Chain, CI Permissions, Container & Secret Hygiene",
+      "score": 92,
+      "grade": "S",
+      "rules_evaluated": [
+        "common/supply_chain",
+        "common/security",
+        "common/git_workflow"
+      ],
+      "pass_count": 3,
+      "warn_count": 0,
+      "fail_count": 0,
+      "summary": "order-dispatch passes all OpenSSF supply-chain and secret hygiene gates (uv.lock, SHA-pinned CI actions with contents: read, Dependabot, LICENSE, SECURITY.md, non-root Dockerfile with .dockerignore, zero hardcoded/committed secrets), with minor hardening recommended to refresh the python:3.12.6-slim-bookworm base image and add a Dockerfile HEALTHCHECK."
+    },
+    {
+      "action_id": "act-06",
+      "audit_id": "python_ast_audit",
+      "title": "Interpret Python AST Facts & Evaluate Quality/Typing/Imports/Security",
+      "score": 95,
+      "grade": "S",
+      "rules_evaluated": [
+        "common/architecture",
+        "common/maintainability",
+        "common/security",
+        "common/security_vulnerability",
+        "python/code_quality",
+        "python/typing",
+        "python/modern_stack",
+        "python/frameworks/fastapi"
+      ],
+      "pass_count": 7,
+      "warn_count": 1,
+      "fail_count": 0,
+      "summary": "order-dispatch achieves 100.0% import hygiene, 100.0% type safety, 100.0% Google-style docstring coverage, 0 circular dependencies, 0 complexity hotspots, 0 dangerous sinks, and exemplary FastAPI + Pydantic v2 layering across 14 files (435 LOC). The sole security boundary gap noted in code is unauthenticated POST /v1/orders and GET /v1/orders/{order_id} (acknowledged via TODO in routes.py:73)."
+    },
+    {
+      "action_id": "act-03",
+      "audit_id": "repo_structure_audit",
+      "title": "Evaluate Repository Structure, Supply Chain & Dependencies",
+      "score": 96,
+      "grade": "S",
+      "rules_evaluated": [
+        "common/supply_chain",
+        "common/documentation",
+        "common/git_workflow",
+        "common/security",
+        "python/dependencies"
+      ],
+      "pass_count": 5,
+      "warn_count": 0,
+      "fail_count": 0,
+      "summary": "order-dispatch demonstrates exemplary repository governance, PEP 621 packaging, deterministic uv.lock pinning, SHA-pinned least-privilege GitHub Actions CI, Dependabot automation, SECURITY.md, Apache-2.0 LICENSE, hardened non-root Dockerfile, and a Diataxis-structured README."
+    }
+  ],
+  "rule_compliance": [
+    {
+      "rule_id": "common/security",
+      "status": "warn",
+      "source_action": "service_readiness_audit",
+      "evidence": "0 committed secret files, 0 companion DSL secrets/sinks across Dockerfile/TOML/YAML, least-privilege CI token permissions, and non-root container user (uid 10001).; 0 hardcoded secrets in AstFacts, 0 committed secret files, 0 Trivy secrets, and 0 dangerous code sinks across Python source and companion DSLs.; 0 hardcoded secrets, 0 dangerous sinks, and strict Pydantic v2 ConfigDict(extra='forbid') input validation with SKU normalization and numeric bounds in api/schemas.py.; Strict Pydantic v2 extra='forbid' boundary validation and 0 secrets/sinks, but /v1/orders endpoints currently omit caller authentication (TODO in routes.py:73).",
+      "summary": ""
+    },
+    {
+      "rule_id": "common/security_vulnerability",
+      "status": "warn",
+      "source_action": "python_ast_audit",
+      "evidence": "0 dangerous code sinks and 0 hardcoded secrets (SEC-03/SEC-04 pass), but all 3 extracted HTTP endpoints (/healthz, POST /v1/orders, GET /v1/orders/{order_id}) in src/order_dispatch/api/routes.py have auth_hint=NONE (SEC-05).; SEC-01: 0 CRITICAL/HIGH in declared app packages; 6 pip@24.2 CVEs (5 MEDIUM, 1 LOW) in base image Python toolchain + 612 Debian 12.7 OS CVEs (9 CRITICAL, 158 HIGH). SEC-02: 1 LOW DS-0026 (no HEALTHCHECK). SEC-03/SEC-04: 0 secrets, 0 dangerous sinks.; SEC-06 live DAST (19 probes, 15 passed, 3 failed, 1 skipped): 0 CRITICAL/HIGH live exploits; 1 MEDIUM (CWE-306 unauthenticated POST /v1/orders -> 201) and 2 LOW (CWE-200 /openapi.json exposed, CWE-693 missing X-Content-Type-Options: nosniff).",
+      "summary": ""
+    },
+    {
+      "rule_id": "common/supply_chain",
+      "status": "warn",
+      "source_action": "security_vulnerability_audit",
+      "evidence": "uv.lock committed, 0 unpinned dependencies, LICENSE and SECURITY.md present, .github/dependabot.yml configured, .github/workflows/ci.yml pins actions/checkout and astral-sh/setup-uv to full commit SHAs with permissions: contents: read, Dockerfile pins python:3.12.6-slim-bookworm with non-root USER appuser and .dockerignore.; uv.lock committed, 0 unpinned dependencies, LICENSE + SECURITY.md + .github/dependabot.yml present, .github/workflows/ci.yml pins actions/checkout and astral-sh/setup-uv to full commit SHAs with permissions: contents: read, Dockerfile runs non-root appuser with .dockerignore.; Dockerfile pins python:3.12.6-slim-bookworm (reproducible but aged Debian 12.7 with 9 CRITICAL OS CVEs and pip@24.2) and omits HEALTHCHECK (DS-0026).",
+      "summary": ""
+    },
+    {
+      "rule_id": "common/twelve_factor",
+      "status": "warn",
+      "source_action": "service_readiness_audit",
+      "evidence": "Factor III PASS (pydantic-settings in settings.py, 0 scattered env reads), Factor IV PASS (OrderRepository Protocol + configured webhook URL), Factor IX PASS (FastAPI lifespan), Factor XI PASS (logging.getLogger, 0 print calls); Factor VI WARN because default runtime wires InMemoryOrderRepository in main.py:33 (process-local memory lost on restart/scale-out).",
+      "summary": ""
+    },
+    {
+      "rule_id": "common/architecture",
+      "status": "pass",
+      "source_action": "python_ast_audit",
+      "evidence": "Strict acyclic layered DAG: api -> services -> domain + infra; domain/models.py and domain/pricing.py have zero framework or network imports; 0 circular dependencies and 0 boundary violations.",
+      "summary": ""
+    },
+    {
+      "rule_id": "common/documentation",
+      "status": "pass",
+      "source_action": "repo_structure_audit",
+      "evidence": "README.md (23 lines, 6 headings) covers Quickstart Tutorial, Operations How-To Guide, HTTP API Reference, and Layered Architecture Explanation aligned with Diataxis.",
+      "summary": ""
+    },
+    {
+      "rule_id": "common/git_workflow",
+      "status": "pass",
+      "source_action": "repo_structure_audit",
+      "evidence": ".gitignore committed and .github/workflows/ci.yml gates push/pull_request on main with ruff check and pytest.; .gitignore committed and CI runs ruff check + pytest on push and pull_request to main.",
+      "summary": ""
+    },
+    {
+      "rule_id": "common/maintainability",
+      "status": "pass",
+      "source_action": "python_ast_audit",
+      "evidence": "0 complex functions, 0 excessive parameter lists, 0 global mutable state usages, and 0 bug-risk idioms across 14 files (435 LOC).",
+      "summary": ""
+    },
+    {
+      "rule_id": "common/production_readiness",
+      "status": "pass",
+      "source_action": "container_runtime_audit",
+      "evidence": "0 missing I/O timeouts (httpx.AsyncClient enforces settings.http_timeout_sec=5.0), /healthz readiness endpoint returns 200, structured logging via logging.getLogger, and graceful httpx.HTTPError handling in webhook_client.py.; 0 missing I/O timeouts (AsyncWebhookClient enforces settings.http_timeout_sec=5.0), graceful httpx.HTTPError degradation to WEBHOOK_DEFERRED, /healthz readiness endpoint, and structured logging.",
+      "summary": ""
+    },
+    {
+      "rule_id": "common/runtime_verification",
+      "status": "pass",
+      "source_action": "deterministic_baseline",
+      "evidence": "build=passed, tests=4/4, smoke=passed; RV-01 project Dockerfile + harness build passed; RV-02 4/4 offline tests passed (--network=none); RV-03 measured line coverage 85.2% (178/209 stmts, branch 62.5%); RV-04 ASGI smoke check passed (/healthz -> 200).",
+      "summary": "Container build, offline tests, and smoke check passed."
+    },
+    {
+      "rule_id": "python/code_quality",
+      "status": "pass",
+      "source_action": "python_ast_audit",
+      "evidence": "100.0% Google-style docstring coverage, 0 signature mismatches, 0 unstructured print logs, consistent snake_case/PascalCase naming.",
+      "summary": ""
+    },
+    {
+      "rule_id": "python/dependencies",
+      "status": "pass",
+      "source_action": "repo_structure_audit",
+      "evidence": "PEP 621 pyproject.toml (uv_build backend, requires-python >=3.11) with 5 bounded runtime dependencies, separate [dependency-groups].dev, and committed uv.lock.",
+      "summary": ""
+    },
+    {
+      "rule_id": "python/frameworks/fastapi",
+      "status": "pass",
+      "source_action": "python_ast_audit",
+      "evidence": "Modern asynccontextmanager lifespan in main.py, explicit response_model on all routes, Depends() DI in routes.py, and non-blocking httpx.AsyncClient with explicit timeout in webhook_client.py.",
+      "summary": ""
+    },
+    {
+      "rule_id": "python/modern_stack",
+      "status": "pass",
+      "source_action": "python_ast_audit",
+      "evidence": "100.0% import hygiene, PEP 621 pyproject.toml with uv_build/uv.lock, Pydantic v2 ConfigDict/@field_validator, Python 3.11+ StrEnum and X | None unions, 0 unused/undeclared dependencies.",
+      "summary": ""
+    },
+    {
+      "rule_id": "python/testing",
+      "status": "pass",
+      "source_action": "python_test_audit",
+      "evidence": "pytest + pytest-cov configured in pyproject.toml; 4/4 deterministic offline tests pass (--network=none), 0 assertion-free tests, 100% static module coverage, 85.2% measured line coverage (100% on domain/models.py, services/dispatcher.py, infra/repository.py, settings.py); branch coverage 62.5% due to untested HTTP route handlers and httpx error branch.",
+      "summary": ""
+    },
+    {
+      "rule_id": "python/typing",
+      "status": "pass",
+      "source_action": "python_ast_audit",
+      "evidence": "100.0% type safety coverage, py.typed marker present, 0 weak Any usages, 0 unscoped type ignores, from __future__ import annotations used consistently.",
+      "summary": ""
+    }
+  ],
+  "module_hotspots": [
+    {
+      "file_path": "src/order_dispatch/api/routes.py",
+      "loc": 0,
+      "risk_score": 0.36,
+      "finding_counts": {
+        "medium": 2,
+        "low": 1
+      },
+      "top_rules": [
+        "common/security_vulnerability",
+        "common/runtime_verification"
+      ]
+    },
+    {
+      "file_path": "Dockerfile",
+      "loc": 0,
+      "risk_score": 0.3,
+      "finding_counts": {
+        "medium": 1
+      },
+      "top_rules": [
+        "common/security_vulnerability"
+      ]
+    },
+    {
+      "file_path": "examples/python/api_fastapi_clean/Dockerfile",
+      "loc": 0,
+      "risk_score": 0.15,
+      "finding_counts": {},
+      "top_rules": []
+    },
+    {
+      "file_path": "src/order_dispatch/main.py",
+      "loc": 0,
+      "risk_score": 0.12,
+      "finding_counts": {
+        "low": 2
+      },
+      "top_rules": [
+        "common/twelve_factor",
+        "common/security_vulnerability"
+      ]
+    },
+    {
+      "file_path": "examples/python/api_fastapi_clean/src/order_dispatch/api/routes.py",
+      "loc": 74,
+      "risk_score": 0.06,
+      "finding_counts": {},
+      "top_rules": []
+    },
+    {
+      "file_path": "examples/python/api_fastapi_clean/src/order_dispatch/services/dispatcher.py",
+      "loc": 74,
+      "risk_score": 0.06,
+      "finding_counts": {},
+      "top_rules": []
+    },
+    {
+      "file_path": "examples/python/api_fastapi_clean/src/order_dispatch/api/schemas.py",
+      "loc": 67,
+      "risk_score": 0.06,
+      "finding_counts": {},
+      "top_rules": []
+    },
+    {
+      "file_path": "examples/python/api_fastapi_clean/src/order_dispatch/main.py",
+      "loc": 48,
+      "risk_score": 0.06,
+      "finding_counts": {},
+      "top_rules": []
+    },
+    {
+      "file_path": "examples/python/api_fastapi_clean/src/order_dispatch/domain/pricing.py",
+      "loc": 41,
+      "risk_score": 0.06,
+      "finding_counts": {},
+      "top_rules": []
+    },
+    {
+      "file_path": "examples/python/api_fastapi_clean/src/order_dispatch/infra/repository.py",
+      "loc": 39,
+      "risk_score": 0.06,
+      "finding_counts": {},
+      "top_rules": []
+    },
+    {
+      "file_path": "examples/python/api_fastapi_clean/src/order_dispatch/infra/webhook_client.py",
+      "loc": 35,
+      "risk_score": 0.06,
+      "finding_counts": {},
+      "top_rules": []
+    },
+    {
+      "file_path": "examples/python/api_fastapi_clean/src/order_dispatch/domain/models.py",
+      "loc": 29,
+      "risk_score": 0.06,
+      "finding_counts": {},
+      "top_rules": []
+    },
+    {
+      "file_path": "examples/python/api_fastapi_clean/src/order_dispatch/settings.py",
+      "loc": 18,
+      "risk_score": 0.06,
+      "finding_counts": {},
+      "top_rules": []
+    },
+    {
+      "file_path": "examples/python/api_fastapi_clean/src/order_dispatch/__init__.py",
+      "loc": 2,
+      "risk_score": 0.06,
+      "finding_counts": {},
+      "top_rules": []
+    },
+    {
+      "file_path": "examples/python/api_fastapi_clean/src/order_dispatch/api/__init__.py",
+      "loc": 2,
+      "risk_score": 0.06,
+      "finding_counts": {},
+      "top_rules": []
+    },
+    {
+      "file_path": "examples/python/api_fastapi_clean/src/order_dispatch/domain/__init__.py",
+      "loc": 2,
+      "risk_score": 0.06,
+      "finding_counts": {},
+      "top_rules": []
+    },
+    {
+      "file_path": "examples/python/api_fastapi_clean/src/order_dispatch/infra/__init__.py",
+      "loc": 2,
+      "risk_score": 0.06,
+      "finding_counts": {},
+      "top_rules": []
+    },
+    {
+      "file_path": "examples/python/api_fastapi_clean/src/order_dispatch/services/__init__.py",
+      "loc": 2,
+      "risk_score": 0.06,
+      "finding_counts": {},
+      "top_rules": []
+    }
+  ],
+  "strengths": [
+    "Full commit-SHA pinning and minimal contents: read permissions in .github/workflows/ci.yml.",
+    "Hardened Dockerfile pinned to python:3.12.6-slim-bookworm running as dedicated non-root user appuser (uid 10001) with .dockerignore.",
+    "Complete supply-chain governance baseline: uv.lock, LICENSE, SECURITY.md, and .github/dependabot.yml.",
+    "Immutable SHA-pinned GitHub Actions steps with least-privilege permissions: contents: read.",
+    "Zero hardcoded secrets, zero committed credentials, and non-root container execution (uid 10001).",
+    "100% import hygiene, 100% type safety, 100% docstring coverage, and zero circular dependencies across 14 modules.",
+    "Pure domain core (domain/models.py, domain/pricing.py) isolated behind repository Protocol and Pydantic v2 ConfigDict(extra='forbid') schemas.",
+    "100% deterministic container buildability, offline --network=none test pass rate (4/4), and clean ASGI /healthz boot.",
+    "100% measured line coverage on core domain/models.py, services/dispatcher.py, infra/repository.py, and settings.py.",
+    "Zero CRITICAL or HIGH vulnerabilities in order-dispatch's runtime dependencies (fastapi, pydantic, pydantic-settings, uvicorn, httpx).",
+    "Zero hardcoded secrets, zero dangerous sinks, and non-root container execution.",
+    "Passed 15/19 live HTTP security probes with zero critical or high exploitable flaws (strict Pydantic validation rejected malformed/injection payloads cleanly).",
+    "Centralized typed ServiceSettings via pydantic-settings with ORDER_DISPATCH_ prefix.",
+    "Explicit httpx.AsyncClient timeout enforcement and graceful WEBHOOK_DEFERRED fallback on partner HTTP failures.",
+    "Clean FastAPI asynccontextmanager lifespan and /healthz readiness probe.",
+    "Deterministic _StubWebhookClient isolates dispatcher unit tests from network dependencies.",
+    "100% measured line coverage on core domain models, dispatcher service, repository adapter, and settings."
+  ],
+  "findings": [
+    {
+      "finding_id": "",
+      "source": "ai",
+      "component": null,
+      "severity": "medium",
+      "category": "security",
+      "rule_id": "common/security_vulnerability",
+      "file_path": "Dockerfile",
+      "line": null,
+      "symbol": null,
+      "evidence": "",
+      "description": "Trivy image scan on python:3.12.6-slim-bookworm (Debian 12.7) reports 9 CRITICAL / 158 HIGH Debian OS CVEs (e.g., CVE-2026-42010 in libgnutls30, CVE-2026-31789 in openssl/libssl3), 6 pip@24.2 CVEs (CVE-2026-8643 et al.), and DS-0026 missing HEALTHCHECK.",
+      "recommendation": "Refresh the base image to the latest patched python:3.12.x-slim-bookworm (or distroless/multi-stage uv copy), remove/upgrade pip to >=26.2.0, and add a HEALTHCHECK against /healthz."
+    },
+    {
+      "finding_id": "",
+      "source": "ai",
+      "component": null,
+      "severity": "medium",
+      "category": "security",
+      "rule_id": "common/security_vulnerability",
+      "file_path": "src/order_dispatch/api/routes.py",
+      "line": null,
+      "symbol": null,
+      "evidence": "",
+      "description": "POST /v1/orders (create_order) and GET /v1/orders/{order_id} (get_order) have no OAuth2/JWT/API-key Depends() guard, matching the TODO(security) marker at line 73.",
+      "recommendation": "Add a FastAPI Security/Depends() caller authentication and per-tenant authorization dependency to /v1/orders endpoints."
+    },
+    {
+      "finding_id": "",
+      "source": "ai",
+      "component": null,
+      "severity": "medium",
+      "category": "security",
+      "rule_id": "common/security_vulnerability",
+      "file_path": "src/order_dispatch/api/routes.py",
+      "line": null,
+      "symbol": null,
+      "evidence": "",
+      "description": "Live probe test_app_probes::test_create_order_enforces_authentication_guard sent an unauthenticated POST /v1/orders request and received HTTP 201 with a created order_id.",
+      "recommendation": "Require OAuth2/JWT or API-key authentication via FastAPI Depends() on /v1/orders endpoints before public exposure."
+    },
+    {
+      "finding_id": "",
+      "source": "ai",
+      "component": null,
+      "severity": "low",
+      "category": "architecture",
+      "rule_id": "common/twelve_factor",
+      "file_path": "src/order_dispatch/main.py",
+      "line": null,
+      "symbol": null,
+      "evidence": "",
+      "description": "main.py instantiates InMemoryOrderRepository by default during FastAPI lifespan startup, which is clean for local/test execution behind OrderRepository Protocol but will not share order state across multiple replicas.",
+      "recommendation": "Provide a durable external OrderRepository implementation (e.g., PostgreSQL/Redis) selectable via ServiceSettings when env == 'prod'."
+    },
+    {
+      "finding_id": "det-dac9a878",
+      "source": "deterministic",
+      "component": null,
+      "severity": "low",
+      "category": "security",
+      "rule_id": "CVE-2025-8869",
+      "file_path": null,
+      "line": null,
+      "symbol": null,
+      "evidence": "pip@24.2 (python-pkg) [AI reclassified: pip@24.2 symlink extraction CVE applies only during wheel installs, not during uvicorn ASGI request handling.]",
+      "description": "Core runtime dependency vulnerability CVE-2025-8869: pip: pip missing checks on symbolic link extraction",
+      "recommendation": "Upgrade `pip` to `25.3`."
+    },
+    {
+      "finding_id": "det-f749f183",
+      "source": "deterministic",
+      "component": null,
+      "severity": "low",
+      "category": "security",
+      "rule_id": "CVE-2026-13346",
+      "file_path": null,
+      "line": null,
+      "symbol": null,
+      "evidence": "pip@24.2 (python-pkg) [AI reclassified: pip@24.2 package index install vulnerability is build-time only and unreachable by order-dispatch runtime HTTP requests; mitigate by refreshing base image.]",
+      "description": "Core runtime dependency vulnerability CVE-2026-13346: pip: pip: Arbitrary file installation via malicious package indexes",
+      "recommendation": "Upgrade `pip` to `26.2.0`."
+    },
+    {
+      "finding_id": "det-e81965d7",
+      "source": "deterministic",
+      "component": null,
+      "severity": "low",
+      "category": "security",
+      "rule_id": "CVE-2026-1703",
+      "file_path": null,
+      "line": null,
+      "symbol": null,
+      "evidence": "pip@24.2 (python-pkg)",
+      "description": "Core runtime dependency vulnerability CVE-2026-1703: pip: pip: Information disclosure via path traversal when installing crafted wheel archives",
+      "recommendation": "Upgrade `pip` to `26.0`."
+    },
+    {
+      "finding_id": "det-dbf87858",
+      "source": "deterministic",
+      "component": null,
+      "severity": "low",
+      "category": "security",
+      "rule_id": "CVE-2026-3219",
+      "file_path": null,
+      "line": null,
+      "symbol": null,
+      "evidence": "pip@24.2 (python-pkg) [AI reclassified: pip@24.2 archive handling CVE is confined to build-stage installation in Dockerfile line 9 and not exposed at runtime.]",
+      "description": "Core runtime dependency vulnerability CVE-2026-3219: pip: pip: Incorrect file installation due to improper archive handling",
+      "recommendation": "Upgrade `pip` to `26.1`."
+    },
+    {
+      "finding_id": "det-88839930",
+      "source": "deterministic",
+      "component": null,
+      "severity": "low",
+      "category": "security",
+      "rule_id": "CVE-2026-6357",
+      "file_path": null,
+      "line": null,
+      "symbol": null,
+      "evidence": "pip@24.2 (python-pkg) [AI reclassified: pip@24.2 wheel extraction CVE is not reachable at runtime because order-dispatch never invokes pip dynamically; fix via multi-stage runtime image.]",
+      "description": "Core runtime dependency vulnerability CVE-2026-6357: pip: pip: Arbitrary code execution or information disclosure via malicious wheel package installation",
+      "recommendation": "Upgrade `pip` to `26.1`."
+    },
+    {
+      "finding_id": "det-13c60704",
+      "source": "deterministic",
+      "component": null,
+      "severity": "low",
+      "category": "security",
+      "rule_id": "CVE-2026-8643",
+      "file_path": null,
+      "line": null,
+      "symbol": null,
+      "evidence": "pip@24.2 (python-pkg) [AI reclassified: pip@24.2 is a build-time packaging tool bundled in python:3.12.6-slim-bookworm, not imported or invoked by order-dispatch at runtime; resolve via multi-stage Docker build or pip>=26.2.]",
+      "description": "Core runtime dependency vulnerability CVE-2026-8643: python-pip: Path traversal via malicious entry point name in pip wheel installation allows arbitrary file overwrite",
+      "recommendation": "Upgrade `pip` to `26.1.2`."
+    },
+    {
+      "finding_id": "",
+      "source": "ai",
+      "component": null,
+      "severity": "low",
+      "category": "security",
+      "rule_id": "common/security_vulnerability",
+      "file_path": "src/order_dispatch/main.py",
+      "line": null,
+      "symbol": null,
+      "evidence": "",
+      "description": "Live probes verified GET /openapi.json returns 200 (4753 bytes) without auth and GET /healthz omits X-Content-Type-Options: nosniff.",
+      "recommendation": "Disable or protect openapi_url/docs_url in production (env=='prod') and register Starlette middleware setting X-Content-Type-Options: nosniff and X-Frame-Options: DENY."
+    },
+    {
+      "finding_id": "",
+      "source": "ai",
+      "component": null,
+      "severity": "low",
+      "category": "testing",
+      "rule_id": "common/runtime_verification",
+      "file_path": "src/order_dispatch/api/routes.py",
+      "line": null,
+      "symbol": null,
+      "evidence": "",
+      "description": "Overall line coverage is 85.2%, but branch coverage is 62.5% because api/routes.py (56.0% line, 0.0% branch), infra/webhook_client.py (55.6% line), and main.py lifespan (67.9% line, 0.0% branch) lack TestClient integration and httpx mock error tests.",
+      "recommendation": "Add FastAPI TestClient tests covering /healthz, POST /v1/orders, GET /v1/orders/{id} (200 & 404), and AsyncWebhookClient MockTransport 2xx/error paths."
+    }
+  ],
+  "consolidated_findings": [
+    {
+      "severity": "medium",
+      "file_path": "Dockerfile",
+      "line": null,
+      "symbol": null,
+      "rule_ids": [
+        "common/security_vulnerability"
+      ],
+      "categories": [
+        "security"
+      ],
+      "primary_description": "Trivy image scan on python:3.12.6-slim-bookworm (Debian 12.7) reports 9 CRITICAL / 158 HIGH Debian OS CVEs (e.g., CVE-2026-42010 in libgnutls30, CVE-2026-31789 in openssl/libssl3), 6 pip@24.2 CVEs (CVE-2026-8643 et al.), and DS-0026 missing HEALTHCHECK.",
+      "combined_evidence": "Trivy image scan on python:3.12.6-slim-bookworm (Debian 12.7) reports 9 CRITICAL / 158 HIGH Debian OS CVEs (e.g., CVE-2026-42010 in libgnutls30, CVE-2026-31789 in openssl/libssl3), 6 pip@24.2 CVEs (CVE-2026-8643 et al.), and DS-0026 missing HEALTHCHECK.",
+      "merged_recommendation": "Refresh the base image to the latest patched python:3.12.x-slim-bookworm (or distroless/multi-stage uv copy), remove/upgrade pip to >=26.2.0, and add a HEALTHCHECK against /healthz."
+    },
+    {
+      "severity": "medium",
+      "file_path": "src/order_dispatch/api/routes.py",
+      "line": null,
+      "symbol": null,
+      "rule_ids": [
+        "common/security_vulnerability",
+        "common/runtime_verification"
+      ],
+      "categories": [
+        "security",
+        "testing"
+      ],
+      "primary_description": "POST /v1/orders (create_order) and GET /v1/orders/{order_id} (get_order) have no OAuth2/JWT/API-key Depends() guard, matching the TODO(security) marker at line 73.",
+      "combined_evidence": "POST /v1/orders (create_order) and GET /v1/orders/{order_id} (get_order) have no OAuth2/JWT/API-key Depends() guard, matching the TODO(security) marker at line 73. | Live probe test_app_probes::test_create_order_enforces_authentication_guard sent an unauthenticated POST /v1/orders request and received HTTP 201 with a created order_id. | Overall line coverage is 85.2%, but branch coverage is 62.5% because api/routes.py (56.0% line, 0.0% branch), infra/webhook_client.py (55.6% line), and main.py lifespan (67.9% line, 0.0% branch) lack TestClient integration and httpx mock error tests.",
+      "merged_recommendation": "Add a FastAPI Security/Depends() caller authentication and per-tenant authorization dependency to /v1/orders endpoints. / Require OAuth2/JWT or API-key authentication via FastAPI Depends() on /v1/orders endpoints before public exposure. / Add FastAPI TestClient tests covering /healthz, POST /v1/orders, GET /v1/orders/{id} (200 & 404), and AsyncWebhookClient MockTransport 2xx/error paths."
+    },
+    {
+      "severity": "low",
+      "file_path": "src/order_dispatch/main.py",
+      "line": null,
+      "symbol": null,
+      "rule_ids": [
+        "common/twelve_factor",
+        "common/security_vulnerability"
+      ],
+      "categories": [
+        "architecture",
+        "security"
+      ],
+      "primary_description": "main.py instantiates InMemoryOrderRepository by default during FastAPI lifespan startup, which is clean for local/test execution behind OrderRepository Protocol but will not share order state across multiple replicas.",
+      "combined_evidence": "main.py instantiates InMemoryOrderRepository by default during FastAPI lifespan startup, which is clean for local/test execution behind OrderRepository Protocol but will not share order state across multiple replicas. | Live probes verified GET /openapi.json returns 200 (4753 bytes) without auth and GET /healthz omits X-Content-Type-Options: nosniff.",
+      "merged_recommendation": "Provide a durable external OrderRepository implementation (e.g., PostgreSQL/Redis) selectable via ServiceSettings when env == 'prod'. / Disable or protect openapi_url/docs_url in production (env=='prod') and register Starlette middleware setting X-Content-Type-Options: nosniff and X-Frame-Options: DENY."
+    },
+    {
+      "severity": "low",
+      "file_path": "",
+      "line": null,
+      "symbol": null,
+      "rule_ids": [
+        "CVE-2025-8869"
+      ],
+      "categories": [
+        "security"
+      ],
+      "primary_description": "Core runtime dependency vulnerability CVE-2025-8869: pip: pip missing checks on symbolic link extraction",
+      "combined_evidence": "pip@24.2 (python-pkg) [AI reclassified: pip@24.2 symlink extraction CVE applies only during wheel installs, not during uvicorn ASGI request handling.]",
+      "merged_recommendation": "Upgrade `pip` to `25.3`."
+    },
+    {
+      "severity": "low",
+      "file_path": "",
+      "line": null,
+      "symbol": null,
+      "rule_ids": [
+        "CVE-2026-13346"
+      ],
+      "categories": [
+        "security"
+      ],
+      "primary_description": "Core runtime dependency vulnerability CVE-2026-13346: pip: pip: Arbitrary file installation via malicious package indexes",
+      "combined_evidence": "pip@24.2 (python-pkg) [AI reclassified: pip@24.2 package index install vulnerability is build-time only and unreachable by order-dispatch runtime HTTP requests; mitigate by refreshing base image.]",
+      "merged_recommendation": "Upgrade `pip` to `26.2.0`."
+    },
+    {
+      "severity": "low",
+      "file_path": "",
+      "line": null,
+      "symbol": null,
+      "rule_ids": [
+        "CVE-2026-1703"
+      ],
+      "categories": [
+        "security"
+      ],
+      "primary_description": "Core runtime dependency vulnerability CVE-2026-1703: pip: pip: Information disclosure via path traversal when installing crafted wheel archives",
+      "combined_evidence": "pip@24.2 (python-pkg)",
+      "merged_recommendation": "Upgrade `pip` to `26.0`."
+    },
+    {
+      "severity": "low",
+      "file_path": "",
+      "line": null,
+      "symbol": null,
+      "rule_ids": [
+        "CVE-2026-3219"
+      ],
+      "categories": [
+        "security"
+      ],
+      "primary_description": "Core runtime dependency vulnerability CVE-2026-3219: pip: pip: Incorrect file installation due to improper archive handling",
+      "combined_evidence": "pip@24.2 (python-pkg) [AI reclassified: pip@24.2 archive handling CVE is confined to build-stage installation in Dockerfile line 9 and not exposed at runtime.]",
+      "merged_recommendation": "Upgrade `pip` to `26.1`."
+    },
+    {
+      "severity": "low",
+      "file_path": "",
+      "line": null,
+      "symbol": null,
+      "rule_ids": [
+        "CVE-2026-6357"
+      ],
+      "categories": [
+        "security"
+      ],
+      "primary_description": "Core runtime dependency vulnerability CVE-2026-6357: pip: pip: Arbitrary code execution or information disclosure via malicious wheel package installation",
+      "combined_evidence": "pip@24.2 (python-pkg) [AI reclassified: pip@24.2 wheel extraction CVE is not reachable at runtime because order-dispatch never invokes pip dynamically; fix via multi-stage runtime image.]",
+      "merged_recommendation": "Upgrade `pip` to `26.1`."
+    },
+    {
+      "severity": "low",
+      "file_path": "",
+      "line": null,
+      "symbol": null,
+      "rule_ids": [
+        "CVE-2026-8643"
+      ],
+      "categories": [
+        "security"
+      ],
+      "primary_description": "Core runtime dependency vulnerability CVE-2026-8643: python-pip: Path traversal via malicious entry point name in pip wheel installation allows arbitrary file overwrite",
+      "combined_evidence": "pip@24.2 (python-pkg) [AI reclassified: pip@24.2 is a build-time packaging tool bundled in python:3.12.6-slim-bookworm, not imported or invoked by order-dispatch at runtime; resolve via multi-stage Docker build or pip>=26.2.]",
+      "merged_recommendation": "Upgrade `pip` to `26.1.2`."
+    }
+  ],
+  "action_plan": [
+    {
+      "priority": "P1",
+      "title": "Enforce authentication and tenant authorization on /v1/orders endpoints",
+      "category": "security",
+      "component": null,
+      "target_files": [
+        "src/order_dispatch/api/routes.py"
+      ],
+      "related_rules": [
+        "common/security_vulnerability",
+        "CWE-306"
+      ],
+      "action": "Introduce an OAuth2/JWT or mTLS caller principal dependency on POST /v1/orders and GET /v1/orders/{order_id} to resolve CWE-306 and the line 73 TODO.",
+      "expected_impact": "Prevents unauthorized order creation and cross-tenant order enumeration."
+    },
+    {
+      "priority": "P1",
+      "title": "Refresh Dockerfile base image, adopt multi-stage build without pip, and add HEALTHCHECK",
+      "category": "security",
+      "component": null,
+      "target_files": [
+        "Dockerfile"
+      ],
+      "related_rules": [
+        "common/security_vulnerability",
+        "SEC-01",
+        "SEC-02",
+        "CVE-2026-42010",
+        "CVE-2026-31789",
+        "CVE-2026-8643"
+      ],
+      "action": "Update python:3.12.6-slim-bookworm to the latest patched 3.12 slim digest, copy only the built venv into a clean runtime stage (eliminating pip@24.2 CVEs), and add HEALTHCHECK for /healthz.",
+      "expected_impact": "Eliminates all 6 pip CVEs, resolves patchable Debian OS CRITICAL CVEs, and clears Trivy DS-0026."
+    },
+    {
+      "priority": "P2",
+      "title": "Add durable OrderRepository adapter for multi-replica production deployments",
+      "category": "architecture",
+      "component": null,
+      "target_files": [
+        "src/order_dispatch/main.py",
+        "src/order_dispatch/infra/repository.py"
+      ],
+      "related_rules": [
+        "common/twelve_factor"
+      ],
+      "action": "Implement a persistent OrderRepository adapter (PostgreSQL/Redis) wired via ServiceSettings in prod mode so processes remain strictly stateless.",
+      "expected_impact": "Enables zero-data-loss restarts and horizontal replica scaling under 12-Factor VI."
+    },
+    {
+      "priority": "P2",
+      "title": "Add HTTP security headers middleware and gate /openapi.json in production",
+      "category": "security",
+      "component": null,
+      "target_files": [
+        "src/order_dispatch/main.py"
+      ],
+      "related_rules": [
+        "common/security_vulnerability",
+        "SEC-06",
+        "CWE-693",
+        "CWE-200"
+      ],
+      "action": "Add lightweight HTTP middleware setting X-Content-Type-Options: nosniff and X-Frame-Options: DENY, and set openapi_url=None when settings.env == 'prod'.",
+      "expected_impact": "Resolves live DAST CWE-693 and CWE-200 baseline hardening findings."
+    },
+    {
+      "priority": "P2",
+      "title": "Add FastAPI TestClient and httpx MockTransport tests for HTTP/lifespan branches",
+      "category": "testing",
+      "component": null,
+      "target_files": [
+        "tests/test_routes.py",
+        "src/order_dispatch/api/routes.py",
+        "src/order_dispatch/infra/webhook_client.py"
+      ],
+      "related_rules": [
+        "common/runtime_verification"
+      ],
+      "action": "Exercise /healthz, POST /v1/orders, GET /v1/orders/{id} (including 404), lifespan startup/shutdown, and httpx.HTTPError fallback via MockTransport.",
+      "expected_impact": "Raises measured branch coverage from 62.5% to >=80% and closes HTTP boundary gaps."
+    }
+  ],
+  "opt_outs": [],
+  "triaged_adjustments": [
+    {
+      "finding_id": "det-13c60704",
+      "action": "reclassify",
+      "new_severity": "low",
+      "reason": "pip@24.2 is a build-time packaging tool bundled in python:3.12.6-slim-bookworm, not imported or invoked by order-dispatch at runtime; resolve via multi-stage Docker build or pip>=26.2."
+    },
+    {
+      "finding_id": "det-f749f183",
+      "action": "reclassify",
+      "new_severity": "low",
+      "reason": "pip@24.2 package index install vulnerability is build-time only and unreachable by order-dispatch runtime HTTP requests; mitigate by refreshing base image."
+    },
+    {
+      "finding_id": "det-88839930",
+      "action": "reclassify",
+      "new_severity": "low",
+      "reason": "pip@24.2 wheel extraction CVE is not reachable at runtime because order-dispatch never invokes pip dynamically; fix via multi-stage runtime image."
+    },
+    {
+      "finding_id": "det-dac9a878",
+      "action": "reclassify",
+      "new_severity": "low",
+      "reason": "pip@24.2 symlink extraction CVE applies only during wheel installs, not during uvicorn ASGI request handling."
+    },
+    {
+      "finding_id": "det-dbf87858",
+      "action": "reclassify",
+      "new_severity": "low",
+      "reason": "pip@24.2 archive handling CVE is confined to build-stage installation in Dockerfile line 9 and not exposed at runtime."
+    }
+  ],
+  "execution_dag": {
+    "workflow_id": "py_api_fastapi_clean",
+    "category": "audit",
+    "scope": "repo",
+    "nodes": [
+      {
+        "stage_id": "confirm_plan",
+        "label": "Confirm Audit Plan & Execution DAG",
+        "mode": "ASK",
+        "status": "completed",
+        "needs": [],
+        "rules_count": 0,
+        "highlight": "Plan approved",
+        "skip_reason": ""
+      },
+      {
+        "stage_id": "repo_and_deps",
+        "label": "Repo Structure Audit",
+        "mode": "HYBRID",
+        "status": "completed",
+        "needs": [
+          "confirm_plan"
+        ],
+        "rules_count": 5,
+        "highlight": "14 src / 3 test files, 5 deps",
+        "skip_reason": ""
+      },
+      {
+        "stage_id": "supply_chain",
+        "label": "Evaluate Supply-Chain, CI Permissions, Container...",
+        "mode": "AI",
+        "status": "completed",
+        "needs": [
+          "repo_and_deps"
+        ],
+        "rules_count": 3,
+        "highlight": "completed",
+        "skip_reason": ""
+      },
+      {
+        "stage_id": "ast_and_quality",
+        "label": "Python Ast Audit",
+        "mode": "HYBRID",
+        "status": "completed",
+        "needs": [
+          "repo_and_deps"
+        ],
+        "rules_count": 8,
+        "highlight": "14 files, 435 LOC, 0 sinks",
+        "skip_reason": ""
+      },
+      {
+        "stage_id": "runtime_verification",
+        "label": "Container Runtime Audit",
+        "mode": "HYBRID",
+        "status": "completed",
+        "needs": [
+          "repo_and_deps"
+        ],
+        "rules_count": 2,
+        "highlight": "build=passed, tests=4/4, cov 85.2%",
+        "skip_reason": ""
+      },
+      {
+        "stage_id": "security_audit",
+        "label": "Security Vulnerability Audit",
+        "mode": "HYBRID",
+        "status": "completed",
+        "needs": [
+          "repo_and_deps"
+        ],
+        "rules_count": 2,
+        "highlight": "Trivy CVEs=6 (CRIT=0, HIGH=0), secrets=0",
+        "skip_reason": ""
+      },
+      {
+        "stage_id": "web_pentest",
+        "label": "Web Penetration Audit",
+        "mode": "HYBRID",
+        "status": "completed",
+        "needs": [
+          "repo_and_deps"
+        ],
+        "rules_count": 1,
+        "highlight": "probes=15/19, findings=3",
+        "skip_reason": ""
+      },
+      {
+        "stage_id": "arch_recording",
+        "label": "Architecture Analysis",
+        "mode": "AI",
+        "status": "completed",
+        "needs": [
+          "ast_and_quality"
+        ],
+        "rules_count": 1,
+        "highlight": "5 layers, 2 flows grounded",
+        "skip_reason": ""
+      },
+      {
+        "stage_id": "service_readiness",
+        "label": "Evaluate 12-Factor Config/Statelessness & SRE PRR...",
+        "mode": "AI",
+        "status": "completed",
+        "needs": [
+          "ast_and_quality"
+        ],
+        "rules_count": 3,
+        "highlight": "completed",
+        "skip_reason": ""
+      },
+      {
+        "stage_id": "test_health",
+        "label": "Evaluate Test Suite Completeness & Structure",
+        "mode": "AI",
+        "status": "completed",
+        "needs": [
+          "ast_and_quality"
+        ],
+        "rules_count": 1,
+        "highlight": "completed",
+        "skip_reason": ""
+      },
+      {
+        "stage_id": "output_score",
+        "label": "Write Validated Score & AI Context JSON",
+        "mode": "AI",
+        "status": "completed",
+        "needs": [
+          "supply_chain",
+          "arch_recording",
+          "service_readiness",
+          "test_health",
+          "runtime_verification",
+          "security_audit",
+          "web_pentest"
+        ],
+        "rules_count": 0,
+        "highlight": "score=94/100 (S), 16 rules, 12 findings",
+        "skip_reason": ""
+      },
+      {
+        "stage_id": "create_report",
+        "label": "Create Visual Report with drawlib",
+        "mode": "AI",
+        "status": "pending",
+        "needs": [
+          "output_score"
+        ],
+        "rules_count": 0,
+        "highlight": "A4 Drawlib PDF report synthesis",
+        "skip_reason": ""
+      }
+    ],
+    "audit_scope": {
+      "target_root": "examples/python/api_fastapi_clean",
+      "source_targets": [
+        "src"
+      ],
+      "test_targets": [
+        "tests"
+      ],
+      "doc_targets": [
+        "README.md"
+      ],
+      "exclude_globs": [],
+      "language": "python",
+      "companion_languages": [],
+      "detected_frameworks": [
+        "fastapi",
+        "pydantic",
+        "pytest",
+        "httpx"
+      ],
+      "git_branch": "main",
+      "git_sha": "d1e02277",
+      "git_dirty": true,
+      "tools_used": [
+        "project_inspect (python)",
+        "tree-sitter AST (python)",
+        "container runtime harness (docker: python/uv.dockerfile)",
+        "Trivy (docker: fs+image)",
+        "web_pentest (httpx, 19 probes)"
+      ],
+      "artifact_manifest": {
+        "score_json": "docs/reports/py_api_fastapi_clean/py_api_fastapi_clean_score.json",
+        "summary_json": "docs/reports/py_api_fastapi_clean/py_api_fastapi_clean_summary.json",
+        "findings_sarif": "docs/reports/py_api_fastapi_clean/py_api_fastapi_clean_findings.sarif",
+        "plan_json": "docs_src/reports/py_api_fastapi_clean/_facts/plan.json",
+        "facts_json": "docs_src/reports/py_api_fastapi_clean/_facts/facts.json",
+        "architecture_json": "docs_src/reports/py_api_fastapi_clean/_facts/architecture.json"
+      }
+    }
+  },
+  "components": [],
+  "approved_plan_summary": "Auto-approved via --auto-approve or plan_gate=false.",
+  "report_hints": [
+    "Highlight clean 4-layer acyclic ArchitectureDiagram (api -> services -> domain + infra) and /v1/orders async dispatch sequence.",
+    "Contrast 85.2% overall line coverage (100% domain/service) against routes.py (56.0%) and webhook_client.py (55.6%) branch gaps in Chapter 5.",
+    "Emphasize separation of 0 declared app CVEs vs. build-time pip@24.2 triage and Debian 12.7 OS CVEs + live DAST 15/19 probe results (CWE-306/200/693) in Chapter 6."
+  ],
+  "summary": "order-dispatch achieves Grade S (94/100) as a clean Python 3.11+ FastAPI + Pydantic v2 microservice benchmark: 100% typing, import hygiene, and docstring coverage, strict acyclic 4-layer Clean Architecture, 4/4 passing offline Docker tests (85.2% line coverage, clean /healthz ASGI boot), zero declared application CVEs, and SHA-pinned OpenSSF CI governance. Live DAST and Trivy image inspection identified four concrete production hardening targets: adding OAuth2/JWT authentication on /v1/orders (CWE-306), refreshing the python:3.12.6-slim-bookworm base image into a pip-free multi-stage build with HEALTHCHECK, adding HTTP security headers and gating /openapi.json in prod, and expanding TestClient/MockTransport branch coverage from 62.5% above 80%."
+}

@@ -1,0 +1,158 @@
+{
+  "workflow_id": "php_wp_plugin_messy",
+  "workflow_run_id": "wf-3389d5e7",
+  "recorded_at": "2026-11-22T11:27:49.318737+00:00",
+  "target_root": "examples/php/wp_plugin_messy",
+  "system_profile": {
+    "system_purpose": "Member Analytics Portal (wp_plugin_messy v1.3.0) is a procedural WordPress plugin that registers a REST member-export endpoint, two admin-ajax handlers (member search and event log purge), an admin settings page with outbound telemetry pings, and a frontend badge shortcode.",
+    "domain_context": "WordPress site administration, member directory export/search, event log purging, telemetry option storage, and frontend badge rendering.",
+    "runtime_types": [
+      "web_api"
+    ],
+    "tech_stack": [
+      "Raw PHP (declared Requires PHP: 7.4, tested under PHP 8.2 harness)",
+      "WordPress Plugin API (REST API, admin-ajax, admin_menu, shortcode, global $wpdb)"
+    ],
+    "external_integrations": [
+      "Outbound HTTP GET ping to https://telemetry.example.com/ping via @file_get_contents() in admin/settings-page.php:21",
+      "WordPress MySQL database accessed via global $wpdb ($wpdb->users, wp_map_events)"
+    ]
+  },
+  "structure_map": {
+    "architecture_pattern": "Procedural Flat WordPress Plugin (Global Hook & Superglobal Coupling, No OOP/PSR-4 Layering)",
+    "layers": [
+      {
+        "name": "Plugin Bootstrap & Shortcode Entrypoint",
+        "responsibility": "Manual require_once loading of plugin files, REST/shortcode hook registration, and badge shortcode rendering.",
+        "paths": [
+          "member-analytics-portal.php"
+        ],
+        "allowed_dependencies": [
+          "REST Endpoint Module",
+          "AJAX Handler Module",
+          "Admin Settings Module"
+        ]
+      },
+      {
+        "name": "REST Endpoint Module",
+        "responsibility": "Registers /wp-json/member-analytics/v1/export and queries wp_users via global $wpdb.",
+        "paths": [
+          "includes/rest-endpoints.php"
+        ],
+        "allowed_dependencies": []
+      },
+      {
+        "name": "AJAX Handler Module",
+        "responsibility": "Handles public wp_ajax_nopriv member search and wp_ajax event log deletion directly against global $wpdb.",
+        "paths": [
+          "includes/ajax-handlers.php"
+        ],
+        "allowed_dependencies": []
+      },
+      {
+        "name": "Admin Settings Module",
+        "responsibility": "Registers WP admin options page, persists telemetry URL option, pings external telemetry URL, and renders inline HTML/JS.",
+        "paths": [
+          "admin/settings-page.php"
+        ],
+        "allowed_dependencies": []
+      }
+    ],
+    "modules": [
+      {
+        "path": "member-analytics-portal.php",
+        "role": "Plugin header, manual require_once loader, and [member_analytics_badge] shortcode",
+        "key_symbols": [
+          "map_render_badge_shortcode"
+        ],
+        "depends_on": [
+          "includes/rest-endpoints.php",
+          "includes/ajax-handlers.php",
+          "admin/settings-page.php"
+        ],
+        "health_note": "No ABSPATH guard, EOL PHP 7.4 header, unescaped $_GET['badge_label'] XSS."
+      },
+      {
+        "path": "includes/rest-endpoints.php",
+        "role": "WordPress REST API member exporter",
+        "key_symbols": [
+          "map_register_rest_routes",
+          "map_export_all_members"
+        ],
+        "depends_on": [],
+        "health_note": "Hardcoded $map_webhook_secret, __return_true public PII export, CWE-89 SQLi, print_r debug leak."
+      },
+      {
+        "path": "includes/ajax-handlers.php",
+        "role": "WordPress admin-ajax search and purge handlers",
+        "key_symbols": [
+          "map_ajax_search_members",
+          "map_ajax_purge_logs"
+        ],
+        "depends_on": [],
+        "health_note": "wp_ajax_nopriv SQLi, missing nonce/capability on DELETE SQLi, unescaped $_POST XSS."
+      },
+      {
+        "path": "admin/settings-page.php",
+        "role": "WordPress admin settings UI and telemetry ping",
+        "key_symbols": [
+          "map_register_admin_menu",
+          "map_render_settings_page"
+        ],
+        "depends_on": [],
+        "health_note": "'read' capability privilege escalation, missing nonce, CWE-79 XSS, unbounded @file_get_contents, raw <script>."
+      }
+    ],
+    "boundary_assessment": "Acyclic 4-file procedural split without circular includes, but completely lacks PSR-4 class boundaries, input/output sanitization layers, or WordPress authorization/nonce middleware."
+  },
+  "execution_flow_map": {
+    "entry_points": [
+      "member-analytics-portal.php:map_render_badge_shortcode",
+      "includes/rest-endpoints.php:map_export_all_members",
+      "includes/ajax-handlers.php:map_ajax_search_members",
+      "includes/ajax-handlers.php:map_ajax_purge_logs",
+      "admin/settings-page.php:map_render_settings_page"
+    ],
+    "execution_flows": [
+      {
+        "name": "Unauthenticated REST Member Export",
+        "trigger": "HTTP GET /wp-json/member-analytics/v1/export?role_filter=...",
+        "steps": [
+          "WordPress invokes map_export_all_members() with permission_callback=>'__return_true' (zero authentication).",
+          "Reads raw $_GET['role_filter'], interpolates directly into SQL LIKE query against $wpdb->users, optionally dumps rows via print_r(), and returns user_login/user_email records."
+        ],
+        "involved_files": [
+          "includes/rest-endpoints.php"
+        ]
+      },
+      {
+        "name": "AJAX Member Search & Event Log Purge",
+        "trigger": "HTTP POST /wp-admin/admin-ajax.php?action=map_search_members|map_purge_logs",
+        "steps": [
+          "map_ajax_search_members() runs via wp_ajax_nopriv without nonce/auth and interpolates raw $_POST['term'] into $wpdb->get_results().",
+          "map_ajax_purge_logs() runs without nonce or current_user_can(), executes raw DELETE FROM wp_map_events with $_POST['category'], and echoes unescaped $_POST['category']."
+        ],
+        "involved_files": [
+          "includes/ajax-handlers.php"
+        ]
+      },
+      {
+        "name": "Admin Settings Mutation & Telemetry Ping",
+        "trigger": "WordPress Admin Options Page (capability 'read') POST/GET",
+        "steps": [
+          "Any logged-in subscriber ('read' cap) can POST map_telemetry_url without nonce, persisting raw input via update_option() and firing unbounded @file_get_contents() to telemetry.example.com.",
+          "Renders unescaped $_GET['tab'] into HTML heading and form input value."
+        ],
+        "involved_files": [
+          "admin/settings-page.php"
+        ]
+      }
+    ],
+    "state_and_storage": [
+      "WordPress MySQL database tables ($wpdb->users, wp_map_events) queried via global $wpdb without $wpdb->prepare().",
+      "WordPress wp_options key 'map_telemetry_url' mutated via update_option() without sanitization or nonce verification.",
+      "Global variable $map_webhook_secret hardcoded in includes/rest-endpoints.php:3."
+    ],
+    "error_and_concurrency_model": "Synchronous PHP request-per-process model under WordPress with silent error suppression (@file_get_contents), unstructured print_r() debug leaks, and zero defensive validation or exception handling."
+  }
+}
