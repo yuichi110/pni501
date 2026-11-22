@@ -1,0 +1,21 @@
+id: svelte_ast_audit
+name: Svelte AST, {@html} XSS, SSR Store Safety & Svelte 5 Runes Audit
+description: Parse Svelte SFC AST via tree-sitter to extract {@html} XSS and eval CWE sinks, SSR store leaks, complexity, and SvelteKit route boundaries.
+rules:
+  - common/architecture
+  - common/maintainability
+  - common/security
+  - common/security_vulnerability
+  - svelte/code_quality
+  - svelte/typing
+  - svelte/modern_stack
+primitives:
+  - type: ast_analyze
+    name: Extract Deterministic Svelte SFC AST Metrics
+    with:
+      lang: "svelte"
+  - type: ai_interpret
+    name: Interpret Svelte AST Facts & Evaluate XSS/SSR/Runes Quality
+    prompt: |
+      Inspect the deterministic AstFacts (`type_safety_coverage_pct`, `weak_type_usages`, `unscoped_type_ignores`, `docstring_coverage_pct`, `complex_functions`, `excessive_parameters`, `bug_risk_idioms`, `global_state_usages`, `missing_io_timeouts`, `scattered_env_access`, `unstructured_logging`, `hardcoded_secrets`, `dangerous_sinks`, `api_endpoints`).
+      Read flagged `.svelte` files to evaluate component/route boundaries (`common/architecture`), SIG maintainability (`common/maintainability`), `{@html}` XSS & SSR store leaks (`common/security`, `common/security_vulnerability`, `svelte/code_quality`), `svelte-check` typing (`svelte/typing`), and Svelte 5 Runes idioms (`svelte/modern_stack`).

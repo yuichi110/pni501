@@ -1,0 +1,10 @@
+id: odin_test_audit
+name: Odin Testing & Tracking-Allocator Standards Audit
+description: Evaluate Odin @(test) suites, Tracking_Allocator leak safety, boundary cases, and testing.expect assertions against odin/testing standards.
+rules:
+  - odin/testing
+primitives:
+  - type: ai_interpret
+    name: Evaluate Odin Test Suite Completeness & Leak Safety
+    prompt: |
+      Compare `source_files_count` vs `test_files_count` from ProjectFacts and inspect `*_test.odin` / `test_*.odin` files and AstFacts (`test_functions_count`, `assertion_free_tests`) to verify `@(test)` coverage, assertions, and leak-free execution according to `odin/testing`.

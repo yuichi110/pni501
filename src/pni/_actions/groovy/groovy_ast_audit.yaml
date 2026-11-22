@@ -1,0 +1,21 @@
+id: groovy_ast_audit
+name: Groovy AST, @CompileStatic, Dynamic Execution & Security Audit
+description: Parse Groovy AST via tree-sitter to extract Groovydoc coverage, @CompileStatic/def typing, Eval.me/GroovyShell/execute() CWE sinks, complexity, and mutable static globals.
+rules:
+  - common/architecture
+  - common/maintainability
+  - common/security
+  - common/security_vulnerability
+  - groovy/code_quality
+  - groovy/typing
+  - groovy/modern_stack
+primitives:
+  - type: ast_analyze
+    name: Extract Deterministic Groovy AST & Package Metrics
+    with:
+      lang: "groovy"
+  - type: ai_interpret
+    name: Interpret Groovy AST Facts & Evaluate Quality/Typing/Security
+    prompt: |
+      Inspect the deterministic AstFacts (`wildcard_imports`, `type_safety_coverage_pct`, `weak_type_usages`, `unscoped_type_ignores`, `docstring_coverage_pct`, `missing_docstrings`, `complex_functions`, `excessive_parameters`, `bug_risk_idioms`, `global_state_usages`, `circular_dependencies`, `missing_io_timeouts`, `unstructured_logging`, `hardcoded_secrets`, `dangerous_sinks`, `api_endpoints`).
+      Read flagged `.groovy` files to evaluate layering (`common/architecture`), SIG maintainability (`common/maintainability`), `Eval.me`/shell-exec/XXE CWE sinks (`common/security`, `common/security_vulnerability`), `@CompileStatic` & CodeNarc discipline (`groovy/code_quality`, `groovy/typing`), and Groovy 4 idioms (`groovy/modern_stack`).

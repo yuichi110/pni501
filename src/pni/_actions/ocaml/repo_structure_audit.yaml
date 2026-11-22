@@ -1,0 +1,19 @@
+id: repo_structure_audit
+name: Repository Structure & Dune/Opam Manifest Audit (OCaml)
+description: Deterministically inspect dune-project, *.opam, OCaml compiler constraints, and documentation, then have AI evaluate against rules.
+rules:
+  - common/supply_chain
+  - common/documentation
+  - common/git_workflow
+  - common/security
+  - ocaml/dependencies
+primitives:
+  - type: project_inspect
+    name: Extract OCaml Dune/Opam, Supply-Chain & Dependency Facts
+    with:
+      lang: "ocaml"
+  - type: ai_interpret
+    name: Evaluate OCaml Build, Supply Chain & Dependencies
+    prompt: |
+      Review the deterministic ProjectFacts (`runtime_types`, `build_system`, `manifest_files`, `lockfiles_found`, `dependencies`, `unpinned_dependencies`, `language_version_constraint`, `has_license`, `has_security_policy`, `ci_supply_chain_issues`, `committed_secret_files`, `readme_headings`, `docs_inventory`, `has_gitignore`).
+      Verify compliance with `common/supply_chain`, `ocaml/dependencies` (noting published opam libs omit `.opam.locked` legitimately), `common/documentation`, `common/git_workflow`, and `common/security`.

@@ -1,0 +1,10 @@
+id: zig_test_audit
+name: Zig Testing & Leak-Detection Standards Audit
+description: Evaluate Zig test blocks, std.testing.allocator leak detection, OOM rollback tests, and assertions against zig/testing standards.
+rules:
+  - zig/testing
+primitives:
+  - type: ai_interpret
+    name: Evaluate Zig Test Suite Completeness & Leak Detection
+    prompt: |
+      Compare `source_files_count` vs `test_files_count` from ProjectFacts and inspect `test "..."` blocks and AstFacts (`test_functions_count`, `assertion_free_tests`) to verify `std.testing.allocator` usage, assertions, and coverage according to `zig/testing`.

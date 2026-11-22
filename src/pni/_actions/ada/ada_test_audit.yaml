@@ -1,0 +1,10 @@
+id: ada_test_audit
+name: Ada Testing & Contract-Verification Audit
+description: Evaluate Ada AUnit/Ahven/GPR test suites, -gnata contract assertions, boundary/Constraint_Error cases, and coverage against ada/testing standards.
+rules:
+  - ada/testing
+primitives:
+  - type: ai_interpret
+    name: Evaluate Ada Test Suite Completeness & Contract Verification
+    prompt: |
+      Compare `source_files_count` vs `test_files_count` from ProjectFacts and inspect `*_test.adb` / `test_*.adb` files and AstFacts (`test_functions_count`, `assertion_free_tests`) to verify AUnit assertions, `-gnata` contract checks, and coverage according to `ada/testing`.

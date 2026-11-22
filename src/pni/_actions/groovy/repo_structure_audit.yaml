@@ -1,0 +1,19 @@
+id: repo_structure_audit
+name: Repository Structure & Groovy/Gradle Manifest Audit (Groovy)
+description: Deterministically inspect build.gradle, pom.xml, Groovy version, dependencies, and documentation, then have AI evaluate against rules.
+rules:
+  - common/supply_chain
+  - common/documentation
+  - common/git_workflow
+  - common/security
+  - groovy/dependencies
+primitives:
+  - type: project_inspect
+    name: Extract Groovy Build, Supply-Chain & Dependency Facts
+    with:
+      lang: "groovy"
+  - type: ai_interpret
+    name: Evaluate Groovy Build, Supply Chain & Dependencies
+    prompt: |
+      Review the deterministic ProjectFacts (`runtime_types`, `build_system`, `manifest_files`, `lockfiles_found`, `dependencies`, `unpinned_dependencies`, `dev_dependencies`, `language_version_constraint`, `has_license`, `has_security_policy`, `ci_supply_chain_issues`, `committed_secret_files`, `container_hygiene_issues`, `readme_headings`, `docs_inventory`, `has_gitignore`).
+      Verify compliance with `common/supply_chain`, `groovy/dependencies`, `common/documentation`, `common/git_workflow`, and `common/security`.

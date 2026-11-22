@@ -1,0 +1,10 @@
+id: groovy_test_audit
+name: Groovy Testing Standards Audit
+description: Evaluate Groovy Spock (*Spec.groovy) and JUnit suites, data-driven tables, mocking isolation, and JaCoCo coverage against groovy/testing standards.
+rules:
+  - groovy/testing
+primitives:
+  - type: ai_interpret
+    name: Evaluate Groovy Test Suite Completeness & Structure
+    prompt: |
+      Compare `source_files_count` vs `test_files_count` from ProjectFacts and inspect `*Spec.groovy` / `*Test.groovy` files and AstFacts (`test_functions_count`, `assertion_free_tests`, `module_test_coverage_pct`) to verify Spock/JUnit isolation, assertions, and coverage according to `groovy/testing`.

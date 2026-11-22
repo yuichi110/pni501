@@ -1,0 +1,27 @@
+id: quick_check
+category: audit
+name: Quick Health Check (OCaml)
+description: Fast deterministic OCaml AST and dune-project check followed by AI interpretation and score output.
+
+targets:
+  source:
+    - "lib"
+    - "bin"
+    - "src"
+  tests:
+    - "test"
+    - "tests"
+  docs:
+    - "README.md"
+
+steps:
+  - id: repo_and_deps
+    uses: repo_structure_audit
+
+  - id: ast_and_quality
+    uses: ocaml_ast_audit
+    needs: [repo_and_deps]
+
+  - id: output_score
+    uses: emit_score
+    needs: [ast_and_quality]

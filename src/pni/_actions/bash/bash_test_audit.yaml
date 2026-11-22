@@ -1,0 +1,10 @@
+id: bash_test_audit
+name: Bash / Shell Testing Standards Audit
+description: Evaluate Bats / ShellSpec / shunit2 test suites, temp-dir isolation, exit-code assertions, and error-path coverage against bash/testing standards.
+rules:
+  - bash/testing
+primitives:
+  - type: ai_interpret
+    name: Evaluate Bash Test Suite Completeness & Isolation
+    prompt: |
+      Compare `source_files_count` vs `test_files_count` from ProjectFacts and inspect `*.bats` / `*_test.sh` files and AstFacts (`test_functions_count`, `assertion_free_tests`) to verify deterministic sandbox isolation, exit-code assertions, and error-branch coverage according to `bash/testing`.

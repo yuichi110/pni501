@@ -1,0 +1,10 @@
+id: vhdl_test_audit
+name: VHDL Verification & Testbench Audit
+description: Evaluate self-checking VHDL/VUnit/GHDL testbenches, severity-failure assertions, reset/boundary coverage, and clean termination against vhdl/testing standards.
+rules:
+  - vhdl/testing
+primitives:
+  - type: ai_interpret
+    name: Evaluate VHDL Testbench Completeness & Self-Checking Assertions
+    prompt: |
+      Compare `source_files_count` vs `test_files_count` from ProjectFacts and inspect `tb_*.vhd` / `*_tb.vhd` files and AstFacts (`test_functions_count`, `assertion_free_tests`) to verify self-checking `severity failure` assertions, termination, and coverage according to `vhdl/testing`.

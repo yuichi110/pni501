@@ -1,0 +1,21 @@
+id: odin_ast_audit
+name: Odin AST, Allocator Ownership, Slices, Error Discipline & Security Audit
+description: Parse Odin AST via tree-sitter to extract doc coverage, allocator/defer leaks, ignored error returns, #no_bounds_check/transmute escapes, mutable globals, and complexity.
+rules:
+  - common/architecture
+  - common/maintainability
+  - common/security
+  - common/security_vulnerability
+  - odin/code_quality
+  - odin/typing
+  - odin/modern_stack
+primitives:
+  - type: ast_analyze
+    name: Extract Deterministic Odin AST & Package Metrics
+    with:
+      lang: "odin"
+  - type: ai_interpret
+    name: Interpret Odin AST Facts & Evaluate Allocator/Type/Memory Safety
+    prompt: |
+      Inspect the deterministic AstFacts (`type_safety_coverage_pct`, `type_safety_issues`, `weak_type_usages`, `unscoped_type_ignores`, `docstring_coverage_pct`, `complex_functions`, `excessive_parameters`, `bug_risk_idioms`, `global_state_usages`, `circular_dependencies`, `unstructured_logging`, `hardcoded_secrets`, `dangerous_sinks`).
+      Read flagged `.odin` files to evaluate package boundaries (`common/architecture`), SIG maintainability (`common/maintainability`), memory/FFI security (`common/security`, `common/security_vulnerability`), `allocator`/`defer`/`or_return` & slice discipline (`odin/code_quality`, `odin/typing`), and modern Odin idioms (`odin/modern_stack`).

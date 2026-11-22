@@ -1,0 +1,10 @@
+id: julia_test_audit
+name: Julia Testing Standards Audit
+description: Evaluate Julia test/runtests.jl (@testset/@test/@inferred), Aqua.jl checks, seed determinism, and Coverage.jl against julia/testing standards.
+rules:
+  - julia/testing
+primitives:
+  - type: ai_interpret
+    name: Evaluate Julia Test Suite Completeness & Determinism
+    prompt: |
+      Compare `source_files_count` vs `test_files_count` from ProjectFacts and inspect `test/runtests.jl` / `test_*.jl` files and AstFacts (`test_functions_count`, `assertion_free_tests`, `module_test_coverage_pct`) to verify `@inferred`, deterministic seeds, and coverage according to `julia/testing`.

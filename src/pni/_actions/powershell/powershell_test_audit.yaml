@@ -1,0 +1,10 @@
+id: powershell_test_audit
+name: PowerShell Testing Standards Audit
+description: Evaluate Pester v5 *.Tests.ps1 suites, TestDrive/Mock isolation, assertion quality, and coverage against powershell/testing standards.
+rules:
+  - powershell/testing
+primitives:
+  - type: ai_interpret
+    name: Evaluate PowerShell Pester Test Suite Completeness & Isolation
+    prompt: |
+      Compare `source_files_count` vs `test_files_count` from ProjectFacts and inspect `*.Tests.ps1` files and AstFacts (`test_functions_count`, `assertion_free_tests`, `module_test_coverage_pct`) to verify Pester v5 structure, isolation, and coverage according to `powershell/testing`.

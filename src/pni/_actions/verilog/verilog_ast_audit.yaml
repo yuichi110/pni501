@@ -1,0 +1,21 @@
+id: verilog_ast_audit
+name: Verilog / SystemVerilog AST, Synthesizable RTL, Latches & CDC Audit
+description: Parse Verilog/SystemVerilog AST via tree-sitter to extract blocking vs non-blocking misuse, inferred latch risks, bit-width truncation, CDC issues, and module complexity.
+rules:
+  - common/architecture
+  - common/maintainability
+  - common/security
+  - common/security_vulnerability
+  - verilog/code_quality
+  - verilog/typing
+  - verilog/modern_stack
+primitives:
+  - type: ast_analyze
+    name: Extract Deterministic Verilog/SystemVerilog AST & Module Metrics
+    with:
+      lang: "verilog"
+  - type: ai_interpret
+    name: Interpret Verilog/SV AST Facts & Evaluate Synthesizable RTL Quality
+    prompt: |
+      Inspect the deterministic AstFacts (`type_safety_coverage_pct`, `type_safety_issues`, `unscoped_type_ignores`, `docstring_coverage_pct`, `complex_functions`, `bug_risk_idioms`, `global_state_usages`, `hardcoded_secrets`, `dangerous_sinks`).
+      Read flagged `.sv`/`.v` files to evaluate RTL hierarchy/datapath boundaries (`common/architecture`), maintainability (`common/maintainability`), `always_ff`/`always_comb` blocking vs non-blocking & latch safety (`verilog/code_quality`), bit-width & CDC discipline (`verilog/typing`), and SystemVerilog-2017 idioms (`verilog/modern_stack`).

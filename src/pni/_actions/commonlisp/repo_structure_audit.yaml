@@ -1,0 +1,19 @@
+id: repo_structure_audit
+name: Repository Structure & ASDF/Qlot Manifest Audit (Common Lisp)
+description: Deterministically inspect *.asd system definitions, qlfile.lock, test system separation, and documentation, then have AI evaluate against rules.
+rules:
+  - common/supply_chain
+  - common/documentation
+  - common/git_workflow
+  - common/security
+  - commonlisp/dependencies
+primitives:
+  - type: project_inspect
+    name: Extract Common Lisp ASDF, Supply-Chain & Governance Facts
+    with:
+      lang: "commonlisp"
+  - type: ai_interpret
+    name: Evaluate Common Lisp ASDF Systems, Supply Chain & Dependencies
+    prompt: |
+      Review the deterministic ProjectFacts (`runtime_types`, `build_system`, `manifest_files`, `lockfiles_found`, `dependencies`, `unpinned_dependencies`, `has_license`, `has_security_policy`, `ci_supply_chain_issues`, `committed_secret_files`, `readme_headings`, `docs_inventory`, `has_gitignore`).
+      Verify compliance with `common/supply_chain`, `commonlisp/dependencies` (noting Quicklisp/ASDF libraries omit `qlfile.lock` legitimately), `common/documentation`, `common/git_workflow`, and `common/security`.

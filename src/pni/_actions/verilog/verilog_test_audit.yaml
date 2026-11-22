@@ -1,0 +1,10 @@
+id: verilog_test_audit
+name: Verilog / SystemVerilog Verification & Testbench Audit
+description: Evaluate self-checking Verilog/SV/cocotb testbenches, reset/backpressure coverage, watchdog timeouts, and assertions against verilog/testing standards.
+rules:
+  - verilog/testing
+primitives:
+  - type: ai_interpret
+    name: Evaluate Verilog/SV Testbench Completeness & Self-Checking Assertions
+    prompt: |
+      Compare `source_files_count` vs `test_files_count` from ProjectFacts and inspect `tb_*.sv` / `*_tb.v` files and AstFacts (`test_functions_count`, `assertion_free_tests`) to verify self-checking `$fatal`/assertions, reset/backpressure coverage, and timeouts according to `verilog/testing`.

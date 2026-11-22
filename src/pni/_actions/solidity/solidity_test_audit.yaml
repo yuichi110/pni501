@@ -1,0 +1,10 @@
+id: solidity_test_audit
+name: Solidity Testing, Fuzzing & Invariant Standards Audit
+description: Evaluate Foundry (*.t.sol) / Hardhat unit, fuzz, and invariant test suites, adversarial reentrancy/revert checks, and coverage against solidity/testing standards.
+rules:
+  - solidity/testing
+primitives:
+  - type: ai_interpret
+    name: Evaluate Solidity Test, Fuzz & Invariant Coverage
+    prompt: |
+      Compare `source_files_count` vs `test_files_count` from ProjectFacts and inspect `*.t.sol` / `*Test.sol` files and AstFacts (`test_functions_count`, `assertion_free_tests`) to verify fuzz/invariant tests, revert checks, and adversarial edge cases according to `solidity/testing`.

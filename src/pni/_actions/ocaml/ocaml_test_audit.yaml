@@ -1,0 +1,10 @@
+id: ocaml_test_audit
+name: OCaml Testing Standards Audit
+description: Evaluate OCaml Alcotest/Expect/QCheck suites, functor isolation, assertion quality, and bisect_ppx coverage against ocaml/testing standards.
+rules:
+  - ocaml/testing
+primitives:
+  - type: ai_interpret
+    name: Evaluate OCaml Test Suite Completeness & Isolation
+    prompt: |
+      Compare `source_files_count` vs `test_files_count` from ProjectFacts and inspect `test_*.ml` / `*_test.ml` files and AstFacts (`test_functions_count`, `assertion_free_tests`, `module_test_coverage_pct`) to verify deterministic `dune runtest` coverage according to `ocaml/testing`.

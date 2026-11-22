@@ -1,0 +1,19 @@
+id: repo_structure_audit
+name: Repository Structure & fpm/CMake Manifest Audit (Fortran)
+description: Deterministically inspect fpm.toml, CMakeLists.txt, compiler standards, dependencies, and documentation, then have AI evaluate against rules.
+rules:
+  - common/supply_chain
+  - common/documentation
+  - common/git_workflow
+  - common/security
+  - fortran/dependencies
+primitives:
+  - type: project_inspect
+    name: Extract Fortran Build, Supply-Chain & Governance Facts
+    with:
+      lang: "fortran"
+  - type: ai_interpret
+    name: Evaluate Fortran Build System, Supply Chain & Dependencies
+    prompt: |
+      Review the deterministic ProjectFacts (`runtime_types`, `build_system`, `manifest_files`, `dependencies`, `unpinned_dependencies`, `language_version_constraint`, `has_license`, `has_security_policy`, `ci_supply_chain_issues`, `committed_secret_files`, `readme_headings`, `docs_inventory`, `has_gitignore`).
+      Verify compliance with `common/supply_chain`, `fortran/dependencies` (noting scientific Fortran repos legitimately omit npm-style lockfiles), `common/documentation`, `common/git_workflow`, and `common/security`.

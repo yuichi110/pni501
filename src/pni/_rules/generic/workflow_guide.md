@@ -1,6 +1,6 @@
 # Generic Multi-Language Audit Workflow Guide (Workflow v2)
 
-Use this Workflow v2 DAG for any PNI-supported language (Tier B static-audit languages such as Bash, PowerShell, Solidity, Zig, Haskell, Verilog/VHDL, etc.) outside the 20 bespoke Tier A rule directories:
+Use this Workflow v2 DAG for any PNI-supported companion/DSL language or custom language outside the 40 bespoke Tier A & Tier B rule directories:
 
 1. **Phase 0/1 — `confirm_plan` (Auto-Prepended Human Alignment Gate)**: Preview recon, discovered components, companion DSLs, and the validated Mermaid DAG (`pni workflows plan full_audit`), then confirm scope, focus areas, and disabled steps with the user.
 2. **Wave 1 — `repo_structure_audit`**: Auto-runs `project_inspect` to inspect manifests, lockfiles, governance hygiene, and companion IaC/config files (`Dockerfile`, Terraform/HCL, CI YAML, Protobuf, SQL).

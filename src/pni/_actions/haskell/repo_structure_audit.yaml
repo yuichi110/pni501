@@ -1,0 +1,19 @@
+id: repo_structure_audit
+name: Repository Structure & Cabal/Stack Manifest Audit (Haskell)
+description: Deterministically inspect *.cabal, cabal.project, stack.yaml, GHC/PVP bounds, and documentation, then have AI evaluate against rules.
+rules:
+  - common/supply_chain
+  - common/documentation
+  - common/git_workflow
+  - common/security
+  - haskell/dependencies
+primitives:
+  - type: project_inspect
+    name: Extract Haskell Cabal/Stack, Supply-Chain & Dependency Facts
+    with:
+      lang: "haskell"
+  - type: ai_interpret
+    name: Evaluate Haskell Build, Supply Chain & Dependencies
+    prompt: |
+      Review the deterministic ProjectFacts (`runtime_types`, `build_system`, `manifest_files`, `lockfiles_found`, `dependencies`, `unpinned_dependencies`, `language_version_constraint`, `has_license`, `has_security_policy`, `ci_supply_chain_issues`, `committed_secret_files`, `readme_headings`, `docs_inventory`, `has_gitignore`).
+      Verify compliance with `common/supply_chain`, `haskell/dependencies` (noting Hackage libraries omit freeze files legitimately), `common/documentation`, `common/git_workflow`, and `common/security`.

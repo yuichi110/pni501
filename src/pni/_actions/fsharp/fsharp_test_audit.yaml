@@ -1,0 +1,10 @@
+id: fsharp_test_audit
+name: F# Testing Standards Audit
+description: Evaluate F# Expecto/xUnit/FsCheck suites, pure isolation, assertion quality, and Coverlet coverage against fsharp/testing standards.
+rules:
+  - fsharp/testing
+primitives:
+  - type: ai_interpret
+    name: Evaluate F# Test Suite Completeness & Isolation
+    prompt: |
+      Compare `source_files_count` vs `test_files_count` from ProjectFacts and inspect `*Tests.fs` / `*Test.fs` files and AstFacts (`test_functions_count`, `assertion_free_tests`, `module_test_coverage_pct`) to verify deterministic isolation, assertions, and coverage according to `fsharp/testing`.

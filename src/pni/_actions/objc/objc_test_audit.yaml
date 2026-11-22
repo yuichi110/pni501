@@ -1,0 +1,10 @@
+id: objc_test_audit
+name: Objective-C Testing Standards Audit
+description: Evaluate Objective-C XCTest (*Tests.m) suites, protocol mocking, async expectations, and coverage against objc/testing standards.
+rules:
+  - objc/testing
+primitives:
+  - type: ai_interpret
+    name: Evaluate Objective-C XCTest Suite Completeness & Isolation
+    prompt: |
+      Compare `source_files_count` vs `test_files_count` from ProjectFacts and inspect `*Tests.m` / `*Test.m` files and AstFacts (`test_functions_count`, `assertion_free_tests`) to verify deterministic isolation, assertions, and coverage according to `objc/testing`.

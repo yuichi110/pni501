@@ -1,0 +1,21 @@
+id: zig_ast_audit
+name: Zig AST, Allocator Ownership, Error Unions, Docs & Security Audit
+description: Parse Zig AST via tree-sitter to extract doc coverage, catch unreachable and @setRuntimeSafety(false) hazards, pointer casts, mutable globals, complexity, and CWE sinks.
+rules:
+  - common/architecture
+  - common/maintainability
+  - common/security
+  - common/security_vulnerability
+  - zig/code_quality
+  - zig/typing
+  - zig/modern_stack
+primitives:
+  - type: ast_analyze
+    name: Extract Deterministic Zig AST & Module Metrics
+    with:
+      lang: "zig"
+  - type: ai_interpret
+    name: Interpret Zig AST Facts & Evaluate Allocator/Safety/Security
+    prompt: |
+      Inspect the deterministic AstFacts (`type_safety_coverage_pct`, `type_safety_issues`, `weak_type_usages`, `unscoped_type_ignores`, `docstring_coverage_pct`, `missing_docstrings`, `complex_functions`, `excessive_parameters`, `bug_risk_idioms`, `global_state_usages`, `missing_io_timeouts`, `unstructured_logging`, `hardcoded_secrets`, `dangerous_sinks`).
+      Read flagged `.zig` files to evaluate module boundaries (`common/architecture`), SIG maintainability (`common/maintainability`), memory/command CWE sinks (`common/security`, `common/security_vulnerability`), allocator/`defer`/`errdefer` & slice safety (`zig/code_quality`, `zig/typing`), and modern Zig idioms (`zig/modern_stack`).

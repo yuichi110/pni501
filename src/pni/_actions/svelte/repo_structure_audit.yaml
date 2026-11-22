@@ -1,0 +1,19 @@
+id: repo_structure_audit
+name: Repository Structure & Svelte/SvelteKit Manifest Audit (Svelte)
+description: Deterministically inspect package.json, svelte.config.*, lockfiles, Svelte version, and documentation, then have AI evaluate against rules.
+rules:
+  - common/supply_chain
+  - common/documentation
+  - common/git_workflow
+  - common/security
+  - svelte/dependencies
+primitives:
+  - type: project_inspect
+    name: Extract Svelte/SvelteKit Package, Supply-Chain & Dependency Facts
+    with:
+      lang: "svelte"
+  - type: ai_interpret
+    name: Evaluate Svelte Build, Supply Chain & Dependencies
+    prompt: |
+      Review the deterministic ProjectFacts (`runtime_types`, `build_system`, `manifest_files`, `lockfiles_found`, `dependencies`, `unpinned_dependencies`, `dev_dependencies`, `language_version_constraint`, `has_license`, `has_security_policy`, `ci_supply_chain_issues`, `committed_secret_files`, `readme_headings`, `docs_inventory`, `has_gitignore`).
+      Verify compliance with `common/supply_chain`, `svelte/dependencies`, `common/documentation`, `common/git_workflow`, and `common/security`.

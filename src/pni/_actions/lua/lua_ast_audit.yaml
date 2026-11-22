@@ -1,0 +1,21 @@
+id: lua_ast_audit
+name: Lua AST, Local Scope Hygiene, LuaCATS & Injection Security Audit
+description: Parse Lua AST via tree-sitter to extract accidental global leaks, load/loadstring/os.execute CWE sinks, complexity, pcall handling, and LuaCATS documentation coverage.
+rules:
+  - common/architecture
+  - common/maintainability
+  - common/security
+  - common/security_vulnerability
+  - lua/code_quality
+  - lua/typing
+  - lua/modern_stack
+primitives:
+  - type: ast_analyze
+    name: Extract Deterministic Lua AST & Module Metrics
+    with:
+      lang: "lua"
+  - type: ai_interpret
+    name: Interpret Lua AST Facts & Evaluate Scope/Contracts/Security
+    prompt: |
+      Inspect the deterministic AstFacts (`docstring_coverage_pct`, `unscoped_type_ignores`, `complex_functions`, `excessive_parameters`, `bug_risk_idioms`, `global_state_usages`, `circular_dependencies`, `missing_io_timeouts`, `unstructured_logging`, `hardcoded_secrets`, `dangerous_sinks`).
+      Read flagged `.lua` files to evaluate module boundaries (`common/architecture`), SIG maintainability (`common/maintainability`), `load`/`os.execute` CWE sinks (`common/security`, `common/security_vulnerability`), `local` scoping & LuaCATS contracts (`lua/code_quality`, `lua/typing`), and modern Lua idioms (`lua/modern_stack`).

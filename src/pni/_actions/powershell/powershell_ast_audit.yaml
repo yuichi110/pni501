@@ -1,0 +1,21 @@
+id: powershell_ast_audit
+name: PowerShell AST, StrictMode, Cmdlet Contracts & Security Audit
+description: Parse PowerShell AST via tree-sitter to extract Invoke-Expression CWE-94 sinks, plaintext secrets, global state, Comment-Based Help, complexity, and timeout hygiene.
+rules:
+  - common/architecture
+  - common/maintainability
+  - common/security
+  - common/security_vulnerability
+  - powershell/code_quality
+  - powershell/typing
+  - powershell/modern_stack
+primitives:
+  - type: ast_analyze
+    name: Extract Deterministic PowerShell AST & Module Metrics
+    with:
+      lang: "powershell"
+  - type: ai_interpret
+    name: Interpret PowerShell AST Facts & Evaluate Cmdlet Safety/Security
+    prompt: |
+      Inspect the deterministic AstFacts (`type_safety_coverage_pct`, `docstring_coverage_pct`, `complex_functions`, `excessive_parameters`, `bug_risk_idioms`, `global_state_usages`, `missing_io_timeouts`, `unstructured_logging`, `hardcoded_secrets`, `dangerous_sinks`).
+      Read flagged `.ps1`/`.psm1` files to evaluate module layering (`common/architecture`), SIG maintainability (`common/maintainability`), `Invoke-Expression`/credential CWE sinks (`common/security`, `common/security_vulnerability`), `Set-StrictMode`/`[CmdletBinding()]` discipline (`powershell/code_quality`, `powershell/typing`), and PowerShell 7+ idioms (`powershell/modern_stack`).

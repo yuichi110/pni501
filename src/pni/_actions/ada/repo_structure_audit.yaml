@@ -1,0 +1,19 @@
+id: repo_structure_audit
+name: Repository Structure & Alire/GPR Manifest Audit (Ada)
+description: Deterministically inspect alire.toml, *.gpr, Ada standard settings, dependencies, and documentation, then have AI evaluate against rules.
+rules:
+  - common/supply_chain
+  - common/documentation
+  - common/git_workflow
+  - common/security
+  - ada/dependencies
+primitives:
+  - type: project_inspect
+    name: Extract Ada Alire/GPR, Supply-Chain & Governance Facts
+    with:
+      lang: "ada"
+  - type: ai_interpret
+    name: Evaluate Ada Build, Supply Chain & Dependencies
+    prompt: |
+      Review the deterministic ProjectFacts (`runtime_types`, `build_system`, `manifest_files`, `lockfiles_found`, `dependencies`, `unpinned_dependencies`, `language_version_constraint`, `has_license`, `has_security_policy`, `ci_supply_chain_issues`, `committed_secret_files`, `readme_headings`, `docs_inventory`, `has_gitignore`).
+      Verify compliance with `common/supply_chain`, `ada/dependencies` (noting pure GPR/Alire library crates omit lockfiles legitimately), `common/documentation`, `common/git_workflow`, and `common/security`.

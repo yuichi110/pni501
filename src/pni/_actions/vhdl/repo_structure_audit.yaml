@@ -1,0 +1,19 @@
+id: repo_structure_audit
+name: Repository Structure & RTL Compile-Order Audit (VHDL)
+description: Deterministically inspect RTL/TB separation, VUnit/FuseSoC/Makefile compile order, IP pinning, and documentation, then have AI evaluate against rules.
+rules:
+  - common/supply_chain
+  - common/documentation
+  - common/git_workflow
+  - common/security
+  - vhdl/dependencies
+primitives:
+  - type: project_inspect
+    name: Extract VHDL Layout, Compile Order & Governance Facts
+    with:
+      lang: "vhdl"
+  - type: ai_interpret
+    name: Evaluate VHDL Build, IP Pinning & Governance
+    prompt: |
+      Review the deterministic ProjectFacts (`runtime_types`, `manifest_files`, `has_license`, `has_security_policy`, `ci_supply_chain_issues`, `committed_secret_files`, `readme_headings`, `docs_inventory`, `has_gitignore`).
+      Verify compliance with `common/supply_chain`, `vhdl/dependencies` (never penalizing RTL repos for lacking npm-style lockfiles), `common/documentation`, `common/git_workflow`, and `common/security`.

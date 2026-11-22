@@ -1,0 +1,21 @@
+id: fortran_ast_audit
+name: Fortran AST, Implicit-None, Precision Kinds, Module & Security Audit
+description: Parse Fortran AST via tree-sitter to extract implicit-none discipline, COMMON/EQUIVALENCE/GOTO legacy hazards, precision kinds, complexity, and command-execution CWE sinks.
+rules:
+  - common/architecture
+  - common/maintainability
+  - common/security
+  - common/security_vulnerability
+  - fortran/code_quality
+  - fortran/typing
+  - fortran/modern_stack
+primitives:
+  - type: ast_analyze
+    name: Extract Deterministic Fortran AST & Module Metrics
+    with:
+      lang: "fortran"
+  - type: ai_interpret
+    name: Interpret Fortran AST Facts & Evaluate Numerical Safety/Modernization
+    prompt: |
+      Inspect the deterministic AstFacts (`wildcard_imports`, `type_safety_coverage_pct`, `docstring_coverage_pct`, `complex_functions`, `excessive_parameters`, `bug_risk_idioms`, `global_state_usages`, `circular_dependencies`, `hardcoded_secrets`, `dangerous_sinks`).
+      Read flagged `.f90`/`.f` files to evaluate module boundaries (`common/architecture`), SIG maintainability (`common/maintainability`), shell/buffer security (`common/security`, `common/security_vulnerability`), `implicit none`/`intent`/`COMMON` discipline (`fortran/code_quality`, `fortran/typing`), and Modern Fortran 2008/2018 idioms (`fortran/modern_stack`).

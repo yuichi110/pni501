@@ -1,0 +1,21 @@
+id: commonlisp_ast_audit
+name: Common Lisp AST, *read-eval* Safety, Package Hygiene & Security Audit
+description: Parse Common Lisp AST via tree-sitter to extract docstrings, *read-eval*/eval/shell-injection CWE sinks, (safety 0) escapes, dynamic special state, and complexity.
+rules:
+  - common/architecture
+  - common/maintainability
+  - common/security
+  - common/security_vulnerability
+  - commonlisp/code_quality
+  - commonlisp/typing
+  - commonlisp/modern_stack
+primitives:
+  - type: ast_analyze
+    name: Extract Deterministic Common Lisp AST & System Metrics
+    with:
+      lang: "commonlisp"
+  - type: ai_interpret
+    name: Interpret Common Lisp AST Facts & Evaluate Safety/CLOS/Hygiene
+    prompt: |
+      Inspect the deterministic AstFacts (`wildcard_imports`, `type_safety_issues`, `unscoped_type_ignores`, `docstring_coverage_pct`, `missing_docstrings`, `complex_functions`, `excessive_parameters`, `bug_risk_idioms`, `global_state_usages`, `missing_io_timeouts`, `unstructured_logging`, `hardcoded_secrets`, `dangerous_sinks`).
+      Read flagged `.lisp`/`.asd` files to evaluate package/ASDF layering (`common/architecture`), maintainability (`common/maintainability`), `*read-eval*`/`eval`/SQL/shell CWE sinks (`common/security`, `common/security_vulnerability`), `defpackage`/macro hygiene & `(safety ...)` discipline (`commonlisp/code_quality`, `commonlisp/typing`), and UIOP/ASDF3 idioms (`commonlisp/modern_stack`).

@@ -1,0 +1,10 @@
+id: lua_test_audit
+name: Lua Testing Standards Audit
+description: Evaluate Lua Busted/LuaUnit suites, module isolation, assertion quality, and LuaCov coverage against lua/testing standards.
+rules:
+  - lua/testing
+primitives:
+  - type: ai_interpret
+    name: Evaluate Lua Test Suite Completeness & Isolation
+    prompt: |
+      Compare `source_files_count` vs `test_files_count` from ProjectFacts and inspect `*_spec.lua` / `*_test.lua` files and AstFacts (`test_functions_count`, `assertion_free_tests`, `module_test_coverage_pct`) to verify deterministic isolation, assertions, and coverage according to `lua/testing`.

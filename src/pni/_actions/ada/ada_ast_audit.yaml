@@ -1,0 +1,21 @@
+id: ada_ast_audit
+name: Ada AST, Contracts, Unchecked-Conversion, GNATdoc & Security Audit
+description: Parse Ada AST via tree-sitter to extract .ads documentation, Unchecked_Conversion, pragma Suppress, silent when-others handlers, shared globals, and complexity.
+rules:
+  - common/architecture
+  - common/maintainability
+  - common/security
+  - common/security_vulnerability
+  - ada/code_quality
+  - ada/typing
+  - ada/modern_stack
+primitives:
+  - type: ast_analyze
+    name: Extract Deterministic Ada AST & Package Metrics
+    with:
+      lang: "ada"
+  - type: ai_interpret
+    name: Interpret Ada AST Facts & Evaluate High-Integrity Contracts/Security
+    prompt: |
+      Inspect the deterministic AstFacts (`wildcard_imports`, `type_safety_coverage_pct`, `type_safety_issues`, `unscoped_type_ignores`, `docstring_coverage_pct`, `missing_docstrings`, `complex_functions`, `excessive_parameters`, `bug_risk_idioms`, `global_state_usages`, `unstructured_logging`, `hardcoded_secrets`, `dangerous_sinks`).
+      Read flagged `.ads`/`.adb` files to evaluate package/task boundaries (`common/architecture`), maintainability (`common/maintainability`), unchecked-conversion/FFI security (`common/security`, `common/security_vulnerability`), contracts & constrained typing (`ada/code_quality`, `ada/typing`), and Ada 2012/2022 idioms (`ada/modern_stack`).

@@ -1,0 +1,10 @@
+id: matlab_test_audit
+name: MATLAB Testing & Numerical Verification Audit
+description: Evaluate MATLAB matlab.unittest / MOxUnit suites, numerical tolerances, RNG pinning, and assertions against matlab/testing standards.
+rules:
+  - matlab/testing
+primitives:
+  - type: ai_interpret
+    name: Evaluate MATLAB Test Suite Completeness & Determinism
+    prompt: |
+      Compare `source_files_count` vs `test_files_count` from ProjectFacts and inspect `*Test.m` / `test_*.m` files and AstFacts (`test_functions_count`, `assertion_free_tests`) to verify `matlab.unittest` assertions, tolerances, and isolation according to `matlab/testing`.

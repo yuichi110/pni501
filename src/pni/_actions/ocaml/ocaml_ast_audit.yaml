@@ -1,0 +1,21 @@
+id: ocaml_ast_audit
+name: OCaml AST, Interface Safety, Obj.magic, ODoc & Security Audit
+description: Parse OCaml AST via tree-sitter to extract ODoc coverage, Obj.magic and Marshal.from_* CWE sinks, open pollution, mutable ref globals, and complexity.
+rules:
+  - common/architecture
+  - common/maintainability
+  - common/security
+  - common/security_vulnerability
+  - ocaml/code_quality
+  - ocaml/typing
+  - ocaml/modern_stack
+primitives:
+  - type: ast_analyze
+    name: Extract Deterministic OCaml AST & Module Metrics
+    with:
+      lang: "ocaml"
+  - type: ai_interpret
+    name: Interpret OCaml AST Facts & Evaluate Type Safety/Modularity/Security
+    prompt: |
+      Inspect the deterministic AstFacts (`wildcard_imports`, `type_safety_coverage_pct`, `type_safety_issues`, `unscoped_type_ignores`, `docstring_coverage_pct`, `missing_docstrings`, `complex_functions`, `excessive_parameters`, `bug_risk_idioms`, `global_state_usages`, `circular_dependencies`, `missing_io_timeouts`, `unstructured_logging`, `hardcoded_secrets`, `dangerous_sinks`).
+      Read flagged `.ml`/`.mli` files to evaluate Dune library boundaries (`common/architecture`), SIG maintainability (`common/maintainability`), `Obj.magic`/`Marshal` CWE sinks (`common/security`, `common/security_vulnerability`), `.mli`/exhaustiveness discipline (`ocaml/code_quality`, `ocaml/typing`), and OCaml 5 idioms (`ocaml/modern_stack`).

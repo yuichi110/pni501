@@ -1,0 +1,21 @@
+id: vhdl_ast_audit
+name: VHDL AST, Synthesizable RTL, Numeric-Std, Latches & CDC Audit
+description: Parse VHDL AST via tree-sitter to extract non-standard std_logic_arith usage, latch/sensitivity risks, shared variable globals, bit-width safety, and entity complexity.
+rules:
+  - common/architecture
+  - common/maintainability
+  - common/security
+  - common/security_vulnerability
+  - vhdl/code_quality
+  - vhdl/typing
+  - vhdl/modern_stack
+primitives:
+  - type: ast_analyze
+    name: Extract Deterministic VHDL AST & Entity Metrics
+    with:
+      lang: "vhdl"
+  - type: ai_interpret
+    name: Interpret VHDL AST Facts & Evaluate Synthesizable RTL Quality
+    prompt: |
+      Inspect the deterministic AstFacts (`type_safety_coverage_pct`, `type_safety_issues`, `docstring_coverage_pct`, `complex_functions`, `bug_risk_idioms`, `global_state_usages`, `hardcoded_secrets`, `dangerous_sinks`).
+      Read flagged `.vhd`/`.vhdl` files to evaluate RTL hierarchy/datapath boundaries (`common/architecture`), maintainability (`common/maintainability`), `numeric_std`/latch/`rising_edge(clk)` discipline (`vhdl/code_quality`), range-constrained typing & CDC (`vhdl/typing`), and VHDL-2008 idioms (`vhdl/modern_stack`).

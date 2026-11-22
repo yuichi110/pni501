@@ -1,0 +1,27 @@
+id: quick_check
+category: audit
+name: Quick Health Check (PowerShell)
+description: Fast deterministic PowerShell AST and module manifest check followed by AI interpretation and score output.
+
+targets:
+  source:
+    - "src"
+    - "scripts"
+    - "."
+  tests:
+    - "tests"
+    - "Tests"
+  docs:
+    - "README.md"
+
+steps:
+  - id: repo_and_deps
+    uses: repo_structure_audit
+
+  - id: ast_and_quality
+    uses: powershell_ast_audit
+    needs: [repo_and_deps]
+
+  - id: output_score
+    uses: emit_score
+    needs: [ast_and_quality]

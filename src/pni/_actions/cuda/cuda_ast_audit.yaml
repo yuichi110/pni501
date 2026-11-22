@@ -1,0 +1,21 @@
+id: cuda_ast_audit
+name: CUDA AST, Kernel Bounds, Sync Safety, Precision & Security Audit
+description: Parse CUDA AST via tree-sitter to extract error-checking gaps, divergent __syncthreads() deadlocks, kernel bounds checks, RAII VRAM hygiene, precision literals, and CWE sinks.
+rules:
+  - common/architecture
+  - common/maintainability
+  - common/security
+  - common/security_vulnerability
+  - cuda/code_quality
+  - cuda/typing
+  - cuda/modern_stack
+primitives:
+  - type: ast_analyze
+    name: Extract Deterministic CUDA AST & Kernel Metrics
+    with:
+      lang: "cuda"
+  - type: ai_interpret
+    name: Interpret CUDA AST Facts & Evaluate GPU Kernel Safety/Performance
+    prompt: |
+      Inspect the deterministic AstFacts (`type_safety_coverage_pct`, `type_safety_issues`, `docstring_coverage_pct`, `complex_functions`, `excessive_parameters`, `bug_risk_idioms`, `global_state_usages`, `unstructured_logging`, `hardcoded_secrets`, `dangerous_sinks`).
+      Read flagged `.cu`/`.cuh` files to evaluate host/kernel pipeline layering (`common/architecture`), SIG maintainability (`common/maintainability`), memory-safety CWE sinks (`common/security`, `common/security_vulnerability`), `cudaError_t`/`__syncthreads()`/RAII & precision discipline (`cuda/code_quality`, `cuda/typing`), and CUDA 12 warp/stream idioms (`cuda/modern_stack`).

@@ -1,0 +1,21 @@
+id: objc_ast_audit
+name: Objective-C AST, ARC Safety, Nullability, HeaderDoc & Security Audit
+description: Parse Objective-C AST via tree-sitter to extract HeaderDoc coverage, ARC retain-cycle risks, format-string and NSKeyedUnarchiver CWE sinks, nullability/generics hygiene, and complexity.
+rules:
+  - common/architecture
+  - common/maintainability
+  - common/security
+  - common/security_vulnerability
+  - objc/code_quality
+  - objc/typing
+  - objc/modern_stack
+primitives:
+  - type: ast_analyze
+    name: Extract Deterministic Objective-C AST & Class Metrics
+    with:
+      lang: "objc"
+  - type: ai_interpret
+    name: Interpret Objective-C AST Facts & Evaluate ARC/Nullability/Security
+    prompt: |
+      Inspect the deterministic AstFacts (`type_safety_coverage_pct`, `weak_type_usages`, `unscoped_type_ignores`, `docstring_coverage_pct`, `missing_docstrings`, `complex_functions`, `excessive_parameters`, `bug_risk_idioms`, `global_state_usages`, `missing_io_timeouts`, `unstructured_logging`, `hardcoded_secrets`, `dangerous_sinks`).
+      Read flagged `.m`/`.mm`/`.h` files to evaluate layering (`common/architecture`), SIG maintainability (`common/maintainability`), format-string/archiver/C-buffer CWE sinks (`common/security`, `common/security_vulnerability`), ARC & nullability discipline (`objc/code_quality`, `objc/typing`), and modern Objective-C / Swift interop (`objc/modern_stack`).

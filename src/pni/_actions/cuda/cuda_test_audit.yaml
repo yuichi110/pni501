@@ -1,0 +1,10 @@
+id: cuda_test_audit
+name: CUDA Kernel Verification & Sanitizer Standards Audit
+description: Evaluate CUDA CPU-oracle kernel tests, tail/edge sizes, compute-sanitizer checks, and tolerances against cuda/testing standards.
+rules:
+  - cuda/testing
+primitives:
+  - type: ai_interpret
+    name: Evaluate CUDA Kernel Test Completeness & Sanitizer Discipline
+    prompt: |
+      Compare `source_files_count` vs `test_files_count` from ProjectFacts and inspect `test_*.cu` / `*_test.cu` files and AstFacts (`test_functions_count`, `assertion_free_tests`) to verify CPU-oracle correctness, tail sizes, and `compute-sanitizer` readiness according to `cuda/testing`.

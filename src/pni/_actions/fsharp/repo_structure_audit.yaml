@@ -1,0 +1,19 @@
+id: repo_structure_audit
+name: Repository Structure & .NET/Paket Manifest Audit (F#)
+description: Deterministically inspect *.fsproj, packages.lock.json/paket.lock, .NET TFM, and documentation, then have AI evaluate against rules.
+rules:
+  - common/supply_chain
+  - common/documentation
+  - common/git_workflow
+  - common/security
+  - fsharp/dependencies
+primitives:
+  - type: project_inspect
+    name: Extract F# .NET/Paket, Supply-Chain & Dependency Facts
+    with:
+      lang: "fsharp"
+  - type: ai_interpret
+    name: Evaluate F# Build, Supply Chain & Dependencies
+    prompt: |
+      Review the deterministic ProjectFacts (`runtime_types`, `build_system`, `manifest_files`, `lockfiles_found`, `dependencies`, `unpinned_dependencies`, `language_version_constraint`, `has_license`, `has_security_policy`, `ci_supply_chain_issues`, `committed_secret_files`, `readme_headings`, `docs_inventory`, `has_gitignore`).
+      Verify compliance with `common/supply_chain`, `fsharp/dependencies`, `common/documentation`, `common/git_workflow`, and `common/security`.

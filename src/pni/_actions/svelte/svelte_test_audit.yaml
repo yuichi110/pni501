@@ -1,0 +1,10 @@
+id: svelte_test_audit
+name: Svelte Testing Standards Audit
+description: Evaluate Svelte Vitest and @testing-library/svelte component suites, deterministic mocking, assertion quality, and coverage against svelte/testing standards.
+rules:
+  - svelte/testing
+primitives:
+  - type: ai_interpret
+    name: Evaluate Svelte Test Suite Completeness & Isolation
+    prompt: |
+      Compare `source_files_count` vs `test_files_count` from ProjectFacts and inspect `*.test.ts` / `*.spec.ts` files and AstFacts (`test_functions_count`, `assertion_free_tests`, `module_test_coverage_pct`) to verify deterministic isolation, DOM assertions, and coverage according to `svelte/testing`.

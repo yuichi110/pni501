@@ -1,0 +1,10 @@
+id: fortran_test_audit
+name: Fortran Testing & Numerical Verification Audit
+description: Evaluate Fortran test-drive/pFUnit/CTest suites, numerical tolerances, bounds checks, and exit-code assertions against fortran/testing standards.
+rules:
+  - fortran/testing
+primitives:
+  - type: ai_interpret
+    name: Evaluate Fortran Test Suite Completeness & Numerical Verification
+    prompt: |
+      Compare `source_files_count` vs `test_files_count` from ProjectFacts and inspect `test_*.f90` / `*_test.f90` files and AstFacts (`test_functions_count`, `assertion_free_tests`) to verify deterministic numerical tolerances, `-fcheck=all` hygiene, and coverage according to `fortran/testing`.

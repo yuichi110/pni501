@@ -1,0 +1,29 @@
+id: quick_check
+category: audit
+name: Quick Smart-Contract Health Check (Solidity)
+description: Fast deterministic Solidity AST and Foundry/Hardhat check followed by AI interpretation and score output.
+
+targets:
+  source:
+    - "contracts"
+    - "src"
+  tests:
+    - "test"
+    - "tests"
+  docs:
+    - "README.md"
+  exclude:
+    - "lib/**"
+    - "node_modules/**"
+
+steps:
+  - id: repo_and_deps
+    uses: repo_structure_audit
+
+  - id: ast_and_quality
+    uses: solidity_ast_audit
+    needs: [repo_and_deps]
+
+  - id: output_score
+    uses: emit_score
+    needs: [ast_and_quality]

@@ -1,0 +1,29 @@
+id: quick_check
+category: audit
+name: Quick Health Check (Lua)
+description: Fast deterministic Lua AST and rockspec check followed by AI interpretation and score output.
+
+targets:
+  source:
+    - "lua"
+    - "src"
+    - "lib"
+    - "."
+  tests:
+    - "spec"
+    - "tests"
+    - "test"
+  docs:
+    - "README.md"
+
+steps:
+  - id: repo_and_deps
+    uses: repo_structure_audit
+
+  - id: ast_and_quality
+    uses: lua_ast_audit
+    needs: [repo_and_deps]
+
+  - id: output_score
+    uses: emit_score
+    needs: [ast_and_quality]

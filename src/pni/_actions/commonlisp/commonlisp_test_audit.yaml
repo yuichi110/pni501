@@ -1,0 +1,10 @@
+id: commonlisp_test_audit
+name: Common Lisp Testing Standards Audit
+description: Evaluate Common Lisp FiveAM/Rove/Parachute suites, ASDF test-op wiring, non-interactive exit hygiene, and sb-cover coverage against commonlisp/testing standards.
+rules:
+  - commonlisp/testing
+primitives:
+  - type: ai_interpret
+    name: Evaluate Common Lisp Test Suite Completeness & ASDF Wiring
+    prompt: |
+      Compare `source_files_count` vs `test_files_count` from ProjectFacts and inspect `*-test.lisp` / `test-*.lisp` files and AstFacts (`test_functions_count`, `assertion_free_tests`) to verify `asdf:test-system` wiring, assertions, and coverage according to `commonlisp/testing`.

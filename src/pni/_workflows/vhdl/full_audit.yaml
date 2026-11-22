@@ -1,0 +1,50 @@
+id: full_audit
+category: audit
+name: Full RTL Health Audit & Report (VHDL)
+description: Workflow v2 DAG — Plan-First alignment, parallel deterministic VHDL AST analysis, GHDL container simulation, security scan, grounded hardware architecture, score+SARIF emission, and Drawlib report.
+
+targets:
+  source:
+    - "rtl"
+    - "src"
+    - "hdl"
+    - "."
+  tests:
+    - "tb"
+    - "sim"
+    - "tests"
+  docs:
+    - "README.md"
+
+steps:
+  - id: repo_and_deps
+    uses: repo_structure_audit
+
+  - id: ast_and_quality
+    uses: vhdl_ast_audit
+    needs: [repo_and_deps]
+
+  - id: runtime_verification
+    uses: container_runtime_audit
+    needs: [repo_and_deps]
+    when: "has_runtime_harness"
+
+  - id: security_audit
+    uses: security_vulnerability_audit
+    needs: [repo_and_deps]
+
+  - id: arch_recording
+    uses: architecture_analysis
+    needs: [ast_and_quality]
+
+  - id: test_health
+    uses: vhdl_test_audit
+    needs: [ast_and_quality]
+
+  - id: output_score
+    uses: emit_score
+    needs: [arch_recording, test_health, runtime_verification, security_audit]
+
+  - id: create_report
+    uses: write_drawlib_report
+    needs: [output_score]

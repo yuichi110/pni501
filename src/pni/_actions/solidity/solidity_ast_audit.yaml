@@ -1,0 +1,21 @@
+id: solidity_ast_audit
+name: Solidity AST, Reentrancy, Access Control, NatSpec & Smart-Contract Security Audit
+description: Parse Solidity AST via tree-sitter to extract tx.origin (CWE-287), delegatecall (CWE-829), selfdestruct, reentrancy/CEI risks, proxy storage hazards, and NatSpec coverage.
+rules:
+  - common/architecture
+  - common/maintainability
+  - common/security
+  - common/security_vulnerability
+  - solidity/code_quality
+  - solidity/typing
+  - solidity/modern_stack
+primitives:
+  - type: ast_analyze
+    name: Extract Deterministic Solidity AST & Smart-Contract Metrics
+    with:
+      lang: "solidity"
+  - type: ai_interpret
+    name: Interpret Solidity AST Facts & Evaluate Smart-Contract Security
+    prompt: |
+      Inspect the deterministic AstFacts (`type_safety_issues`, `docstring_coverage_pct`, `missing_docstrings`, `complex_functions`, `excessive_parameters`, `bug_risk_idioms`, `global_state_usages`, `hardcoded_secrets`, `dangerous_sinks`).
+      Read flagged `.sol` contracts to evaluate inheritance/proxy architecture (`common/architecture`), SIG maintainability (`common/maintainability`), reentrancy/access-control/`tx.origin`/`delegatecall`/oracle CWE sinks (`common/security`, `common/security_vulnerability`, `solidity/code_quality`), Solidity 0.8+ arithmetic/storage discipline (`solidity/typing`), and OpenZeppelin v5 / EIP-712 idioms (`solidity/modern_stack`).
