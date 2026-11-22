@@ -60,6 +60,8 @@ pni workflows start full_audit
 
 Official bilingual (`en` / `ja`) architectural documentation and live Workflow v2 sample audit / migration reports for `pni501` are maintained under [`docs_src/`](docs_src/README.md) (`docs_src/site/` + `docs_src/reports/*`) and compiled into [`docs/`](docs/) for GitHub Pages (**[https://www.pni501.com](https://www.pni501.com)**):
 
+- **Official Site**: [English (`www.pni501.com`)](https://www.pni501.com/en/) | [日本語 (`www.pni501.com/ja/`)](https://www.pni501.com/ja/)
+- **Live Sample Reports Gallery**: [English](https://www.pni501.com/en/04_scoring_and_reports/sample_reports.html) | [日本語](https://www.pni501.com/ja/04_scoring_and_reports/sample_reports.html)
 - **Official Site Source**: `docs_src/site/en/` and `docs_src/site/ja/` (`docs_src/site/drawlib.toml`) -> `docs/`
 - **Sample Reports Source**: `docs_src/reports/<slug>/` (`_facts/` + `en/` + `ja/`) -> `docs/reports/<slug>/` (HTML, PDF, JSON, SARIF)
 - **Rebuild All & Link Check**: `./docs_src/build.sh`

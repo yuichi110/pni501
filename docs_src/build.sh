@@ -35,7 +35,10 @@ if [ -d "docs_src/reports" ]; then
     done
 fi
 
-echo "=== 3. Verifying Portal Links (docs/) ==="
+echo "=== 3. Injecting Unified Top Portal Banner (docs/) ==="
+python3 "$SCRIPT_DIR/inject_banner.py" "$REPO_ROOT/docs"
+
+echo "=== 4. Verifying Portal Links (docs/) ==="
 $DRAWLIB_CMD serve docs/ --check
 
 echo "All portal builds and link checks passed!"

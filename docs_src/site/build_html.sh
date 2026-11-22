@@ -23,4 +23,5 @@ echo "Building HTML site (docs_src/site/ -> docs/)..."
 $DRAWLIB_CMD build html docs_src/site/ -o docs/
 echo "www.pni501.com" > docs/CNAME
 touch docs/.nojekyll
+python3 "$REPO_ROOT/docs_src/inject_banner.py" "$REPO_ROOT/docs"
 echo "HTML site build complete: docs/"
