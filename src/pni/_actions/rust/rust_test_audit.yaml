@@ -1,0 +1,10 @@
+id: rust_test_audit
+name: Rust Testing Standards Audit
+description: Evaluate Rust #[cfg(test)] unit tests, tests/ integration suites, doctests, isolation, and coverage against rust/testing standards.
+rules:
+  - rust/testing
+primitives:
+  - type: ai_interpret
+    name: Evaluate Rust Test Suite Completeness & Structure
+    prompt: |
+      Compare `source_files_count` vs `test_files_count` from ProjectFacts and inspect `#[cfg(test)]` modules / `tests/*.rs` files and AstFacts (`test_functions_count`, `assertion_free_tests`, `module_test_coverage_pct`) to verify deterministic isolation, error-path assertions, and coverage according to `rust/testing`.

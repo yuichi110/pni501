@@ -1,0 +1,10 @@
+id: scala_test_audit
+name: Scala Testing Standards Audit
+description: Evaluate ScalaTest/MUnit/ZIO Test suites, property tests, deterministic async isolation, and scoverage against scala/testing standards.
+rules:
+  - scala/testing
+primitives:
+  - type: ai_interpret
+    name: Evaluate Scala Test Suite Completeness & Structure
+    prompt: |
+      Compare `source_files_count` vs `test_files_count` from ProjectFacts and inspect `*Spec.scala` / `*Suite.scala` / `*Test.scala` files and AstFacts (`test_functions_count`, `assertion_free_tests`, `module_test_coverage_pct`) to verify deterministic effect testing, assertion density, and coverage according to `scala/testing`.

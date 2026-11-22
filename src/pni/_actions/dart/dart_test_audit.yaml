@@ -1,0 +1,10 @@
+id: dart_test_audit
+name: Dart Testing Standards Audit
+description: Evaluate Dart/Flutter *_test.dart suites, async isolation, assertion quality, and LCOV coverage against dart/testing standards.
+rules:
+  - dart/testing
+primitives:
+  - type: ai_interpret
+    name: Evaluate Dart Test Suite Completeness & Structure
+    prompt: |
+      Compare `source_files_count` vs `test_files_count` from ProjectFacts and inspect `*_test.dart` files and AstFacts (`test_functions_count`, `assertion_free_tests`, `module_test_coverage_pct`) to verify deterministic isolation, assertion quality, and coverage according to `dart/testing`.

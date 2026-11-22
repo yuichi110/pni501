@@ -1,0 +1,21 @@
+id: kotlin_ast_audit
+name: Kotlin AST, Null Safety, Coroutines, KDoc & Security Audit
+description: Parse Kotlin AST via tree-sitter to extract wildcard imports, KDoc coverage, null-assertion and GlobalScope hazards, mutable singletons, complexity, CWE sinks, and Ktor/Spring routes.
+rules:
+  - common/architecture
+  - common/maintainability
+  - common/security
+  - common/security_vulnerability
+  - kotlin/code_quality
+  - kotlin/typing
+  - kotlin/modern_stack
+primitives:
+  - type: ast_analyze
+    name: Extract Deterministic Kotlin AST & Package Metrics
+    with:
+      lang: "kotlin"
+  - type: ai_interpret
+    name: Interpret Kotlin AST Facts & Evaluate Quality/Nullability/Coroutines/Security
+    prompt: |
+      Inspect the deterministic AstFacts (`import_hygiene_coverage_pct`, `wildcard_imports`, `type_safety_coverage_pct`, `type_safety_issues`, `weak_type_usages`, `unscoped_type_ignores`, `docstring_coverage_pct`, `missing_docstrings`, `complex_functions`, `excessive_parameters`, `bug_risk_idioms`, `global_state_usages`, `circular_dependencies`, `missing_io_timeouts`, `scattered_env_access`, `unstructured_logging`, `hardcoded_secrets`, `dangerous_sinks`, `api_endpoints`).
+      Read flagged `.kt` files to evaluate layering (`common/architecture`), SIG maintainability (`common/maintainability`), code security & CWE sinks (`common/security`, `common/security_vulnerability`), coroutine/null safety & KDoc (`kotlin/code_quality`, `kotlin/typing`), and Kotlin 2.0 idioms (`kotlin/modern_stack`).

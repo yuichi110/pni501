@@ -1,0 +1,21 @@
+id: cpp_ast_audit
+name: C++ AST, RAII Ownership, Header Hygiene, Modern C++ & Security Audit
+description: Parse C++ AST via tree-sitter to extract Doxygen coverage, header wildcard namespace pollution, raw new/delete, C-style casts, mutable globals, complexity, and CWE sinks.
+rules:
+  - common/architecture
+  - common/maintainability
+  - common/security
+  - common/security_vulnerability
+  - cpp/code_quality
+  - cpp/typing
+  - cpp/modern_stack
+primitives:
+  - type: ast_analyze
+    name: Extract Deterministic C++ AST & Header Metrics
+    with:
+      lang: "cpp"
+  - type: ai_interpret
+    name: Interpret C++ AST Facts & Evaluate RAII/Typing/Security
+    prompt: |
+      Inspect the deterministic AstFacts (`wildcard_imports`, `type_safety_coverage_pct`, `type_safety_issues`, `weak_type_usages`, `unscoped_type_ignores`, `docstring_coverage_pct`, `missing_docstrings`, `complex_functions`, `excessive_parameters`, `bug_risk_idioms`, `global_state_usages`, `circular_dependencies`, `unstructured_logging`, `hardcoded_secrets`, `dangerous_sinks`).
+      Read flagged `.cpp`/`.hpp` files to evaluate module/header layering (`common/architecture`), SIG maintainability (`common/maintainability`), memory/CWE security (`common/security`, `common/security_vulnerability`), RAII & header discipline (`cpp/code_quality`, `cpp/typing`), and Modern C++20/23 idioms (`cpp/modern_stack`).

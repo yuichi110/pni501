@@ -1,0 +1,21 @@
+id: swift_ast_audit
+name: Swift AST, Concurrency, Force-Unwrap, DocC & Security Audit
+description: Parse Swift AST via tree-sitter to extract DocC coverage, force-unwrap/try!/as! crash idioms, Sendable/actor risks, mutable static state, complexity, CWE sinks, and server routes.
+rules:
+  - common/architecture
+  - common/maintainability
+  - common/security
+  - common/security_vulnerability
+  - swift/code_quality
+  - swift/typing
+  - swift/modern_stack
+primitives:
+  - type: ast_analyze
+    name: Extract Deterministic Swift AST & Target Metrics
+    with:
+      lang: "swift"
+  - type: ai_interpret
+    name: Interpret Swift AST Facts & Evaluate Quality/Typing/Concurrency/Security
+    prompt: |
+      Inspect the deterministic AstFacts (`type_safety_coverage_pct`, `type_safety_issues`, `weak_type_usages`, `unscoped_type_ignores`, `docstring_coverage_pct`, `missing_docstrings`, `complex_functions`, `excessive_parameters`, `bug_risk_idioms`, `global_state_usages`, `circular_dependencies`, `missing_io_timeouts`, `scattered_env_access`, `unstructured_logging`, `hardcoded_secrets`, `dangerous_sinks`, `api_endpoints`).
+      Read flagged `.swift` files to evaluate layering (`common/architecture`), SIG maintainability (`common/maintainability`), code security & CWE sinks (`common/security`, `common/security_vulnerability`), force-unwrap/ARC/DocC discipline (`swift/code_quality`, `swift/typing`), and Swift 6 structured concurrency (`swift/modern_stack`).

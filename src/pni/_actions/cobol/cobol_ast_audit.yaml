@@ -1,0 +1,21 @@
+id: cobol_ast_audit
+name: COBOL AST, Structured Flow, PIC Precision, Copybooks & Security Audit
+description: Parse COBOL AST via tree-sitter to extract PROGRAM-ID/paragraph complexity, GO TO/ALTER spaghetti idioms, WORKING-STORAGE coupling, FILE STATUS discipline, and SQL/CALL CWE sinks.
+rules:
+  - common/architecture
+  - common/maintainability
+  - common/security
+  - common/security_vulnerability
+  - cobol/code_quality
+  - cobol/typing
+  - cobol/modern_stack
+primitives:
+  - type: ast_analyze
+    name: Extract Deterministic COBOL AST & Program Metrics
+    with:
+      lang: "cobol"
+  - type: ai_interpret
+    name: Interpret COBOL AST Facts & Evaluate Structured Flow/Data/Security
+    prompt: |
+      Inspect the deterministic AstFacts (`docstring_coverage_pct`, `complex_functions`, `bug_risk_idioms`, `global_state_usages`, `circular_dependencies`, `hardcoded_secrets`, `dangerous_sinks`).
+      Read flagged `.cob`/`.cbl`/`.cpy` files to evaluate program/copybook boundaries (`common/architecture`), SIG maintainability (`common/maintainability`), embedded SQL/dynamic-CALL security (`common/security`, `common/security_vulnerability`), `GO TO`/`ALTER`/scope-terminator hygiene (`cobol/code_quality`), `PIC`/`COMP-3`/`REDEFINES`/`OCCURS` safety (`cobol/typing`), and `FILE STATUS`/modernization readiness (`cobol/modern_stack`).

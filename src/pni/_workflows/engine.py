@@ -1257,13 +1257,13 @@ def _render_active_opt_outs(opt_outs: list[OptOutEntry]) -> list[str]:
     return lines
 
 
-def _render_active_rules(rule_ids: list[str], project_root: Path) -> list[str]:
+def _render_active_rules(rule_ids: list[str], project_root: Path, *, lang: str | None = None) -> list[str]:
     """Load and render full Markdown standards for the action's target rules."""
     if not rule_ids:
         return []
     lines = ["\n## Active Engineering Rules for This Action"]
     for rid in rule_ids:
-        res = get_rule_content(rid, project_root)
+        res = get_rule_content(rid, project_root, lang=lang)
         if res is not None:
             info, content = res
             lines.append(f"\n### Rule `{info.identifier}`\n{content.strip()}")
@@ -1474,7 +1474,13 @@ def _build_action_prompt_payload(
     lines.extend(_render_projected_facts(run, action, bundle, project_root, facts_rel))
     if action.primitive_type != PrimitiveType.CONFIRM_PLAN:
         lines.extend(_render_active_opt_outs(eff_opt_outs))
-        lines.extend(_render_active_rules(action.rules, project_root))
+        raw_lang = action.params.get("lang")
+        active_lang = (
+            bundle.project_facts.language
+            if bundle.project_facts is not None
+            else (raw_lang if isinstance(raw_lang, str) else None)
+        )
+        lines.extend(_render_active_rules(action.rules, project_root, lang=active_lang))
 
     if action.primitive_type in (
         PrimitiveType.EMIT_MIGRATION_PLAN,

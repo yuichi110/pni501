@@ -1,0 +1,21 @@
+id: perl_ast_audit
+name: Perl AST, Strict/Warnings, Safe I/O, POD & Security Audit
+description: Parse Perl AST via tree-sitter to extract missing strict/warnings pragmas, 2-arg open pipe injection, string eval CWE-94, mutable globals, complexity, and Mojolicious/CGI routes.
+rules:
+  - common/architecture
+  - common/maintainability
+  - common/security
+  - common/security_vulnerability
+  - perl/code_quality
+  - perl/typing
+  - perl/modern_stack
+primitives:
+  - type: ast_analyze
+    name: Extract Deterministic Perl AST & Module Metrics
+    with:
+      lang: "perl"
+  - type: ai_interpret
+    name: Interpret Perl AST Facts & Evaluate Safety/Contracts/Modernization
+    prompt: |
+      Inspect the deterministic AstFacts (`docstring_coverage_pct`, `missing_docstrings`, `unscoped_type_ignores`, `complex_functions`, `excessive_parameters`, `bug_risk_idioms`, `global_state_usages`, `circular_dependencies`, `missing_io_timeouts`, `scattered_env_access`, `unstructured_logging`, `hardcoded_secrets`, `dangerous_sinks`, `api_endpoints`).
+      Read flagged `.pl`/`.pm` files to evaluate layering (`common/architecture`), SIG maintainability (`common/maintainability`), command/code-injection CWE sinks (`common/security`, `common/security_vulnerability`), `strict`/`warnings`/3-arg `open` discipline (`perl/code_quality`, `perl/typing`), and Modern Perl 5.36+ idioms (`perl/modern_stack`).

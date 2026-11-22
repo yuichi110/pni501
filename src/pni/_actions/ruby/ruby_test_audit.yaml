@@ -1,0 +1,10 @@
+id: ruby_test_audit
+name: Ruby Testing Standards Audit
+description: Evaluate Ruby RSpec/Minitest suites, assertion quality, deterministic isolation, and SimpleCov coverage against ruby/testing standards.
+rules:
+  - ruby/testing
+primitives:
+  - type: ai_interpret
+    name: Evaluate Ruby Test Suite Completeness & Structure
+    prompt: |
+      Compare `source_files_count` vs `test_files_count` from ProjectFacts and inspect `*_spec.rb` / `*_test.rb` files and AstFacts (`test_functions_count`, `assertion_free_tests`, `module_test_coverage_pct`) to verify deterministic isolation, assertion density, and coverage according to `ruby/testing`.

@@ -1,0 +1,21 @@
+id: c_ast_audit
+name: C AST, Memory Safety, Buffer/UB Hygiene & Security Audit
+description: Parse C AST via tree-sitter to extract header documentation, complexity, banned buffer functions (gets/strcpy/sprintf), mutable globals, non-reentrant calls, and CWE sinks.
+rules:
+  - common/architecture
+  - common/maintainability
+  - common/security
+  - common/security_vulnerability
+  - c/code_quality
+  - c/typing
+  - c/modern_stack
+primitives:
+  - type: ast_analyze
+    name: Extract Deterministic C AST & Header Metrics
+    with:
+      lang: "c"
+  - type: ai_interpret
+    name: Interpret C AST Facts & Evaluate Memory Safety/Quality/Security
+    prompt: |
+      Inspect the deterministic AstFacts (`type_safety_coverage_pct`, `type_safety_issues`, `weak_type_usages`, `docstring_coverage_pct`, `missing_docstrings`, `complex_functions`, `excessive_parameters`, `bug_risk_idioms`, `global_state_usages`, `circular_dependencies`, `missing_io_timeouts`, `hardcoded_secrets`, `dangerous_sinks`).
+      Read flagged `.c`/`.h` files to evaluate API/header boundaries (`common/architecture`), SIG maintainability (`common/maintainability`), memory/buffer/format-string CWE sinks (`common/security`, `common/security_vulnerability`, `c/code_quality`), fixed-width/`const` discipline (`c/typing`), and modern C11+ safety idioms (`c/modern_stack`).

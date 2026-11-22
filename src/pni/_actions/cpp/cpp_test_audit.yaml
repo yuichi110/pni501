@@ -1,0 +1,10 @@
+id: cpp_test_audit
+name: C++ Testing & Sanitizer Standards Audit
+description: Evaluate C++ GoogleTest/Catch2/CTest suites, assertion quality, ASan/UBSan readiness, and coverage against cpp/testing standards.
+rules:
+  - cpp/testing
+primitives:
+  - type: ai_interpret
+    name: Evaluate C++ Test Suite Completeness & Memory Safety Verification
+    prompt: |
+      Compare `source_files_count` vs `test_files_count` from ProjectFacts and inspect `*_test.cpp` / `*Test.cpp` files and AstFacts (`test_functions_count`, `assertion_free_tests`, `module_test_coverage_pct`) to verify deterministic isolation, ASan/UBSan coverage, and assertion quality according to `cpp/testing`.

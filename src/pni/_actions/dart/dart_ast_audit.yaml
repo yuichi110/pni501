@@ -1,0 +1,21 @@
+id: dart_ast_audit
+name: Dart AST, Sound Null Safety, Async Lifecycle, Dartdoc & Security Audit
+description: Parse Dart AST via tree-sitter to extract dartdoc coverage, dynamic/bang nullability issues, empty catches, mutable globals, complexity, and CWE sinks.
+rules:
+  - common/architecture
+  - common/maintainability
+  - common/security
+  - common/security_vulnerability
+  - dart/code_quality
+  - dart/typing
+  - dart/modern_stack
+primitives:
+  - type: ast_analyze
+    name: Extract Deterministic Dart AST & Library Metrics
+    with:
+      lang: "dart"
+  - type: ai_interpret
+    name: Interpret Dart AST Facts & Evaluate Quality/Nullability/Security
+    prompt: |
+      Inspect the deterministic AstFacts (`type_safety_coverage_pct`, `type_safety_issues`, `weak_type_usages`, `unscoped_type_ignores`, `docstring_coverage_pct`, `missing_docstrings`, `complex_functions`, `excessive_parameters`, `bug_risk_idioms`, `global_state_usages`, `circular_dependencies`, `missing_io_timeouts`, `scattered_env_access`, `unstructured_logging`, `hardcoded_secrets`, `dangerous_sinks`, `api_endpoints`).
+      Read flagged `.dart` files to evaluate layering (`common/architecture`), SIG maintainability (`common/maintainability`), code security & CWE sinks (`common/security`, `common/security_vulnerability`), Dart lifecycle & dartdoc discipline (`dart/code_quality`, `dart/typing`), and Dart 3 idioms (`dart/modern_stack`).

@@ -1,0 +1,10 @@
+id: kotlin_test_audit
+name: Kotlin Testing Standards Audit
+description: Evaluate Kotlin JUnit 5/Kotest suites, coroutine runTest determinism, assertion density, and coverage against kotlin/testing standards.
+rules:
+  - kotlin/testing
+primitives:
+  - type: ai_interpret
+    name: Evaluate Kotlin Test Suite Completeness & Structure
+    prompt: |
+      Compare `source_files_count` vs `test_files_count` from ProjectFacts and inspect `*Test.kt` / `*Spec.kt` files and AstFacts (`test_functions_count`, `assertion_free_tests`, `module_test_coverage_pct`) to verify deterministic coroutine testing, assertion density, and coverage according to `kotlin/testing`.

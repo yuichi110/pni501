@@ -1,0 +1,21 @@
+id: scala_ast_audit
+name: Scala AST, FP Purity, ADT Safety, Scaladoc & Security Audit
+description: Parse Scala AST via tree-sitter to extract Scaladoc coverage, null/var/Await.result/asInstanceOf hazards, mutable object globals, complexity, CWE sinks, and HTTP endpoints.
+rules:
+  - common/architecture
+  - common/maintainability
+  - common/security
+  - common/security_vulnerability
+  - scala/code_quality
+  - scala/typing
+  - scala/modern_stack
+primitives:
+  - type: ast_analyze
+    name: Extract Deterministic Scala AST & Package Metrics
+    with:
+      lang: "scala"
+  - type: ai_interpret
+    name: Interpret Scala AST Facts & Evaluate FP Safety/Typing/Security
+    prompt: |
+      Inspect the deterministic AstFacts (`wildcard_imports`, `type_safety_coverage_pct`, `type_safety_issues`, `weak_type_usages`, `unscoped_type_ignores`, `docstring_coverage_pct`, `missing_docstrings`, `complex_functions`, `excessive_parameters`, `bug_risk_idioms`, `global_state_usages`, `circular_dependencies`, `missing_io_timeouts`, `scattered_env_access`, `unstructured_logging`, `hardcoded_secrets`, `dangerous_sinks`, `api_endpoints`).
+      Read flagged `.scala` files to evaluate layering (`common/architecture`), SIG maintainability (`common/maintainability`), code security & CWE sinks (`common/security`, `common/security_vulnerability`), total FP & ADT discipline (`scala/code_quality`, `scala/typing`), and Scala 3 idioms (`scala/modern_stack`).

@@ -1,0 +1,21 @@
+id: vue_ast_audit
+name: Vue SFC AST, Composition API, Template XSS & Security Audit
+description: Parse Vue Single-File Components via tree-sitter to extract script/template complexity, v-html XSS and eval CWE sinks, prop/composable hygiene, and client/SSR risks.
+rules:
+  - common/architecture
+  - common/maintainability
+  - common/security
+  - common/security_vulnerability
+  - vue/code_quality
+  - vue/typing
+  - vue/modern_stack
+primitives:
+  - type: ast_analyze
+    name: Extract Deterministic Vue SFC AST Metrics
+    with:
+      lang: "vue"
+  - type: ai_interpret
+    name: Interpret Vue SFC AST Facts & Evaluate Quality/Typing/Security
+    prompt: |
+      Inspect the deterministic AstFacts (`type_safety_coverage_pct`, `weak_type_usages`, `unscoped_type_ignores`, `docstring_coverage_pct`, `complex_functions`, `excessive_parameters`, `bug_risk_idioms`, `global_state_usages`, `circular_dependencies`, `missing_io_timeouts`, `scattered_env_access`, `unstructured_logging`, `hardcoded_secrets`, `dangerous_sinks`, `api_endpoints`).
+      Read flagged `.vue` files to evaluate component/composable layering (`common/architecture`), SIG maintainability (`common/maintainability`), `v-html`/XSS/eval CWE sinks (`common/security`, `common/security_vulnerability`, `vue/code_quality`), `defineProps`/`vue-tsc` typing (`vue/typing`), and Vue 3/Nuxt 3 idioms (`vue/modern_stack`).

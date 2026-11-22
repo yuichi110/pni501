@@ -1,0 +1,10 @@
+id: csharp_test_audit
+name: C# Testing Standards Audit
+description: Evaluate C# xUnit/NUnit/MSTest suites, assertion coverage, async isolation, and Cobertura coverage against csharp/testing standards.
+rules:
+  - csharp/testing
+primitives:
+  - type: ai_interpret
+    name: Evaluate C# Test Suite Completeness & Structure
+    prompt: |
+      Compare `source_files_count` vs `test_files_count` from ProjectFacts and inspect `*Tests.cs` / `*Test.cs` files and AstFacts (`test_functions_count`, `assertion_free_tests`, `module_test_coverage_pct`) to verify deterministic async isolation, assertion quality, and coverage according to `csharp/testing`.

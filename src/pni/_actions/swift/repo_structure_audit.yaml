@@ -1,0 +1,19 @@
+id: repo_structure_audit
+name: Repository Structure & SwiftPM Manifest Audit (Swift)
+description: Deterministically inspect Package.swift, Package.resolved, Swift toolchain versions, and documentation, then have AI evaluate against rules.
+rules:
+  - common/supply_chain
+  - common/documentation
+  - common/git_workflow
+  - common/security
+  - swift/dependencies
+primitives:
+  - type: project_inspect
+    name: Extract SwiftPM, Supply-Chain & Dependency Facts
+    with:
+      lang: "swift"
+  - type: ai_interpret
+    name: Evaluate SwiftPM Build, Supply Chain & Dependencies
+    prompt: |
+      Review the deterministic ProjectFacts (`runtime_types`, `build_system`, `manifest_files`, `lockfiles_found`, `dependencies`, `unpinned_dependencies`, `dev_dependencies`, `language_version_constraint`, `has_license`, `has_security_policy`, `has_dependency_automation`, `ci_supply_chain_issues`, `committed_secret_files`, `container_hygiene_issues`, `readme_headings`, `docs_inventory`, `has_gitignore`).
+      Verify compliance with `common/supply_chain`, `swift/dependencies` (noting pure SwiftPM libraries may omit `Package.resolved`), `common/documentation`, `common/git_workflow`, and `common/security`.

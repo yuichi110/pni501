@@ -1,0 +1,28 @@
+id: quick_check
+category: audit
+name: Quick Health Check (Vue)
+description: Fast deterministic Vue SFC AST and package.json check followed by AI interpretation and score output.
+
+targets:
+  source:
+    - "src"
+    - "components"
+    - "pages"
+  tests:
+    - "tests"
+    - "test"
+    - "__tests__"
+  docs:
+    - "README.md"
+
+steps:
+  - id: repo_and_deps
+    uses: repo_structure_audit
+
+  - id: ast_and_quality
+    uses: vue_ast_audit
+    needs: [repo_and_deps]
+
+  - id: output_score
+    uses: emit_score
+    needs: [ast_and_quality]

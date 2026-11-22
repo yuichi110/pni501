@@ -1,0 +1,10 @@
+id: swift_test_audit
+name: Swift Testing Standards Audit
+description: Evaluate Swift Testing (@Test/#expect) and XCTest suites, async determinism, assertion density, and coverage against swift/testing standards.
+rules:
+  - swift/testing
+primitives:
+  - type: ai_interpret
+    name: Evaluate Swift Test Suite Completeness & Structure
+    prompt: |
+      Compare `source_files_count` vs `test_files_count` from ProjectFacts and inspect `*Tests.swift` / `*Test.swift` files and AstFacts (`test_functions_count`, `assertion_free_tests`, `module_test_coverage_pct`) to verify deterministic async isolation, assertion quality, and coverage according to `swift/testing`.

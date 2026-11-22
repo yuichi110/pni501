@@ -1,0 +1,10 @@
+id: vue_test_audit
+name: Vue Testing Standards Audit
+description: Evaluate Vue Vitest/@vue/test-utils component and composable suites, deterministic mocking, assertion quality, and coverage against vue/testing standards.
+rules:
+  - vue/testing
+primitives:
+  - type: ai_interpret
+    name: Evaluate Vue Test Suite Completeness & Structure
+    prompt: |
+      Compare `source_files_count` vs `test_files_count` from ProjectFacts and inspect `*.spec.ts` / `*.test.ts` / `*.spec.js` files and AstFacts (`test_functions_count`, `assertion_free_tests`, `module_test_coverage_pct`) to verify deterministic isolation, behavior assertions, and coverage according to `vue/testing`.

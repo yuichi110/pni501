@@ -1,0 +1,21 @@
+id: rust_ast_audit
+name: Rust AST, Ownership, Unsafe, Rustdoc & Security Audit
+description: Parse Rust AST via tree-sitter to extract wildcard imports, rustdoc coverage, cognitive complexity, production unwrap/unsafe/static-mut idioms, CWE sinks, and HTTP/CLI boundaries.
+rules:
+  - common/architecture
+  - common/maintainability
+  - common/security
+  - common/security_vulnerability
+  - rust/code_quality
+  - rust/typing
+  - rust/modern_stack
+primitives:
+  - type: ast_analyze
+    name: Extract Deterministic Rust AST & Crate Metrics
+    with:
+      lang: "rust"
+  - type: ai_interpret
+    name: Interpret Rust AST Facts & Evaluate Quality/Typing/Safety/Security
+    prompt: |
+      Inspect the deterministic AstFacts (`import_hygiene_coverage_pct`, `wildcard_imports`, `type_safety_coverage_pct`, `type_safety_issues`, `weak_type_usages`, `unscoped_type_ignores`, `docstring_coverage_pct`, `missing_docstrings`, `complex_functions`, `excessive_parameters`, `bug_risk_idioms`, `global_state_usages`, `circular_dependencies`, `missing_io_timeouts`, `scattered_env_access`, `unstructured_logging`, `hardcoded_secrets`, `dangerous_sinks`, `api_endpoints`).
+      Read flagged `.rs` files to evaluate crate layering (`common/architecture`), SIG maintainability (`common/maintainability`), code security & CWE sinks (`common/security`, `common/security_vulnerability`), production `.unwrap()`/`unsafe`/`static mut` safety (`rust/code_quality`), and domain type/error design (`rust/typing`, `rust/modern_stack`).

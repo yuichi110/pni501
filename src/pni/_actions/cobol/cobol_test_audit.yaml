@@ -1,0 +1,10 @@
+id: cobol_test_audit
+name: COBOL Testing & Regression Harness Audit
+description: Evaluate COBOL unit tests (cobol-check/GCBLUnit/GnuCOBOL drivers), golden-dataset regression tests, bounds checking, and assertions against cobol/testing standards.
+rules:
+  - cobol/testing
+primitives:
+  - type: ai_interpret
+    name: Evaluate COBOL Test Suite Completeness & Regression Safety
+    prompt: |
+      Compare `source_files_count` vs `test_files_count` from ProjectFacts and inspect `test_*.cob` / `test_*.cbl` / `*_test.cbl` files and AstFacts (`test_functions_count`, `assertion_free_tests`) to verify deterministic offline testing, boundary/overflow coverage, and assertions according to `cobol/testing`.

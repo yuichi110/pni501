@@ -1,0 +1,29 @@
+id: quick_check
+category: audit
+name: Quick Health Check (R)
+description: Fast deterministic R AST and DESCRIPTION check followed by AI interpretation and score output.
+
+targets:
+  source:
+    - "R"
+    - "src"
+    - "."
+  tests:
+    - "tests"
+    - "tests/testthat"
+  docs:
+    - "README.md"
+  exclude:
+    - "renv/**"
+
+steps:
+  - id: repo_and_deps
+    uses: repo_structure_audit
+
+  - id: ast_and_quality
+    uses: r_ast_audit
+    needs: [repo_and_deps]
+
+  - id: output_score
+    uses: emit_score
+    needs: [ast_and_quality]

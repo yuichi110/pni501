@@ -5,8 +5,8 @@ rules:
   - common/architecture
   - common/supply_chain
   - common/twelve_factor
-  - generic/dependencies
-  - generic/modern_stack
+  - dependencies
+  - modern_stack
 primitives:
   - type: project_inspect
     name: Inspect Project Manifests, Lockfiles & Governance Signals

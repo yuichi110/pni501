@@ -1,0 +1,21 @@
+id: elixir_ast_audit
+name: Elixir AST, OTP Safety, Typespecs, ExDoc & Security Audit
+description: Parse Elixir AST via tree-sitter to extract ExDoc coverage, String.to_atom/binary_to_term/Code.eval_string hazards, complexity, CWE sinks, and Phoenix/Plug endpoints.
+rules:
+  - common/architecture
+  - common/maintainability
+  - common/security
+  - common/security_vulnerability
+  - elixir/code_quality
+  - elixir/typing
+  - elixir/modern_stack
+primitives:
+  - type: ast_analyze
+    name: Extract Deterministic Elixir AST & OTP Module Metrics
+    with:
+      lang: "elixir"
+  - type: ai_interpret
+    name: Interpret Elixir AST Facts & Evaluate OTP/Typespec/Security Quality
+    prompt: |
+      Inspect the deterministic AstFacts (`docstring_coverage_pct`, `missing_docstrings`, `type_safety_coverage_pct`, `weak_type_usages`, `unscoped_type_ignores`, `complex_functions`, `excessive_parameters`, `bug_risk_idioms`, `global_state_usages`, `circular_dependencies`, `missing_io_timeouts`, `scattered_env_access`, `unstructured_logging`, `hardcoded_secrets`, `dangerous_sinks`, `api_endpoints`).
+      Read flagged `.ex` files to evaluate context/OTP layering (`common/architecture`), SIG maintainability (`common/maintainability`), BEAM security & CWE sinks (`common/security`, `common/security_vulnerability`), OTP/ExDoc/typespec discipline (`elixir/code_quality`, `elixir/typing`), and modern Elixir/Phoenix idioms (`elixir/modern_stack`).

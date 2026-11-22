@@ -1,0 +1,10 @@
+id: elixir_test_audit
+name: Elixir Testing Standards Audit
+description: Evaluate Elixir ExUnit suites, doctests, Mox/Sandbox async isolation, assertion quality, and coverage against elixir/testing standards.
+rules:
+  - elixir/testing
+primitives:
+  - type: ai_interpret
+    name: Evaluate Elixir Test Suite Completeness & Structure
+    prompt: |
+      Compare `source_files_count` vs `test_files_count` from ProjectFacts and inspect `*_test.exs` files and AstFacts (`test_functions_count`, `assertion_free_tests`, `module_test_coverage_pct`) to verify ExUnit isolation, assertion density, and coverage according to `elixir/testing`.

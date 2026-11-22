@@ -1,0 +1,21 @@
+id: r_ast_audit
+name: R AST, Environment Safety, Type Stability, Roxygen2 & Security Audit
+description: Parse R AST via tree-sitter to extract roxygen2 documentation, <<- super-assignment and attach() global hazards, eval(parse())/system() CWE sinks, complexity, and Plumber/Shiny boundaries.
+rules:
+  - common/architecture
+  - common/maintainability
+  - common/security
+  - common/security_vulnerability
+  - r/code_quality
+  - r/typing
+  - r/modern_stack
+primitives:
+  - type: ast_analyze
+    name: Extract Deterministic R AST & Package Metrics
+    with:
+      lang: "r"
+  - type: ai_interpret
+    name: Interpret R AST Facts & Evaluate Safety/Stability/Security
+    prompt: |
+      Inspect the deterministic AstFacts (`docstring_coverage_pct`, `missing_docstrings`, `complex_functions`, `excessive_parameters`, `bug_risk_idioms`, `global_state_usages`, `circular_dependencies`, `missing_io_timeouts`, `scattered_env_access`, `unstructured_logging`, `hardcoded_secrets`, `dangerous_sinks`, `api_endpoints`).
+      Read flagged `.R`/`.r` files to evaluate layering (`common/architecture`), SIG maintainability (`common/maintainability`), `eval(parse())`/`system()`/SQLi/XSS CWE sinks (`common/security`, `common/security_vulnerability`), `<<-`/`attach()`/`roxygen2` discipline (`r/code_quality`, `r/typing`), and Modern R 4.2+ idioms (`r/modern_stack`).

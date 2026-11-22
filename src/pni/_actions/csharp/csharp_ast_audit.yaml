@@ -1,0 +1,21 @@
+id: csharp_ast_audit
+name: C# AST, Nullability, Async Safety, XML Docs & Security Audit
+description: Parse C# AST via tree-sitter to extract XML doc coverage, nullable/dynamic type safety, async void and sync-over-async deadlocks, cognitive complexity, CWE sinks, and ASP.NET Core routes.
+rules:
+  - common/architecture
+  - common/maintainability
+  - common/security
+  - common/security_vulnerability
+  - csharp/code_quality
+  - csharp/typing
+  - csharp/modern_stack
+primitives:
+  - type: ast_analyze
+    name: Extract Deterministic C# AST & Assembly Metrics
+    with:
+      lang: "csharp"
+  - type: ai_interpret
+    name: Interpret C# AST Facts & Evaluate Quality/Typing/Async/Security
+    prompt: |
+      Inspect the deterministic AstFacts (`import_hygiene_coverage_pct`, `type_safety_coverage_pct`, `type_safety_issues`, `weak_type_usages`, `unscoped_type_ignores`, `docstring_coverage_pct`, `missing_docstrings`, `complex_functions`, `excessive_parameters`, `bug_risk_idioms`, `global_state_usages`, `circular_dependencies`, `missing_io_timeouts`, `scattered_env_access`, `unstructured_logging`, `hardcoded_secrets`, `dangerous_sinks`, `api_endpoints`).
+      Read flagged `.cs` files to evaluate layering (`common/architecture`), SIG maintainability (`common/maintainability`), code security & CWE sinks (`common/security`, `common/security_vulnerability`), async/IDisposable/XML-doc discipline (`csharp/code_quality`), and nullability/modern .NET idioms (`csharp/typing`, `csharp/modern_stack`).

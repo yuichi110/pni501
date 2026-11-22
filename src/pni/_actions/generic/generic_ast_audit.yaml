@@ -6,9 +6,9 @@ rules:
   - common/maintainability
   - common/security
   - common/security_vulnerability
-  - generic/code_quality
-  - generic/typing
-  - generic/modern_stack
+  - code_quality
+  - typing
+  - modern_stack
 primitives:
   - type: ast_analyze
     name: Extract Deterministic Multi-Language Tree-sitter AST Metrics

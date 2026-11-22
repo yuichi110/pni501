@@ -385,14 +385,21 @@ def test_extended_manifest_detection_and_scaffolding(tmp_path: Path) -> None:
     assert any("Cargo.lock" in issue for issue in pf.tooling_modernization_issues)
     assert not any("pyproject.toml" in issue for issue in pf.tooling_modernization_issues)
 
-    for lang in ("rust", "cobol", "r", "vue", "dockerfile"):
+    for lang in ("rust", "cobol", "r", "vue"):
         ws = tmp_path / f"scaffold_{lang}"
         ws.mkdir()
         rules = list_rules(ws, lang=lang)
-        assert any(r.scope == "generic" for r in rules)
+        assert any(r.scope == lang for r in rules)
         assert len(copy_rule_templates(ws, lang=lang)) > 0
         assert len(copy_action_templates(ws, lang=lang)) > 0
         assert len(copy_workflow_templates(ws, lang=lang)) > 0
+
+    df_ws = tmp_path / "scaffold_dockerfile"
+    df_ws.mkdir()
+    assert any(r.scope == "generic" for r in list_rules(df_ws, lang="dockerfile"))
+    assert len(copy_rule_templates(df_ws, lang="dockerfile")) > 0
+    assert len(copy_action_templates(df_ws, lang="dockerfile")) > 0
+    assert len(copy_workflow_templates(df_ws, lang="dockerfile")) > 0
 
     cs_repo = tmp_path / "cs_app"
     cs_repo.mkdir()

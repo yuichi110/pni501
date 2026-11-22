@@ -1,0 +1,10 @@
+id: r_test_audit
+name: R Testing Standards Audit
+description: Evaluate R testthat 3rd-edition suites, deterministic seed isolation, assertion quality, and covr coverage against r/testing standards.
+rules:
+  - r/testing
+primitives:
+  - type: ai_interpret
+    name: Evaluate R Test Suite Completeness & Structure
+    prompt: |
+      Compare `source_files_count` vs `test_files_count` from ProjectFacts and inspect `tests/testthat/test-*.R` files and AstFacts (`test_functions_count`, `assertion_free_tests`, `module_test_coverage_pct`) to verify deterministic seed/filesystem isolation, assertion quality, and coverage according to `r/testing`.

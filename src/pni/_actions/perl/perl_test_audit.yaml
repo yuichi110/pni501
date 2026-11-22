@@ -1,0 +1,10 @@
+id: perl_test_audit
+name: Perl Testing Standards Audit
+description: Evaluate Perl t/*.t (Test2::V0 / Test::More / prove) suites, deterministic isolation, assertion quality, and Devel::Cover coverage against perl/testing standards.
+rules:
+  - perl/testing
+primitives:
+  - type: ai_interpret
+    name: Evaluate Perl Test Suite Completeness & Structure
+    prompt: |
+      Compare `source_files_count` vs `test_files_count` from ProjectFacts and inspect `t/*.t` files and AstFacts (`test_functions_count`, `assertion_free_tests`, `module_test_coverage_pct`) to verify TAP/Test2 structure, offline isolation, and coverage according to `perl/testing`.

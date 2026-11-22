@@ -1,0 +1,50 @@
+id: full_audit
+category: audit
+name: Full Project Health Audit & Report (R)
+description: Workflow v2 DAG — Plan-First alignment, parallel deterministic R AST/DESCRIPTION analysis, container runtime verification, security scan, grounded architecture, score+SARIF emission, and Drawlib report.
+
+targets:
+  source:
+    - "R"
+    - "src"
+    - "."
+  tests:
+    - "tests"
+    - "tests/testthat"
+  docs:
+    - "README.md"
+  exclude:
+    - "renv/**"
+
+steps:
+  - id: repo_and_deps
+    uses: repo_structure_audit
+
+  - id: ast_and_quality
+    uses: r_ast_audit
+    needs: [repo_and_deps]
+
+  - id: runtime_verification
+    uses: container_runtime_audit
+    needs: [repo_and_deps]
+    when: "has_runtime_harness"
+
+  - id: security_audit
+    uses: security_vulnerability_audit
+    needs: [repo_and_deps]
+
+  - id: arch_recording
+    uses: architecture_analysis
+    needs: [ast_and_quality]
+
+  - id: test_health
+    uses: r_test_audit
+    needs: [ast_and_quality]
+
+  - id: output_score
+    uses: emit_score
+    needs: [arch_recording, test_health, runtime_verification, security_audit]
+
+  - id: create_report
+    uses: write_drawlib_report
+    needs: [output_score]

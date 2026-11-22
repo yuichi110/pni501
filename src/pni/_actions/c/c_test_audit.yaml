@@ -1,0 +1,10 @@
+id: c_test_audit
+name: C Testing & Sanitizer Standards Audit
+description: Evaluate C unit tests (Unity/CMocka/Check/CTest), boundary & NULL-input cases, sanitizer readiness, and gcov coverage against c/testing standards.
+rules:
+  - c/testing
+primitives:
+  - type: ai_interpret
+    name: Evaluate C Test Suite Completeness & Memory Safety Verification
+    prompt: |
+      Compare `source_files_count` vs `test_files_count` from ProjectFacts and inspect `test_*.c` / `*_test.c` files and AstFacts (`test_functions_count`, `assertion_free_tests`, `module_test_coverage_pct`) to verify boundary coverage, ASan/UBSan usage, and assertion quality according to `c/testing`.
