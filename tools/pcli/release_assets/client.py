@@ -60,13 +60,16 @@ def resolve_github_token(explicit_token: str | None = None) -> str | None:
 
 def _resolve_token_from_git() -> str | None:
     """Retrieve GitHub token from system git credential helper if configured."""
+    env = os.environ.copy()
+    env["GIT_TERMINAL_PROMPT"] = "0"
     try:
         proc = subprocess.run(
             ["git", "credential", "fill"],
             input="protocol=https\nhost=github.com\n",
             text=True,
             capture_output=True,
-            timeout=10,
+            env=env,
+            timeout=5,
             check=True,
         )
         for line in proc.stdout.splitlines():
