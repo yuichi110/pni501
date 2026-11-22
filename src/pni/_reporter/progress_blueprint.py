@@ -17,7 +17,12 @@ from typing import Final
 from pni._actions.base_model import HealthGrade
 from pni._actions.progress_analyze.models import ProgressResult
 from pni._cache import default_progress_blueprint_rel_path, ensure_cache_parent
-from pni._reporter.blueprint import BlueprintChapterSpec, ReportBlueprint
+from pni._reporter.blueprint import (
+    BlueprintChapterSpec,
+    ReportBlueprint,
+    format_artifact_manifest_lines,
+    format_execution_dag_and_scope_lines,
+)
 
 _PROGRESS_CHAPTER_TITLES: Final[dict[str, dict[str, str]]] = {
     "ja": {
@@ -219,16 +224,32 @@ def _build_prog_actions_chapter(res: ProgressResult, titles: dict[str, str]) -> 
         )
     if not data:
         data.append("- **Next Actions**: Maintain current sprint cadence and branch integration hygiene.")
+    data.extend(format_execution_dag_and_scope_lines(res.execution_dag))
+    data.extend(
+        format_artifact_manifest_lines(
+            res.execution_dag,
+            fallback_manifest={
+                "progress_json": f"reports/{res.workflow_id or 'progress_check'}_progress.json",
+                "progress_facts_json": res.progress_facts_file
+                or f".pni/cache/{res.workflow_id or 'progress_check'}/progress_facts.json",
+                **({"baseline_plan_yaml": res.plan_file} if res.plan_file else {}),
+            },
+        )
+    )
     return BlueprintChapterSpec(
         filename="04_risks_and_next_actions.md",
         title=titles["04"],
         purpose=(
             "Present prioritized P0-P2 operational actions for conflict resolution, stale branch cleanup, "
-            "test-gap recovery, and realistic milestone adjustments."
+            "test-gap recovery, realistic milestone adjustments, plus the executed Measurement Pipeline (DAG) "
+            "and Machine-Readable Artifact Reference Table."
         ),
         required_diagrams=[
             "Prioritized P0 -> P1 -> P2 Delivery Recovery & Git Hygiene Roadmap (`Roadmap`)",
-            "Actionable Next-Sprint Execution Table (`Table`: Priority, Category, Targets, Impact)",
+            (
+                "Actionable Next-Sprint Execution Table (`Table`: Priority, Category, Targets, Impact) "
+                "+ Executed Measurement Pipeline DAG & Artifact Reference Table"
+            ),
         ],
         sorted_data_markdown=data,
     )

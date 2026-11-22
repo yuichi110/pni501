@@ -54,8 +54,10 @@ _FALLBACK_CHAPTER_SPECS = (
     ),
     (
         "`04_standards_and_findings.md`",
-        "4. Audit Standards, Rule Compliance & Findings: Audit Step Scores (`BarChart`, weakest-first), "
-        "Rule Compliance Matrix (`Table`, `FAIL -> WARN -> PASS`), and Findings Index (`Table`, `CRITICAL -> INFO`).",
+        "4. Audit Pipeline (DAG), Standards & Findings: Executed Action-Level DAG (`drawlib.graph` / `flow` "
+        "with `AUTO`/`AI`/`HYBRID`/`SKIP` badges & scope/tools), 7-Axis Deterministic Baseline vs. AI Δ `Table`, "
+        "Audit Step Scores (`BarChart`), Rule Compliance Matrix (`FAIL -> WARN -> PASS`), Consolidated Findings "
+        "(`CRITICAL -> INFO`), FP Triage/Waiver Log, and compact Artifact Reference Table (never raw JSON).",
     ),
     (
         "`05_code_and_runtime_analysis.md`",
@@ -317,6 +319,7 @@ def render_drawlib_report_guide(
         "       uv run drawlib rules show lib-smartarts-overview # Panel, KpiCards, Roadmap, Table, TreeNode, CardList",
         "       uv run drawlib rules show lib-charts-overview    # Radar, Bar, Box, Heatmap, LineChart",
         "       uv run drawlib rules show lib-diagrams-overview  # ClassDiagram, HeatmapOverlay, architecture/flow",
+        "       uv run drawlib rules show lib-graph-overview     # Auto-layout DAG solvers (`get_layout()`) for DAGs",
         "       uv run drawlib rules show lib-icons-overview     # phosphor, FontAwesome & cloud icon helpers",
         "       ```",
         f"   - **Step 3b — Ensure `{src_dir}/` Scaffolding Exists (Preserve Manifest & Theme Assets)**:",
@@ -380,6 +383,12 @@ def render_drawlib_report_guide(
         "       - **`Table` `rule_id` column widths**: Allocate `>= 38` width units for `rule_id` columns",
         "         (or insert explicit `'\\n'` after `'/'` such as `'common/\\ndocumentation'`) so path",
         "         prefixes never wrap mid-word without a slash.",
+        "       - **Executed Audit DAG & Evidence Provenance (No Raw JSON Dumps)**: Render the action-level",
+        "         Executed DAG (`execution_dag`, 5-9 nodes) via `drawlib.graph` (`get_layout()`) or `diagrams.flow`",
+        "         with neutral styling (`Styles.PrimaryNeutral` for AUTO/HYBRID, `Styles.SecondaryNeutral` for AI,",
+        "         `Styles.Neutral` for SKIP with skip reason, 1 focal highlight on Score), include the 7-axis",
+        "         Deterministic Baseline vs. AI Δ table and triage/waiver log, and point to machine-readable",
+        "         JSON/SARIF files via a compact 4-5 row Reference Table rather than pasting raw JSON in PDFs.",
         "   - **Step 3e — Multimodal Grid Verification (`drawlib show -g`) & Report Build**:",
         "     - Export diagrams with the coordinate grid overlaid, resolve any `[Geometry Warning]`, and visually",
         "       inspect `.drawlib/scratch/*.png` with your image-viewing tool to fix text clipping, arrow/label",

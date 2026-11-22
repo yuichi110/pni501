@@ -116,6 +116,7 @@ Always execute workflows through the Workflow v2 pull-push cycle:
           drawlib rules show lib-smartarts-overview # Panel, KpiCards, Roadmap, Table, TreeNode, CardList APIs
           drawlib rules show lib-charts-overview    # RadarChart, BarChart, HeatmapChart, LineChart APIs
           drawlib rules show lib-diagrams-overview  # ClassDiagram, HeatmapOverlay, architecture/flow/sequence APIs
+          drawlib rules show lib-graph-overview     # Auto-layout DAG solvers (`get_layout()`) for Executed Audit DAGs
           drawlib rules show lib-icons-overview     # Phosphor, FontAwesome & cloud architecture icon helpers
           ```
      4. **WRITE or UPDATE, GRID-VERIFY & COMPILE drawlib Report**:

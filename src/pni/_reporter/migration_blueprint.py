@@ -16,7 +16,12 @@ from typing import Final
 
 from pni._actions.migration_analyze.models import MigrationPlanResult
 from pni._cache import default_migration_blueprint_rel_path, ensure_cache_parent
-from pni._reporter.blueprint import BlueprintChapterSpec, ReportBlueprint
+from pni._reporter.blueprint import (
+    BlueprintChapterSpec,
+    ReportBlueprint,
+    format_artifact_manifest_lines,
+    format_execution_dag_and_scope_lines,
+)
 
 _MIGRATION_CHAPTER_TITLES: Final[dict[str, dict[str, str]]] = {
     "ja": {
@@ -241,16 +246,31 @@ def _build_mig_pr_wbs_chapter(plan: MigrationPlanResult, titles: dict[str, str])
             f"`{pr.automated_or_manual}`, deps={pr.depends_on_prs})**: **{pr.title}** | "
             f"files={pr.target_files} | verify=`{pr.verification_cmd}` — {pr.changes_summary}"
         )
+    data.extend(format_execution_dag_and_scope_lines(plan.execution_dag))
+    data.extend(
+        format_artifact_manifest_lines(
+            plan.execution_dag,
+            fallback_manifest={
+                "migration_plan_json": f"reports/{plan.workflow_id or 'migration_plan'}_migration_plan.json",
+                "migration_facts_json": plan.migration_facts_file
+                or f".pni/cache/{plan.workflow_id or 'migration_plan'}/migration_facts.json",
+            },
+        )
+    )
     return BlueprintChapterSpec(
         filename="06_pr_wbs_and_verification_gates.md",
         title=titles["06"],
         purpose=(
             "Provide an issue-tracker-ready, topologically ordered PR Work Breakdown Structure (`PR-01`..`PR-NN`) "
-            "with target files, size estimates, dependencies, and deterministic verification commands."
+            "with target files, size estimates, dependencies, deterministic verification commands, plus the "
+            "executed Migration Analysis Pipeline (DAG) & Machine-Readable Artifact Reference Table."
         ),
         required_diagrams=[
             "Topologically Ordered PR Work Breakdown Structure (`Table`: PR ID, Phase, Title, Files, Verify, Size)",
-            "PR Dependency Chain & Verification Gate Summary (`BarChart` / `CardList`)",
+            (
+                "PR Dependency Chain & Executed Analysis Pipeline DAG (`drawlib.graph` / `BarChart`) "
+                "+ Machine-Readable Artifact Reference Table"
+            ),
         ],
         sorted_data_markdown=data,
     )

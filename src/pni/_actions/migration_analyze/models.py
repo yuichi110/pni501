@@ -15,6 +15,8 @@ from typing import Literal, Optional
 
 from pydantic import BaseModel, Field
 
+from pni._actions.base_model import ExecutionDagSummary
+
 MigrationStrategy = Literal["auto", "phased_pr", "strangler_fig", "rewrite"]
 ResolvedMigrationStrategy = Literal["phased_pr", "strangler_fig", "rewrite"]
 ApiCompatibilityPolicy = Literal["strict", "versioned_v2", "flexible"]
@@ -23,6 +25,7 @@ CodemodToolChoice = Literal["auto", "openrewrite", "rector", "ruff", "manual_onl
 TransformationMode = Literal["same_lang_upgrade", "architectural_restructure", "cross_stack_replacement"]
 TouchpointKind = Literal["in_memory_state", "persistence_db", "external_http_rpc"]
 MigrationRiskLevel = Literal["critical", "high", "medium", "low", "info"]
+
 MigrationAxisCategory = Literal[
     "language_runtime",
     "framework",
@@ -318,3 +321,4 @@ class MigrationPlanResult(BaseModel):
     phase_gates: list[MigrationPhaseGate] = Field(default_factory=list)
     pr_wbs: list[MigrationPrTicket] = Field(default_factory=list)
     migration_facts: Optional[MigrationFacts] = None
+    execution_dag: Optional[ExecutionDagSummary] = None

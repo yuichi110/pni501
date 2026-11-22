@@ -16,11 +16,14 @@ from typing import Literal, Optional
 
 from pydantic import BaseModel, Field, model_validator
 
+from pni._actions.base_model import ExecutionDagSummary
+
 GitMethodology = Literal["github_flow", "trunk_based", "git_flow", "release_flow", "custom"]
 GitMergeStrategy = Literal["squash_only", "rebase_ff", "merge_commit", "any"]
 CommitConvention = Literal["conventional_commits", "freeform"]
 TaskDeclaredStatus = Literal["todo", "in_progress", "blocked", "done"]
 TaskScheduleState = Literal["upcoming", "active", "overdue", "completed_declared"]
+
 DeliveryStatus = Literal["on_track", "at_risk", "delayed", "blocked"]
 ProgressSeverity = Literal["critical", "high", "medium", "low", "info"]
 ProgressPriority = Literal["P0", "P1", "P2"]
@@ -503,3 +506,4 @@ class ProgressResult(BaseModel):
     next_actions: list[ProgressActionItem] = Field(default_factory=list)
     progress_facts_file: str = ""
     progress_facts: Optional[ProgressFacts] = None
+    execution_dag: Optional[ExecutionDagSummary] = None

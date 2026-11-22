@@ -50,6 +50,8 @@ from pni._workflows.base_model import (
     WorkflowPrerequisiteError,
     WorkflowRunRecord,
 )
+from pni._workflows.planner import default_plan_rel_path
+from pni._workflows.provenance import build_rollup_execution_dag_summary
 
 _WEAKEST_LINK_MARGIN: Final[int] = 15
 _CATEGORY_KEYS: Final[tuple[str, ...]] = (
@@ -312,6 +314,8 @@ def validate_and_persist_rollup(
     rollup_facts: RollupFacts,
     raw_input: str,
     project_root: Path,
+    *,
+    all_actions: list[ActionRunRecord] | None = None,
 ) -> str:
     """Validate RollupSynthesisInput, assemble unified ScoreResult, and emit Score + Summary + SARIF."""
     synth = RollupSynthesisInput.model_validate_json(raw_input)
@@ -319,7 +323,7 @@ def validate_and_persist_rollup(
     all_findings.sort(
         key=lambda f: (SEVERITY_RANK.get(f.severity, 99), f.component or "", f.file_path or "~", f.line or 0)
     )
-    all_actions = synth.unified_action_plan or rollup_facts.merged_action_plan
+    all_actions_plan = synth.unified_action_plan or rollup_facts.merged_action_plan
     all_strengths = list(dict.fromkeys([*rollup_facts.merged_strengths, *synth.strengths]))[:15]
     langs = sorted({c.language for c in rollup_facts.components})
     total_loc = sum(c.total_loc for c in rollup_facts.components)
@@ -328,6 +332,21 @@ def validate_and_persist_rollup(
     score_rel = str(action.params.get("score_path") or run.outputs.score or default_score)
     summary_rel = default_summary_rel_path(score_rel)
     sarif_rel = default_sarif_rel_path(score_rel)
+    rollup_facts_rel = f".pni/cache/{run.workflow_id}/rollup_facts.json"
+    artifact_manifest = {
+        "score_json": score_rel,
+        "summary_json": summary_rel,
+        "findings_sarif": sarif_rel,
+        "plan_json": default_plan_rel_path(run.workflow_id),
+        "rollup_facts_json": rollup_facts_rel,
+    }
+    exec_dag = build_rollup_execution_dag_summary(
+        run,
+        all_actions or [action],
+        rollup_facts,
+        project_root,
+        artifact_manifest=artifact_manifest,
+    )
 
     unified = ScoreResult(
         schema_version="2.0",
@@ -353,7 +372,8 @@ def validate_and_persist_rollup(
         strengths=all_strengths,
         findings=all_findings,
         consolidated_findings=consolidate_findings_by_location(all_findings),
-        action_plan=all_actions,
+        action_plan=all_actions_plan,
+        execution_dag=exec_dag,
         components=rollup_facts.components,
         report_hints=synth.report_hints,
         summary=synth.summary,
@@ -369,7 +389,7 @@ def validate_and_persist_rollup(
     write_sarif_report(unified, project_root / sarif_rel)
     record_audit_history_from_score(project_root, run.workflow_id, unified)
 
-    facts_file = project_root / f".pni/cache/{run.workflow_id}/rollup_facts.json"
+    facts_file = project_root / rollup_facts_rel
     ensure_cache_parent(project_root, facts_file)
     facts_file.write_text(rollup_facts.model_dump_json(indent=2) + "\n", encoding="utf-8")
     return canonical

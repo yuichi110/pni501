@@ -18,6 +18,9 @@ from pydantic import BaseModel, Field
 
 from pni._actions.base_model import (
     ArchitectureRecord,
+    ExecutionDagSummary,
+    Finding,
+    FindingAdjustment,
     MetricScalar,
     ScoreResult,
     consolidate_findings_by_location,
@@ -25,13 +28,23 @@ from pni._actions.base_model import (
 from pni._actions.runtime_check.parsers import extract_verbatim_error_excerpt
 from pni._cache import default_blueprint_rel_path, ensure_cache_parent
 
+_CATEGORY_ORDER: Final[tuple[tuple[str, str], ...]] = (
+    ("architecture", "Architecture"),
+    ("code_quality", "Code Quality"),
+    ("typing", "Typing"),
+    ("testing", "Testing"),
+    ("dependencies", "Dependencies"),
+    ("security", "Security"),
+    ("documentation", "Documentation"),
+)
+
 _CHAPTER_TITLES: Final[dict[str, dict[str, str]]] = {
     "ja": {
         "00": "PNI ソフトウェア健全性診断レポート",
         "01": "1. エグゼクティブサマリー",
         "02": "2. アーキテクチャとソースコード構成",
         "03": "3. 推奨する変更対応",
-        "04": "4. 検査指標・ルール適合マトリクスと指摘一覧",
+        "04": "4. 監査パイプライン（DAG）・検査基準と指摘一覧",
         "05": "5. 詳細分析：コード品質・テスト・動的検証",
         "06": "6. 詳細分析：セキュリティ・脆弱性・API境界",
     },
@@ -40,7 +53,7 @@ _CHAPTER_TITLES: Final[dict[str, dict[str, str]]] = {
         "01": "1. Executive Summary",
         "02": "2. Architecture & Source Code Structure",
         "03": "3. Recommended Remediation Roadmap",
-        "04": "4. Audit Standards, Rule Compliance & Findings",
+        "04": "4. Audit Pipeline (DAG), Standards & Findings",
         "05": "5. Deep Dive: Code Quality, Testing & Runtime",
         "06": "6. Deep Dive: Security, Supply Chain & API Surface",
     },
@@ -333,9 +346,131 @@ def _build_remediation_roadmap_chapter(score: ScoreResult, titles: dict[str, str
     )
 
 
+def format_execution_dag_and_scope_lines(dag: ExecutionDagSummary | None) -> list[str]:
+    """Format action-level Executed DAG nodes, edges, scope boundaries, Git state, and tools executed."""
+    if dag is None:
+        return []
+    lines: list[str] = []
+    if dag.nodes:
+        lines.append(
+            f"- **Executed Workflow Pipeline DAG (`{dag.workflow_id}`, {len(dag.nodes)} logical stages — "
+            "render as a 5-9 node Drawlib `graph` / `flow` diagram showing `AUTO`/`AI`/`HYBRID`/`ASK`/`SKIP` badges)**:"
+        )
+        for node in dag.nodes:
+            deps_lbl = f"needs={node.needs}" if node.needs else "root"
+            rules_lbl = f", rules={node.rules_count}" if node.rules_count else ""
+            hl = node.skip_reason if node.status == "skipped" and node.skip_reason else node.highlight
+            lines.append(
+                f"  - `{node.stage_id}` **[{node.mode} | {node.status.upper()}]** `{node.label}` "
+                f"({deps_lbl}{rules_lbl}) — {hl or node.status}"
+            )
+    sc = dag.audit_scope
+    if sc is not None:
+        git_lbl = (
+            f"{sc.git_branch or 'HEAD'}@{sc.git_sha}{' (dirty)' if sc.git_dirty else ''}"
+            if sc.git_sha
+            else "untracked / non-git"
+        )
+        lines.append("- **Inspection Scope, Exclusions & Tools Executed (`audit_scope`)**:")
+        lines.append(
+            f"  - **Targets**: root=`{sc.target_root}`, source=`{sc.source_targets}`, "
+            f"tests=`{sc.test_targets}`, docs=`{sc.doc_targets}`, exclude=`{sc.exclude_globs or ['none']}`"
+        )
+        lines.append(
+            f"  - **Languages & Provenance**: primary=`{sc.language or 'auto'}`, "
+            f"companions=`{sc.companion_languages or ['none']}`, "
+            f"frameworks=`{sc.detected_frameworks or ['none']}`, git=`{git_lbl}`"
+        )
+        if sc.tools_used:
+            lines.append(f"  - **Deterministic Tools Executed**: {', '.join(f'`{t}`' for t in sc.tools_used)}")
+    return lines
+
+
+def format_baseline_vs_final_lines(score: ScoreResult) -> list[str]:
+    """Format the 7-axis Deterministic Baseline vs. AI Adjustment (±10pt) comparison table rows."""
+    if score.baseline_scores is None:
+        return []
+    bs = score.baseline_scores
+    cs = score.category_scores
+    rats = score.category_rationales
+    lines = [
+        "- **7-Axis Deterministic Baseline vs. Final Score Comparison (`±10pt` Anchoring Table)**:",
+    ]
+    for key, label in _CATEGORY_ORDER:
+        b_val = int(getattr(bs, key))
+        f_val = int(getattr(cs, key))
+        delta = f_val - b_val
+        delta_s = f"{delta:+d}" if delta != 0 else "0"
+        rat = str(getattr(rats, key, "")).strip() or "Aligned with deterministic baseline."
+        lines.append(f"  - **{label}**: baseline=`{b_val}`, ai_delta=`{delta_s}`, final=`{f_val}` — {rat[:140]}")
+    return lines
+
+
+def format_finding_source_and_triage_lines(
+    findings: list[Finding],
+    adjustments: list[FindingAdjustment],
+) -> list[str]:
+    """Format finding source distribution (deterministic vs AI) and FP triage adjustment audit trail."""
+    det_cnt = sum(1 for f in findings if f.source == "deterministic")
+    ai_cnt = sum(1 for f in findings if f.source != "deterministic")
+    lines = [
+        (
+            f"- **Finding Source Split**: deterministic_analyzers=`{det_cnt}`, "
+            f"ai_qualitative=`{ai_cnt}`, total=`{len(findings)}`"
+        )
+    ]
+    if adjustments:
+        lines.append(f"- **AI False-Positive Triage Log (`finding_adjustments`, total={len(adjustments)})**:")
+        for idx, adj in enumerate(adjustments, start=1):
+            act_lbl = f"reclassify -> {adj.new_severity}" if adj.action == "reclassify" else "waive"
+            lines.append(f"  {idx}. `{adj.finding_id}` (`{act_lbl}`) — Reason: {adj.reason}")
+    else:
+        lines.append("- **AI False-Positive Triage Log**: `0` deterministic pre-findings waived or reclassified.")
+    return lines
+
+
+def format_artifact_manifest_lines(
+    dag: ExecutionDagSummary | None,
+    *,
+    fallback_manifest: dict[str, str] | None = None,
+) -> list[str]:
+    """Format a compact 4-5 row pointer table to machine-readable JSON/SARIF artifacts (never dump raw JSON)."""
+    manifest = (
+        dict(dag.audit_scope.artifact_manifest)
+        if dag is not None and dag.audit_scope is not None and dag.audit_scope.artifact_manifest
+        else dict(fallback_manifest or {})
+    )
+    if not manifest:
+        return []
+    labels = {
+        "score_json": "Full Structured Score & Metrics (`ScoreResult` v2.0)",
+        "summary_json": "CI / Portal Lightweight Summary (`ScoreSummary`)",
+        "findings_sarif": "GitHub Code Scanning / IDE Findings (`SARIF 2.1.0`)",
+        "plan_json": "Pre-Flight Recon Plan & Validated Mermaid DAG",
+        "facts_json": "Raw Deterministic Facts Bundle (AST / Runtime / Trivy)",
+        "rollup_facts_json": "Multi-Component Rollup Facts & Companion Scans",
+        "migration_plan_json": "Validated Migration Plan (`MigrationPlanResult`)",
+        "migration_facts_json": "Deterministic Migration Facts (Waves / Contracts / Codemods)",
+        "based_on_audit_score": "Prerequisite Audit Score JSON (`based_on`)",
+        "progress_json": "Validated Progress & Git Health (`ProgressResult`)",
+        "progress_facts_json": "Deterministic Git Merge-Tree & Trajectory Facts",
+        "baseline_plan_yaml": "Read-Only Baseline Progress Plan (SHA-256 verified)",
+    }
+    lines = [
+        "- **Machine-Readable Evidence Artifacts (Render as a compact Reference Table — NEVER paste raw JSON)**:",
+    ]
+    for key, rel_path in manifest.items():
+        if rel_path:
+            desc = labels.get(key, key.replace("_", " ").title())
+            lines.append(f"  - `{rel_path}` — {desc}")
+    return lines
+
+
 def _build_standards_and_findings_chapter(score: ScoreResult, titles: dict[str, str]) -> BlueprintChapterSpec:
-    """Build `04_standards_and_findings.md` (4. Audit Standards, Rule Compliance & Findings)."""
+    """Build `04_standards_and_findings.md` (4. Audit Pipeline (DAG), Standards & Findings)."""
     data: list[str] = []
+    data.extend(format_execution_dag_and_scope_lines(score.execution_dag))
+    data.extend(format_baseline_vs_final_lines(score))
     if score.audit_dimensions:
         data.append("- **Audit Step Scores (Pre-Sorted Weakest -> Strongest for `BarChart`)**:")
         for dim in score.audit_dimensions:
@@ -350,6 +485,7 @@ def _build_standards_and_findings_chapter(score: ScoreResult, titles: dict[str, 
                 f"  - `[{rc.status.upper()}]` | `{rc.rule_id}` | `{rc.source_action}` | {rc.evidence}"
             )
 
+    data.extend(format_finding_source_and_triage_lines(score.findings, score.triaged_adjustments))
     consolidated = score.consolidated_findings or consolidate_findings_by_location(score.findings)
     if consolidated:
         data.append(
@@ -377,24 +513,43 @@ def _build_standards_and_findings_chapter(score: ScoreResult, titles: dict[str, 
                 f"  {idx}. `{wv.id}` | scope=`[{scope_lbl}]` | matched=`{wv.matched_count}` — "
                 f"Reason: {wv.reason}"
             )
+    else:
+        data.append("- **Configured Design Waivers (`pni.toml [[opt_out]]`)**: `0` active waivers.")
+
+    wf_id = score.workflow_id or "full_audit"
+    fallback_manifest = {
+        "score_json": f"reports/{wf_id}_score.json",
+        "summary_json": f"reports/{wf_id}_summary.json",
+        "findings_sarif": f"reports/{wf_id}_findings.sarif",
+        "plan_json": f".pni/cache/{wf_id}/plan.json",
+        "facts_json": score.facts_file or f".pni/cache/{wf_id}/facts.json",
+    }
+    data.extend(format_artifact_manifest_lines(score.execution_dag, fallback_manifest=fallback_manifest))
 
     return BlueprintChapterSpec(
         filename="04_standards_and_findings.md",
         title=titles["04"],
         purpose=(
-            "Bridge high-level recommendations to detailed chapters by presenting every audit step score, "
-            "the full `FAIL -> WARN -> PASS` rule compliance matrix, the consolidated `CRITICAL -> INFO` "
-            "findings index (grouped by `file:line` to eliminate duplicate rows), and any configured "
-            "`pni.toml` design waivers (`[[opt_out]]`)."
+            "Establish full audit transparency and reproducibility before deep dives: visualize the actual "
+            "action-level Executed Audit DAG (AUTO/AI/HYBRID/SKIP with reasons), inspection scope & tools, "
+            "7-axis Deterministic Baseline vs. AI Adjustment (±10pt) table, audit step scores, "
+            "`FAIL -> WARN -> PASS` rule compliance matrix, consolidated `CRITICAL -> INFO` findings index "
+            "with source split & FP triage/waiver log, and a compact Machine-Readable Artifact Reference Table "
+            "(never dump raw JSON payloads into the PDF)."
         ),
         required_diagrams=[
             (
-                "Executed Audit Step Score Comparison (`BarChart`, weakest-first) + "
-                "Rule Compliance Matrix (`Table`, `FAIL -> WARN -> PASS`)"
+                "Executed Audit Pipeline DAG (`drawlib.graph.get_layout()` or `drawlib.diagrams.flow`: "
+                "5-9 logical stages with `AUTO`/`AI`/`HYBRID`/`ASK`/`SKIP` badges, skip reasons, and stage highlights) "
+                "+ Inspection Scope & Tools Summary"
             ),
             (
-                "Consolidated Location Findings Evidence Table (`Table` preserving exact `CRITICAL -> INFO` "
-                "order with multi-rule tags per `file:line`)"
+                "7-Axis Deterministic Baseline vs. Final Score Comparison (`Table`: Baseline, AI Δ ±10pt, Final) "
+                "+ Executed Audit Step Score Comparison (`BarChart`, weakest-first)"
+            ),
+            (
+                "Rule Compliance Matrix (`Table`, `FAIL -> WARN -> PASS`), Consolidated Location Findings "
+                "Evidence Table (`CRITICAL -> INFO`), Triage/Waiver Log & Machine-Readable Artifact Reference Table"
             ),
         ],
         sorted_data_markdown=data,

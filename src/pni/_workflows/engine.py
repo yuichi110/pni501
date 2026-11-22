@@ -136,10 +136,12 @@ from pni._workflows.planner import (
     WorkflowExecutionPlan,
     build_recon_context,
     build_workflow_plan,
+    default_plan_rel_path,
     evaluate_when_expr,
     persist_workflow_plan,
     render_plan_markdown,
 )
+from pni._workflows.provenance import build_execution_dag_summary
 from pni._workflows.state_db import WorkflowStateDB
 
 
@@ -1504,6 +1506,10 @@ def _build_action_prompt_payload(
                 "\n### Pre-Submission Mandatory Checklist (`write_drawlib_report`)",
                 "- [ ] **Cover Emblem (`00_cover.md`)**: Verify `00_cover.md` draws the PNI501 triangle emblem "
                 "via `from drawlib.utils import draw_pni_logo; draw_pni_logo((135, 48), width=9.0, dark=True)`.",
+                "- [ ] **Audit Pipeline DAG & Provenance (`04_standards_and_findings.md` / Rollup Ch. 4)**: "
+                "Render the logical action-level Executed DAG (`drawlib.graph` or `drawlib.diagrams.flow`), "
+                "the 7-axis Deterministic Baseline vs. AI Delta table, triage/waiver log, and the compact "
+                "Machine-Readable Artifact Reference Table (NEVER paste raw JSON payloads into the PDF).",
                 "- [ ] **Multi-Series Legends**: Every `BarChart` / `LineChart` with `>= 2` `.add_series(...)` calls "
                 "MUST invoke `chart.draw_legend(xy=(x, y), orientation='horizontal')`.",
                 "- [ ] **Overlay & Table Guardrails**: Every `ClassDiagram` + `HeatmapOverlay` sets `height >= 80` "
@@ -2034,6 +2040,30 @@ def _persist_emitted_score(
     score_rel = _resolve_score_rel_path(run, action)
     summary_rel = default_summary_rel_path(score_rel)
     sarif_rel = default_sarif_rel_path(score_rel)
+    facts_rel = _resolve_facts_rel_path(run, action)
+    plan_rel = default_plan_rel_path(run.workflow_id)
+    artifact_manifest = {
+        "score_json": score_rel,
+        "summary_json": summary_rel,
+        "findings_sarif": sarif_rel,
+        "plan_json": plan_rel,
+        "facts_json": facts_rel,
+    }
+    exec_dag = build_execution_dag_summary(
+        run,
+        all_actions,
+        bundle,
+        project_root,
+        plan=plan,
+        artifact_manifest=artifact_manifest,
+        current_action_id=action.action_id,
+        stage_highlights={
+            (action.step_key or action.action_id): (
+                f"score={sub.overall_score}/100 ({score_to_grade(sub.overall_score)}), "
+                f"{len(digest.rule_compliance)} rules, {len(digest.findings)} findings"
+            )
+        },
+    )
 
     score_obj = ScoreResult(
         schema_version="2.0",
@@ -2043,7 +2073,7 @@ def _persist_emitted_score(
         evaluated_at=datetime.now(timezone.utc).isoformat(),
         language=lang,
         target_root=run.targets.root,
-        facts_file=_resolve_facts_rel_path(run, action),
+        facts_file=facts_rel,
         key_files_inspected=list(sub.key_files_inspected),
         overall_score=sub.overall_score,
         grade=score_to_grade(sub.overall_score),
@@ -2059,6 +2089,8 @@ def _persist_emitted_score(
         consolidated_findings=digest.consolidated_findings,
         action_plan=digest.action_plan,
         opt_outs=digest.opt_outs,
+        triaged_adjustments=digest.applied_adjustments,
+        execution_dag=exec_dag,
         approved_plan_summary=approved_summary,
         report_hints=list(sub.report_hints),
         summary=sub.summary,
@@ -2094,12 +2126,34 @@ def _persist_emitted_output(
         return _persist_emitted_score(run, action, all_actions, bundle, raw_input, project_root, target_root, db)
     if action.primitive_type == PrimitiveType.SYNTHESIZE_ROLLUP:
         rollup_facts = execute_rollup_collect(run, project_root)
-        return validate_and_persist_rollup(run, action, rollup_facts, raw_input, project_root)
+        return validate_and_persist_rollup(
+            run,
+            action,
+            rollup_facts,
+            raw_input,
+            project_root,
+            all_actions=all_actions,
+        )
     if action.primitive_type == PrimitiveType.EMIT_MIGRATION_PLAN:
         return validate_and_persist_migration_plan(
-            run, action, bundle, raw_input, project_root, _verify_grounded_paths
+            run,
+            action,
+            bundle,
+            raw_input,
+            project_root,
+            _verify_grounded_paths,
+            all_actions=all_actions,
+            plan=_load_run_plan(run),
         )
-    return validate_and_persist_progress_result(run, action, bundle, raw_input, project_root)
+    return validate_and_persist_progress_result(
+        run,
+        action,
+        bundle,
+        raw_input,
+        project_root,
+        all_actions=all_actions,
+        plan=_load_run_plan(run),
+    )
 
 
 def _validate_and_apply_push_payload(

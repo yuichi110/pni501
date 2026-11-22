@@ -14,7 +14,13 @@ from __future__ import annotations
 from typing import Final
 
 from pni._actions.base_model import ScoreResult
-from pni._reporter.blueprint import BlueprintChapterSpec, ReportBlueprint
+from pni._reporter.blueprint import (
+    BlueprintChapterSpec,
+    ReportBlueprint,
+    format_artifact_manifest_lines,
+    format_execution_dag_and_scope_lines,
+    format_finding_source_and_triage_lines,
+)
 
 _ROLLUP_TITLES: Final[dict[str, dict[str, str]]] = {
     "ja": {
@@ -22,7 +28,7 @@ _ROLLUP_TITLES: Final[dict[str, dict[str, str]]] = {
         "01": "1. エグゼクティブサマリー・コンポーネント比較",
         "02": "2. 横断アーキテクチャと境界整合性",
         "03": "3. 統合改善ロードマップ（全言語横断）",
-        "04": "4. 共通ガバナンス・Companion IaC / セキュリティ総括",
+        "04": "4. 統合監査パイプライン（DAG）・共通ガバナンス・セキュリティ総括",
         "05": "5. コンポーネント別詳細分析",
     },
     "en": {
@@ -30,7 +36,7 @@ _ROLLUP_TITLES: Final[dict[str, dict[str, str]]] = {
         "01": "1. Executive Summary & Component Comparison",
         "02": "2. Cross-Component Architecture & Contract Alignment",
         "03": "3. Unified Cross-Language Remediation Roadmap",
-        "04": "4. Repository Governance, Companion IaC & Security Overview",
+        "04": "4. Rollup Pipeline (DAG), Governance & Companion Security",
         "05": "5. Per-Component Deep Dives",
     },
 }
@@ -100,12 +106,36 @@ def build_rollup_report_blueprint(
         BlueprintChapterSpec(
             filename="04_governance_and_companions.md",
             title=titles["04"],
-            purpose="Repo-wide CI/CD, supply chain, security posture, and companion IaC findings.",
-            required_diagrams=["Findings by Severity & Component Chart (`drawlib.charts.BarChart`)"],
+            purpose=(
+                "Visualize the executed Multi-Component Rollup DAG (component sub-audits + companion DSL scan -> "
+                "log1p(LOC) weighted synthesis & weakest-link guardrails), repo-wide CI/CD & security findings, "
+                "finding source split, and Machine-Readable Artifact Reference Table (never dump raw JSON)."
+            ),
+            required_diagrams=[
+                (
+                    "Executed Multi-Component Rollup Pipeline DAG (`drawlib.graph.get_layout()` or "
+                    "`drawlib.diagrams.flow`: parallel component sub-audits + companion DSL scan -> "
+                    "hybrid weighted synthesis -> unified report)"
+                ),
+                "Findings by Severity & Component Chart (`drawlib.charts.BarChart`) + Artifact Reference Table",
+            ],
             sorted_data_markdown=[
-                f"- `[{f.severity.upper()}]` `[{f.component or 'repo'}]` `{f.rule_id}` (`{f.file_path or '-'}`): "
-                f"{f.description}"
-                for f in score.findings[:20]
+                *format_execution_dag_and_scope_lines(score.execution_dag),
+                *format_finding_source_and_triage_lines(score.findings, score.triaged_adjustments),
+                *[
+                    f"- `[{f.severity.upper()}]` `[{f.component or 'repo'}]` `{f.rule_id}` (`{f.file_path or '-'}`): "
+                    f"{f.description}"
+                    for f in score.findings[:20]
+                ],
+                *format_artifact_manifest_lines(
+                    score.execution_dag,
+                    fallback_manifest={
+                        "score_json": f"reports/{score.workflow_id or target}_score.json",
+                        "summary_json": f"reports/{score.workflow_id or target}_summary.json",
+                        "findings_sarif": f"reports/{score.workflow_id or target}_findings.sarif",
+                        "rollup_facts_json": f".pni/cache/{score.workflow_id or target}/rollup_facts.json",
+                    },
+                ),
             ],
         ),
         BlueprintChapterSpec(

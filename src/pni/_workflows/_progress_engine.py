@@ -37,6 +37,8 @@ from pni._workflows.base_model import (
     WorkflowFactsBundle,
     WorkflowRunRecord,
 )
+from pni._workflows.planner import WorkflowExecutionPlan, default_plan_rel_path
+from pni._workflows.provenance import build_execution_dag_summary
 
 
 def parse_progress_options(params: dict[str, ParamValue]) -> ProgressOptions:
@@ -257,6 +259,9 @@ def validate_and_persist_progress_result(
     bundle: WorkflowFactsBundle,
     raw_input: str,
     project_root: Path,
+    *,
+    all_actions: list[ActionRunRecord] | None = None,
+    plan: WorkflowExecutionPlan | None = None,
 ) -> str:
     """Validate `ProgressResult`, enforce plan immutability, persist JSON, and update JSONL history."""
     prog_obj = ProgressResult.model_validate_json(raw_input)
@@ -280,21 +285,46 @@ def validate_and_persist_progress_result(
     if conflict_files:
         _verify_safe_relative_paths(conflict_files, "branch_assessments[].conflicting_files")
 
+    out_dir = str(action.params.get("output_dir", DEFAULT_REPORT_OUTPUT_DIR))
+    tgt = str(action.params.get("target") or run.workflow_id)
+    prog_rel = resolve_progress_result_rel_path(out_dir, tgt, str(action.params.get("progress_path", "")))
+    prog_facts_rel = default_progress_facts_rel_path(run.workflow_id)
+
     prog_obj.workflow_id = run.workflow_id
     prog_obj.workflow_run_id = run.run_id
     if not prog_obj.generated_at:
         prog_obj.generated_at = datetime.now(timezone.utc).isoformat()
     prog_obj.target_root = run.targets.root
-    prog_obj.progress_facts_file = default_progress_facts_rel_path(run.workflow_id)
+    prog_obj.progress_facts_file = prog_facts_rel
     if pf is not None:
         prog_obj.as_of_date = pf.as_of_date
         prog_obj.plan_file = pf.plan_file
         prog_obj.plan_sha256 = pf.plan_sha256
         prog_obj.progress_facts = pf
 
-    out_dir = str(action.params.get("output_dir", DEFAULT_REPORT_OUTPUT_DIR))
-    tgt = str(action.params.get("target") or run.workflow_id)
-    prog_rel = resolve_progress_result_rel_path(out_dir, tgt, str(action.params.get("progress_path", "")))
+    artifact_manifest = {
+        "progress_json": prog_rel,
+        "progress_facts_json": prog_facts_rel,
+        "plan_json": default_plan_rel_path(run.workflow_id),
+    }
+    if prog_obj.plan_file:
+        artifact_manifest["baseline_plan_yaml"] = prog_obj.plan_file
+    prog_obj.execution_dag = build_execution_dag_summary(
+        run,
+        all_actions or [action],
+        bundle,
+        project_root,
+        plan=plan,
+        artifact_manifest=artifact_manifest,
+        current_action_id=action.action_id,
+        stage_highlights={
+            (action.step_key or action.action_id): (
+                f"status={prog_obj.delivery_status}, score={prog_obj.overall_health_score}/100, "
+                f"{len(prog_obj.task_assessments)} tasks"
+            )
+        },
+    )
+
     root_res = project_root.resolve()
     prog_file = (root_res / prog_rel).resolve()
     if prog_file == root_res or not prog_file.is_relative_to(root_res):

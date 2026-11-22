@@ -435,6 +435,47 @@ class AppliedOptOut(BaseModel):
     matched_count: int = 0
 
 
+class ExecutionStageNode(BaseModel):
+    """Logical workflow stage node recorded for deterministic DAG visualization in Drawlib reports."""
+
+    stage_id: str
+    label: str
+    mode: Literal["AUTO", "AI", "HYBRID", "ASK", "SKIP"] = "HYBRID"
+    status: Literal["completed", "skipped", "pending", "in_progress"] = "completed"
+    needs: list[str] = Field(default_factory=list)
+    rules_count: int = 0
+    highlight: str = ""
+    skip_reason: str = ""
+
+
+class AuditScopeMetadata(BaseModel):
+    """Deterministic inspection boundary, Git provenance, tools executed, and artifact manifest."""
+
+    target_root: str = "."
+    source_targets: list[str] = Field(default_factory=list)
+    test_targets: list[str] = Field(default_factory=list)
+    doc_targets: list[str] = Field(default_factory=list)
+    exclude_globs: list[str] = Field(default_factory=list)
+    language: str = ""
+    companion_languages: list[str] = Field(default_factory=list)
+    detected_frameworks: list[str] = Field(default_factory=list)
+    git_branch: str = ""
+    git_sha: str = ""
+    git_dirty: bool = False
+    tools_used: list[str] = Field(default_factory=list)
+    artifact_manifest: dict[str, str] = Field(default_factory=dict)
+
+
+class ExecutionDagSummary(BaseModel):
+    """Action-level actual execution DAG and inspection provenance attached to diagnostic results."""
+
+    workflow_id: str
+    category: str = "audit"
+    scope: str = "repo"
+    nodes: list[ExecutionStageNode] = Field(default_factory=list)
+    audit_scope: Optional[AuditScopeMetadata] = None
+
+
 class ComponentScoreSummary(BaseModel):
     """Per-component scorecard preserved inside a multi-language Rollup ScoreResult."""
 
@@ -489,6 +530,8 @@ class ScoreResult(BaseModel):
     consolidated_findings: list[ConsolidatedFinding] = Field(default_factory=list)
     action_plan: list[ActionItem] = Field(default_factory=list)
     opt_outs: list[AppliedOptOut] = Field(default_factory=list)
+    triaged_adjustments: list[FindingAdjustment] = Field(default_factory=list)
+    execution_dag: Optional[ExecutionDagSummary] = None
     components: list[ComponentScoreSummary] = Field(default_factory=list)
     approved_plan_summary: str = ""
     report_hints: list[str] = Field(default_factory=list)
