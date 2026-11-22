@@ -65,7 +65,7 @@ def test_pni_toml_scaffold_and_opt_out_validation(tmp_path: Path) -> None:
     cfg = load_pni_config(tmp_path)
     assert cfg.scan.respect_gitignore is True
     assert "uv.lock" in cfg.scan.include_gitignored
-    assert cfg.report.src_dir == "reports_src"
+    assert cfg.report.src_dir == "pni_report_src"
 
     # OptOutEntry requires non-empty id and reason >= 10 non-whitespace chars
     with pytest.raises(ValidationError):
@@ -369,12 +369,12 @@ style = "claude"
     assert report_step.params["style"] == "openai"
 
     # 2. Verify scaffold_report_project appends @media print wide-table rules to style.css
-    src_base = tmp_path / "reports_src"
-    out_dir = tmp_path / "reports"
+    src_dir = tmp_path / "pni_report_src"
+    out_dir = tmp_path / "pni_report"
     html_dir = tmp_path / "docs" / "reports" / "pni-audit"
     scaffold = scaffold_report_project(
         "demo",
-        src_base_dir=src_base,
+        src_dir=src_dir,
         lang="en",
         style="google",
         clean_sample_chapters=False,
@@ -387,7 +387,7 @@ style = "claude"
     # 3. Verify compile_report_project routes HTML directly into html_output_dir
     built = compile_report_project(
         "demo",
-        src_base_dir=src_base,
+        src_dir=src_dir,
         output_dir=out_dir,
         html_output_dir=html_dir,
         formats=("html",),

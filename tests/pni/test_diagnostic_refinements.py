@@ -305,14 +305,14 @@ def test_ws3_consolidate_findings_by_location_and_blueprint_rendering() -> None:
 
 def test_ws5_lint_drawlib_chapters_and_strict_preflight(tmp_path: Path) -> None:
     """Verify lint_drawlib_chapters catches missing multi-series legends and contour-line collisions."""
-    src_dir = tmp_path / "reports_src" / "demo_src"
+    src_dir = tmp_path / "pni_report_src"
     en_dir = src_dir / "en"
     en_dir.mkdir(parents=True)
     (src_dir / "drawlib.toml").write_text(
         '[project]\ntype = "doc"\n\n[i18n]\ndefault_lang = "en"\nlangs = ["en"]\n',
         encoding="utf-8",
     )
-    out_dir = tmp_path / "reports"
+    out_dir = tmp_path / "pni_report"
 
     bad_ch2 = en_dir / "02_architecture.md"
     bad_ch2.write_text(
@@ -341,7 +341,7 @@ def test_ws5_lint_drawlib_chapters_and_strict_preflight(tmp_path: Path) -> None:
     assert any("chart.draw_legend" in w for w in warnings)
 
     with pytest.raises(ValueError, match="Drawlib preflight visual check failed"):
-        compile_report_project("demo", src_base_dir=tmp_path / "reports_src", output_dir=out_dir, strict_preflight=True)
+        compile_report_project("demo", src_dir=src_dir, output_dir=out_dir, strict_preflight=True)
 
     # Fix both issues and verify zero warnings + clean compile_report_project with mocked drawlib.tools
     bad_ch2.write_text(
@@ -379,7 +379,7 @@ def test_ws5_lint_drawlib_chapters_and_strict_preflight(tmp_path: Path) -> None:
     with patch("pni._reporter.compiler._get_drawlib_tools", return_value=fake_tools):
         res = compile_report_project(
             "demo",
-            src_base_dir=tmp_path / "reports_src",
+            src_dir=src_dir,
             output_dir=out_dir,
             strict_preflight=True,
         )
@@ -388,8 +388,8 @@ def test_ws5_lint_drawlib_chapters_and_strict_preflight(tmp_path: Path) -> None:
 
     guide = render_drawlib_report_guide(
         target="demo",
-        score_path="reports/demo_score.json",
-        facts_path=".pni/cache/demo/facts.json",
+        score_path="pni_report/demo_score.json",
+        facts_path="pni_report_src/_facts/facts.json",
         target_root="examples/demo",
         source_targets=["src"],
         doc_targets=["README.md"],

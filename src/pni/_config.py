@@ -258,17 +258,18 @@ def render_default_pni_toml(project_root: Path, *, lang: str = "python") -> str:
         f"source = [{src_literal}]\n"
         f"tests = [{tst_literal}]\n"
         'docs = ["README.md"]\n'
-        'exclude = ["docs/**", "docs_src/**", "reports/**", "reports_src/**"]\n\n'
+        'exclude = ["docs/**", "docs_src/**", "reports/**", "reports_src/**", "pni_report/**", "pni_report_src/**"]\n\n'
         "[scan]\n"
         "# Exclude untracked files matched by .gitignore (e.g. local developer .env) from filesystem/secret scans\n"
         "respect_gitignore = true\n"
         f"include_gitignored = [{ignored_lock_literal}]\n"
         'skip_files = [".env", ".env.*", "**/.env"]\n'
-        'skip_dirs = ["docs", "docs_src", "reports", "reports_src"]\n\n'
+        'skip_dirs = ["docs", "docs_src", "reports", "reports_src", "pni_report", "pni_report_src"]\n\n'
         "[report]\n"
-        'src_dir = "reports_src"\n'
-        'output_dir = "reports"\n'
-        '# html_output_dir = "docs/reports/pni-full-audit"\n'
+        'src_dir = "pni_report_src"\n'
+        'output_dir = "pni_report"\n'
+        '# Example custom flat layout: src_dir = "docs_src/pni", output_dir = "docs/pni"\n'
+        '# html_output_dir = "docs/pni"\n'
         'formats = ["pdf"]\n'
         'lang = "en"\n'
         'style = "google"\n\n'

@@ -368,7 +368,7 @@ def test_universal_rules_archetype_actions_and_engine_metrics(tmp_path: Path) ->
     ok, _ = push_workflow_action(run.run_id, a_score.action_id, score_json, tmp_path)
     assert ok is True
 
-    score_text = (tmp_path / "reports" / "svc_audit_score.json").read_text(encoding="utf-8")
+    score_text = (tmp_path / "pni_report" / "svc_audit_score.json").read_text(encoding="utf-8")
     emitted = ScoreResult.model_validate_json(score_text)
     assert emitted.metrics_snapshot["runtime_types"] == ["web_api"]
     assert emitted.metrics_snapshot["missing_io_timeouts_count"] == 1

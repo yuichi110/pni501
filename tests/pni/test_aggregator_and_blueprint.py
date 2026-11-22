@@ -220,8 +220,8 @@ steps:
     uses: write_drawlib_report
     with:
       target: "bp_test"
-      src_dir: "reports_src"
-      output_dir: "reports"
+      src_dir: "pni_report_src"
+      output_dir: "pni_report"
 """,
         encoding="utf-8",
     )
@@ -361,7 +361,7 @@ def test_workflow_map_reduce_and_five_chapter_blueprint(tmp_path: Path) -> None:
     assert push_workflow_action(run.run_id, act8.action_id, score_in, tmp_path)[0] is True
 
     persisted_score = ScoreResult.model_validate_json(
-        (tmp_path / "reports" / "bp_test_score.json").read_text(encoding="utf-8")
+        (tmp_path / "pni_report" / "bp_test_score.json").read_text(encoding="utf-8")
     )
     assert persisted_score.grade == "A"
     assert persisted_score.architecture_record is not None
@@ -382,7 +382,9 @@ def test_workflow_map_reduce_and_five_chapter_blueprint(tmp_path: Path) -> None:
     assert "03_remediation_roadmap.md" in guide9
     assert "04_standards_and_findings.md" in guide9
     assert "06_security_and_supply_chain.md" in guide9
-    assert (tmp_path / ".pni" / "cache" / "bp_test" / "blueprint.json").is_file()
+    assert (tmp_path / "pni_report_src" / "_facts" / "blueprint.json").is_file()
+    assert (tmp_path / "pni_report_src" / "_facts" / "facts.json").is_file()
+    assert (tmp_path / "pni_report_src" / "_facts" / "architecture.json").is_file()
 
     bp = build_report_blueprint(persisted_score, lang="ja", target="bp_test")
     assert [c.filename for c in bp.chapters] == [

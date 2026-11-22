@@ -18,7 +18,7 @@ Before running `pni workflows start <migration_id>`, execute this 4-step pre-fli
 
 ### Step 1: Ensure Prerequisite Audit Is Completed & Cross-Check As-Is Facts
 - Run `pni workflows show <migration_id>` (or check `pni workflows status`) to verify `based_on: <audit_workflow_id>` has a `COMPLETED` run in `.pni/cache/workflow_state.db`. If not yet completed, run and complete `<audit_workflow_id>` first so full As-Is diagnostics exist.
-- Inspect the completed audit artifacts (`reports/<lang>/<target>_score.json`, `.pni/cache/<audit_wf>/facts.json`) and target manifests/code (`pom.xml`, `composer.json`, `pyproject.toml`, session/cache globals, SQL queries, HTTP clients).
+- Inspect the completed audit artifacts (`pni_report/<target>_score.json`, `pni_report_src/_facts/facts.json` or `.pni/cache/<audit_wf>/facts.json`) and target manifests/code (`pom.xml`, `composer.json`, `pyproject.toml`, session/cache globals, SQL queries, HTTP clients).
 
 ### Step 2: Scrutinize the 6 Ambiguity Dimensions
 Check whether any of the following 6 architectural decisions are missing, contradictory, or phrased vaguely (e.g., `"latest"`, `"最新"`, `"いい感じ"`, `"TBD"`, `"未定"`):

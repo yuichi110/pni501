@@ -16,8 +16,9 @@ from typing import Final
 
 from pydantic import BaseModel, Field
 
-DEFAULT_REPORT_SRC_DIR: Final[str] = "reports_src"
-DEFAULT_REPORT_OUTPUT_DIR: Final[str] = "reports"
+DEFAULT_REPORT_SRC_DIR: Final[str] = "pni_report_src"
+DEFAULT_REPORT_OUTPUT_DIR: Final[str] = "pni_report"
+DEFAULT_REPORT_FACTS_SUBDIR: Final[str] = "_facts"
 DEFAULT_REPORT_FORMATS: Final[tuple[str, ...]] = ("pdf",)
 SUPPORTED_REPORT_FORMATS: Final[frozenset[str]] = frozenset({"pdf", "html", "markdown", "images"})
 
@@ -33,9 +34,18 @@ class BrokenLinkRecord(BaseModel):
 class ReportProjectConfig(BaseModel):
     """Configuration parameters for scaffolding and building a drawlib report project."""
 
-    target: str = Field(default="full_audit", description="Target prefix name creating '<src_dir>/<target>_src/'.")
-    src_dir: str = Field(default=DEFAULT_REPORT_SRC_DIR, description="Base directory holding '<target>_src/' folders.")
-    output_dir: str = Field(default=DEFAULT_REPORT_OUTPUT_DIR, description="Directory holding '<target>.pdf' outputs.")
+    target: str = Field(
+        default="full_audit",
+        description="Output artifact stem name (creates '<output_dir>/<target>.pdf').",
+    )
+    src_dir: str = Field(
+        default=DEFAULT_REPORT_SRC_DIR,
+        description="Direct Drawlib report source directory (e.g., 'pni_report_src' or 'docs_src/pni').",
+    )
+    output_dir: str = Field(
+        default=DEFAULT_REPORT_OUTPUT_DIR,
+        description="Direct destination directory for '<target>.pdf' and score/SARIF outputs (e.g., 'pni_report').",
+    )
     html_output_dir: str | None = Field(
         default=None,
         description="Optional custom directory for compiled HTML output (defaults to '<output_dir>/<target>_html').",

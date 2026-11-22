@@ -88,6 +88,12 @@ IGNORED_PATH_PARTS: Final[frozenset[str]] = frozenset(
         ".gradle",
         "reports",
         "reports_src",
+        "pni_report",
+        "pni_report_src",
+        "pni_migration",
+        "pni_migration_src",
+        "pni_progress",
+        "pni_progress_src",
     }
 )
 FAT_BASH_LOC_THRESHOLD: Final[int] = 100

@@ -222,7 +222,7 @@ def _evaluate_single_task(
 def _load_audit_summary_snapshot(
     project_root: Path,
     base_workflow_id: str,
-    score_output_dir: str = "reports",
+    score_output_dir: str = "pni_report",
 ) -> AuditSummarySnapshot | None:
     """Load Git-tracked `.pni/history/audit/<id>.jsonl` and optional `*_score.json` summary."""
     clean_id = base_workflow_id.strip()

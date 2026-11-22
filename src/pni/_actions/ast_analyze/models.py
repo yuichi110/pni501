@@ -56,6 +56,12 @@ IGNORED_DIR_NAMES: Final[frozenset[str]] = frozenset(
         "out",
         "reports",
         "reports_src",
+        "pni_report",
+        "pni_report_src",
+        "pni_migration",
+        "pni_migration_src",
+        "pni_progress",
+        "pni_progress_src",
     }
 )
 __all_helpers__ = [matches_exclude_globs]

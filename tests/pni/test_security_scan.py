@@ -619,7 +619,9 @@ def test_stateful_workflow_security_scan_hotspot_and_seven_file_blueprint(tmp_pa
     )
     assert push_workflow_action(run.run_id, act_score.action_id, score_payload, tmp_path)[0] is True
 
-    saved = ScoreResult.model_validate_json((tmp_path / "reports" / "sec_flow_score.json").read_text(encoding="utf-8"))
+    saved = ScoreResult.model_validate_json(
+        (tmp_path / "pni_report" / "sec_flow_score.json").read_text(encoding="utf-8")
+    )
     assert saved.category_scores.security == 30
     assert saved.security_facts is not None and saved.security_facts.app_vuln_counts.critical == 1
     assert len(saved.dangerous_sinks) == 1 and saved.dangerous_sinks[0].cwe_id == "CWE-89"

@@ -16,13 +16,15 @@ from typing import Final
 
 from pni._actions.base_model import HealthGrade
 from pni._actions.progress_analyze.models import ProgressResult
-from pni._cache import default_progress_blueprint_rel_path, ensure_cache_parent
+from pni._cache import default_progress_blueprint_rel_path
+from pni._reporter.base_model import DEFAULT_REPORT_OUTPUT_DIR
 from pni._reporter.blueprint import (
     BlueprintChapterSpec,
     ReportBlueprint,
     format_artifact_manifest_lines,
     format_execution_dag_and_scope_lines,
 )
+from pni._reporter.facts_sync import write_blueprint_to_report_facts
 
 _PROGRESS_CHAPTER_TITLES: Final[dict[str, dict[str, str]]] = {
     "ja": {
@@ -229,7 +231,7 @@ def _build_prog_actions_chapter(res: ProgressResult, titles: dict[str, str]) -> 
         format_artifact_manifest_lines(
             res.execution_dag,
             fallback_manifest={
-                "progress_json": f"reports/{res.workflow_id or 'progress_check'}_progress.json",
+                "progress_json": f"{DEFAULT_REPORT_OUTPUT_DIR}/{res.workflow_id or 'progress_check'}_progress.json",
                 "progress_facts_json": res.progress_facts_file
                 or f".pni/cache/{res.workflow_id or 'progress_check'}/progress_facts.json",
                 **({"baseline_plan_yaml": res.plan_file} if res.plan_file else {}),
@@ -316,8 +318,9 @@ def load_or_build_progress_blueprint(
     lang: str = "en",
     style: str = "google",
     workflow_id: str = "",
+    report_src_dir: str | None = None,
 ) -> tuple[ReportBlueprint | None, str]:
-    """Load ProgressResult from `progress_path` if present, build ProgressBlueprint, and cache JSON."""
+    """Load ProgressResult from `progress_path` if present, build ProgressBlueprint, and persist JSON."""
     if project_root is None or not progress_path.strip():
         return None, ""
     root_resolved = project_root.resolve()
@@ -328,9 +331,11 @@ def load_or_build_progress_blueprint(
     result = ProgressResult.model_validate_json(prog_file.read_text(encoding="utf-8"))
     blueprint = build_progress_blueprint(result, target=target, lang=lang, style=style)
     cache_key = (workflow_id or result.workflow_id or target).strip() or "project_progress"
-    rel_bp = default_progress_blueprint_rel_path(cache_key)
-    bp_file = (root_resolved / rel_bp).resolve()
-    if bp_file.is_relative_to(root_resolved):
-        ensure_cache_parent(project_root, bp_file)
-        bp_file.write_text(blueprint.model_dump_json(indent=2) + "\n", encoding="utf-8")
+    rel_bp = write_blueprint_to_report_facts(
+        project_root,
+        report_src_dir,
+        "progress_blueprint.json",
+        blueprint.model_dump_json(indent=2) + "\n",
+        default_progress_blueprint_rel_path(cache_key),
+    )
     return blueprint, rel_bp

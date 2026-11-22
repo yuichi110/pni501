@@ -87,32 +87,36 @@ save()
 
 
 def test_report_project_config_and_target_normalization() -> None:
-    """Test ReportProjectConfig defaults and normalize_report_target handling."""
+    """Test ReportProjectConfig defaults and direct flat normalize_report_target handling."""
     cfg = ReportProjectConfig()
     assert cfg.project_type == "doc"
     assert cfg.target == "full_audit"
-    assert cfg.src_dir == DEFAULT_REPORT_SRC_DIR
-    assert cfg.output_dir == DEFAULT_REPORT_OUTPUT_DIR
+    assert cfg.src_dir == DEFAULT_REPORT_SRC_DIR == "pni_report_src"
+    assert cfg.output_dir == DEFAULT_REPORT_OUTPUT_DIR == "pni_report"
     assert cfg.formats == ["pdf"]
     assert cfg.lang == "en"
     assert cfg.style == "google"
 
-    t1, b1 = normalize_report_target("python_clean", Path("reports_src"))
+    t1, s1 = normalize_report_target("python_clean", Path("pni_report_src"))
     assert t1 == "python_clean"
-    assert b1 == Path("reports_src")
+    assert s1 == Path("pni_report_src")
 
-    t2, b2 = normalize_report_target("custom_src/my_target_src/", Path("reports_src"))
-    assert t2 == "my_target"
-    assert b2 == Path("custom_src")
+    t2, s2 = normalize_report_target("docs_src/pni/", Path("pni_report_src"))
+    assert t2 == "pni"
+    assert s2 == Path("docs_src/pni")
+
+    t3, s3 = normalize_report_target("custom_src/my_target_src/", Path("pni_report_src"))
+    assert t3 == "my_target"
+    assert s3 == Path("custom_src/my_target_src")
 
 
 def test_scaffold_non_destructive_chapter_preservation(tmp_path: Path) -> None:
-    """Test scaffold_report_project preserves existing chapter Markdown files on both repeat and --force runs."""
-    src_base = tmp_path / "reports_src"
-    scaffold = scaffold_report_project("demo", src_base_dir=src_base, lang="ja", style="google")
+    """Test scaffold_report_project scaffolds flat `pni_report_src` and custom `docs_src/pni` without extra nesting."""
+    src_dir = tmp_path / "pni_report_src"
+    scaffold = scaffold_report_project("demo", src_dir=src_dir, lang="ja", style="google")
     ja_dir = scaffold.src_dir / "ja"
 
-    assert scaffold.src_dir == (src_base / "demo_src").resolve()
+    assert scaffold.src_dir == src_dir.resolve()
     assert scaffold.preserved_existing is False
     assert (scaffold.src_dir / "drawlib.toml").is_file()
     assert (scaffold.src_dir / "styles.py").is_file()
@@ -134,38 +138,52 @@ def test_scaffold_non_destructive_chapter_preservation(tmp_path: Path) -> None:
     (ja_dir / "03_findings_roadmap.md").write_text("# Custom Roadmap v1\n", encoding="utf-8")
 
     # Re-run without force -> idempotent no-op preserving chapters
-    repeat = scaffold_report_project("demo", src_base_dir=src_base, lang="ja", style="google", force=False)
+    repeat = scaffold_report_project("demo", src_dir=src_dir, lang="ja", style="google", force=False)
     assert repeat.preserved_existing is True
     assert repeat.created_files == []
     assert (ja_dir / "00_cover.md").read_text(encoding="utf-8") == "# Custom Cover v1\n"
 
     # Re-run WITH force=True -> refreshes scripts/templates while keeping custom chapters intact
-    forced = scaffold_report_project("demo", src_base_dir=src_base, lang="ja", style="google", force=True)
+    forced = scaffold_report_project("demo", src_dir=src_dir, lang="ja", style="google", force=True)
     assert forced.preserved_existing is True
     assert (ja_dir / "00_cover.md").read_text(encoding="utf-8") == "# Custom Cover v1\n"
     assert (ja_dir / "03_findings_roadmap.md").read_text(encoding="utf-8") == "# Custom Roadmap v1\n"
     assert not (ja_dir / "01_overview.md").exists()
     assert not (ja_dir / "02_design.md").exists()
 
+    # Custom non-'_src' flat path (e.g., docs_src/pni -> docs/pni) works with zero extra nesting!
+    custom_src = tmp_path / "docs_src" / "pni"
+    (custom_src / "_facts").mkdir(parents=True)
+    (custom_src / "_facts" / "facts.json").write_text('{"ok": true}\n', encoding="utf-8")
+    custom_scaf = scaffold_report_project("pni", src_dir=custom_src, lang="en", style="google")
+    assert custom_scaf.src_dir == custom_src.resolve()
+    assert (custom_src / "drawlib.toml").is_file()
+    assert (custom_src / "_facts" / "facts.json").is_file()
+    assert not (custom_src / "pni_src").exists()
+
 
 def test_compile_report_pdf_default_and_multi_format(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
-    """Test PDF-only default compilation and optional HTML/Markdown/images compilation."""
-    src_base = tmp_path / "reports_src"
-    out_dir = tmp_path / "reports"
-    scaffold = scaffold_report_project("demo", src_base_dir=src_base, lang="ja", style="google")
+    """Test PDF-only default compilation and optional HTML/Markdown/images compilation with _facts/ present."""
+    src_dir = tmp_path / "pni_report_src"
+    out_dir = tmp_path / "pni_report"
+    scaffold = scaffold_report_project("demo", src_dir=src_dir, lang="ja", style="google")
     ja_dir = scaffold.src_dir / "ja"
+    # Populate _facts/ to verify Drawlib build + link verification cleanly ignores _facts/
+    facts_dir = scaffold.src_dir / "_facts"
+    facts_dir.mkdir(parents=True, exist_ok=True)
+    (facts_dir / "facts.json").write_text('{"workflow_id": "demo"}\n', encoding="utf-8")
 
     # Empty chapters should raise ValueError
     with pytest.raises(ValueError, match="No chapter Markdown files found"):
-        compile_report_project("demo", src_base_dir=src_base, output_dir=out_dir)
+        compile_report_project("demo", src_dir=src_dir, output_dir=out_dir)
 
     # Unsupported format should raise ValueError
     (ja_dir / "00_cover.md").write_text(_SAMPLE_COVER_MD, encoding="utf-8")
     (ja_dir / "01_metrics.md").write_text(_SAMPLE_METRICS_MD, encoding="utf-8")
     with pytest.raises(ValueError, match="Unsupported report format"):
-        compile_report_project("demo", src_base_dir=src_base, output_dir=out_dir, formats=("docx",))
+        compile_report_project("demo", src_dir=src_dir, output_dir=out_dir, formats=("docx",))
 
-    # Default formats=("pdf",) should normalize drawlib 0.3.5 'demo_ja.pdf' -> 'reports/demo.pdf'
+    # Default formats=("pdf",) should normalize drawlib 0.3.5 'demo_ja.pdf' -> 'pni_report/demo.pdf'
     drawlib_tools = importlib.import_module("drawlib.tools")
 
     def _fake_build_pdf(src_dir_str: str, *, output_file: str, **_kwargs: object) -> str:
@@ -176,7 +194,7 @@ def test_compile_report_pdf_default_and_multi_format(tmp_path: Path, monkeypatch
         return str(localized_pdf)
 
     monkeypatch.setattr(drawlib_tools, "build_pdf", _fake_build_pdf)
-    pdf_only = compile_report_project("demo", src_base_dir=src_base, output_dir=out_dir)
+    pdf_only = compile_report_project("demo", src_dir=src_dir, output_dir=out_dir)
     assert pdf_only.formats == ["pdf"]
     assert pdf_only.pdf_file == (out_dir / "demo.pdf").resolve()
     assert pdf_only.pdf_file.is_file()
@@ -189,7 +207,7 @@ def test_compile_report_pdf_default_and_multi_format(tmp_path: Path, monkeypatch
     # Opt-in HTML + Markdown + Images build
     built = compile_report_project(
         "demo",
-        src_base_dir=src_base,
+        src_dir=src_dir,
         output_dir=out_dir,
         formats=("html", "markdown", "images"),
         no_cache=True,
@@ -207,21 +225,22 @@ def test_compile_report_pdf_default_and_multi_format(tmp_path: Path, monkeypatch
 
 def test_compile_report_missing_src_and_broken_link_detection(tmp_path: Path) -> None:
     """Test compile_report_project error handling on missing src_dir and broken internal HTML links."""
-    src_base = tmp_path / "reports_src"
-    out_dir = tmp_path / "reports"
+    missing_src = tmp_path / "missing_src"
+    out_dir = tmp_path / "pni_report"
     with pytest.raises(FileNotFoundError, match="does not exist"):
-        compile_report_project("missing", src_base_dir=src_base, output_dir=out_dir, formats=("html",))
+        compile_report_project("missing", src_dir=missing_src, output_dir=out_dir, formats=("html",))
 
-    scaffold = scaffold_report_project("broken", src_base_dir=src_base, lang="en", style="default")
+    broken_src = tmp_path / "broken_src"
+    scaffold = scaffold_report_project("broken", src_dir=broken_src, lang="en", style="default")
     bad_md = _SAMPLE_COVER_MD + "\n\nSee [Missing Asset](nonexistent_page.html) for details.\n"
     (scaffold.src_dir / "en" / "00_cover.md").write_text(bad_md, encoding="utf-8")
 
     with pytest.raises(ValueError, match="Broken internal links"):
-        compile_report_project("broken", src_base_dir=src_base, output_dir=out_dir, formats=("html",), no_cache=True)
+        compile_report_project("broken", src_dir=broken_src, output_dir=out_dir, formats=("html",), no_cache=True)
 
     non_strict = compile_report_project(
         "broken",
-        src_base_dir=src_base,
+        src_dir=broken_src,
         output_dir=out_dir,
         formats=("html",),
         no_cache=True,
@@ -231,9 +250,9 @@ def test_compile_report_missing_src_and_broken_link_detection(tmp_path: Path) ->
 
 
 def test_cli_report_init_and_build(tmp_path: Path) -> None:
-    """Test 'pni report init' and 'pni report build' CLI subcommands."""
-    src_base = tmp_path / "reports_src"
-    out_dir = tmp_path / "reports"
+    """Test 'pni report init' and 'pni report build' CLI subcommands with direct flat src_dir."""
+    src_dir = tmp_path / "docs_src" / "pni"
+    out_dir = tmp_path / "docs" / "pni"
 
     res_init = runner.invoke(
         app,
@@ -242,7 +261,7 @@ def test_cli_report_init_and_build(tmp_path: Path) -> None:
             "init",
             "cli_demo",
             "--src-dir",
-            str(src_base),
+            str(src_dir),
             "--lang",
             "en",
             "--style",
@@ -250,13 +269,13 @@ def test_cli_report_init_and_build(tmp_path: Path) -> None:
             "--keep-samples",
         ],
     )
-    assert res_init.exit_code == 0
+    assert res_init.exit_code == 0, res_init.output
     assert "Drawlib report project" in res_init.stdout
-    assert (src_base / "cli_demo_src" / "drawlib.toml").is_file()
-    assert (src_base / "cli_demo_src" / "en" / "00_cover.md").is_file()
+    assert (src_dir / "drawlib.toml").is_file()
+    assert (src_dir / "en" / "00_cover.md").is_file()
 
     # Re-running without --force succeeds idempotently and preserves chapters
-    res_repeat = runner.invoke(app, ["report", "init", "cli_demo", "--src-dir", str(src_base)])
+    res_repeat = runner.invoke(app, ["report", "init", "cli_demo", "--src-dir", str(src_dir)])
     assert res_repeat.exit_code == 0
     assert "preserved existing chapters" in res_repeat.stdout
 
@@ -267,7 +286,7 @@ def test_cli_report_init_and_build(tmp_path: Path) -> None:
             "build",
             "cli_demo",
             "--src-dir",
-            str(src_base),
+            str(src_dir),
             "--output-dir",
             str(out_dir),
             "-f",
@@ -275,25 +294,35 @@ def test_cli_report_init_and_build(tmp_path: Path) -> None:
             "--no-cache",
         ],
     )
-    assert res_build.exit_code == 0
+    assert res_build.exit_code == 0, res_build.output
     assert "Compiled Drawlib report" in res_build.stdout
     assert (out_dir / "cli_demo_html" / "index.html").is_file()
 
     res_build_fail = runner.invoke(
         app,
-        ["report", "build", "nope", "--src-dir", str(src_base), "--output-dir", str(out_dir), "-f", "html"],
+        [
+            "report",
+            "build",
+            "nope",
+            "--src-dir",
+            str(tmp_path / "nonexistent_src"),
+            "--output-dir",
+            str(out_dir),
+            "-f",
+            "html",
+        ],
     )
     assert res_build_fail.exit_code == 1
 
 
 def test_drawlib_guide_and_action_directive_rendering() -> None:
-    """Test render_drawlib_report_guide and write_drawlib_report task body injection."""
+    """Test render_drawlib_report_guide and write_drawlib_report task body injection with flat src_dir."""
     guide = render_drawlib_report_guide(
         target="lib_clean",
-        src_base_dir="reports_src/python",
-        output_dir="reports/python",
-        score_path="reports/python/lib_clean_score.json",
-        facts_path=".pni/cache/py_lib_clean/facts.json",
+        src_dir="docs_src/pni",
+        output_dir="docs/pni",
+        score_path="docs/pni/lib_clean_score.json",
+        facts_path="docs_src/pni/_facts/facts.json",
         target_root="examples/python/lib_clean",
         source_targets=["src"],
         doc_targets=["README.md"],
@@ -302,18 +331,18 @@ def test_drawlib_guide_and_action_directive_rendering() -> None:
         workflow_id="py_lib_clean",
     )
     assert "lang=ja" in guide
-    assert "reports_src/python/lib_clean_src/ja" in guide
+    assert "docs_src/pni/ja" in guide
     assert "HeatmapChart" in guide
     assert "HeatmapOverlay" in guide
-    assert "pni report init lib_clean --src-dir reports_src/python --lang ja --style google" in guide
+    assert "pni report init lib_clean --src-dir docs_src/pni --lang ja --style google" in guide
     assert "uv run drawlib -h" in guide
     assert "uv run drawlib rules show agent-instruction" in guide
     assert "uv run drawlib rules show api" in guide
     assert "uv run drawlib rules show lib-smartarts-overview" in guide
     assert "uv run drawlib rules show lib-charts-overview" in guide
     assert "uv run drawlib rules show lib-diagrams-overview" in guide
-    assert "reports/python/lib_clean.pdf" in guide
-    assert ".pni/cache/py_lib_clean/architecture.json" in guide
+    assert "docs/pni/lib_clean.pdf" in guide
+    assert "docs_src/pni/_facts/facts.json" in guide
     assert "git diff" in guide
     assert "draw_pni_logo" in guide
     assert "_assets/logo.png" in guide
@@ -323,10 +352,10 @@ def test_drawlib_guide_and_action_directive_rendering() -> None:
         {
             "workflow_id": "py_api_legacy_messy",
             "target": "api_legacy_messy",
-            "src_dir": "reports_src/python",
-            "output_dir": "reports/python",
-            "score_path": "reports/python/api_legacy_messy_score.json",
-            "facts_path": ".pni/cache/py_api_legacy_messy/facts.json",
+            "src_dir": "docs_src/pni",
+            "output_dir": "docs/pni",
+            "score_path": "docs/pni/api_legacy_messy_score.json",
+            "facts_path": "docs_src/pni/_facts/facts.json",
             "target_root": "examples/python/api_legacy_messy",
             "source_targets": ["order_app"],
             "doc_targets": ["README.md"],
@@ -335,7 +364,7 @@ def test_drawlib_guide_and_action_directive_rendering() -> None:
         },
         prompt="Focus on processor.py hotspots.",
     )
-    assert "pni report build api_legacy_messy --src-dir reports_src/python --output-dir reports/python" in body
+    assert "pni report build api_legacy_messy --src-dir docs_src/pni --output-dir docs/pni" in body
     assert "Focus on processor.py hotspots." in body
 
 

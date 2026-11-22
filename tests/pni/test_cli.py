@@ -195,10 +195,10 @@ def test_cli_stateful_workflow_commands(tmp_path: Path) -> None:
         assert res_push2.exit_code == 0
         assert "COMPLETED" in res_push2.stdout
 
-        emitted = json.loads((tmp_path / "reports" / "mini_score.json").read_text(encoding="utf-8"))
+        emitted = json.loads((tmp_path / "pni_report" / "mini_score.json").read_text(encoding="utf-8"))
         assert emitted["overall_score"] == 96
-        assert (tmp_path / "reports" / "mini_summary.json").is_file()
-        assert (tmp_path / "reports" / "mini_findings.sarif").is_file()
+        assert (tmp_path / "pni_report" / "mini_summary.json").is_file()
+        assert (tmp_path / "pni_report" / "mini_findings.sarif").is_file()
 
         # Status commands
         res_status_list = runner.invoke(app, ["workflows", "status"])

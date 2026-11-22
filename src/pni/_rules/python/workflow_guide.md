@@ -11,7 +11,7 @@ Inspect `pyproject.toml` (`[project]`, `[tool.uv]`, `[tool.poetry]`, `[tool.hatc
 | Layout Archetype | Typical Directory Structure | Recommended `targets` Configuration |
 | :--- | :--- | :--- |
 | **Standard `src/` Layout** *(Recommended PEP 621)* | `src/<pkg>/`, `tests/`, `README.md` | `source: ["src"]`<br>`tests: ["tests"]`<br>`docs: ["README.md"]` |
-| **Flat Package Layout** | `<pkg>/__init__.py`, `tests/` | `source: ["<pkg>"]` *(list explicit package dirs, NOT `"."`, so `tests/` or `reports_src/` are not mixed into source AST)* |
+| **Flat Package Layout** | `<pkg>/__init__.py`, `tests/` | `source: ["<pkg>"]` *(list explicit package dirs, NOT `"."`, so `tests/` or `pni_report_src/` are not mixed into source AST)* |
 | **FastAPI / Web Service (`app/` Layout)** | `app/`, `migrations/`, `scripts/`, `tests/` | `source: ["app"]` *(exclude auto-generated Alembic `migrations/versions` from source AST)*<br>`tests: ["tests"]` |
 | **Library + Internal Dev CLI** | `src/<pkg>/`, `tools/<cli>/`, `tests/` | Either audit `source: ["src"]` for the published package or create a separate `scope: component` workflow for `tools/` |
 | **`uv` / Poetry Workspace or Multi-Language Monorepo** | `packages/core/`, `packages/api/`, `frontend/` | Create one `scope: component` workflow per package (`root: "packages/core"`) + one `category: rollup` workflow (`includes:`) for a unified report |

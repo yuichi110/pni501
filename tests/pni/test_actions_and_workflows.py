@@ -137,8 +137,8 @@ def test_composite_action_normalization(tmp_path: Path) -> None:
     wf_info, wf_def = loaded
     assert wf_def.targets.source == ["src"]
     assert wf_info.outputs.facts == ".pni/cache/full_audit/facts.json"
-    assert wf_info.outputs.score == "reports/full_audit_score.json"
-    assert wf_info.outputs.report == "reports/full_audit.pdf"
+    assert wf_info.outputs.score == "pni_report/full_audit_score.json"
+    assert wf_info.outputs.report == "pni_report/full_audit.pdf"
 
     primitives = normalize_workflow_steps(wf_def, tmp_path)
     prim_types = [p.type for p in primitives]
@@ -147,9 +147,9 @@ def test_composite_action_normalization(tmp_path: Path) -> None:
     assert PrimitiveType.AI_INTERPRET in prim_types
     assert PrimitiveType.EMIT_SCORE in prim_types
     assert primitives[-1].type == PrimitiveType.WRITE_DRAWLIB_REPORT
-    assert primitives[-1].params["src_dir"] == "reports_src"
-    assert primitives[-1].params["output_dir"] == "reports"
-    assert primitives[-1].params["score_path"] == "reports/full_audit_score.json"
+    assert primitives[-1].params["src_dir"] == "pni_report_src"
+    assert primitives[-1].params["output_dir"] == "pni_report"
+    assert primitives[-1].params["score_path"] == "pni_report/full_audit_score.json"
 
 
 def test_stateful_workflow_pull_push_lifecycle(tmp_path: Path) -> None:
@@ -317,8 +317,8 @@ def test_action_with_target_interpolation_and_score_propagation(tmp_path: Path) 
     prims = normalize_workflow_steps(wf_def, tmp_path)
     assert len(prims) == 3
     assert prims[0].type == PrimitiveType.CONFIRM_PLAN
-    assert prims[1].params["score_path"] == "reports/python_clean_score.json"
+    assert prims[1].params["score_path"] == "pni_report/python_clean_score.json"
     # Even though create_report omitted target, emitted score_path propagated forward
-    assert prims[2].params["score_path"] == "reports/python_clean_score.json"
-    assert wf_info.outputs.score == "reports/python_clean_score.json"
-    assert wf_info.outputs.report == "reports/example_clean.pdf"
+    assert prims[2].params["score_path"] == "pni_report/python_clean_score.json"
+    assert wf_info.outputs.score == "pni_report/python_clean_score.json"
+    assert wf_info.outputs.report == "pni_report/example_clean.pdf"

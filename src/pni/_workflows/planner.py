@@ -65,6 +65,12 @@ _IGNORED_SCAN_DIRS: Final[frozenset[str]] = frozenset(
         ".drawlib",
         "reports",
         "reports_src",
+        "pni_report",
+        "pni_report_src",
+        "pni_migration",
+        "pni_migration_src",
+        "pni_progress",
+        "pni_progress_src",
     }
 )
 

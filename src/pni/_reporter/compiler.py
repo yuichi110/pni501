@@ -14,6 +14,7 @@ from __future__ import annotations
 import importlib
 import re
 import shutil
+import tempfile
 import tomllib
 from collections.abc import Sequence
 from pathlib import Path
@@ -155,22 +156,22 @@ def _get_drawlib_tools() -> _DrawlibToolsProtocol:
     return cast(_DrawlibToolsProtocol, importlib.import_module("drawlib.tools"))
 
 
-def normalize_report_target(target_or_path: str, default_src_base: Path) -> tuple[str, Path]:
-    """Normalize a target name or path (e.g., 'python_clean' or 'reports_src/python_clean_src').
+def normalize_report_target(target_or_path: str, default_src_dir: Path) -> tuple[str, Path]:
+    """Resolve `(clean_target, exact_src_dir)` without adding extra nested `<target>_src` subdirectories.
 
     Args:
-        target_or_path: Target name or relative path to '<target>_src'.
-        default_src_base: Default base directory holding '*_src' folders.
+        target_or_path: Target stem (e.g., 'full_audit') or direct path (e.g., 'docs_src/pni').
+        default_src_dir: Direct Drawlib report source directory (e.g., 'pni_report_src' or 'docs_src/pni').
 
     Returns:
-        tuple[str, Path]: Clean target name (without '_src') and resolved src_base_dir.
+        tuple[str, Path]: Clean target output stem (without '_src') and exact Drawlib source directory.
     """
     cleaned = target_or_path.strip().rstrip("/")
     if "/" in cleaned or "\\" in cleaned:
         p = Path(cleaned)
         target_name = p.name.removesuffix("_src")
-        return target_name or "report", p.parent
-    return cleaned.removesuffix("_src") or "report", default_src_base
+        return target_name or "report", p
+    return cleaned.removesuffix("_src") or "report", default_src_dir
 
 
 def _validate_locale_code(src_dir: Path, raw_lang: str) -> str:
@@ -405,21 +406,72 @@ def _ensure_report_brand_assets(src_dir: Path, *, clean_sample_chapters: bool = 
     return copied
 
 
+def _run_drawlib_init_into_exact_dir(
+    drawlib_tools: _DrawlibToolsProtocol,
+    project_type: str,
+    src_dir: Path,
+    clean_target: str,
+    *,
+    force: bool,
+    lang: str,
+    style: str,
+) -> list[Path]:
+    """Scaffold Drawlib templates directly into `src_dir` regardless of whether `src_dir` ends with `_src`."""
+    if src_dir.name.endswith("_src") and len(src_dir.name) > 4:
+        src_dir.parent.mkdir(parents=True, exist_ok=True)
+        dl_target = src_dir.name.removesuffix("_src")
+        return drawlib_tools.init_project(
+            project_type,
+            destination=src_dir.parent,
+            target=dl_target,
+            force=force,
+            lang=lang,
+            style=style,
+        )
+
+    src_dir.mkdir(parents=True, exist_ok=True)
+    stem = src_dir.name or clean_target or "pni_report"
+    created: list[Path] = []
+    with tempfile.TemporaryDirectory(prefix="pni_drawlib_init_") as tmp_name:
+        tmp_root = Path(tmp_name)
+        tmp_created = drawlib_tools.init_project(
+            project_type,
+            destination=tmp_root,
+            target=stem,
+            force=True,
+            lang=lang,
+            style=style,
+        )
+        tmp_src = tmp_root / f"{stem}_src"
+        for item in tmp_created:
+            if not item.exists():
+                continue
+            rel = item.resolve().relative_to(tmp_src.resolve())
+            dest = src_dir / rel
+            if item.is_dir():
+                dest.mkdir(parents=True, exist_ok=True)
+            else:
+                dest.parent.mkdir(parents=True, exist_ok=True)
+                shutil.copy2(item, dest)
+                created.append(dest)
+    return created
+
+
 def scaffold_report_project(
     target: str = "full_audit",
     *,
-    src_base_dir: Path = Path(DEFAULT_REPORT_SRC_DIR),
+    src_dir: Path = Path(DEFAULT_REPORT_SRC_DIR),
     project_type: str = "doc",
     lang: str = "en",
     style: str = "google",
     clean_sample_chapters: bool = True,
     force: bool = False,
 ) -> ReportScaffoldResult:
-    """Scaffold or refresh <src_base_dir>/<target>_src/ without deleting existing chapter documents.
+    """Scaffold or refresh `src_dir` directly (e.g., `pni_report_src/` or `docs_src/pni/`) non-destructively.
 
     Args:
-        target: Target prefix name creating '<src_base_dir>/<target>_src/'.
-        src_base_dir: Base directory for report source projects (default 'reports_src').
+        target: Output target stem (e.g., 'full_audit') or direct path to report source directory.
+        src_dir: Exact Drawlib report source directory (default 'pni_report_src').
         project_type: Drawlib project type ('doc' recommended for linear A4 PDF reports).
         lang: Localized typography and stylesheet language ('en', 'ja', or 'en,ja').
         style: Drawlib preset theme ('google', 'default', 'monochrome').
@@ -429,17 +481,18 @@ def scaffold_report_project(
     Returns:
         ReportScaffoldResult: Paths, preservation status, and scaffolded files metadata.
     """
-    clean_target, eff_base = normalize_report_target(target, src_base_dir)
-    resolved_base = eff_base.resolve()
-    src_dir = resolved_base / f"{clean_target}_src"
+    clean_target, eff_src_dir = normalize_report_target(target, src_dir)
+    resolved_src = eff_src_dir.resolve()
+    resolved_parent = resolved_src.parent
 
-    existing_chapters = _snapshot_existing_chapters(src_dir, fallback_lang=lang)
-    if src_dir.is_dir() and not force:
-        _ensure_print_table_css(src_dir, ())
-        _ensure_report_brand_assets(src_dir, clean_sample_chapters=False)
+    existing_chapters = _snapshot_existing_chapters(resolved_src, fallback_lang=lang)
+    already_initialized = (resolved_src / "drawlib.toml").is_file()
+    if already_initialized and not force:
+        _ensure_print_table_css(resolved_src, ())
+        _ensure_report_brand_assets(resolved_src, clean_sample_chapters=False)
         return ReportScaffoldResult(
-            src_base_dir=resolved_base,
-            src_dir=src_dir,
+            src_base_dir=resolved_parent,
+            src_dir=resolved_src,
             project_type=project_type,
             target=clean_target,
             lang=lang,
@@ -448,34 +501,34 @@ def scaffold_report_project(
             created_files=[],
         )
 
-    resolved_base.mkdir(parents=True, exist_ok=True)
     drawlib_tools = _get_drawlib_tools()
-    raw_created = drawlib_tools.init_project(
+    raw_created = _run_drawlib_init_into_exact_dir(
+        drawlib_tools,
         project_type,
-        destination=resolved_base,
-        target=clean_target,
-        force=force,
+        resolved_src,
+        clean_target,
+        force=force or resolved_src.exists(),
         lang=lang,
         style=style,
     )
 
-    _, target_langs = _read_drawlib_i18n_config(src_dir, fallback_lang=lang)
+    _, target_langs = _read_drawlib_i18n_config(resolved_src, fallback_lang=lang)
     _restore_or_clean_chapters(
-        src_dir,
+        resolved_src,
         target_langs,
         existing_chapters,
         clean_sample_chapters=clean_sample_chapters,
     )
-    _ensure_print_table_css(src_dir, raw_created)
-    brand_files = _ensure_report_brand_assets(src_dir, clean_sample_chapters=clean_sample_chapters)
+    _ensure_print_table_css(resolved_src, raw_created)
+    brand_files = _ensure_report_brand_assets(resolved_src, clean_sample_chapters=clean_sample_chapters)
     kept_set = {p.resolve() for p in raw_created if p.exists()}
     kept_files = [p for p in raw_created if p.exists()]
     for bf in brand_files:
         if bf.resolve() not in kept_set:
             kept_files.append(bf)
     return ReportScaffoldResult(
-        src_base_dir=resolved_base,
-        src_dir=src_dir,
+        src_base_dir=resolved_parent,
+        src_dir=resolved_src,
         project_type=project_type,
         target=clean_target,
         lang=lang,
@@ -610,7 +663,7 @@ def _run_optional_non_pdf_builds(
 def compile_report_project(
     target: str = "full_audit",
     *,
-    src_base_dir: Path = Path(DEFAULT_REPORT_SRC_DIR),
+    src_dir: Path = Path(DEFAULT_REPORT_SRC_DIR),
     output_dir: Path = Path(DEFAULT_REPORT_OUTPUT_DIR),
     html_output_dir: Path | None = None,
     link_check_root: Path | None = None,
@@ -621,12 +674,12 @@ def compile_report_project(
     strict_links: bool = True,
     strict_preflight: bool = False,
 ) -> ReportBuildResult:
-    """Compile <src_base_dir>/<target>_src/ into <output_dir>/<target>.pdf (and optional extra formats).
+    """Compile `src_dir` directly into `<output_dir>/<target>.pdf` (and optional extra formats).
 
     Args:
-        target: Project target prefix or path (e.g. 'python_clean' -> 'reports_src/python_clean_src').
-        src_base_dir: Base directory containing '<target>_src/' (default 'reports_src').
-        output_dir: Destination directory for compiled deliverables (default 'reports').
+        target: Output target stem (e.g. 'full_audit') or direct path to report source directory.
+        src_dir: Exact Drawlib report source directory (default 'pni_report_src', e.g. 'docs_src/pni').
+        output_dir: Destination directory for compiled deliverables (default 'pni_report').
         html_output_dir: Optional custom destination directory for compiled HTML output.
         link_check_root: Optional root directory for HTML relative link verification in multi-portal layouts.
         formats: Output formats to build (defaults to ('pdf',); supports 'pdf', 'html', 'markdown', 'images').
@@ -640,28 +693,25 @@ def compile_report_project(
         ReportBuildResult: Paths of compiled deliverables and link scan statistics.
 
     Raises:
-        FileNotFoundError: If '<src_base_dir>/<target>_src/' does not exist.
+        FileNotFoundError: If `src_dir` does not exist.
         ValueError: If drawlib.toml or chapters are missing, format is invalid, or link/preflight checks fail.
     """
-    clean_target, eff_src_base = normalize_report_target(target, src_base_dir)
+    clean_target, eff_src_dir = normalize_report_target(target, src_dir)
     active_formats = _normalize_formats(formats)
-    resolved_src_base = eff_src_base.resolve()
-    src_dir = resolved_src_base / f"{clean_target}_src"
-    if not src_dir.is_dir() and (resolved_src_base / "drawlib.toml").is_file():
-        src_dir = resolved_src_base
-    if not src_dir.is_dir():
-        msg = f"Report source directory '{src_dir}' does not exist. Run 'pni report init {clean_target}' first."
+    resolved_src = eff_src_dir.resolve()
+    if not resolved_src.is_dir():
+        msg = f"Report source directory '{resolved_src}' does not exist. Run 'pni report init {clean_target}' first."
         raise FileNotFoundError(msg)
-    if not (src_dir / "drawlib.toml").is_file():
-        msg = f"Missing 'drawlib.toml' in '{src_dir}'. Run 'pni report init {clean_target} --force' first."
+    if not (resolved_src / "drawlib.toml").is_file():
+        msg = f"Missing 'drawlib.toml' in '{resolved_src}'. Run 'pni report init {clean_target} --force' first."
         raise ValueError(msg)
 
-    _ensure_report_brand_assets(src_dir, clean_sample_chapters=False)
-    default_lang, langs = _read_drawlib_i18n_config(src_dir)
-    chapters = _find_chapter_markdown_files(src_dir, fallback_lang=default_lang)
+    _ensure_report_brand_assets(resolved_src, clean_sample_chapters=False)
+    default_lang, langs = _read_drawlib_i18n_config(resolved_src)
+    chapters = _find_chapter_markdown_files(resolved_src, fallback_lang=default_lang)
     if not chapters:
         msg = (
-            f"No chapter Markdown files found in '{src_dir}/{default_lang}/' "
+            f"No chapter Markdown files found in '{resolved_src}/{default_lang}/' "
             "(create 00_cover.md, 01_*.md, ...)."
         )
         raise ValueError(msg)
@@ -674,8 +724,8 @@ def compile_report_project(
 
     out_dir = output_dir.resolve()
     out_dir.mkdir(parents=True, exist_ok=True)
-    styles_file = src_dir / "styles.py"
-    utils_file = src_dir / "utils.py"
+    styles_file = resolved_src / "styles.py"
+    utils_file = resolved_src / "utils.py"
     styles_arg = str(styles_file) if styles_file.is_file() else None
     utils_arg = str(utils_file) if utils_file.is_file() else None
     drawlib_tools = _get_drawlib_tools()
@@ -684,7 +734,7 @@ def compile_report_project(
     if "pdf" in active_formats:
         pdf_candidate = out_dir / f"{clean_target}.pdf"
         raw_pdf = drawlib_tools.build_pdf(
-            str(src_dir),
+            str(resolved_src),
             output_file=str(pdf_candidate),
             page_break=page_break,
             generate_index=generate_toc,
@@ -696,7 +746,7 @@ def compile_report_project(
 
     html_dir, html_index, markdown_dir, images_dir = _run_optional_non_pdf_builds(
         drawlib_tools,
-        src_dir,
+        resolved_src,
         out_dir,
         clean_target,
         active_formats,
@@ -717,7 +767,7 @@ def compile_report_project(
     deliverables = _collect_deliverables(pdf_file, html_index, markdown_dir, images_dir)
     return ReportBuildResult(
         target=clean_target,
-        src_dir=src_dir,
+        src_dir=resolved_src,
         output_dir=out_dir,
         formats=active_formats,
         pdf_file=pdf_file,

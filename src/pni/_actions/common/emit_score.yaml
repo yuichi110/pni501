@@ -5,7 +5,7 @@ primitives:
   - type: emit_score
     name: Write Validated Score & AI Context JSON
     with:
-      output_dir: "reports"
+      output_dir: "pni_report"
       target: "{workflow_id}"
       score_path: "{output_dir}/{target}_score.json"
     prompt: |

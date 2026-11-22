@@ -151,7 +151,7 @@ workflows_app = typer.Typer(
 )
 report_app = typer.Typer(
     name="report",
-    help="Scaffold and compile Drawlib visual project reports (reports_src/*_src -> reports/*.pdf).",
+    help="Scaffold and compile Drawlib visual project reports (pni_report_src -> pni_report).",
     epilog=HELP_EPILOG,
     no_args_is_help=True,
     context_settings=CONTEXT_SETTINGS,
@@ -1481,12 +1481,12 @@ def cancel_workflow_cmd(
 def report_init_cmd(
     target: str = typer.Argument(
         "full_audit",
-        help="Report target name creating '<src_dir>/<target>_src/' (e.g., 'full_audit', 'python_clean').",
+        help="Report output stem (e.g., 'full_audit') or direct Drawlib source path (e.g., 'docs_src/pni').",
     ),
     src_dir: Optional[Path] = typer.Option(
         None,
         "--src-dir",
-        help="Base directory holding '<target>_src/' report source projects (defaults to pni.toml or 'reports_src').",
+        help="Direct Drawlib report source directory (defaults to pni.toml or 'pni_report_src').",
     ),
     lang: Optional[str] = typer.Option(
         None,
@@ -1520,7 +1520,7 @@ def report_init_cmd(
     try:
         res = scaffold_report_project(
             target,
-            src_base_dir=eff_src_dir,
+            src_dir=eff_src_dir,
             project_type="doc",
             lang=eff_lang,
             style=eff_style,
@@ -1542,18 +1542,18 @@ def report_init_cmd(
 def report_build_cmd(
     target: str = typer.Argument(
         "full_audit",
-        help="Report target name or path (compiles '<src_dir>/<target>_src/' -> '<output_dir>/<target>.pdf').",
+        help="Report output stem (e.g., 'full_audit') or direct source dir ('<src_dir>' -> '<output_dir>').",
     ),
     src_dir: Optional[Path] = typer.Option(
         None,
         "--src-dir",
-        help="Base directory containing '<target>_src/' (defaults to pni.toml or 'reports_src').",
+        help="Direct Drawlib report source directory (defaults to pni.toml or 'pni_report_src').",
     ),
     output_dir: Optional[Path] = typer.Option(
         None,
         "--output-dir",
         "-o",
-        help="Destination directory for compiled report deliverables (defaults to pni.toml or 'reports').",
+        help="Destination directory for compiled report deliverables (defaults to pni.toml or 'pni_report').",
     ),
     html_output_dir: Optional[Path] = typer.Option(
         None,
@@ -1598,7 +1598,7 @@ def report_build_cmd(
     try:
         res = compile_report_project(
             target,
-            src_base_dir=eff_src_dir,
+            src_dir=eff_src_dir,
             output_dir=eff_out_dir,
             html_output_dir=eff_html_dir,
             link_check_root=link_check_root,

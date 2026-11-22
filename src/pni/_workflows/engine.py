@@ -74,6 +74,8 @@ from pni._reporter import (
     build_score_summary,
     default_sarif_rel_path,
     default_summary_rel_path,
+    resolve_report_src_dir_for_actions,
+    sync_workflow_facts_to_report,
     write_sarif_report,
     write_score_summary,
 )
@@ -152,7 +154,7 @@ def inspect_base_audit_status(
     """Check SQLite state DB for a completed prerequisite audit run when 'based_on' is declared.
 
     Note: `category: progress` workflows treat `based_on` as an optional Git-tracked history link
-    (`.pni/history/audit/<based_on>.jsonl` / `reports/<based_on>_score.json`) rather than requiring
+    (`.pni/history/audit/<based_on>.jsonl` / `pni_report/<based_on>_score.json`) rather than requiring
     `.gitignore`'d `.pni/cache/workflow_state.db`.
     """
     db_file = project_root / DEFAULT_STATE_DB_REL_PATH
@@ -2049,13 +2051,22 @@ def _persist_emitted_score(
     summary_rel = default_summary_rel_path(score_rel)
     sarif_rel = default_sarif_rel_path(score_rel)
     facts_rel = _resolve_facts_rel_path(run, action)
+    arch_rel = _resolve_arch_rel_path(run, action)
     plan_rel = default_plan_rel_path(run.workflow_id)
+
+    report_src_dir = resolve_report_src_dir_for_actions(all_actions)
+    raw_evidence = {
+        "plan_json": plan_rel,
+        "facts_json": facts_rel,
+        **({"architecture_json": arch_rel} if (project_root / arch_rel).is_file() else {}),
+    }
+    synced_evidence = sync_workflow_facts_to_report(project_root, report_src_dir, source_files=raw_evidence)
+    eff_facts_rel = synced_evidence.get("facts_json", facts_rel)
     artifact_manifest = {
         "score_json": score_rel,
         "summary_json": summary_rel,
         "findings_sarif": sarif_rel,
-        "plan_json": plan_rel,
-        "facts_json": facts_rel,
+        **synced_evidence,
     }
     exec_dag = build_execution_dag_summary(
         run,
@@ -2081,7 +2092,7 @@ def _persist_emitted_score(
         evaluated_at=datetime.now(timezone.utc).isoformat(),
         language=lang,
         target_root=run.targets.root,
-        facts_file=facts_rel,
+        facts_file=eff_facts_rel,
         key_files_inspected=list(sub.key_files_inspected),
         overall_score=sub.overall_score,
         grade=score_to_grade(sub.overall_score),

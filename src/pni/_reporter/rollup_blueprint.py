@@ -14,6 +14,7 @@ from __future__ import annotations
 from typing import Final
 
 from pni._actions.base_model import ScoreResult
+from pni._reporter.base_model import DEFAULT_REPORT_OUTPUT_DIR
 from pni._reporter.blueprint import (
     BlueprintChapterSpec,
     ReportBlueprint,
@@ -130,9 +131,9 @@ def build_rollup_report_blueprint(
                 *format_artifact_manifest_lines(
                     score.execution_dag,
                     fallback_manifest={
-                        "score_json": f"reports/{score.workflow_id or target}_score.json",
-                        "summary_json": f"reports/{score.workflow_id or target}_summary.json",
-                        "findings_sarif": f"reports/{score.workflow_id or target}_findings.sarif",
+                        "score_json": f"{DEFAULT_REPORT_OUTPUT_DIR}/{score.workflow_id or target}_score.json",
+                        "summary_json": f"{DEFAULT_REPORT_OUTPUT_DIR}/{score.workflow_id or target}_summary.json",
+                        "findings_sarif": f"{DEFAULT_REPORT_OUTPUT_DIR}/{score.workflow_id or target}_findings.sarif",
                         "rollup_facts_json": f".pni/cache/{score.workflow_id or target}/rollup_facts.json",
                     },
                 ),

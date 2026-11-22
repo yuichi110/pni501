@@ -242,7 +242,7 @@ def test_three_aspect_record_architecture_grounding_and_persistence(tmp_path: Pa
     ok6, _ = push_workflow_action(run.run_id, act6.action_id, score_payload, tmp_path)
     assert ok6 is True
 
-    score_data = json.loads((tmp_path / "reports" / "arch_audit_score.json").read_text(encoding="utf-8"))
+    score_data = json.loads((tmp_path / "pni_report" / "arch_audit_score.json").read_text(encoding="utf-8"))
     assert score_data["architecture_overview"]["pattern"] == "layered_cli"
     assert score_data["architecture_overview"]["entry_points"] == ["src/mini/cli.py:main"]
     assert len(score_data["architecture_overview"]["modules"]) == 1

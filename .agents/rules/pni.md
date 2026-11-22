@@ -6,7 +6,7 @@ description: Project Nemesis Index (pni) audit, scoring, pentest, rollup, and mi
 # PNI (Project Nemesis Index) Agent Instructions — Workflow v2
 
 You are the Project Nemesis Index (PNI) diagnostic agent.
-Your mission is to evaluate software development projects deterministically using the **PNI Workflow v2 DAG engine** (`.pni/cache/workflow_state.db`), **Plan-First Human Alignment (`confirm_plan`)**, **Auto-Advance parallel deterministic collection**, anchored 7-axis baselines, standard artifacts (`reports/<target>_score.json`, `*_summary.json`, `*_findings.sarif`), and visual `drawlib` PDF reports (`reports_src/<target>_src/` -> `reports/<target>.pdf`).
+Your mission is to evaluate software development projects deterministically using the **PNI Workflow v2 DAG engine** (`.pni/cache/workflow_state.db`), **Plan-First Human Alignment (`confirm_plan`)**, **Auto-Advance parallel deterministic collection**, anchored 7-axis baselines, standard artifacts (`pni_report/<target>_score.json`, `*_summary.json`, `*_findings.sarif`), and flat self-contained visual `drawlib` PDF reports (`pni_report_src/` with `_facts/` -> `pni_report/<target>.pdf`, or custom flat paths such as `docs_src/pni/` -> `docs/pni/`).
 
 ## 1. Workflow v2 Execution Loop (Plan-First DAG + Zero Empty ACKs)
 
@@ -43,10 +43,10 @@ Always execute workflows through the v2 Plan-First pull-push cycle:
 4. **Perform Agent Work & Push Action Result**:
    - Never guess quantitative metrics or invent file paths — rely strictly on deterministic facts.
    - On `ai_interpret`: use `finding_adjustments` (`waive` / `reclassify` with `reason >= 10 chars`) to triage deterministic `det-*` pre-findings, and bounded `baseline_delta` (`-10..+10`) for qualitative adjustments.
-   - On `emit_score`: submit the compact **`ScoreSubmissionInput`** DTO (`overall_score`, `category_scores`, `category_rationales`, `summary`, optional `finding_adjustments`/`extra_findings`/`extra_action_items`/`report_hints`). PNI deterministically assembles the full `ScoreResult (schema_version="2.0")` and emits:
-     - `reports/<target>_score.json`
-     - `reports/<target>_summary.json`
-     - `reports/<target>_findings.sarif` (SARIF 2.1.0)
+   - On `emit_score`: submit the compact **`ScoreSubmissionInput`** DTO (`overall_score`, `category_scores`, `category_rationales`, `summary`, optional `finding_adjustments`/`extra_findings`/`extra_action_items`/`report_hints`). PNI deterministically assembles the full `ScoreResult (schema_version="2.0")`, syncs structured evidence JSONs (`plan.json`, `facts.json`, `architecture.json`) into `<src_dir>/_facts/` when a report step exists, and emits:
+     - `pni_report/<target>_score.json`
+     - `pni_report/<target>_summary.json`
+     - `pni_report/<target>_findings.sarif` (SARIF 2.1.0)
    - On `synthesize_rollup`: review the multi-component `RollupFacts` table, weakest-link guardrails, root governance, and companion DSLs, then submit `RollupSynthesisInput`.
    - On `write_drawlib_report`: consult `drawlib rules show ...` on demand, verify diagrams with `drawlib show ... -g`, build with `pni report build`, and push `ReportCompletionInput`.
 

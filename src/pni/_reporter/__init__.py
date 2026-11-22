@@ -12,6 +12,7 @@
 from __future__ import annotations
 
 from pni._reporter.base_model import (
+    DEFAULT_REPORT_FACTS_SUBDIR,
     DEFAULT_REPORT_FORMATS,
     DEFAULT_REPORT_OUTPUT_DIR,
     DEFAULT_REPORT_SRC_DIR,
@@ -35,6 +36,11 @@ from pni._reporter.compiler import (
     scaffold_report_project,
 )
 from pni._reporter.drawlib_guide import render_drawlib_report_guide
+from pni._reporter.facts_sync import (
+    resolve_report_src_dir_for_actions,
+    sync_workflow_facts_to_report,
+    write_blueprint_to_report_facts,
+)
 from pni._reporter.migration_blueprint import (
     build_migration_blueprint,
     load_or_build_migration_blueprint,
@@ -56,6 +62,7 @@ from pni._reporter.sarif import (
 )
 
 __all__ = [
+    "DEFAULT_REPORT_FACTS_SUBDIR",
     "DEFAULT_REPORT_FORMATS",
     "DEFAULT_REPORT_OUTPUT_DIR",
     "DEFAULT_REPORT_SRC_DIR",
@@ -84,7 +91,10 @@ __all__ = [
     "render_drawlib_report_guide",
     "render_migration_blueprint_markdown",
     "render_progress_blueprint_markdown",
+    "resolve_report_src_dir_for_actions",
     "scaffold_report_project",
+    "sync_workflow_facts_to_report",
+    "write_blueprint_to_report_facts",
     "write_sarif_report",
     "write_score_summary",
 ]

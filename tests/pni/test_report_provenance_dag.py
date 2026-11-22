@@ -59,6 +59,10 @@ def _setup_dag_provenance_repo(tmp_path: Path) -> None:
 
     wf_dir = tmp_path / ".pni" / "workflows"
     wf_dir.mkdir(parents=True)
+    (tmp_path / ".pni" / "pni.toml").write_text(
+        '[report]\nsrc_dir = "docs_src/pni"\noutput_dir = "docs/pni"\n',
+        encoding="utf-8",
+    )
     (wf_dir / "prov_audit.yaml").write_text(
         """id: prov_audit
 name: Provenance DAG Audit
@@ -90,8 +94,6 @@ steps:
     needs: [score]
     with:
       target: "prov_audit"
-      src_dir: "reports_src"
-      output_dir: "reports"
 """,
         encoding="utf-8",
     )
@@ -173,7 +175,7 @@ def test_end_to_end_execution_dag_baseline_triage_and_artifact_manifest(tmp_path
     assert ok is True, msg
 
     score_obj = ScoreResult.model_validate_json(
-        (tmp_path / "reports" / "prov_audit_score.json").read_text(encoding="utf-8")
+        (tmp_path / "docs" / "pni" / "prov_audit_score.json").read_text(encoding="utf-8")
     )
     assert score_obj.execution_dag is not None
     dag = score_obj.execution_dag
@@ -190,14 +192,20 @@ def test_end_to_end_execution_dag_baseline_triage_and_artifact_manifest(tmp_path
     assert dag.audit_scope is not None
     assert dag.audit_scope.exclude_globs == ["dist/**"]
     assert any("tree-sitter" in t for t in dag.audit_scope.tools_used)
-    assert dag.audit_scope.artifact_manifest["score_json"] == "reports/prov_audit_score.json"
-    assert dag.audit_scope.artifact_manifest["findings_sarif"] == "reports/prov_audit_findings.sarif"
+    assert dag.audit_scope.artifact_manifest["score_json"] == "docs/pni/prov_audit_score.json"
+    assert dag.audit_scope.artifact_manifest["findings_sarif"] == "docs/pni/prov_audit_findings.sarif"
+    # Structured facts & plan automatically synced into custom flat report src_dir `_facts/`!
+    assert dag.audit_scope.artifact_manifest["facts_json"] == "docs_src/pni/_facts/facts.json"
+    assert dag.audit_scope.artifact_manifest["plan_json"] == "docs_src/pni/_facts/plan.json"
+    assert (tmp_path / "docs_src" / "pni" / "_facts" / "facts.json").is_file()
+    assert (tmp_path / "docs_src" / "pni" / "_facts" / "plan.json").is_file()
     assert len(score_obj.triaged_adjustments) == 1
     assert score_obj.triaged_adjustments[0].finding_id == det_id
 
     # 4. write_drawlib_report prompt & Chapter 4 Blueprint contents
     _, act_rep, guide_rep = get_workflow_action(run.run_id, tmp_path)
     assert act_rep is not None and act_rep.primitive_type == PrimitiveType.WRITE_DRAWLIB_REPORT
+    assert (tmp_path / "docs_src" / "pni" / "_facts" / "blueprint.json").is_file()
     assert "lib-graph-overview" in guide_rep
     assert "Executed Workflow Pipeline DAG" in guide_rep
     assert "7-Axis Deterministic Baseline vs. Final Score Comparison" in guide_rep
@@ -212,7 +220,8 @@ def test_end_to_end_execution_dag_baseline_triage_and_artifact_manifest(tmp_path
     assert "[SKIP | SKIPPED]" in ch4_text
     assert "Finding Source Split" in ch4_text
     assert det_id in ch4_text
-    assert "reports/prov_audit_findings.sarif" in ch4_text
+    assert "docs/pni/prov_audit_findings.sarif" in ch4_text
+    assert "docs_src/pni/_facts/facts.json" in ch4_text
 
 
 def test_rollup_migration_and_progress_blueprints_include_dag_and_artifacts() -> None:

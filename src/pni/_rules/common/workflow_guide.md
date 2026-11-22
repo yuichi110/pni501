@@ -124,8 +124,8 @@ steps:
     needs: [output_score]
     with:
       target: "full_audit"
-      src_dir: "reports_src"
-      output_dir: "reports"
+      src_dir: "pni_report_src"
+      output_dir: "pni_report"
       formats: ["pdf"]
 ```
 
@@ -139,7 +139,7 @@ When one repository contains multiple primary languages or independently structu
 
 1. **Author Per-Component Sub-Audits (`scope: component`)**:
    - Create `.pni/workflows/audit_backend.yaml`, `audit_frontend.yaml`, etc., setting `scope: component` and `targets.root: "backend"` (or `"frontend"`).
-   - Component sub-audits skip duplicate root governance/companion checks and end at `emit_score` (producing `reports/<component>_score.json`, `*_summary.json`, and `*_findings.sarif` without generating redundant standalone PDFs unless explicitly requested).
+   - Component sub-audits skip duplicate root governance/companion checks and end at `emit_score` (producing `pni_report/<component>_score.json`, `*_summary.json`, and `*_findings.sarif` without generating redundant standalone PDFs unless explicitly requested).
    - Optionally declare components centrally in `.pni/pni.toml` under `[[components]]`.
 2. **Author One Unified Rollup Workflow (`category: rollup`)**:
    - PNI verifies all `includes:` sub-audits are `COMPLETED`, aggregates 7-axis scores via `log1p(LOC)` smoothing + `security`/`testing` weakest-link guardrails (`min_primary + 15`), normalizes every finding path to repository root with `component` tags, runs root governance + companion DSL scans once, and renders a unified 6-chapter Drawlib report (`report_mode: "unified"` default):
@@ -173,8 +173,8 @@ steps:
     needs: [rollup_synthesis]
     with:
       target: "monorepo_rollup"
-      src_dir: "reports_src"
-      output_dir: "reports"
+      src_dir: "pni_report_src"
+      output_dir: "pni_report"
       formats: ["pdf"]
 ```
 
@@ -207,15 +207,15 @@ steps:
       api_compatibility: "strict"         # strict | versioned_v2 | flexible
       bug_handling_policy: "ask_human"    # ask_human | preserve_behavior | fix_in_phase3
       codemod_tool: "openrewrite"         # openrewrite | rector | ruff | manual_only
-      output_dir: "reports"
+      output_dir: "pni_report"
       target: "app_migration"
 
   - id: create_migration_pdf
     uses: write_migration_report
     needs: [gap_and_order]
     with:
-      src_dir: "reports_src"
-      output_dir: "reports"
+      src_dir: "pni_report_src"
+      output_dir: "pni_report"
       target: "app_migration"
       lang: "ja"
       style: "google"
@@ -250,15 +250,15 @@ steps:
     with:
       plan_file: ".pni/progress/project_progress.yaml"
       lookback_weeks: 12
-      output_dir: "reports"
+      output_dir: "pni_report"
       target: "project_progress"
 
   - id: create_progress_pdf
     uses: write_progress_report
     needs: [assess_progress]
     with:
-      src_dir: "reports_src"
-      output_dir: "reports"
+      src_dir: "pni_report_src"
+      output_dir: "pni_report"
       target: "project_progress"
       lang: "ja"
       style: "google"

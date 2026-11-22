@@ -591,27 +591,27 @@ steps:
 
     mig_guide = render_drawlib_report_guide(
         target="demo_migration",
-        src_base_dir="reports_src",
-        output_dir="reports",
-        score_path="reports/demo_migration_score.json",
-        facts_path=".pni/cache/demo_migration/facts.json",
+        src_dir="pni_report_src",
+        output_dir="pni_report",
+        score_path="pni_report/demo_migration_score.json",
+        facts_path="pni_report_src/_facts/migration_facts.json",
         target_root=".",
         source_targets=["src"],
         doc_targets=["README.md"],
         workflow_id="demo_migration",
         lang="ja",
         report_kind="migration",
-        plan_path="reports/demo_migration_plan.json",
+        plan_path="pni_report/demo_migration_plan.json",
     )
     assert "02_architecture_waves_and_contracts.md" in mig_guide
     assert "demo_migration_plan.json" in mig_guide
 
-    # Step 4: write_drawlib_report renders blueprint-driven migration report guide
+    # Step 4: write_drawlib_report renders blueprint-driven migration report guide and persists blueprint in _facts/
     _, act4, guide4 = get_workflow_action(run_rec.run_id, tmp_path)
     assert act4 is not None
     assert act4.primitive_type.value == "write_drawlib_report"
     assert "01_migration_strategy_summary.md" in guide4
-    assert (tmp_path / ".pni" / "cache" / "demo_migration" / "migration_blueprint.json").exists()
+    assert (tmp_path / "reports_src" / "_facts" / "migration_blueprint.json").exists()
 
 
 def test_workflow_category_and_based_on_schema_validation() -> None:

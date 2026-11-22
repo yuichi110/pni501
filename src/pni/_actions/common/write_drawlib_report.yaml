@@ -5,8 +5,8 @@ primitives:
   - type: write_drawlib_report
     name: Create Visual Report with drawlib
     with:
-      src_dir: "reports_src"
-      output_dir: "reports"
+      src_dir: "pni_report_src"
+      output_dir: "pni_report"
       target: "{workflow_id}"
       score_path: "{output_dir}/{target}_score.json"
       formats:
@@ -15,6 +15,6 @@ primitives:
       style: "google"
     prompt: |
       Execute the 3-phase report synthesis:
-      1. READ Score from the configured score JSON and deterministic facts JSON.
+      1. READ Score from the configured score JSON and structured evidence JSONs in `<src_dir>/_facts/` (plan, facts, architecture, blueprint).
       2. READ Code & Documentation across the target paths to capture real module boundaries and key insights.
-      3. CONSULT Drawlib rules on demand (`drawlib rules show agent-instruction`, `api`, `lib-smartarts-overview`, `lib-charts-overview`, `lib-diagrams-overview`, `lib-graph-overview`, `project-doc`), WRITE or UPDATE the Drawlib `doc` report (`reports_src/<target>_src/<lang>/` -> `reports/<target>.pdf`), place the PNI501 logo badge (`_assets/logo_dark.png` or `_assets/logo.png` via `draw_pni_logo()` in `utils.py` or `drawlib.images.image`) on the `00_cover.md` cover diagram, include the action-level Executed Audit DAG (`drawlib.graph` / `drawlib.diagrams.flow`), 7-axis Deterministic Baseline vs. AI Δ table, triage/waiver log, and compact Machine-Readable Artifact Reference Table in Chapter 4 (never paste raw JSON into the PDF), visually verify diagrams via `drawlib show ... -g`, and COMPILE. Use exact submodule imports (`from drawlib.charts.bar import BarChart`) and `Styles.WarningNeutral.shape_fill_color` (never invent `Colors.AmberNeutral`), and keep chapter/diagram counts identical across all languages when building multi-language reports. If chapter `.md` files already exist in `reports_src/<target>_src/<lang>/`, update them in-place without deleting existing documents or creating dated archive copies so `git diff` tracks changes cleanly.
+      3. CONSULT Drawlib rules on demand (`drawlib rules show agent-instruction`, `api`, `lib-smartarts-overview`, `lib-charts-overview`, `lib-diagrams-overview`, `lib-graph-overview`, `project-doc`), WRITE or UPDATE the Drawlib `doc` report directly inside `<src_dir>/<lang>/` (default `pni_report_src/<lang>/` -> `pni_report/<target>.pdf`, or custom e.g. `docs_src/pni/<lang>/` -> `docs/pni/<target>.pdf`), place the PNI501 logo badge (`_assets/logo_dark.png` or `_assets/logo.png` via `draw_pni_logo()` in `utils.py` or `drawlib.images.image`) on the `00_cover.md` cover diagram, include the action-level Executed Audit DAG (`drawlib.graph` / `drawlib.diagrams.flow`), 7-axis Deterministic Baseline vs. AI Δ table, triage/waiver log, and compact Machine-Readable Artifact Reference Table in Chapter 4 (never paste raw JSON into the PDF), visually verify diagrams via `drawlib show ... -g`, and COMPILE. Use exact submodule imports (`from drawlib.charts.bar import BarChart`) and `Styles.WarningNeutral.shape_fill_color` (never invent `Colors.AmberNeutral`), and keep chapter/diagram counts identical across all languages when building multi-language reports. If chapter `.md` files already exist in `<src_dir>/<lang>/`, update them in-place without deleting existing documents or creating dated archive copies so `git diff` tracks changes cleanly.

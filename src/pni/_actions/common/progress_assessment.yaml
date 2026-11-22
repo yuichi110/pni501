@@ -9,7 +9,7 @@ primitives:
     name: Extract Schedule, Branch Merge-Tree Conflicts & Historical LOC/Test Trajectories
     with:
       lookback_weeks: 12
-      output_dir: "reports"
+      output_dir: "pni_report"
       target: "{workflow_id}"
   - type: ai_interpret
     name: Evaluate Declared vs. Verified Progress, Branch Conflicts & Git Governance
@@ -31,7 +31,7 @@ primitives:
   - type: emit_progress
     name: Emit Validated ProgressResult JSON & Append Progress Ledger
     with:
-      output_dir: "reports"
+      output_dir: "pni_report"
       target: "{workflow_id}"
     prompt: |
       Emit a complete, evidence-grounded `ProgressResult` JSON payload without modifying

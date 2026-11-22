@@ -149,6 +149,7 @@ def _render_chapter_spec_block(
     report_kind: str = "audit",
     plan_path: str = "",
     progress_path: str = "",
+    report_src_dir: str | None = None,
 ) -> list[str]:
     """Render either the live pre-sorted Blueprint or the canonical chapter fallback layout."""
     if report_kind == "migration":
@@ -159,6 +160,7 @@ def _render_chapter_spec_block(
             lang=lang,
             style=style,
             workflow_id=workflow_id,
+            report_src_dir=report_src_dir,
         )
         if mig_bp is not None:
             return [render_migration_blueprint_markdown(mig_bp, mig_rel)]
@@ -175,6 +177,7 @@ def _render_chapter_spec_block(
             lang=lang,
             style=style,
             workflow_id=workflow_id,
+            report_src_dir=report_src_dir,
         )
         if prog_bp is not None:
             return [render_progress_blueprint_markdown(prog_bp, prog_rel)]
@@ -190,6 +193,7 @@ def _render_chapter_spec_block(
         lang=lang,
         style=style,
         workflow_id=workflow_id,
+        report_src_dir=report_src_dir,
     )
     if blueprint is not None:
         return [render_blueprint_markdown(blueprint, bp_rel)]
@@ -202,7 +206,7 @@ def _render_chapter_spec_block(
 def render_drawlib_report_guide(
     *,
     target: str,
-    src_base_dir: str = DEFAULT_REPORT_SRC_DIR,
+    src_dir: str = DEFAULT_REPORT_SRC_DIR,
     output_dir: str = DEFAULT_REPORT_OUTPUT_DIR,
     html_output_dir: str | None = None,
     formats: Sequence[str] = DEFAULT_REPORT_FORMATS,
@@ -222,18 +226,27 @@ def render_drawlib_report_guide(
 ) -> str:
     """Render deterministic instructions and pre-sorted Blueprint for authoring a Drawlib report."""
     clean_target = target.strip().removesuffix("_src") or "full_audit"
-    src_dir = f"{src_base_dir.rstrip('/')}/{clean_target}_src"
+    clean_src = src_dir.strip().rstrip("/") or DEFAULT_REPORT_SRC_DIR
     primary_lang = (lang.split(",", maxsplit=1)[0].strip() if lang.strip() else "en") or "en"
-    chapter_dir = f"{src_dir}/{primary_lang}"
+    chapter_dir = f"{clean_src}/{primary_lang}"
     clean_out = output_dir.rstrip("/")
     clean_html_out = html_output_dir.strip().rstrip("/") if html_output_dir and html_output_dir.strip() else None
     cache_key = workflow_id.strip() or clean_target
+    eff_facts = facts_path
     arch_ref = architecture_path or default_architecture_rel_path(cache_key)
+    if project_root is not None:
+        synced_facts = project_root / clean_src / "_facts" / Path(facts_path).name
+        if synced_facts.is_file():
+            eff_facts = f"{clean_src}/_facts/{Path(facts_path).name}"
+        synced_arch = project_root / clean_src / "_facts" / "architecture.json"
+        if synced_arch.is_file():
+            arch_ref = f"{clean_src}/_facts/architecture.json"
+
     fmt_list = [f.strip().lower() for f in formats if f.strip()] or ["pdf"]
     fmt_flags = " ".join(f"-f {f}" for f in fmt_list) if fmt_list != ["pdf"] else ""
     html_dir_flag = f" --html-output-dir {clean_html_out}" if clean_html_out else ""
     build_cmd = (
-        f"pni report build {clean_target} --src-dir {src_base_dir} --output-dir {clean_out}"
+        f"pni report build {clean_target} --src-dir {clean_src} --output-dir {clean_out}"
         + html_dir_flag
         + (f" {fmt_flags}" if fmt_flags else "")
     )
@@ -257,6 +270,7 @@ def render_drawlib_report_guide(
         report_kind=report_kind,
         plan_path=plan_path,
         progress_path=progress_path,
+        report_src_dir=clean_src,
     )
     if is_prog:
         sample_ch = "02_git_methodology_and_conflicts.md"
@@ -264,7 +278,7 @@ def render_drawlib_report_guide(
         read_step_desc = (
             f"   - Load `{primary_prog}` (`ProgressResult` containing `delivery_status`, `dimension_scores`,\n"
             "     `task_assessments`, `branch_assessments`, `next_actions`, and deterministic `progress_facts`),\n"
-            f"     and `{facts_path}`."
+            f"     and `{eff_facts}` (synchronized inside `{clean_src}/_facts/`)."
         )
         report_label = "Project Progress"
         file_count_note = "5 Markdown files (`00_cover.md` + `01_*.md` .. `04_*.md`)"
@@ -275,7 +289,7 @@ def render_drawlib_report_guide(
         read_step_desc = (
             f"   - Load `{primary_mig}` (`MigrationPlanResult` containing `target_axes`, `target_architecture`,\n"
             "     `decision_log`, `phase_gates`, `pr_wbs`, and deterministic `migration_facts`),\n"
-            f"     `{arch_ref}`, and `{facts_path}`."
+            f"     `{arch_ref}`, and `{eff_facts}` (synchronized inside `{clean_src}/_facts/`)."
         )
         report_label = "Migration Plan"
         file_count_note = "7 Markdown files (`00_cover.md` + `01_*.md` .. `06_*.md`)"
@@ -287,7 +301,7 @@ def render_drawlib_report_guide(
             "     `audit_dimensions`, `rule_compliance`, `module_hotspots`, `architecture_record`,\n"
             "     `runtime_facts`, `security_facts`, `module_inventory`, `dangerous_sinks`, `api_endpoints`,\n"
             "     `findings`, `action_plan`, `metrics_snapshot`),\n"
-            f"     `{arch_ref}`, and `{facts_path}`."
+            f"     `{arch_ref}`, and `{eff_facts}` (synchronized inside `{clean_src}/_facts/`)."
         )
         report_label = "Visual"
         file_count_note = "7 Markdown files (`00_cover.md` + `01_*.md` .. `06_*.md`)"
@@ -296,7 +310,7 @@ def render_drawlib_report_guide(
     lines = [
         (
             f"### 3-Phase Blueprint-Driven {report_label} Report Synthesis "
-            f"(`target={clean_target}`, `lang={lang}`, `style={style}`)"
+            f"(`target={clean_target}`, `src_dir={clean_src}`, `lang={lang}`, `style={style}`)"
         ),
         "",
         "1. **READ Structured Artifacts**:",
@@ -322,13 +336,13 @@ def render_drawlib_report_guide(
         "       uv run drawlib rules show lib-graph-overview     # Auto-layout DAG solvers (`get_layout()`) for DAGs",
         "       uv run drawlib rules show lib-icons-overview     # phosphor, FontAwesome & cloud icon helpers",
         "       ```",
-        f"   - **Step 3b — Ensure `{src_dir}/` Scaffolding Exists (Preserve Manifest & Theme Assets)**:",
+        f"   - **Step 3b — Ensure `{clean_src}/` Scaffolding Exists (Preserve Manifest, `_facts/`, & Theme Assets)**:",
         "     ```bash",
-        f"     pni report init {clean_target} --src-dir {src_base_dir} --lang {lang} --style {style}",
+        f"     pni report init {clean_target} --src-dir {clean_src} --lang {lang} --style {style}",
         "     ```",
         (
-            "     - Preserve `drawlib.toml`, `styles.py`, `utils.py`, `style.css`, and `template.html` "
-            f"inside `{src_dir}/`."
+            "     - Preserve `drawlib.toml`, `styles.py`, `utils.py`, `style.css`, `template.html`, and `_facts/` "
+            f"inside `{clean_src}/`."
         ),
         f"     - **Blueprint Chapter Sync Policy**: Author or overwrite the exact {file_count_note}",
         f"       defined in the Blueprint below inside `{chapter_dir}/`, and delete any stale",
@@ -338,9 +352,9 @@ def render_drawlib_report_guide(
             f"(all prose & labels in `{primary_lang}`):"
         ),
         *chapter_block,
-       "   - **Step 3d — Drawlib `doc` Authoring Rules (Mandatory)**:",
+        "   - **Step 3d — Drawlib `doc` Authoring Rules (Mandatory)**:",
         (
-            f"     - **Never create `navbar.md`** inside `{src_dir}/` or `{chapter_dir}/` "
+            f"     - **Never create `navbar.md`** inside `{clean_src}/` or `{chapter_dir}/` "
             "(preserves single-page `doc` + PDF ToC after `00_cover.md`)."
         ),
         f"     - **Zero `file:///` or absolute paths** (`/usr/...`, `/home/...`) inside `{chapter_dir}/*.md`.",
@@ -396,7 +410,7 @@ def render_drawlib_report_guide(
         "     ```bash",
         (
             f"     uv run drawlib show {chapter_dir}/{sample_ch} <diagram>.png "
-            f"-s {src_dir}/styles.py -u {src_dir}/utils.py -g -o .drawlib/scratch/grid_check.png"
+            f"-s {clean_src}/styles.py -u {clean_src}/utils.py -g -o .drawlib/scratch/grid_check.png"
         ),
         "     ```",
         "     Then compile the final report as its own single command:",

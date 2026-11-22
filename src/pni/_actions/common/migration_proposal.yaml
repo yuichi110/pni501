@@ -11,7 +11,7 @@ primitives:
       api_compatibility: "strict"
       bug_handling_policy: "ask_human"
       codemod_tool: "auto"
-      output_dir: "reports"
+      output_dir: "pni_report"
       target: "{workflow_id}"
   - type: ai_interpret
     name: Evaluate Migration Constraints & Architecture Boundaries
@@ -28,7 +28,7 @@ primitives:
   - type: emit_migration_plan
     name: Emit Validated MigrationPlanResult JSON
     with:
-      output_dir: "reports"
+      output_dir: "pni_report"
       target: "{workflow_id}"
     prompt: |
       Emit a complete, grounded `MigrationPlanResult` JSON payload:

@@ -513,7 +513,7 @@ def test_stateful_workflow_run_check_and_blueprint_integration(tmp_path: Path) -
     assert ok3
 
     saved_score = ScoreResult.model_validate_json(
-        (tmp_path / "reports" / "rt_flow_score.json").read_text(encoding="utf-8")
+        (tmp_path / "pni_report" / "rt_flow_score.json").read_text(encoding="utf-8")
     )
     assert saved_score.runtime_facts is not None
     assert saved_score.metrics_snapshot["runtime_status"] == "skipped"

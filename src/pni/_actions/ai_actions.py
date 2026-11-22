@@ -210,7 +210,7 @@ def _render_report_directive(
     target = str(params.get("target") or workflow_id or "full_audit")
     cache_key = workflow_id or target
     output_dir = str(params.get("output_dir", DEFAULT_REPORT_OUTPUT_DIR))
-    src_base_dir = str(params.get("src_dir", DEFAULT_REPORT_SRC_DIR))
+    src_dir = str(params.get("src_dir", DEFAULT_REPORT_SRC_DIR))
     report_kind = str(params.get("report_kind", "audit")).strip().lower()
     default_score = f"{output_dir.rstrip('/')}/{target}_score.json"
     plan_path = (
@@ -227,7 +227,7 @@ def _render_report_directive(
     html_out = str(raw_html_out).strip() if isinstance(raw_html_out, str) and raw_html_out.strip() else None
     return render_drawlib_report_guide(
         target=target,
-        src_base_dir=src_base_dir,
+        src_dir=src_dir,
         output_dir=output_dir,
         html_output_dir=html_out,
         formats=_to_str_list(params.get("formats"), ["pdf"]),

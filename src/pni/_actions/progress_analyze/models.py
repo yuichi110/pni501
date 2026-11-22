@@ -69,7 +69,7 @@ def resolve_progress_result_rel_path(
     """
     if explicit_progress_path.strip():
         return explicit_progress_path.strip()
-    clean_out = output_dir.rstrip("/") or "reports"
+    clean_out = output_dir.rstrip("/") or "pni_report"
     clean_tgt = target.strip().removesuffix("_src") or "project_progress"
     stem = clean_tgt if clean_tgt.endswith("_progress") else f"{clean_tgt}_progress"
     return f"{clean_out}/{stem}.json"
@@ -232,7 +232,7 @@ class ProgressOptions(BaseModel):
     lookback_weeks: int = Field(default=12, ge=1, le=104)
     as_of_date: str = ""
     base_audit_workflow: str = ""
-    output_dir: str = "reports"
+    output_dir: str = "pni_report"
     target: str = ""
     progress_path: str = ""
 

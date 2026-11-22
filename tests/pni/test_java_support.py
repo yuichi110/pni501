@@ -388,7 +388,7 @@ public class Greeter {
     assert ok5 is True
     assert "COMPLETED" in msg5
 
-    emitted = json.loads((tmp_path / "reports" / "quick_check_score.json").read_text(encoding="utf-8"))
+    emitted = json.loads((tmp_path / "pni_report" / "quick_check_score.json").read_text(encoding="utf-8"))
     assert emitted["language"] == "java"
     assert emitted["metrics_snapshot"]["build_system"] == "maven"
     assert emitted["metrics_snapshot"]["type_safety_coverage_pct"] == 100.0

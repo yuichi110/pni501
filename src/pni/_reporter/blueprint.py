@@ -26,7 +26,9 @@ from pni._actions.base_model import (
     consolidate_findings_by_location,
 )
 from pni._actions.runtime_check.parsers import extract_verbatim_error_excerpt
-from pni._cache import default_blueprint_rel_path, ensure_cache_parent
+from pni._cache import default_blueprint_rel_path
+from pni._reporter.base_model import DEFAULT_REPORT_OUTPUT_DIR
+from pni._reporter.facts_sync import write_blueprint_to_report_facts
 
 _CATEGORY_ORDER: Final[tuple[tuple[str, str], ...]] = (
     ("architecture", "Architecture"),
@@ -448,6 +450,7 @@ def format_artifact_manifest_lines(
         "findings_sarif": "GitHub Code Scanning / IDE Findings (`SARIF 2.1.0`)",
         "plan_json": "Pre-Flight Recon Plan & Validated Mermaid DAG",
         "facts_json": "Raw Deterministic Facts Bundle (AST / Runtime / Trivy)",
+        "architecture_json": "Grounded Architecture Record (`ArchitectureRecord`)",
         "rollup_facts_json": "Multi-Component Rollup Facts & Companion Scans",
         "migration_plan_json": "Validated Migration Plan (`MigrationPlanResult`)",
         "migration_facts_json": "Deterministic Migration Facts (Waves / Contracts / Codemods)",
@@ -518,9 +521,9 @@ def _build_standards_and_findings_chapter(score: ScoreResult, titles: dict[str, 
 
     wf_id = score.workflow_id or "full_audit"
     fallback_manifest = {
-        "score_json": f"reports/{wf_id}_score.json",
-        "summary_json": f"reports/{wf_id}_summary.json",
-        "findings_sarif": f"reports/{wf_id}_findings.sarif",
+        "score_json": f"{DEFAULT_REPORT_OUTPUT_DIR}/{wf_id}_score.json",
+        "summary_json": f"{DEFAULT_REPORT_OUTPUT_DIR}/{wf_id}_summary.json",
+        "findings_sarif": f"{DEFAULT_REPORT_OUTPUT_DIR}/{wf_id}_findings.sarif",
         "plan_json": f".pni/cache/{wf_id}/plan.json",
         "facts_json": score.facts_file or f".pni/cache/{wf_id}/facts.json",
     }
@@ -910,8 +913,9 @@ def load_or_build_blueprint(
     lang: str = "en",
     style: str = "google",
     workflow_id: str = "",
+    report_src_dir: str | None = None,
 ) -> tuple[ReportBlueprint | None, str]:
-    """Load ScoreResult from score_path if present, build ReportBlueprint, and persist JSON cache."""
+    """Load ScoreResult from score_path if present, build ReportBlueprint, and persist JSON."""
     if project_root is None:
         return None, ""
     score_file = _resolve_safe_workspace_path(project_root, score_path)
@@ -921,9 +925,11 @@ def load_or_build_blueprint(
     score = ScoreResult.model_validate_json(score_file.read_text(encoding="utf-8"))
     blueprint = build_report_blueprint(score, target=target, lang=lang, style=style)
     cache_key = (workflow_id or score.workflow_id or target).strip() or "full_audit"
-    rel_bp = default_blueprint_rel_path(cache_key)
-    bp_file = _resolve_safe_workspace_path(project_root, rel_bp)
-    if bp_file is not None:
-        ensure_cache_parent(project_root, bp_file)
-        bp_file.write_text(blueprint.model_dump_json(indent=2) + "\n", encoding="utf-8")
+    rel_bp = write_blueprint_to_report_facts(
+        project_root,
+        report_src_dir,
+        "blueprint.json",
+        blueprint.model_dump_json(indent=2) + "\n",
+        default_blueprint_rel_path(cache_key),
+    )
     return blueprint, rel_bp

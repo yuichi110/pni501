@@ -34,7 +34,12 @@ from pni._actions import (
 )
 from pni._actions.ast_analyze.companion import scan_companion_languages
 from pni._cache import ensure_cache_parent
-from pni._reporter import DEFAULT_REPORT_OUTPUT_DIR
+from pni._config import load_pni_config
+from pni._reporter import (
+    DEFAULT_REPORT_OUTPUT_DIR,
+    resolve_report_src_dir_for_actions,
+    sync_workflow_facts_to_report,
+)
 from pni._reporter.sarif import (
     build_score_summary,
     default_sarif_rel_path,
@@ -89,16 +94,24 @@ class RollupFacts(BaseModel):
     weakest_link_notes: list[str] = Field(default_factory=list)
 
 
+def _resolve_rollup_score_dir(project_root: Path) -> str:
+    """Resolve the configured report output directory for locating component scores."""
+    cfg = load_pni_config(project_root)
+    return (cfg.report.output_dir or "").strip().rstrip("/") or DEFAULT_REPORT_OUTPUT_DIR
+
+
 def _locate_component_score_file(project_root: Path, spec: RollupComponentSpec) -> Optional[Path]:
-    """Resolve `reports/<workflow_or_id>_score.json` for a RollupComponentSpec."""
+    """Resolve `<output_dir>/<workflow_or_id>_score.json` for a RollupComponentSpec."""
     wf_id = (spec.workflow_id or spec.id).strip()
-    candidates = [
-        project_root / DEFAULT_REPORT_OUTPUT_DIR / f"{wf_id}_score.json",
-        project_root / DEFAULT_REPORT_OUTPUT_DIR / f"{spec.id}_score.json",
-    ]
-    for cand in candidates:
-        if cand.is_file():
-            return cand
+    out_dir = _resolve_rollup_score_dir(project_root)
+    dirs = [out_dir]
+    if DEFAULT_REPORT_OUTPUT_DIR not in dirs:
+        dirs.append(DEFAULT_REPORT_OUTPUT_DIR)
+    for rel_dir in dirs:
+        for stem in (wf_id, spec.id):
+            cand = project_root / rel_dir / f"{stem}_score.json"
+            if cand.is_file():
+                return cand
     return None
 
 
@@ -109,8 +122,9 @@ def inspect_rollup_prerequisites(
     """Ensure every component declared in `includes` already has a completed score JSON."""
     if not workflow_def.includes:
         return None
+    out_dir = _resolve_rollup_score_dir(project_root)
     missing = [
-        f"{spec.id} (expected reports/{spec.workflow_id or spec.id}_score.json)"
+        f"{spec.id} (expected {out_dir}/{spec.workflow_id or spec.id}_score.json)"
         for spec in workflow_def.includes
         if _locate_component_score_file(project_root, spec) is None
     ]
@@ -333,12 +347,25 @@ def validate_and_persist_rollup(
     summary_rel = default_summary_rel_path(score_rel)
     sarif_rel = default_sarif_rel_path(score_rel)
     rollup_facts_rel = f".pni/cache/{run.workflow_id}/rollup_facts.json"
+
+    facts_file = project_root / rollup_facts_rel
+    ensure_cache_parent(project_root, facts_file)
+    facts_file.write_text(rollup_facts.model_dump_json(indent=2) + "\n", encoding="utf-8")
+
+    report_src_dir = resolve_report_src_dir_for_actions(all_actions or [action])
+    synced_evidence = sync_workflow_facts_to_report(
+        project_root,
+        report_src_dir,
+        source_files={
+            "plan_json": default_plan_rel_path(run.workflow_id),
+            "rollup_facts_json": rollup_facts_rel,
+        },
+    )
     artifact_manifest = {
         "score_json": score_rel,
         "summary_json": summary_rel,
         "findings_sarif": sarif_rel,
-        "plan_json": default_plan_rel_path(run.workflow_id),
-        "rollup_facts_json": rollup_facts_rel,
+        **synced_evidence,
     }
     exec_dag = build_rollup_execution_dag_summary(
         run,
@@ -356,6 +383,7 @@ def validate_and_persist_rollup(
         evaluated_at=datetime.now(timezone.utc).isoformat(),
         language="+".join(langs) if langs else "multi",
         target_root=".",
+        facts_file=synced_evidence.get("rollup_facts_json", rollup_facts_rel),
         overall_score=rollup_facts.weighted_overall_score,
         grade=score_to_grade(rollup_facts.weighted_overall_score),
         category_scores=rollup_facts.weighted_category_scores,
@@ -388,8 +416,4 @@ def validate_and_persist_rollup(
     write_score_summary(summary_obj, project_root / summary_rel)
     write_sarif_report(unified, project_root / sarif_rel)
     record_audit_history_from_score(project_root, run.workflow_id, unified)
-
-    facts_file = project_root / rollup_facts_rel
-    ensure_cache_parent(project_root, facts_file)
-    facts_file.write_text(rollup_facts.model_dump_json(indent=2) + "\n", encoding="utf-8")
     return canonical

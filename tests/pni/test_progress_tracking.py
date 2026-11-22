@@ -542,7 +542,7 @@ def test_cli_progress_commands_and_full_stateful_workflow_e2e(
     ok3, msg3 = push_workflow_action(run_rec.run_id, a3.action_id, prog_payload, repo)
     assert ok3, msg3
 
-    emitted_file = repo / "reports" / "dev_progress.json"
+    emitted_file = repo / "pni_report" / "dev_progress.json"
     assert emitted_file.is_file()
     res_val_prog = runner.invoke(app, ["validate-progress", str(emitted_file)])
     assert res_val_prog.exit_code == 0, res_val_prog.output
@@ -552,7 +552,7 @@ def test_cli_progress_commands_and_full_stateful_workflow_e2e(
     assert prog_ledger[0].overall_health_score == 64
     assert prog_ledger[0].verified_completion_pct == 40.0
 
-    # Final: write_drawlib_report -> materializes 5-chapter `ProgressBlueprint`
+    # Final: write_drawlib_report -> materializes 5-chapter `ProgressBlueprint` into pni_report_src/_facts/
     _, a4, p4 = get_workflow_action(run_rec.run_id, repo)
     assert a4 is not None and a4.primitive_type == PrimitiveType.WRITE_DRAWLIB_REPORT
     assert "01_schedule_and_milestones.md" in p4
@@ -560,9 +560,9 @@ def test_cli_progress_commands_and_full_stateful_workflow_e2e(
     assert "03_code_and_test_trajectories.md" in p4
     assert "04_risks_and_next_actions.md" in p4
 
-    bp_files = list((repo / ".pni" / "cache").rglob("*progress_blueprint.json"))
-    assert len(bp_files) == 1
-    bp_data = json.loads(bp_files[0].read_text(encoding="utf-8"))
+    bp_file = repo / "pni_report_src" / "_facts" / "progress_blueprint.json"
+    assert bp_file.is_file()
+    bp_data = json.loads(bp_file.read_text(encoding="utf-8"))
     assert len(bp_data["chapters"]) == 5
 
     # Also test direct blueprint & guide helper APIs
@@ -572,30 +572,30 @@ def test_cli_progress_commands_and_full_stateful_workflow_e2e(
     assert len(direct_bp.chapters) == 5
     guide_ja = render_drawlib_report_guide(
         target="dev_progress",
-        src_base_dir="reports_src",
-        output_dir="reports",
-        score_path="reports/dev_progress_score.json",
-        facts_path=".pni/cache/dev_progress/facts.json",
+        src_dir="pni_report_src",
+        output_dir="pni_report",
+        score_path="pni_report/dev_progress_score.json",
+        facts_path="pni_report_src/_facts/progress_facts.json",
         target_root=".",
         source_targets=["src"],
         doc_targets=["docs"],
         workflow_id="dev_progress",
         lang="ja",
         report_kind="progress",
-        progress_path="reports/dev_progress.json",
+        progress_path="pni_report/dev_progress.json",
         project_root=repo,
     )
     assert "01_schedule_and_milestones.md" in guide_ja
 
     # Simulate rendered HTML output and complete report step
-    html_dir = repo / "reports" / "dev_progress_html"
+    html_dir = repo / "pni_report" / "dev_progress_html"
     html_dir.mkdir(parents=True, exist_ok=True)
     html_index = html_dir / "index.html"
     html_index.write_text("<html><body>Progress Report</body></html>\n", encoding="utf-8")
 
     rep_done = ReportCompletionInput(
         summary="Generated 5-chapter progress report.",
-        generated_files=["reports/dev_progress_html/index.html"],
+        generated_files=["pni_report/dev_progress_html/index.html"],
     )
     ok4, msg4 = push_workflow_action(run_rec.run_id, a4.action_id, rep_done.model_dump_json(), repo)
     assert ok4, msg4

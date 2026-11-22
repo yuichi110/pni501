@@ -403,12 +403,14 @@ def test_baseline_anchoring_finding_adjustments_and_sarif_summary_outputs(tmp_pa
     ok_score, msg_score = push_workflow_action(run.run_id, act_score.action_id, sub.model_dump_json(), tmp_path)
     assert ok_score is True and "COMPLETED" in msg_score
 
-    score_path = tmp_path / "reports" / "baseline_wf_score.json"
-    summary_path = tmp_path / "reports" / "baseline_wf_summary.json"
-    sarif_path = tmp_path / "reports" / "baseline_wf_findings.sarif"
+    score_path = tmp_path / "pni_report" / "baseline_wf_score.json"
+    summary_path = tmp_path / "pni_report" / "baseline_wf_summary.json"
+    sarif_path = tmp_path / "pni_report" / "baseline_wf_findings.sarif"
     assert score_path.is_file()
     assert summary_path.is_file()
     assert sarif_path.is_file()
+    # Non-report workflow must NOT create pni_report_src/!
+    assert not (tmp_path / "pni_report_src").exists()
 
     saved_score = ScoreResult.model_validate_json(score_path.read_text(encoding="utf-8"))
     assert saved_score.schema_version == "2.0"
@@ -418,7 +420,7 @@ def test_baseline_anchoring_finding_adjustments_and_sarif_summary_outputs(tmp_pa
 
     saved_summary = ScoreSummary.model_validate_json(summary_path.read_text(encoding="utf-8"))
     assert saved_summary.overall_score == 84
-    assert saved_summary.sarif_file == "reports/baseline_wf_findings.sarif"
+    assert saved_summary.sarif_file == "pni_report/baseline_wf_findings.sarif"
 
     sarif_doc = json.loads(sarif_path.read_text(encoding="utf-8"))
     assert sarif_doc["version"] == "2.1.0"
@@ -467,7 +469,7 @@ def test_polyglot_monorepo_rollup_e2e_weighted_guardrail_and_unified_blueprint(t
         start_workflow_run("monorepo_rollup", tmp_path, auto_approve=True, probe_container_engine=False)
 
     # 2. Emit 3 component sub-audit ScoreResults (backend has weak security=35 to trigger weakest-link guardrail!)
-    reports_dir = tmp_path / "reports"
+    reports_dir = tmp_path / "pni_report"
     reports_dir.mkdir(parents=True)
 
     backend_score = ScoreResult(

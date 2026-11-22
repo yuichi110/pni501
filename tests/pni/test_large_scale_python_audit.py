@@ -373,11 +373,11 @@ def test_dual_cli_library_archetype_smoke_pytest_args_and_legacy_score_compat(tm
         assert parsed.project_name
 
     # Path-traversal guard on drawlib.toml locale codes
-    bad_src = tmp_path / "reports_src" / "bad_src"
+    bad_src = tmp_path / "bad_src"
     bad_src.mkdir(parents=True)
     (bad_src / "drawlib.toml").write_text(
         '[project]\ntype = "doc"\n\n[i18n]\ndefault_lang = "../escape"\nlangs = ["../escape"]\n',
         encoding="utf-8",
     )
     with pytest.raises(ValueError, match="Invalid locale code"):
-        compile_report_project("bad", src_base_dir=tmp_path / "reports_src", output_dir=tmp_path / "out")
+        compile_report_project("bad", src_dir=bad_src, output_dir=tmp_path / "out")

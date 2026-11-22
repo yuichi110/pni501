@@ -29,7 +29,11 @@ from pni._actions import (
     run_progress_analyze,
 )
 from pni._cache import default_progress_facts_rel_path
-from pni._reporter import DEFAULT_REPORT_OUTPUT_DIR
+from pni._reporter import (
+    DEFAULT_REPORT_OUTPUT_DIR,
+    resolve_report_src_dir_for_actions,
+    sync_workflow_facts_to_report,
+)
 from pni._workflows.base_model import (
     ActionRunRecord,
     WorkflowCategory,
@@ -290,12 +294,21 @@ def validate_and_persist_progress_result(
     prog_rel = resolve_progress_result_rel_path(out_dir, tgt, str(action.params.get("progress_path", "")))
     prog_facts_rel = default_progress_facts_rel_path(run.workflow_id)
 
+    report_src_dir = resolve_report_src_dir_for_actions(all_actions or [action])
+    synced_evidence = sync_workflow_facts_to_report(
+        project_root,
+        report_src_dir,
+        source_files={
+            "progress_facts_json": prog_facts_rel,
+            "plan_json": default_plan_rel_path(run.workflow_id),
+        },
+    )
     prog_obj.workflow_id = run.workflow_id
     prog_obj.workflow_run_id = run.run_id
     if not prog_obj.generated_at:
         prog_obj.generated_at = datetime.now(timezone.utc).isoformat()
     prog_obj.target_root = run.targets.root
-    prog_obj.progress_facts_file = prog_facts_rel
+    prog_obj.progress_facts_file = synced_evidence.get("progress_facts_json", prog_facts_rel)
     if pf is not None:
         prog_obj.as_of_date = pf.as_of_date
         prog_obj.plan_file = pf.plan_file
@@ -304,8 +317,7 @@ def validate_and_persist_progress_result(
 
     artifact_manifest = {
         "progress_json": prog_rel,
-        "progress_facts_json": prog_facts_rel,
-        "plan_json": default_plan_rel_path(run.workflow_id),
+        **synced_evidence,
     }
     if prog_obj.plan_file:
         artifact_manifest["baseline_plan_yaml"] = prog_obj.plan_file

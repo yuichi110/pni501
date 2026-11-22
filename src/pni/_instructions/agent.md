@@ -1,7 +1,7 @@
 # PNI (Project Nemesis Index) Agent Instructions
 
 You are the Project Nemesis Index (PNI) diagnostic agent.
-Your mission is to evaluate software development projects deterministically using the **PNI Workflow v2 DAG engine** (`.pni/cache/workflow_state.db`), **Plan-First Human Alignment (`confirm_plan`)**, **Auto-Advance parallel deterministic collection** (AST, imports, typing, docstrings, dependencies, runtime containers, security/Trivy, pentests, migration, progress), aspect-separated grounded architecture comprehension, anchored 7-axis baselines, standard output artifacts (`reports/<target>_score.json` v2.0, `*_summary.json`, `*_findings.sarif`), and visual `drawlib` PDF reports (`reports_src/<target>_src/` -> `reports/<target>.pdf`).
+Your mission is to evaluate software development projects deterministically using the **PNI Workflow v2 DAG engine** (`.pni/cache/workflow_state.db`), **Plan-First Human Alignment (`confirm_plan`)**, **Auto-Advance parallel deterministic collection** (AST, imports, typing, docstrings, dependencies, runtime containers, security/Trivy, pentests, migration, progress), aspect-separated grounded architecture comprehension, anchored 7-axis baselines, standard output artifacts (`pni_report/<target>_score.json` v2.0, `*_summary.json`, `*_findings.sarif`), and flat self-contained visual `drawlib` PDF reports (`pni_report_src/` with `_facts/` -> `pni_report/<target>.pdf`, or custom flat paths like `docs_src/pni/` -> `docs/pni/`).
 
 ## 1. Authoring or Customizing Project Workflows (First-Time Setup)
 
@@ -29,7 +29,7 @@ Before starting a workflow in a new or customized repository:
      ```
 4. **Multi-Language / Monorepo Rollup Setup (`scope: component` + `category: rollup`)**:
    - When a repository contains multiple primary languages or distinct subprojects (e.g., `backend/` Python + `frontend/` TypeScript + `native/` Rust):
-     - Define one `scope: component` audit workflow per subproject (`targets.root: "<subdir>"`, skipping duplicate root governance penalties and omitting separate PDF reports unless requested; emits `reports/<component>_score.json`, `*_summary.json`, `*_findings.sarif`).
+     - Define one `scope: component` audit workflow per subproject (`targets.root: "<subdir>"`, skipping duplicate root governance penalties and omitting separate PDF reports unless requested; emits `pni_report/<component>_score.json`, `*_summary.json`, `*_findings.sarif`).
      - Define one `category: rollup` workflow listing `includes:` (referencing each component workflow with optional `weight` / `primary` and default `report_mode: unified`) ending with `uses: synthesize_rollup` -> `uses: write_drawlib_report`.
      - PNI aggregates 7-axis scores via `log1p(LOC)` smoothing with `security`/`testing` weakest-link guardrails (`min_primary + 15`), normalizes paths to repository root with `component` tags, runs root governance + companion DSL scans once, and generates a single unified 6-chapter Drawlib report.
 5. **Implement Web Penetration Tests First (When Workflow Includes `web_pentest`)**:
@@ -59,7 +59,7 @@ Before starting a workflow in a new or customized repository:
 Coding agents auto-approve commands by **prefix matching** (e.g., `uv run pni ...` or `pni ...`). Combining `pni` or `drawlib` with shell metacharacters disables prefix matching and triggers repeated confirmation prompts. Always follow these rules:
 - **Single simple commands ONLY**: Never use pipes (`|`), redirects (`>`, `>>`), heredocs (`<<EOF`), command substitutions (`$(...)`), shell variables (`$VAR`), command chaining (`&&`, `;`), or inline multi-line JSON arguments with `pni` / `drawlib`.
 - **Use your file-writing tool + `--file`**: Write JSON payloads to `.pni/cache/<workflow_id>/input_<action_id>.json` with your file-writing tool, then run `pni workflows push-action <run_id> <action_id> --file <path> --next`.
-- **Use `-o <path>` + your file-reading tool**: Never pipe to `head`/`tail`/`grep`/`jq`, redirect with `>`, or inspect JSON via `python -c`. Pass `-o <path>` (`get-action -o`, `get-actions -o`, `plan -o`, `rules show -o`, `push-action --next -o`) and read `.pni/cache/...` or `reports/...` files with your file-reading tool.
+- **Use `-o <path>` + your file-reading tool**: Never pipe to `head`/`tail`/`grep`/`jq`, redirect with `>`, or inspect JSON via `python -c`. Pass `-o <path>` (`get-action -o`, `get-actions -o`, `plan -o`, `rules show -o`, `push-action --next -o`) and read `.pni/cache/...`, `pni_report_src/_facts/...`, or `pni_report/...` files with your file-reading tool.
 - **File-based Mermaid verification**: Write diagrams to a file (`.pni/cache/check.mmd` or target `.md`), then run `pni validate-mermaid <file>` (never `echo ... | pni validate-mermaid`).
 
 Always execute workflows through the Workflow v2 pull-push cycle:
@@ -96,19 +96,19 @@ Always execute workflows through the Workflow v2 pull-push cycle:
    - On **`ai_interpret`**: triage deterministic `det-*` pre-findings via `finding_adjustments` (`waive` / `reclassify` with `reason >= 10 chars`) and submit bounded `baseline_delta` (`-10..+10`) when qualitative evidence warrants adjusting the deterministic baseline.
    - On **`record_architecture`** (`purpose_and_stack`, `layers_and_modules`, `flows_and_state`): PNI validates every referenced file/module path against the real workspace and persists `.pni/cache/<workflow_id>/architecture.json`.
    - On **`emit_score`**: submit the clean **`ScoreSubmissionInput`** DTO (`overall_score`, `category_scores`, `category_rationales`, `summary`, optional `finding_adjustments`, `extra_findings`, `extra_action_items`, `report_hints`). PNI verifies `±10pt` baseline anchoring, deterministically assembles `ScoreResult (schema_version="2.0")`, writes:
-     - `reports/<target>_score.json` (full structured score)
-     - `reports/<target>_summary.json` (lightweight `ScoreSummary` for dashboards/CI)
-     - `reports/<target>_findings.sarif` (**SARIF 2.1.0** for GitHub Code Scanning / IDEs)
+     - `pni_report/<target>_score.json` (full structured score)
+     - `pni_report/<target>_summary.json` (lightweight `ScoreSummary` for dashboards/CI)
+     - `pni_report/<target>_findings.sarif` (**SARIF 2.1.0** for GitHub Code Scanning / IDEs)
      and appends/upserts `.pni/history/audit/<workflow_id>.jsonl`.
    - On **`synthesize_rollup`** (`category: rollup`): review the aggregated `RollupFacts` component matrix, weakest-link guardrails, root governance, and companion DSLs, then submit `RollupSynthesisInput`. PNI emits the unified `*_score.json`, `*_summary.json`, `*_findings.sarif`, and 6-chapter rollup blueprint.
-   - On **`emit_migration_plan`**: PNI validates `MigrationPlanResult` against grounded As-Is paths, attaches deterministic `MigrationFacts`, and writes `reports/<target>_migration_plan.json`.
-   - On **`emit_progress`**: PNI verifies `.pni/progress/<target>.yaml` was not mutated mid-run, validates `ProgressResult`, writes `reports/<target>_progress.json`, and appends/upserts `.pni/history/progress/<workflow_id>.jsonl`.
+   - On **`emit_migration_plan`**: PNI validates `MigrationPlanResult` against grounded As-Is paths, attaches deterministic `MigrationFacts`, and writes `pni_report/<target>_migration_plan.json`.
+   - On **`emit_progress`**: PNI verifies `.pni/progress/<target>.yaml` was not mutated mid-run, validates `ProgressResult`, writes `pni_report/<target>_progress.json`, and appends/upserts `.pni/history/progress/<workflow_id>.jsonl`.
    - Write structured JSON matching the action's input DTO to `.pni/cache/<workflow_id>/input_<action_id>.json` with your file-writing tool, then submit in a single simple command (pass `--next` to pull the next step without chaining `&&`, and optional `-o <path>` to save long prompts without `>`):
      ```bash
      pni workflows push-action <workflow_run_id> <action_id> --file .pni/cache/<workflow_id>/input_<action_id>.json --next
      ```
    - On **`write_drawlib_report` / `write_migration_report` / `write_progress_report`** (final step):
-     1. **READ Artifacts**: Load `reports/<target>_score.json` (or `*_migration_plan.json` / `*_progress.json`), `.pni/cache/<workflow_id>/facts.json`, `.pni/cache/<workflow_id>/architecture.json` (if present), and `.pni/cache/<workflow_id>/blueprint.json` (or `migration_blueprint.json` / `progress_blueprint.json`).
+     1. **READ Artifacts**: Load `pni_report/<target>_score.json` (or configured `<output_dir>/*_migration_plan.json` / `*_progress.json`) and the structured evidence JSONs synchronized inside `<src_dir>/_facts/` (`plan.json`, `facts.json`, `architecture.json`, `blueprint.json`).
      2. **READ Code & Docs**: Inspect target source modules and documentation (`README.md`, design docs).
      3. **CONSULT Drawlib CLI & Rules On-Demand (Never Guess APIs)**:
         - Never guess `drawlib` constructor signatures, arguments, or coordinate anchors, and never fall back to raw `rectangle()`/`line()` primitives when a high-level component exists. Right before authoring diagrams, query Drawlib's built-in CLI help and rules (prefix with `uv run` in `uv` workspaces):
@@ -126,9 +126,9 @@ Always execute workflows through the Workflow v2 pull-push cycle:
           drawlib rules show lib-icons-overview     # Phosphor, FontAwesome & cloud architecture icon helpers
           ```
      4. **WRITE or UPDATE, GRID-VERIFY & COMPILE drawlib Report**:
-        - Scaffold (non-destructive): `pni report init <target> --src-dir <src_dir> --lang <lang> --style <style>` (provisions `_assets/logo.png`, `_assets/logo_dark.png`, `_assets/favicon.png`, and `draw_pni_logo()` in `utils.py`).
-        - Author or update the blueprint files (`00_cover.md` + `01_*.md` .. `06_*.md` for audit/migration, `00_cover.md`..`05_component_deep_dives.md` for rollup, or `01_*.md` .. `04_*.md` for progress) inside `<src_dir>/<target>_src/<lang>/` (preserving `<src_dir>/<target>_src/drawlib.toml`). **Always place the official PNI501 logo badge on `00_cover.md`** via `draw_pni_logo()`. **Update existing chapters in-place so `git diff` tracks changes cleanly.**
-        - **Visual Grid Self-Verification (`drawlib show ... -g`)**: Export diagrams with the coordinate grid overlaid (`drawlib show <src_dir>/<target>_src/<lang>/<chapter.md> <diagram.png> -s <src_dir>/<target>_src/styles.py -u <src_dir>/<target>_src/utils.py -g -o .drawlib/scratch/<unique_name>_grid.png`) and visually inspect the rendered PNG to fix text clipping, label overlap, margin violations, or coordinate anchor mistakes before finalizing.
+        - Scaffold (non-destructive): `pni report init <target> --src-dir <src_dir> --lang <lang> --style <style>` (scaffolds directly into `<src_dir>/` — default `pni_report_src/`, or custom flat paths like `docs_src/pni/` — preserving `_facts/`, provisioning `_assets/logo.png`, `_assets/logo_dark.png`, `_assets/favicon.png`, and `draw_pni_logo()` in `utils.py`).
+        - Author or update the blueprint files (`00_cover.md` + `01_*.md` .. `06_*.md` for audit/migration, `00_cover.md`..`05_component_deep_dives.md` for rollup, or `01_*.md` .. `04_*.md` for progress) inside `<src_dir>/<lang>/` (preserving `<src_dir>/drawlib.toml` and `<src_dir>/_facts/`). **Always place the official PNI501 logo badge on `00_cover.md`** via `draw_pni_logo()`. **Update existing chapters in-place so `git diff` tracks changes cleanly.**
+        - **Visual Grid Self-Verification (`drawlib show ... -g`)**: Export diagrams with the coordinate grid overlaid (`drawlib show <src_dir>/<lang>/<chapter.md> <diagram.png> -s <src_dir>/styles.py -u <src_dir>/utils.py -g -o .drawlib/scratch/<unique_name>_grid.png`) and visually inspect the rendered PNG to fix text clipping, label overlap, margin violations, or coordinate anchor mistakes before finalizing.
         - Compile A4 vector PDF (default PDF-only): `pni report build <target> --src-dir <src_dir> --output-dir <output_dir>`
         - Push `ReportCompletionInput` listing `<output_dir>/<target>.pdf` in `generated_files`.
 5. **Repeat Step 3 -> Step 4** until `get-action` / `push-action` reports `COMPLETED`.
@@ -161,8 +161,8 @@ pni validate-mermaid <file.md_or_mmd> --browser [--json]    # Layer 2 official m
 - `pni validate-mermaid [path] [--browser] [--mermaid-js <path>] [--json]`: Validate Mermaid syntax (Layer 1 static + optional Layer 2 Playwright `mermaid.parse()`).
 - `pni progress init [target] [-w <workflow_id>] [--force]` / `pni progress validate [target_or_path]`: Scaffold and validate `.pni/progress/<target>.yaml`.
 - `pni pentests init [-w <workflow_id>] [--force]` / `pni pentests run [-w <workflow_id>] [--base-url URL]`: Scaffold and execute isolated `Python + httpx` penetration tests.
-- `pni report init <target> [--src-dir reports_src] [--lang en] [--style google] [--force]`: Non-destructively scaffold or refresh `reports_src/<target>_src/`.
-- `pni report build <target> [--src-dir reports_src] [--output-dir reports] [-f pdf] [--toc/--no-toc]`: Compile `reports/<target>.pdf` (default PDF-only; optional `-f html -f markdown -f images`).
+- `pni report init <target> [--src-dir pni_report_src] [--lang en] [--style google] [--force]`: Non-destructively scaffold or refresh `<src_dir>/` directly (default `pni_report_src/`, or custom flat path e.g. `docs_src/pni/`).
+- `pni report build <target> [--src-dir pni_report_src] [--output-dir pni_report] [-f pdf] [--toc/--no-toc]`: Compile `<output_dir>/<target>.pdf` (default `pni_report/<target>.pdf`; optional `-f html -f markdown -f images`).
 - `pni validate-score <path>` / `pni validate-migration-plan <path>` / `pni validate-progress <path>`: Validate PNI JSON artifacts.
 
 ## 5. Drawlib CLI & Rules Reference (On-Demand During Visual Report Steps)

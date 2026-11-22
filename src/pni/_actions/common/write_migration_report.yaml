@@ -6,8 +6,8 @@ primitives:
     name: Author & Compile Drawlib Migration Execution Plan PDF
     with:
       report_kind: "migration"
-      src_dir: "reports_src"
-      output_dir: "reports"
+      src_dir: "pni_report_src"
+      output_dir: "pni_report"
       target: "{workflow_id}"
       formats:
         - "pdf"
@@ -15,8 +15,8 @@ primitives:
       style: "google"
     prompt: |
       Execute the 3-phase migration plan visual report synthesis:
-      1. READ the validated `MigrationPlanResult` JSON (`*_migration_plan.json`) and deterministic `MigrationFacts`.
+      1. READ the validated `MigrationPlanResult` JSON (`*_migration_plan.json`) and synchronized `<src_dir>/_facts/migration_facts.json`.
       2. READ the target source files so To-Be Port & Adapter `ClassDiagram` boxes, Wave 1..4 `Roadmap`, and
          implicit contract DTO mappings cite real code symbols.
-      3. CONSULT Drawlib rules on demand (`drawlib rules show agent-instruction`, `api`, `lib-smartarts-overview`, `lib-charts-overview`, `lib-diagrams-overview`, `project-doc`), WRITE or UPDATE the 7 migration chapters (`00_cover.md` + `01_migration_strategy_summary.md` ..
-         `06_pr_wbs_and_verification_gates.md`) inside `<src_dir>/<target>_src/<lang>/`, place the PNI501 logo badge (`_assets/logo_dark.png` or `_assets/logo.png` via `draw_pni_logo()` in `utils.py` or `drawlib.images.image`) on the `00_cover.md` cover diagram, visually verify diagrams via `drawlib show ... -g`, and compile `<output_dir>/<target>.pdf`.
+      3. CONSULT Drawlib rules on demand (`drawlib rules show agent-instruction`, `api`, `lib-smartarts-overview`, `lib-charts-overview`, `lib-diagrams-overview`, `lib-graph-overview`, `project-doc`), WRITE or UPDATE the 7 migration chapters (`00_cover.md` + `01_migration_strategy_summary.md` ..
+         `06_pr_wbs_and_verification_gates.md`) directly inside `<src_dir>/<lang>/`, place the PNI501 logo badge (`_assets/logo_dark.png` or `_assets/logo.png` via `draw_pni_logo()` in `utils.py` or `drawlib.images.image`) on the `00_cover.md` cover diagram, visually verify diagrams via `drawlib show ... -g`, and compile `<output_dir>/<target>.pdf`.

@@ -15,13 +15,15 @@ from pathlib import Path
 from typing import Final
 
 from pni._actions.migration_analyze.models import MigrationPlanResult
-from pni._cache import default_migration_blueprint_rel_path, ensure_cache_parent
+from pni._cache import default_migration_blueprint_rel_path
+from pni._reporter.base_model import DEFAULT_REPORT_OUTPUT_DIR
 from pni._reporter.blueprint import (
     BlueprintChapterSpec,
     ReportBlueprint,
     format_artifact_manifest_lines,
     format_execution_dag_and_scope_lines,
 )
+from pni._reporter.facts_sync import write_blueprint_to_report_facts
 
 _MIGRATION_CHAPTER_TITLES: Final[dict[str, dict[str, str]]] = {
     "ja": {
@@ -251,7 +253,9 @@ def _build_mig_pr_wbs_chapter(plan: MigrationPlanResult, titles: dict[str, str])
         format_artifact_manifest_lines(
             plan.execution_dag,
             fallback_manifest={
-                "migration_plan_json": f"reports/{plan.workflow_id or 'migration_plan'}_migration_plan.json",
+                "migration_plan_json": (
+                    f"{DEFAULT_REPORT_OUTPUT_DIR}/{plan.workflow_id or 'migration_plan'}_migration_plan.json"
+                ),
                 "migration_facts_json": plan.migration_facts_file
                 or f".pni/cache/{plan.workflow_id or 'migration_plan'}/migration_facts.json",
             },
@@ -338,8 +342,9 @@ def load_or_build_migration_blueprint(
     lang: str = "en",
     style: str = "google",
     workflow_id: str = "",
+    report_src_dir: str | None = None,
 ) -> tuple[ReportBlueprint | None, str]:
-    """Load MigrationPlanResult from plan_path if present, build MigrationBlueprint, and cache JSON."""
+    """Load MigrationPlanResult from plan_path if present, build MigrationBlueprint, and persist JSON."""
     if project_root is None or not plan_path.strip():
         return None, ""
     root_resolved = project_root.resolve()
@@ -350,9 +355,11 @@ def load_or_build_migration_blueprint(
     plan = MigrationPlanResult.model_validate_json(plan_file.read_text(encoding="utf-8"))
     blueprint = build_migration_blueprint(plan, target=target, lang=lang, style=style)
     cache_key = (workflow_id or plan.workflow_id or target).strip() or "migration"
-    rel_bp = default_migration_blueprint_rel_path(cache_key)
-    bp_file = (root_resolved / rel_bp).resolve()
-    if bp_file.is_relative_to(root_resolved):
-        ensure_cache_parent(project_root, bp_file)
-        bp_file.write_text(blueprint.model_dump_json(indent=2) + "\n", encoding="utf-8")
+    rel_bp = write_blueprint_to_report_facts(
+        project_root,
+        report_src_dir,
+        "migration_blueprint.json",
+        blueprint.model_dump_json(indent=2) + "\n",
+        default_migration_blueprint_rel_path(cache_key),
+    )
     return blueprint, rel_bp

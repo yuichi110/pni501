@@ -50,7 +50,7 @@ def resolve_migration_plan_rel_path(
     with `_migration` or `_migration_plan`.
 
     Args:
-        output_dir: Output directory (e.g. 'reports/java').
+        output_dir: Output directory (e.g. 'pni_report' or 'docs/pni').
         target: Workflow or report target identifier (e.g. 'api_spring_messy_migration').
         explicit_plan_path: Explicit override path if configured.
 
@@ -59,7 +59,7 @@ def resolve_migration_plan_rel_path(
     """
     if explicit_plan_path.strip():
         return explicit_plan_path.strip()
-    clean_out = output_dir.rstrip("/") or "reports"
+    clean_out = output_dir.rstrip("/") or "pni_report"
     clean_tgt = target.strip().removesuffix("_src") or "migration"
     if clean_tgt.endswith("_migration_plan"):
         stem = clean_tgt
@@ -80,7 +80,7 @@ class MigrationOptions(BaseModel):
     api_compatibility: ApiCompatibilityPolicy = "strict"
     bug_handling_policy: BugHandlingPolicy = "ask_human"
     codemod_tool: CodemodToolChoice = "auto"
-    output_dir: str = "reports"
+    output_dir: str = "pni_report"
     target: str = ""
     plan_path: str = ""
 
