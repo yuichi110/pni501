@@ -1,0 +1,21 @@
+id: xml_ast_audit
+name: XML AST, XXE/DTD Safety, Manifest Security & XSD Schema Audit
+description: Parse XML/XSD/XSL files via tree-sitter to detect XXE external entity constructs (CWE-611), hardcoded credentials, insecure debug flags, and namespace/schema hygiene.
+rules:
+  - common/architecture
+  - common/maintainability
+  - common/security
+  - common/security_vulnerability
+  - xml/code_quality
+  - xml/typing
+  - xml/modern_stack
+primitives:
+  - type: ast_analyze
+    name: Extract Deterministic XML AST & Security Metrics
+    with:
+      lang: "xml"
+  - type: ai_interpret
+    name: Interpret XML AST Facts & Evaluate XXE/Schema/Manifest Security
+    prompt: |
+      Inspect the deterministic AstFacts (`bug_risk_idioms`, `hardcoded_secrets`, `dangerous_sinks`, `modernization_hints`).
+      Read flagged `.xml`/`.xsd`/`.xsl` files to evaluate schema/manifest layout (`common/architecture`), XXE/DTD/credential/SVG/XSLT security (`common/security`, `common/security_vulnerability`, `xml/code_quality`), XSD/namespace contracts (`xml/typing`), and safe parser idioms (`xml/modern_stack`).

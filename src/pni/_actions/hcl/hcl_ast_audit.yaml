@@ -1,0 +1,21 @@
+id: hcl_ast_audit
+name: HCL / Terraform AST, Cloud Security, Encryption & Variable Typing Audit
+description: Parse HCL/Terraform via tree-sitter to detect 0.0.0.0/0 exposure (CWE-284), encrypted=false (CWE-311), wildcard IAM, local-exec sinks, hardcoded secrets, and module hygiene.
+rules:
+  - common/architecture
+  - common/maintainability
+  - common/security
+  - common/security_vulnerability
+  - hcl/code_quality
+  - hcl/typing
+  - hcl/modern_stack
+primitives:
+  - type: ast_analyze
+    name: Extract Deterministic HCL / Terraform AST & Cloud Security Metrics
+    with:
+      lang: "hcl"
+  - type: ai_interpret
+    name: Interpret HCL AST Facts & Evaluate Cloud Security/State/Modularity
+    prompt: |
+      Inspect the deterministic AstFacts (`type_safety_coverage_pct`, `weak_type_usages`, `docstring_coverage_pct`, `bug_risk_idioms`, `hardcoded_secrets`, `dangerous_sinks`, `modernization_hints`).
+      Read flagged `.tf`/`.hcl` files to evaluate module/state boundaries (`common/architecture`), cloud security (`0.0.0.0/0`, `encrypted = false`, wildcard IAM, `local-exec`; `common/security`, `common/security_vulnerability`, `hcl/code_quality`), variable `type`/`validation`/`sensitive` contracts (`hcl/typing`), and modern Terraform/OpenTofu idioms (`hcl/modern_stack`).

@@ -1,0 +1,19 @@
+id: repo_structure_audit
+name: Repository Structure & Flake Lockfile Audit (Nix)
+description: Deterministically inspect flake.nix, flake.lock, input pinning/.follows, and documentation, then have AI evaluate against rules.
+rules:
+  - common/supply_chain
+  - common/documentation
+  - common/git_workflow
+  - common/security
+  - nix/dependencies
+primitives:
+  - type: project_inspect
+    name: Extract Nix Flake, Supply-Chain & Governance Facts
+    with:
+      lang: "nix"
+  - type: ai_interpret
+    name: Evaluate Nix Flake Pinning, Supply Chain & Governance
+    prompt: |
+      Review the deterministic ProjectFacts (`manifest_files`, `lockfiles_found`, `has_license`, `has_security_policy`, `has_dependency_automation`, `ci_supply_chain_issues`, `committed_secret_files`, `readme_headings`, `docs_inventory`, `has_gitignore`).
+      Verify compliance with `common/supply_chain`, `nix/dependencies`, `common/documentation`, `common/git_workflow`, and `common/security`.

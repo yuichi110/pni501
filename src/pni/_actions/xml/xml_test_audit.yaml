@@ -1,0 +1,10 @@
+id: xml_test_audit
+name: XML Well-Formedness, XSD Validation & XSpec Audit
+description: Evaluate xmllint --noout --nonet CI gates, XSD/RNG positive/negative fixtures, and XSpec tests against xml/testing standards.
+rules:
+  - xml/testing
+primitives:
+  - type: ai_interpret
+    name: Evaluate XML Schema Validation & XSLT Test Coverage
+    prompt: |
+      Inspect CI workflows, `*.xsd` fixtures, XSpec tests, and ProjectFacts/AstFacts to verify offline `xmllint --noout --nonet` and schema validation gates according to `xml/testing`.

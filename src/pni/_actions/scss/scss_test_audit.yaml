@@ -1,0 +1,10 @@
+id: scss_test_audit
+name: SCSS Compilation, Stylelint & Sass-True Testing Audit
+description: Evaluate zero-warning Dart Sass builds, Stylelint SCSS gates, and sass-true mixin unit tests against scss/testing standards.
+rules:
+  - scss/testing
+primitives:
+  - type: ai_interpret
+    name: Evaluate SCSS Build, Lint & Unit Verification Coverage
+    prompt: |
+      Inspect `.stylelintrc*`, CI build scripts, `sass-true` specs, and ProjectFacts/AstFacts to verify zero-warning Dart Sass compilation and Stylelint coverage according to `scss/testing`.

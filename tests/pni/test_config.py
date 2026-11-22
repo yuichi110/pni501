@@ -223,52 +223,9 @@ def test_rules_manager_edge_cases_and_six_language_parity(tmp_path: Path) -> Non
     with pytest.raises(ValueError, match="Unsupported language"):
         copy_rule_templates(tmp_path / "bad_lang", lang="nonexistent_lang")
 
-    # All 40 Tier A & Tier B executable languages plus generic fallback have canonical 6-file rule packs
+    # All 55 built-in languages plus generic fallback have canonical 6-file rule packs
     all_ids = {r.identifier for r in list_rules(tmp_path, include_all=True)}
-    bespoke_and_generic = (
-        "python",
-        "java",
-        "php",
-        "go",
-        "typescript",
-        "javascript",
-        "csharp",
-        "rust",
-        "ruby",
-        "kotlin",
-        "swift",
-        "c",
-        "cpp",
-        "scala",
-        "dart",
-        "elixir",
-        "vue",
-        "perl",
-        "cobol",
-        "r",
-        "bash",
-        "powershell",
-        "groovy",
-        "objc",
-        "lua",
-        "haskell",
-        "fsharp",
-        "ocaml",
-        "zig",
-        "julia",
-        "fortran",
-        "matlab",
-        "svelte",
-        "solidity",
-        "cuda",
-        "verilog",
-        "vhdl",
-        "ada",
-        "odin",
-        "commonlisp",
-        "generic",
-    )
-    for lang in bespoke_and_generic:
+    for lang in (*SUPPORTED_LANGUAGES, "generic"):
         for suffix in ("code_quality", "dependencies", "modern_stack", "testing", "typing", "workflow_guide"):
             assert f"{lang}/{suffix}" in all_ids
     assert len(SUPPORTED_LANGUAGES) == 55

@@ -1,0 +1,19 @@
+id: repo_structure_audit
+name: Repository Structure & Web Asset/CDN Governance Audit (HTML)
+description: Deterministically inspect HTML site layout, CDN/script asset hygiene, and documentation, then have AI evaluate against rules.
+rules:
+  - common/supply_chain
+  - common/documentation
+  - common/git_workflow
+  - common/security
+  - html/dependencies
+primitives:
+  - type: project_inspect
+    name: Extract HTML Layout, Asset & Governance Facts
+    with:
+      lang: "html"
+  - type: ai_interpret
+    name: Evaluate HTML External Assets, CDN Pinning & Governance
+    prompt: |
+      Review the deterministic ProjectFacts (`manifest_files`, `has_license`, `has_security_policy`, `ci_supply_chain_issues`, `committed_secret_files`, `readme_headings`, `docs_inventory`, `has_gitignore`).
+      Verify compliance with `common/supply_chain`, `html/dependencies` (noting pure static HTML directories omit lockfiles legitimately), `common/documentation`, `common/git_workflow`, and `common/security`.

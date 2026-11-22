@@ -1,0 +1,21 @@
+id: protobuf_ast_audit
+name: Protobuf AST, Wire Compatibility, Tag Integrity & Schema Audit
+description: Parse .proto files via tree-sitter to detect missing versioned packages, duplicate field numbers, proto2 legacy traps, naming issues, and schema documentation coverage.
+rules:
+  - common/architecture
+  - common/maintainability
+  - common/security
+  - common/security_vulnerability
+  - protobuf/code_quality
+  - protobuf/typing
+  - protobuf/modern_stack
+primitives:
+  - type: ast_analyze
+    name: Extract Deterministic Protobuf AST & Schema Metrics
+    with:
+      lang: "protobuf"
+  - type: ai_interpret
+    name: Interpret Protobuf AST Facts & Evaluate Wire Compatibility/Typing
+    prompt: |
+      Inspect the deterministic AstFacts (`docstring_coverage_pct`, `bug_risk_idioms`, `weak_type_usages`, `hardcoded_secrets`, `modernization_hints`).
+      Read flagged `.proto` files to evaluate service/package boundaries (`common/architecture`), wire-tag integrity & `reserved` safety (`protobuf/code_quality`), WKT/`optional`/`oneof` typing (`protobuf/typing`), and Proto3/Editions 2023 + Buf v2 idioms (`protobuf/modern_stack`).

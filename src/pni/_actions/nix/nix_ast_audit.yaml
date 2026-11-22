@@ -1,0 +1,21 @@
+id: nix_ast_audit
+name: Nix AST, Hermetic Purity, Store-Secret Safety & Module Typing Audit
+description: Parse Nix expressions via tree-sitter to detect impure <nixpkgs> refs, /nix/store secret leaks, nested with shadowing, rec traps, and NixOS module option hygiene.
+rules:
+  - common/architecture
+  - common/maintainability
+  - common/security
+  - common/security_vulnerability
+  - nix/code_quality
+  - nix/typing
+  - nix/modern_stack
+primitives:
+  - type: ast_analyze
+    name: Extract Deterministic Nix AST & Flake Metrics
+    with:
+      lang: "nix"
+  - type: ai_interpret
+    name: Interpret Nix AST Facts & Evaluate Purity/Secrets/Modularity
+    prompt: |
+      Inspect the deterministic AstFacts (`docstring_coverage_pct`, `weak_type_usages`, `bug_risk_idioms`, `hardcoded_secrets`, `dangerous_sinks`, `modernization_hints`).
+      Read flagged `.nix` files to evaluate flake/module composition (`common/architecture`), `/nix/store` secret safety & systemd sandboxing (`common/security`, `common/security_vulnerability`, `nix/code_quality`), `lib.types` option contracts (`nix/typing`), and Flakes/`lib.fileset` idioms (`nix/modern_stack`).

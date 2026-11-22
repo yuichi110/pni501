@@ -1,0 +1,43 @@
+id: full_audit
+category: audit
+name: Full Infrastructure-as-Code Audit & Report (HCL / Terraform)
+description: Workflow v2 DAG — Plan-First alignment, parallel deterministic HCL AST & Trivy IaC analysis, grounded infrastructure architecture, score+SARIF emission, and Drawlib report.
+
+targets:
+  source:
+    - "."
+    - "infra"
+    - "terraform"
+  tests: []
+  docs:
+    - "README.md"
+  exclude:
+    - ".terraform/**"
+
+steps:
+  - id: repo_and_deps
+    uses: repo_structure_audit
+
+  - id: ast_and_quality
+    uses: hcl_ast_audit
+    needs: [repo_and_deps]
+
+  - id: security_audit
+    uses: security_vulnerability_audit
+    needs: [repo_and_deps]
+
+  - id: arch_recording
+    uses: architecture_analysis
+    needs: [ast_and_quality]
+
+  - id: test_health
+    uses: hcl_test_audit
+    needs: [ast_and_quality]
+
+  - id: output_score
+    uses: emit_score
+    needs: [arch_recording, test_health, security_audit]
+
+  - id: create_report
+    uses: write_drawlib_report
+    needs: [output_score]

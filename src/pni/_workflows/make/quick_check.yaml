@@ -1,0 +1,23 @@
+id: quick_check
+category: audit
+name: Quick Build Definition Check (Makefile)
+description: Fast deterministic Makefile AST and recipe check followed by AI interpretation and score output.
+
+targets:
+  source:
+    - "."
+  tests: []
+  docs:
+    - "README.md"
+
+steps:
+  - id: repo_and_deps
+    uses: repo_structure_audit
+
+  - id: ast_and_quality
+    uses: make_ast_audit
+    needs: [repo_and_deps]
+
+  - id: output_score
+    uses: emit_score
+    needs: [ast_and_quality]

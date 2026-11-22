@@ -1,0 +1,26 @@
+id: quick_check
+category: audit
+name: Quick Protobuf Schema Check (Protocol Buffers)
+description: Fast deterministic Protobuf AST and buf.yaml check followed by AI interpretation and score output.
+
+targets:
+  source:
+    - "proto"
+    - "protos"
+    - "api"
+    - "."
+  tests: []
+  docs:
+    - "README.md"
+
+steps:
+  - id: repo_and_deps
+    uses: repo_structure_audit
+
+  - id: ast_and_quality
+    uses: protobuf_ast_audit
+    needs: [repo_and_deps]
+
+  - id: output_score
+    uses: emit_score
+    needs: [ast_and_quality]

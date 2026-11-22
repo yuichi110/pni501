@@ -1,0 +1,10 @@
+id: protobuf_test_audit
+name: Protobuf Lint & Breaking-Change Verification Audit
+description: Evaluate buf lint, buf breaking CI gates, codegen freshness checks, and contract tests against protobuf/testing standards.
+rules:
+  - protobuf/testing
+primitives:
+  - type: ai_interpret
+    name: Evaluate Protobuf Breaking-Change & Lint Gate Coverage
+    prompt: |
+      Inspect `buf.yaml`, CI workflows, and ProjectFacts/AstFacts to verify automated `buf lint`, `buf breaking`, and codegen synchronization checks according to `protobuf/testing`.

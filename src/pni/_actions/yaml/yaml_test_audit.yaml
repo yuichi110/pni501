@@ -1,0 +1,10 @@
+id: yaml_test_audit
+name: YAML Linting, Actionlint & Kubeconform Verification Audit
+description: Evaluate yamllint, actionlint, kubeconform/helm lint, spectral, and Trivy config CI gates against yaml/testing standards.
+rules:
+  - yaml/testing
+primitives:
+  - type: ai_interpret
+    name: Evaluate YAML Lint & Schema Validation Gate Coverage
+    prompt: |
+      Inspect CI workflows, `.yamllint*`, schema tests, and ProjectFacts/AstFacts to verify automated `yamllint`/`actionlint`/`kubeconform`/Trivy gates according to `yaml/testing`.

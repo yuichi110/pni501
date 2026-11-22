@@ -1,0 +1,10 @@
+id: make_test_audit
+name: Makefile Verification, Checkmake & Parallel-Safety Audit
+description: Evaluate Makefile checkmake lint, dry-run validation, and make -j parallel prerequisite completeness against make/testing standards.
+rules:
+  - make/testing
+primitives:
+  - type: ai_interpret
+    name: Evaluate Makefile Verification & Parallel Safety
+    prompt: |
+      Inspect Makefiles, CI build targets, and ProjectFacts/AstFacts to verify `checkmake`/`make -n` validation, `make -j` prerequisite hygiene, and deterministic exit codes according to `make/testing`.

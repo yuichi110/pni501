@@ -1,0 +1,10 @@
+id: bicep_test_audit
+name: Bicep Validation, PSRule & What-If Audit
+description: Evaluate Bicep CI lint/build gates, PSRule/Trivy policy scanning, and .bicepparam what-if verification against bicep/testing standards.
+rules:
+  - bicep/testing
+primitives:
+  - type: ai_interpret
+    name: Evaluate Bicep Validation & Policy Gate Coverage
+    prompt: |
+      Inspect CI workflows, `bicepconfig.json`, `.bicepparam` files, and ProjectFacts/AstFacts to verify automated `bicep lint`/`build`, PSRule/Trivy scanning, and `what-if` checks according to `bicep/testing`.

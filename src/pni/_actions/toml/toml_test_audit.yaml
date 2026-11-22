@@ -1,0 +1,10 @@
+id: toml_test_audit
+name: TOML Taplo & Deserialization Verification Audit
+description: Evaluate taplo check/fmt gates and config-struct round-trip deserialization tests against toml/testing standards.
+rules:
+  - toml/testing
+primitives:
+  - type: ai_interpret
+    name: Evaluate TOML Validation & Config Loader Coverage
+    prompt: |
+      Inspect `taplo.toml`, CI workflows, config deserialization tests, and ProjectFacts/AstFacts to verify automated TOML validation according to `toml/testing`.

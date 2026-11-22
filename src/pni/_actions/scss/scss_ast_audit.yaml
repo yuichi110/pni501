@@ -1,0 +1,21 @@
+id: scss_ast_audit
+name: SCSS AST, @use/@forward Modules, Nesting Depth & Dart Sass Audit
+description: Parse SCSS files via tree-sitter to inspect legacy @import usage, deep nesting, !important abuse, deprecated Sass global functions, and SassDoc coverage.
+rules:
+  - common/architecture
+  - common/maintainability
+  - common/security
+  - common/security_vulnerability
+  - scss/code_quality
+  - scss/typing
+  - scss/modern_stack
+primitives:
+  - type: ast_analyze
+    name: Extract Deterministic SCSS AST & Module Metrics
+    with:
+      lang: "scss"
+  - type: ai_interpret
+    name: Interpret SCSS AST Facts & Evaluate Sass Architecture/Modernization
+    prompt: |
+      Inspect the deterministic AstFacts (`docstring_coverage_pct`, `bug_risk_idioms`, `hardcoded_secrets`, `dangerous_sinks`, `modernization_hints`).
+      Read flagged `.scss` files to evaluate partial/token architecture (`common/architecture`), `@use`/`@forward`, nesting depth & accessibility (`scss/code_quality`, `scss/typing`), and Dart Sass 2.0 readiness (`scss/modern_stack`).

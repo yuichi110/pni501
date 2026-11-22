@@ -1,0 +1,21 @@
+id: css_ast_audit
+name: CSS AST, Cascade Specificity, Design Tokens & Accessibility Audit
+description: Parse CSS files via tree-sitter to evaluate !important abuse, selector specificity, outline:none a11y gaps, remote @import sinks, and modern Grid/@layer usage.
+rules:
+  - common/architecture
+  - common/maintainability
+  - common/security
+  - common/security_vulnerability
+  - css/code_quality
+  - css/typing
+  - css/modern_stack
+primitives:
+  - type: ast_analyze
+    name: Extract Deterministic CSS AST & Stylesheet Metrics
+    with:
+      lang: "css"
+  - type: ai_interpret
+    name: Interpret CSS AST Facts & Evaluate Cascade/A11y/Modernization
+    prompt: |
+      Inspect the deterministic AstFacts (`bug_risk_idioms`, `hardcoded_secrets`, `dangerous_sinks`, `modernization_hints`).
+      Read flagged `.css` files to evaluate layer/component styling structure (`common/architecture`), `!important`/specificity/a11y focus & reduced-motion hygiene (`css/code_quality`, `css/typing`), remote `@import`/`url()` safety (`common/security`), and modern CSS Grid/`@layer`/container queries (`css/modern_stack`).

@@ -1,0 +1,27 @@
+id: quick_check
+category: audit
+name: Quick Infrastructure-as-Code Check (HCL / Terraform)
+description: Fast deterministic HCL AST and provider pinning check followed by AI interpretation and score output.
+
+targets:
+  source:
+    - "."
+    - "infra"
+    - "terraform"
+  tests: []
+  docs:
+    - "README.md"
+  exclude:
+    - ".terraform/**"
+
+steps:
+  - id: repo_and_deps
+    uses: repo_structure_audit
+
+  - id: ast_and_quality
+    uses: hcl_ast_audit
+    needs: [repo_and_deps]
+
+  - id: output_score
+    uses: emit_score
+    needs: [ast_and_quality]

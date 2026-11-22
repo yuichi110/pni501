@@ -1,0 +1,21 @@
+id: yaml_ast_audit
+name: YAML AST, CI Supply-Chain, K8s Hardening & Secret Safety Audit
+description: Parse YAML files via tree-sitter to detect permissions:write-all (CWE-269), unpinned Actions, GHA expression injection, K8s privileged pods, duplicate keys, and secrets.
+rules:
+  - common/architecture
+  - common/maintainability
+  - common/security
+  - common/security_vulnerability
+  - yaml/code_quality
+  - yaml/typing
+  - yaml/modern_stack
+primitives:
+  - type: ast_analyze
+    name: Extract Deterministic YAML AST & CI/K8s Security Metrics
+    with:
+      lang: "yaml"
+  - type: ai_interpret
+    name: Interpret YAML AST Facts & Evaluate CI/K8s Security/Schemas
+    prompt: |
+      Inspect the deterministic AstFacts (`bug_risk_idioms`, `hardcoded_secrets`, `dangerous_sinks`, `modernization_hints`).
+      Read flagged `.yaml`/`.yml` files to evaluate GitOps/CI/OpenAPI structure (`common/architecture`), CI `permissions`/SHA pinning/K8s `securityContext` & secrets (`common/security`, `common/security_vulnerability`, `yaml/code_quality`), YAML 1.2 schema typing (`yaml/typing`), and modern OIDC/K8s idioms (`yaml/modern_stack`).

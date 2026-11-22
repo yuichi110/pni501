@@ -1,0 +1,19 @@
+id: repo_structure_audit
+name: Repository Structure & Bzlmod Manifest Audit (Starlark / Bazel)
+description: Deterministically inspect MODULE.bazel, MODULE.bazel.lock, .bazelversion, integrity hashes, and documentation, then have AI evaluate against rules.
+rules:
+  - common/supply_chain
+  - common/documentation
+  - common/git_workflow
+  - common/security
+  - starlark/dependencies
+primitives:
+  - type: project_inspect
+    name: Extract Bazel Bzlmod, Supply-Chain & Governance Facts
+    with:
+      lang: "starlark"
+  - type: ai_interpret
+    name: Evaluate Bzlmod Pinning, Toolchain Hermeticity & Supply Chain
+    prompt: |
+      Review the deterministic ProjectFacts (`manifest_files`, `lockfiles_found`, `has_license`, `has_security_policy`, `has_dependency_automation`, `ci_supply_chain_issues`, `committed_secret_files`, `readme_headings`, `docs_inventory`, `has_gitignore`).
+      Verify compliance with `common/supply_chain`, `starlark/dependencies`, `common/documentation`, `common/git_workflow`, and `common/security`.

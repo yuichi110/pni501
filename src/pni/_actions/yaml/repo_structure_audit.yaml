@@ -1,0 +1,19 @@
+id: repo_structure_audit
+name: Repository Structure & CI/Helm Pinning Governance Audit (YAML)
+description: Deterministically inspect YAML layout, Chart.lock, CI supply-chain issues, Dependabot/Renovate, and documentation, then have AI evaluate against rules.
+rules:
+  - common/supply_chain
+  - common/documentation
+  - common/git_workflow
+  - common/security
+  - yaml/dependencies
+primitives:
+  - type: project_inspect
+    name: Extract YAML Config, CI Supply-Chain & Governance Facts
+    with:
+      lang: "yaml"
+  - type: ai_interpret
+    name: Evaluate YAML Action/Image/Chart Pinning & Governance
+    prompt: |
+      Review the deterministic ProjectFacts (`manifest_files`, `lockfiles_found`, `has_license`, `has_security_policy`, `has_dependency_automation`, `ci_supply_chain_issues`, `committed_secret_files`, `readme_headings`, `docs_inventory`, `has_gitignore`).
+      Verify compliance with `common/supply_chain`, `yaml/dependencies`, `common/documentation`, `common/git_workflow`, and `common/security`.

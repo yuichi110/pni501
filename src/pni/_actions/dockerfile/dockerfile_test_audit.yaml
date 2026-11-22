@@ -1,0 +1,10 @@
+id: dockerfile_test_audit
+name: Dockerfile Verification, Hadolint & Smoke-Test Audit
+description: Evaluate Dockerfile static lint gates (hadolint/trivy config), CI image builds, and non-root smoke verification against dockerfile/testing standards.
+rules:
+  - dockerfile/testing
+primitives:
+  - type: ai_interpret
+    name: Evaluate Container Build & Security Gate Verification
+    prompt: |
+      Inspect CI workflows, container tests, and ProjectFacts/AstFacts to verify automated `hadolint`/Trivy checks and non-root container boot verification according to `dockerfile/testing`.

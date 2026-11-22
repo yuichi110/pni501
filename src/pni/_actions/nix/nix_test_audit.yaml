@@ -1,0 +1,10 @@
+id: nix_test_audit
+name: Nix Flake Check & Evaluation Testing Audit
+description: Evaluate Nix flake check outputs, statix/deadnix/nixfmt lint gates, and runNixOSTest / nix-unit suites against nix/testing standards.
+rules:
+  - nix/testing
+primitives:
+  - type: ai_interpret
+    name: Evaluate Nix Flake Check & Module Verification Coverage
+    prompt: |
+      Inspect `flake.nix` `checks` outputs, CI workflows, and ProjectFacts/AstFacts to verify automated `nix flake check`, `statix`/`deadnix`, and VM/unit tests according to `nix/testing`.

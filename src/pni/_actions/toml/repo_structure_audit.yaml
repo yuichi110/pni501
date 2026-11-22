@@ -1,0 +1,19 @@
+id: repo_structure_audit
+name: Repository Structure & TOML Config Governance Audit (TOML)
+description: Deterministically inspect TOML manifests/configs, secret-file hygiene, and documentation, then have AI evaluate against rules.
+rules:
+  - common/supply_chain
+  - common/documentation
+  - common/git_workflow
+  - common/security
+  - toml/dependencies
+primitives:
+  - type: project_inspect
+    name: Extract TOML Config, Secret-File & Governance Facts
+    with:
+      lang: "toml"
+  - type: ai_interpret
+    name: Evaluate TOML Manifest Consolidation, Secret Hygiene & Governance
+    prompt: |
+      Review the deterministic ProjectFacts (`manifest_files`, `has_license`, `has_security_policy`, `ci_supply_chain_issues`, `committed_secret_files`, `readme_headings`, `docs_inventory`, `has_gitignore`).
+      Verify compliance with `common/supply_chain`, `toml/dependencies`, `common/documentation`, `common/git_workflow`, and `common/security`.

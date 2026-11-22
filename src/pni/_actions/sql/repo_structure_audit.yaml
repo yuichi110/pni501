@@ -1,0 +1,19 @@
+id: repo_structure_audit
+name: Repository Structure & SQL Migration Governance Audit (SQL)
+description: Deterministically inspect SQL migration directories, dialect configs (.sqlfluff/dbt_project.yml), and documentation, then have AI evaluate against rules.
+rules:
+  - common/supply_chain
+  - common/documentation
+  - common/git_workflow
+  - common/security
+  - sql/dependencies
+primitives:
+  - type: project_inspect
+    name: Extract SQL Migration Layout, Config & Governance Facts
+    with:
+      lang: "sql"
+  - type: ai_interpret
+    name: Evaluate SQL Migration Governance, Roles & Dialect Configuration
+    prompt: |
+      Review the deterministic ProjectFacts (`manifest_files`, `has_license`, `has_security_policy`, `ci_supply_chain_issues`, `committed_secret_files`, `readme_headings`, `docs_inventory`, `has_gitignore`).
+      Verify compliance with `common/supply_chain`, `sql/dependencies` (noting pure SQL repos omit npm-style lockfiles legitimately), `common/documentation`, `common/git_workflow`, and `common/security`.

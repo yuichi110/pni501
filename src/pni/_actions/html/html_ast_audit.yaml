@@ -1,0 +1,21 @@
+id: html_ast_audit
+name: HTML AST, XSS/CSP Safety, SRI, Semantic Markup & Accessibility Audit
+description: "Parse HTML files via tree-sitter to detect inline onclick/javascript: XSS sinks (CWE-79), target=_blank missing noopener, non-SRI CDN scripts, and semantic/a11y gaps."
+rules:
+  - common/architecture
+  - common/maintainability
+  - common/security
+  - common/security_vulnerability
+  - html/code_quality
+  - html/typing
+  - html/modern_stack
+primitives:
+  - type: ast_analyze
+    name: Extract Deterministic HTML AST & Markup Security Metrics
+    with:
+      lang: "html"
+  - type: ai_interpret
+    name: Interpret HTML AST Facts & Evaluate XSS/CSP/Accessibility Quality
+    prompt: |
+      Inspect the deterministic AstFacts (`bug_risk_idioms`, `hardcoded_secrets`, `dangerous_sinks`, `modernization_hints`).
+      Read flagged `.html`/`.htm` files to evaluate layout/template organization (`common/architecture`), XSS/CSP/SRI/`rel="noopener"` security (`common/security`, `common/security_vulnerability`, `html/code_quality`), document/form/ARIA validity (`html/typing`), and modern HTML5 idioms (`html/modern_stack`).

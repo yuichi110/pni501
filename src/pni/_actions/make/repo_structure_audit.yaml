@@ -1,0 +1,19 @@
+id: repo_structure_audit
+name: Repository Structure & Make Toolchain Governance Audit (Makefile)
+description: Deterministically inspect Makefiles, toolchain overrides, lockfile-honoring build recipes, and documentation, then have AI evaluate against rules.
+rules:
+  - common/supply_chain
+  - common/documentation
+  - common/git_workflow
+  - common/security
+  - make/dependencies
+primitives:
+  - type: project_inspect
+    name: Extract Makefile Layout, Supply-Chain & Governance Facts
+    with:
+      lang: "make"
+  - type: ai_interpret
+    name: Evaluate Makefile Dependencies, Toolchain Overrides & Governance
+    prompt: |
+      Review the deterministic ProjectFacts (`manifest_files`, `has_license`, `has_security_policy`, `ci_supply_chain_issues`, `committed_secret_files`, `readme_headings`, `docs_inventory`, `has_gitignore`).
+      Verify compliance with `common/supply_chain`, `make/dependencies` (never penalizing Makefiles for lacking a package lockfile), `common/documentation`, `common/git_workflow`, and `common/security`.

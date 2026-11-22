@@ -1,0 +1,10 @@
+id: json_test_audit
+name: JSON Schema & Validation Gate Audit
+description: Evaluate check-jsonschema/ajv/Biome CI validation and positive/negative schema fixture suites against json/testing standards.
+rules:
+  - json/testing
+primitives:
+  - type: ai_interpret
+    name: Evaluate JSON Validation & Schema Fixture Coverage
+    prompt: |
+      Inspect CI workflows, `*.schema.json` fixtures, and ProjectFacts/AstFacts to verify automated JSON syntax and schema validation gates according to `json/testing`.

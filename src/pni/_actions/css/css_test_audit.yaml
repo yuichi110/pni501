@@ -1,0 +1,10 @@
+id: css_test_audit
+name: CSS Stylelint, Contrast & Visual-Regression Audit
+description: Evaluate Stylelint CI gates, contrast verification, and responsive visual-regression testing against css/testing standards.
+rules:
+  - css/testing
+primitives:
+  - type: ai_interpret
+    name: Evaluate CSS Lint & Visual Verification Coverage
+    prompt: |
+      Inspect `.stylelintrc*`, CI workflows, visual snapshot tests, and ProjectFacts/AstFacts to verify Stylelint, contrast, and responsive checks according to `css/testing`.

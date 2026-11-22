@@ -1,0 +1,10 @@
+id: html_test_audit
+name: HTML Validation, Accessibility & Link-Integrity Audit
+description: Evaluate HTML validation (html-validate), axe-core/Lighthouse WCAG 2.1 AA audits, and broken-link verification against html/testing standards.
+rules:
+  - html/testing
+primitives:
+  - type: ai_interpret
+    name: Evaluate HTML Validation & Accessibility Gate Coverage
+    prompt: |
+      Inspect CI workflows, Playwright/axe tests, and ProjectFacts/AstFacts to verify automated HTML validation, accessibility audits, and broken-link checks according to `html/testing`.

@@ -1,0 +1,21 @@
+id: bicep_ast_audit
+name: Bicep AST, Azure Security, @secure() & User-Defined Type Audit
+description: Parse Azure Bicep via tree-sitter to extract @secure()/@description hygiene, TLS/public-access misconfigurations, hardcoded secrets, and user-defined type contracts.
+rules:
+  - common/architecture
+  - common/maintainability
+  - common/security
+  - common/security_vulnerability
+  - bicep/code_quality
+  - bicep/typing
+  - bicep/modern_stack
+primitives:
+  - type: ast_analyze
+    name: Extract Deterministic Bicep AST & Azure IaC Metrics
+    with:
+      lang: "bicep"
+  - type: ai_interpret
+    name: Interpret Bicep AST Facts & Evaluate Azure Security/Modularity
+    prompt: |
+      Inspect the deterministic AstFacts (`type_safety_coverage_pct`, `weak_type_usages`, `docstring_coverage_pct`, `bug_risk_idioms`, `hardcoded_secrets`, `dangerous_sinks`, `modernization_hints`).
+      Read flagged `.bicep` files to evaluate module boundaries (`common/architecture`), Azure security (`@secure()`, TLS 1.2+, Managed Identity, zero secret outputs; `common/security`, `common/security_vulnerability`, `bicep/code_quality`), user-defined type contracts (`bicep/typing`), and AVM/`.bicepparam` idioms (`bicep/modern_stack`).

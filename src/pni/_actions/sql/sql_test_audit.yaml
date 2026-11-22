@@ -1,0 +1,10 @@
+id: sql_test_audit
+name: SQL Migration Replay, Linting & Data-Test Audit
+description: Evaluate ephemeral DB migration replay, sqlfluff/squawk lock-safety linting, and pgTAP/dbt data tests against sql/testing standards.
+rules:
+  - sql/testing
+primitives:
+  - type: ai_interpret
+    name: Evaluate SQL Migration Replay & Integrity Test Coverage
+    prompt: |
+      Inspect SQL tests, `.sqlfluff`, CI migration workflows, and ProjectFacts/AstFacts to verify clean migration replay, `sqlfluff`/`squawk` gates, and constraint/view tests according to `sql/testing`.

@@ -1,0 +1,19 @@
+id: repo_structure_audit
+name: Repository Structure & Buf Schema Manifest Audit (Protocol Buffers)
+description: Deterministically inspect buf.yaml, buf.lock, buf.gen.yaml, package-to-directory alignment, and documentation, then have AI evaluate against rules.
+rules:
+  - common/supply_chain
+  - common/documentation
+  - common/git_workflow
+  - common/security
+  - protobuf/dependencies
+primitives:
+  - type: project_inspect
+    name: Extract Protobuf Buf, Supply-Chain & Governance Facts
+    with:
+      lang: "protobuf"
+  - type: ai_interpret
+    name: Evaluate Buf Dependency Pinning & Schema Governance
+    prompt: |
+      Review the deterministic ProjectFacts (`manifest_files`, `lockfiles_found`, `has_license`, `has_security_policy`, `ci_supply_chain_issues`, `committed_secret_files`, `readme_headings`, `docs_inventory`, `has_gitignore`).
+      Verify compliance with `common/supply_chain`, `protobuf/dependencies` (noting zero-import `.proto` repos omit `buf.lock` legitimately), `common/documentation`, `common/git_workflow`, and `common/security`.

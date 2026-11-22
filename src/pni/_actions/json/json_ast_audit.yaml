@@ -1,0 +1,21 @@
+id: json_ast_audit
+name: JSON AST, Duplicate-Key, Secret Exposure & JSON Schema Audit
+description: Parse JSON files via tree-sitter to detect duplicate keys, hardcoded credentials/service-account keys, missing $schema declarations, and data-contract issues.
+rules:
+  - common/architecture
+  - common/maintainability
+  - common/security
+  - common/security_vulnerability
+  - json/code_quality
+  - json/typing
+  - json/modern_stack
+primitives:
+  - type: ast_analyze
+    name: Extract Deterministic JSON AST & Secret/Schema Metrics
+    with:
+      lang: "json"
+  - type: ai_interpret
+    name: Interpret JSON AST Facts & Evaluate Schema/Secret Hygiene
+    prompt: |
+      Inspect the deterministic AstFacts (`bug_risk_idioms`, `hardcoded_secrets`, `dangerous_sinks`, `modernization_hints`).
+      Read flagged `.json` files to evaluate schema/config organization (`common/architecture`), committed credential/secret safety (`common/security`, `common/security_vulnerability`, `json/code_quality`), JSON Schema 2020-12 contracts (`json/typing`), and modern JSON/JSONL idioms (`json/modern_stack`).

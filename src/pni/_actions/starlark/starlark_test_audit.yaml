@@ -1,0 +1,10 @@
+id: starlark_test_audit
+name: Starlark / Bazel Rule Analysis Testing Audit
+description: Evaluate Bazel rules_testing analysis_test suites, buildifier lint gates, and hermetic sandbox execution against starlark/testing standards.
+rules:
+  - starlark/testing
+primitives:
+  - type: ai_interpret
+    name: Evaluate Starlark Rule Testing & Buildifier Coverage
+    prompt: |
+      Inspect `tests/*.bzl`, `BUILD.bazel` test targets, CI workflows, and ProjectFacts/AstFacts to verify `rules_testing`/`skylib` analysis tests and `buildifier` lint gates according to `starlark/testing`.

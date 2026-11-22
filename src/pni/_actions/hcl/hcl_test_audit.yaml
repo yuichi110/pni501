@@ -1,0 +1,10 @@
+id: hcl_test_audit
+name: HCL / Terraform Validation & Testing Audit
+description: Evaluate Terraform/OpenTofu static validation gates (fmt/validate/tflint/trivy) and *.tftest.hcl / Terratest assertions against hcl/testing standards.
+rules:
+  - hcl/testing
+primitives:
+  - type: ai_interpret
+    name: Evaluate Terraform Validation & Policy Test Coverage
+    prompt: |
+      Inspect `tests/*.tftest.hcl`, CI validation gates, and ProjectFacts/AstFacts to verify automated `fmt`/`validate`/`tflint`/Trivy checks and module plan/assert tests according to `hcl/testing`.

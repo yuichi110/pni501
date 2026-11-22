@@ -1,0 +1,21 @@
+id: dockerfile_ast_audit
+name: Dockerfile AST, Hardening, Base-Image Pinning & BuildKit Audit
+description: Parse Dockerfile/Containerfile via tree-sitter to detect :latest tags (AVD-DS-0001), root runtime users (AVD-DS-0002), curl|sh (CWE-829), baked secrets, and multi-stage hygiene.
+rules:
+  - common/architecture
+  - common/maintainability
+  - common/security
+  - common/security_vulnerability
+  - dockerfile/code_quality
+  - dockerfile/typing
+  - dockerfile/modern_stack
+primitives:
+  - type: ast_analyze
+    name: Extract Deterministic Dockerfile AST & Container Hardening Metrics
+    with:
+      lang: "dockerfile"
+  - type: ai_interpret
+    name: Interpret Dockerfile AST Facts & Evaluate Container Security/Hygiene
+    prompt: |
+      Inspect the deterministic AstFacts (`bug_risk_idioms`, `hardcoded_secrets`, `dangerous_sinks`, `modernization_hints`).
+      Read flagged `Dockerfile` / `Containerfile` files to evaluate multi-stage layering (`common/architecture`), container hardening (`dockerfile/code_quality`, `dockerfile/typing`), supply-chain & secret safety (`common/security`, `common/security_vulnerability`), and BuildKit/distroless idioms (`dockerfile/modern_stack`).

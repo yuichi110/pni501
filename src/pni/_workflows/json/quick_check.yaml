@@ -1,0 +1,26 @@
+id: quick_check
+category: audit
+name: Quick Schema & Configuration Check (JSON)
+description: Fast deterministic JSON AST and secret/schema check followed by AI interpretation and score output.
+
+targets:
+  source:
+    - "."
+  tests: []
+  docs:
+    - "README.md"
+  exclude:
+    - "package-lock.json"
+    - "node_modules/**"
+
+steps:
+  - id: repo_and_deps
+    uses: repo_structure_audit
+
+  - id: ast_and_quality
+    uses: json_ast_audit
+    needs: [repo_and_deps]
+
+  - id: output_score
+    uses: emit_score
+    needs: [ast_and_quality]

@@ -1,0 +1,25 @@
+id: quick_check
+category: audit
+name: Quick Stylesheet Architecture Check (SCSS)
+description: Fast deterministic SCSS AST and Dart Sass check followed by AI interpretation and score output.
+
+targets:
+  source:
+    - "styles"
+    - "src"
+    - "."
+  tests: []
+  docs:
+    - "README.md"
+
+steps:
+  - id: repo_and_deps
+    uses: repo_structure_audit
+
+  - id: ast_and_quality
+    uses: scss_ast_audit
+    needs: [repo_and_deps]
+
+  - id: output_score
+    uses: emit_score
+    needs: [ast_and_quality]

@@ -1,0 +1,40 @@
+id: full_audit
+category: audit
+name: Full Configuration, CI & GitOps Audit & Report (YAML)
+description: Workflow v2 DAG — Plan-First alignment, parallel deterministic YAML AST & Trivy IaC analysis, grounded config/GitOps topology, score+SARIF emission, and Drawlib report.
+
+targets:
+  source:
+    - "."
+    - ".github/workflows"
+  tests: []
+  docs:
+    - "README.md"
+
+steps:
+  - id: repo_and_deps
+    uses: repo_structure_audit
+
+  - id: ast_and_quality
+    uses: yaml_ast_audit
+    needs: [repo_and_deps]
+
+  - id: security_audit
+    uses: security_vulnerability_audit
+    needs: [repo_and_deps]
+
+  - id: arch_recording
+    uses: architecture_analysis
+    needs: [ast_and_quality]
+
+  - id: test_health
+    uses: yaml_test_audit
+    needs: [ast_and_quality]
+
+  - id: output_score
+    uses: emit_score
+    needs: [arch_recording, test_health, security_audit]
+
+  - id: create_report
+    uses: write_drawlib_report
+    needs: [output_score]

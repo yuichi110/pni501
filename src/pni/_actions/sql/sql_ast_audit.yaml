@@ -1,0 +1,21 @@
+id: sql_ast_audit
+name: SQL AST, Destructive DDL/DML, Injection, Typing & Zero-Downtime Audit
+description: Parse SQL files via tree-sitter to detect unguarded DELETE/UPDATE/DROP, SELECT *, dynamic SQL injection, SECURITY DEFINER search_path hazards, and column typing hygiene.
+rules:
+  - common/architecture
+  - common/maintainability
+  - common/security
+  - common/security_vulnerability
+  - sql/code_quality
+  - sql/typing
+  - sql/modern_stack
+primitives:
+  - type: ast_analyze
+    name: Extract Deterministic SQL AST & Migration Metrics
+    with:
+      lang: "sql"
+  - type: ai_interpret
+    name: Interpret SQL AST Facts & Evaluate Data Integrity/Security/DDL Safety
+    prompt: |
+      Inspect the deterministic AstFacts (`docstring_coverage_pct`, `bug_risk_idioms`, `type_safety_issues`, `hardcoded_secrets`, `dangerous_sinks`, `modernization_hints`).
+      Read flagged `.sql` files to evaluate schema/domain boundaries (`common/architecture`), destructive DDL/DML & SQLi safety (`common/security`, `common/security_vulnerability`, `sql/code_quality`), `NUMERIC`/`TIMESTAMPTZ`/PK/FK/index typing (`sql/typing`), and modern CTE/window/RLS idioms (`sql/modern_stack`).

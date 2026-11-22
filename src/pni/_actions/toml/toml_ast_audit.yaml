@@ -1,0 +1,21 @@
+id: toml_ast_audit
+name: TOML AST, Duplicate-Key, Secret Safety & Schema Hygiene Audit
+description: Parse TOML files via tree-sitter to detect duplicate keys/tables, hardcoded secrets, native typing misuse, and TOML v1.0.0 schema hygiene.
+rules:
+  - common/architecture
+  - common/maintainability
+  - common/security
+  - common/security_vulnerability
+  - toml/code_quality
+  - toml/typing
+  - toml/modern_stack
+primitives:
+  - type: ast_analyze
+    name: Extract Deterministic TOML AST & Config Security Metrics
+    with:
+      lang: "toml"
+  - type: ai_interpret
+    name: Interpret TOML AST Facts & Evaluate Config Safety/Schemas
+    prompt: |
+      Inspect the deterministic AstFacts (`docstring_coverage_pct`, `bug_risk_idioms`, `hardcoded_secrets`, `dangerous_sinks`, `modernization_hints`).
+      Read flagged `.toml` files to evaluate config/manifest organization (`common/architecture`), hardcoded secret & duplicate-key safety (`common/security`, `common/security_vulnerability`, `toml/code_quality`), native TOML typing (`toml/typing`), and TOML v1.0.0 idioms (`toml/modern_stack`).
