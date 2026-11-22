@@ -16,6 +16,7 @@ import os
 import re
 from pathlib import Path
 
+import pytest
 from typer.testing import CliRunner
 
 from pni._actions import CategoryScores, ScoreResult
@@ -302,3 +303,105 @@ def test_cli_validate_score(tmp_path: Path) -> None:
 
     res_missing = runner.invoke(app, ["validate-score", str(tmp_path / "missing.json")])
     assert res_missing.exit_code == 1
+
+
+def test_auto_approval_friendly_cli_output_pull_and_next_options(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Verify -o/--output, start --pull, push-action --next, and rewind --pull -o avoid shell pipes/redirects."""
+    src_dir = tmp_path / "src" / "mini"
+    src_dir.mkdir(parents=True)
+    (src_dir / "__init__.py").write_text('"""Mini pkg."""\n', encoding="utf-8")
+    (src_dir / "calc.py").write_text('"""Calc."""\n\n\ndef inc(x: int) -> int:\n    """Inc."""\n    return x + 1\n')
+    (tmp_path / "pyproject.toml").write_text(
+        '[project]\nname = "mini"\nversion = "0.1.0"\nrequires-python = ">=3.11"\n',
+        encoding="utf-8",
+    )
+    (tmp_path / "README.md").write_text("# Mini\n\n## Usage\n\nSimple package.\n", encoding="utf-8")
+    wf_dir = tmp_path / ".pni" / "workflows"
+    wf_dir.mkdir(parents=True)
+    (wf_dir / "pipe_free.yaml").write_text(
+        """id: pipe_free
+name: Pipe-Free Single Command Audit
+targets:
+  root: "."
+  source: ["src"]
+steps:
+  - id: inspect
+    uses: repo_structure_audit
+  - id: score
+    uses: emit_score
+    needs: [inspect]
+    with:
+      target: "pipe_free"
+""",
+        encoding="utf-8",
+    )
+    monkeypatch.chdir(tmp_path)
+
+    # 1. rules show -o
+    rule_out = tmp_path / ".pni" / "cache" / "rule.md"
+    r_rule = runner.invoke(app, ["rules", "show", "common/agent_instruction", "-o", str(rule_out)])
+    assert r_rule.exit_code == 0, r_rule.output
+    assert "Auto-Approval Friendly CLI Discipline" in rule_out.read_text(encoding="utf-8")
+
+    # 2. workflows plan -o
+    plan_out = tmp_path / ".pni" / "cache" / "plan_preview.md"
+    r_plan = runner.invoke(app, ["workflows", "plan", "pipe_free", "--no-container-probe", "-o", str(plan_out)])
+    assert r_plan.exit_code == 0, r_plan.output
+    assert "flowchart TD" in plan_out.read_text(encoding="utf-8")
+
+    # 3. workflows start --pull --json -o
+    start_out = tmp_path / ".pni" / "cache" / "start.json"
+    r_start = runner.invoke(app, ["workflows", "start", "pipe_free", "--pull", "--json", "-o", str(start_out)])
+    assert r_start.exit_code == 0, r_start.output
+    started = json.loads(start_out.read_text(encoding="utf-8"))
+    run_id = started["run_id"]
+    assert started["next_status"] == "ready"
+    assert started["next_action"]["primitive_type"] == "confirm_plan"
+    assert "--file .pni/cache/pipe_free/input_act-01.json --next" in started["next_action"]["prompt_markdown"]
+
+    # 4. get-action -o & get-actions -o
+    ga_out = tmp_path / ".pni" / "cache" / "act1.md"
+    r_ga = runner.invoke(app, ["workflows", "get-action", run_id, "-o", str(ga_out)])
+    assert r_ga.exit_code == 0, r_ga.output
+    assert "confirm_plan" in ga_out.read_text(encoding="utf-8")
+
+    gas_out = tmp_path / ".pni" / "cache" / "ready.md"
+    r_gas = runner.invoke(app, ["workflows", "get-actions", run_id, "--ready", "-o", str(gas_out)])
+    assert r_gas.exit_code == 0, r_gas.output
+    assert "act-01" in gas_out.read_text(encoding="utf-8")
+
+    # 5. push-action --file ... --next --json -o (advances past project_inspect to ai_interpret!)
+    p1 = tmp_path / ".pni" / "cache" / "pipe_free" / "input_act-01.json"
+    p1.parent.mkdir(parents=True, exist_ok=True)
+    p1.write_text(json.dumps({"approved": True}), encoding="utf-8")
+    n1_out = tmp_path / ".pni" / "cache" / "next1.json"
+    r_p1 = runner.invoke(
+        app,
+        ["workflows", "push-action", run_id, "act-01", "--file", str(p1), "--next", "--json", "-o", str(n1_out)],
+    )
+    assert r_p1.exit_code == 0, r_p1.output
+    n1 = json.loads(n1_out.read_text(encoding="utf-8"))
+    assert n1["ok"] is True
+    assert n1["next_status"] == "ready"
+    assert n1["next_action"]["primitive_type"] == "ai_interpret"
+    ai_act_id = n1["next_action"]["action_id"]
+
+    # 6. push-action ai_interpret --next -o (markdown mode) -> emits next emit_score prompt to file
+    p2 = tmp_path / ".pni" / "cache" / "pipe_free" / f"input_{ai_act_id}.json"
+    p2.write_text(json.dumps({"summary": "Manifest checked.", "step_score": 88}), encoding="utf-8")
+    n2_out = tmp_path / ".pni" / "cache" / "next2.md"
+    r_p2 = runner.invoke(
+        app,
+        ["workflows", "push-action", run_id, ai_act_id, "--file", str(p2), "--next", "-o", str(n2_out)],
+    )
+    assert r_p2.exit_code == 0, r_p2.output
+    assert "emit_score" in n2_out.read_text(encoding="utf-8")
+
+    # 7. rewind --pull -o
+    rw_out = tmp_path / ".pni" / "cache" / "rewound.md"
+    r_rw = runner.invoke(app, ["workflows", "rewind", run_id, ai_act_id, "--pull", "-o", str(rw_out)])
+    assert r_rw.exit_code == 0, r_rw.output
+    assert ai_act_id in rw_out.read_text(encoding="utf-8")

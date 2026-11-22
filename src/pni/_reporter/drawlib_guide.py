@@ -394,8 +394,13 @@ def render_drawlib_report_guide(
         "       inspect `.drawlib/scratch/*.png` with your image-viewing tool to fix text clipping, arrow/label",
         "       collisions, or anchor mistakes before finalizing the PDF compilation:",
         "     ```bash",
-        f"     uv run drawlib show {chapter_dir}/{sample_ch} <diagram>.png \\",
-        f"       -s {src_dir}/styles.py -u {src_dir}/utils.py -g -o .drawlib/scratch/grid_check.png",
+        (
+            f"     uv run drawlib show {chapter_dir}/{sample_ch} <diagram>.png "
+            f"-s {src_dir}/styles.py -u {src_dir}/utils.py -g -o .drawlib/scratch/grid_check.png"
+        ),
+        "     ```",
+        "     Then compile the final report as its own single command:",
+        "     ```bash",
         f"     {build_cmd}",
         "     ```",
         "   - **Step 3f — Push `ReportCompletionInput` (workspace-relative paths)**:",

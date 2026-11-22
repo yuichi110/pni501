@@ -66,6 +66,7 @@ from pni._rules import (
 )
 from pni._workflows import (
     DEFAULT_STATE_DB_REL_PATH,
+    ActionPromptPayload,
     InspectedActionItem,
     RunStatus,
     WorkflowCategory,
@@ -309,6 +310,12 @@ def show_rule_cmd(
         "-p",
         help="Render rule Markdown inside a styled Rich terminal panel instead of plain Markdown.",
     ),
+    output_file: Optional[Path] = typer.Option(
+        None,
+        "--output",
+        "-o",
+        help="Optional file path to save the rule Markdown without shell redirects.",
+    ),
 ) -> None:
     """Read a specific rule or workflow guide specification in clean Markdown."""
     project_root = Path.cwd()
@@ -321,8 +328,8 @@ def show_rule_cmd(
         raise typer.Exit(code=1)
 
     rule_info, content = result
-    if not pretty:
-        print(content)
+    if output_file is not None or not pretty:
+        _write_or_print_payload(content, output_file, label=f"rule '{rule_info.identifier}'")
         return
 
     source_tag = "Local (.pni)" if rule_info.is_local else "Builtin"
@@ -612,6 +619,12 @@ def plan_workflow_cmd(
         "--no-container-probe",
         help="Skip Docker/Podman detection during Phase 0 lightweight recon.",
     ),
+    output_file: Optional[Path] = typer.Option(
+        None,
+        "--output",
+        "-o",
+        help="Optional file path to save the execution plan without shell redirects.",
+    ),
 ) -> None:
     """Preview the Workflow v2 execution plan, validated Mermaid DAG, and human alignment questions."""
     project_root = Path.cwd()
@@ -631,12 +644,12 @@ def plan_workflow_cmd(
 
     _, _, plan = planned
     if as_json:
-        print(plan.model_dump_json(indent=2))
-        return
-    if mermaid_only:
-        print(plan.mermaid_dag)
-        return
-    print(render_plan_markdown(plan))
+        text = plan.model_dump_json(indent=2)
+    elif mermaid_only:
+        text = plan.mermaid_dag
+    else:
+        text = render_plan_markdown(plan)
+    _write_or_print_payload(text, output_file, label="execution plan")
 
 
 @workflows_app.command("start")
@@ -659,6 +672,23 @@ def start_workflow_cmd(
         None,
         "--plan",
         help="Optional path to a pre-approved PlanApprovalInput or plan.json file.",
+    ),
+    pull: bool = typer.Option(
+        False,
+        "--pull",
+        "-p",
+        help="Immediately pull the first ready action in the same single command (avoids '&&' chaining).",
+    ),
+    as_json: bool = typer.Option(
+        False,
+        "--json",
+        help="Emit structured JSON (includes first action payload when combined with --pull).",
+    ),
+    output_file: Optional[Path] = typer.Option(
+        None,
+        "--output",
+        "-o",
+        help="Optional file path to save the started/pulled output without shell redirects.",
     ),
 ) -> None:
     """Start a stateful Workflow v2 session in .pni/cache/workflow_state.db and return its run ID."""
@@ -701,23 +731,14 @@ def start_workflow_cmd(
         err_console.print("Run [bold]pni workflows list[/bold] to see available project workflows.")
         raise typer.Exit(code=1)
 
-    console.print(
-        f"[bold green]✓ Started workflow[/bold green] [cyan]{record.workflow_id}[/cyan] "
-        f"[dim](category={record.category.value}, scope={record.scope}, status={record.status.value})[/dim]"
+    _emit_started_workflow(
+        record,
+        project_root,
+        prior_active=prior_active,
+        pull=pull,
+        as_json=as_json,
+        output_file=output_file,
     )
-    console.print(f"Workflow Run ID: [bold yellow]{record.run_id}[/bold yellow]")
-    if record.based_on:
-        console.print(
-            f"Based On Audit: [bold cyan]{record.based_on}[/bold cyan] "
-            f"(SQLite run: [bold yellow]{record.based_on_run_id or '-'}[/bold yellow])"
-        )
-    if prior_active:
-        console.print(
-            f"[yellow]Note: Older unfinished run(s) exist for '{record.workflow_id}': {prior_active}. "
-            "Run 'pni workflows cancel --superseded' to mark them cancelled.[/yellow]"
-        )
-    console.print(f"State DB: [dim]{DEFAULT_STATE_DB_REL_PATH}[/dim]")
-    console.print(f"Next step: [bold]pni workflows get-action {record.run_id}[/bold]")
 
 
 @workflows_app.command("run-action")
@@ -777,6 +798,75 @@ def run_workflow_action_cmd(
         raise typer.Exit(code=1)
 
 
+def _emit_started_workflow(
+    record: WorkflowRunRecord,
+    project_root: Path,
+    *,
+    prior_active: list[str],
+    pull: bool,
+    as_json: bool,
+    output_file: Optional[Path],
+) -> None:
+    """Emit start confirmation and optionally pull the first ready action in one command."""
+    if as_json:
+        payload: dict[str, object] = {
+            "run_id": record.run_id,
+            "workflow_id": record.workflow_id,
+            "category": record.category.value,
+            "scope": record.scope,
+            "status": record.status.value,
+            "based_on": record.based_on,
+            "based_on_run_id": record.based_on_run_id,
+        }
+        if pull:
+            _, actions, _ = _fetch_ready_actions_or_exit(record.run_id, project_root, full_schema=False)
+            payload["next_status"] = "ready" if actions else "completed"
+            payload["next_action"] = actions[0].model_dump(mode="json") if actions else None
+        _write_or_print_payload(json.dumps(payload, indent=2, ensure_ascii=False), output_file, label="workflow start")
+        return
+
+    console.print(
+        f"[bold green]✓ Started workflow[/bold green] [cyan]{record.workflow_id}[/cyan] "
+        f"[dim](category={record.category.value}, scope={record.scope}, status={record.status.value})[/dim]"
+    )
+    console.print(f"Workflow Run ID: [bold yellow]{record.run_id}[/bold yellow]")
+    if record.based_on:
+        console.print(
+            f"Based On Audit: [bold cyan]{record.based_on}[/bold cyan] "
+            f"(SQLite run: [bold yellow]{record.based_on_run_id or '-'}[/bold yellow])"
+        )
+    if prior_active:
+        console.print(
+            f"[yellow]Note: Older unfinished run(s) exist for '{record.workflow_id}': {prior_active}. "
+            "Run 'pni workflows cancel --superseded' to mark them cancelled.[/yellow]"
+        )
+    console.print(f"State DB: [dim]{DEFAULT_STATE_DB_REL_PATH}[/dim]")
+    if pull:
+        _, _, guide = _fetch_ready_actions_or_exit(record.run_id, project_root, full_schema=False)
+        _write_or_print_payload(guide, output_file, label="action prompt")
+        return
+    console.print(f"Next step: [bold]pni workflows get-action {record.run_id}[/bold]")
+
+
+def _fetch_ready_actions_or_exit(
+    run_id: str,
+    project_root: Path,
+    *,
+    full_schema: bool,
+) -> tuple[WorkflowRunRecord, list[ActionPromptPayload], str]:
+    """Fetch DAG-ready workflow actions or exit cleanly with a formatted error."""
+    try:
+        run, payloads, guide = get_ready_workflow_actions(run_id, project_root, full_schema=full_schema)
+    except WorkflowPrerequisiteError as exc:
+        err_console.print(f"[bold red]Error: {exc}[/bold red]")
+        raise typer.Exit(code=1) from exc
+
+    if run is None:
+        err_console.print(f"[bold red]{guide}[/bold red]")
+        raise typer.Exit(code=1)
+    return run, payloads, guide
+
+
 @workflows_app.command("get-action")
 def get_workflow_action_cmd(
     run_id: str = typer.Argument(
@@ -793,27 +883,26 @@ def get_workflow_action_cmd(
         "--full-schema",
         help="Include full verbose JSON Schema instead of the compact skeleton.",
     ),
+    output_file: Optional[Path] = typer.Option(
+        None,
+        "--output",
+        "-o",
+        help="Optional file path to save the action prompt/JSON without shell redirects.",
+    ),
 ) -> None:
     """Auto-advance deterministic steps and fetch the next actionable AI/gate step."""
     project_root = Path.cwd()
-    try:
-        run, payloads, guide = get_ready_workflow_actions(run_id, project_root, full_schema=full_schema)
-    except WorkflowPrerequisiteError as exc:
-        err_console.print(f"[bold red]Error: {exc}[/bold red]")
-        raise typer.Exit(code=1) from exc
-
-    if run is None:
-        err_console.print(f"[bold red]{guide}[/bold red]")
-        raise typer.Exit(code=1)
+    run, payloads, guide = _fetch_ready_actions_or_exit(run_id, project_root, full_schema=full_schema)
 
     if as_json:
         if not payloads:
-            print(json.dumps({"run_id": run.run_id, "status": "completed", "action": None}, indent=2))
-            return
-        print(payloads[0].model_dump_json(indent=2))
+            out_json = json.dumps({"run_id": run.run_id, "status": "completed", "action": None}, indent=2)
+        else:
+            out_json = payloads[0].model_dump_json(indent=2)
+        _write_or_print_payload(out_json, output_file, label="action payload")
         return
 
-    print(guide)
+    _write_or_print_payload(guide, output_file, label="action prompt")
 
 
 @workflows_app.command("get-actions")
@@ -837,26 +926,40 @@ def get_ready_actions_cmd(
         "--full-schema",
         help="Include full verbose JSON Schema instead of the compact skeleton.",
     ),
+    output_file: Optional[Path] = typer.Option(
+        None,
+        "--output",
+        "-o",
+        help="Optional file path to save the ready actions list/JSON without shell redirects.",
+    ),
 ) -> None:
     """Auto-advance deterministic steps and list all DAG-ready actions available for parallel execution."""
     _ = ready
     project_root = Path.cwd()
-    try:
-        run, payloads, done_msg = get_ready_workflow_actions(run_id, project_root, full_schema=full_schema)
-    except WorkflowPrerequisiteError as exc:
-        err_console.print(f"[bold red]Error: {exc}[/bold red]")
-        raise typer.Exit(code=1) from exc
-
-    if run is None:
-        err_console.print(f"[bold red]{done_msg}[/bold red]")
-        raise typer.Exit(code=1)
+    run, payloads, done_msg = _fetch_ready_actions_or_exit(run_id, project_root, full_schema=full_schema)
 
     if as_json:
-        print(json.dumps([p.model_dump(mode="json") for p in payloads], indent=2))
+        out_json = json.dumps([p.model_dump(mode="json") for p in payloads], indent=2, ensure_ascii=False)
+        _write_or_print_payload(out_json, output_file, label="ready actions")
         return
 
     if not payloads:
-        print(done_msg)
+        _write_or_print_payload(done_msg, output_file, label="ready actions")
+        return
+
+    if output_file is not None:
+        md_lines = [
+            f"# DAG-Ready Actions (`{run.run_id}` — `{run.workflow_id}`)",
+            "",
+            "| Action ID | Step Key | Primitive | Expected Input | Fact Views |",
+            "| :--- | :--- | :--- | :--- | :--- |",
+        ]
+        for p in payloads:
+            md_lines.append(
+                f"| `{p.action_id}` | `{p.step_key}` | `{p.primitive_type.value}` | "
+                f"`{p.expected_input_model}` | `{', '.join(p.fact_views)}` |"
+            )
+        _write_or_print_payload("\n".join(md_lines), output_file, label="ready actions")
         return
 
     table = Table(
@@ -892,18 +995,35 @@ def push_workflow_action_cmd(
     ),
     input_json: Optional[str] = typer.Argument(
         None,
-        help="JSON payload conforming to the action's input schema (optional if --file is used).",
+        help="Inline JSON payload (prefer '--file <path>' for agent auto-approval reliability).",
     ),
     input_file: Optional[Path] = typer.Option(
         None,
         "--file",
         "-f",
-        help="Path to a JSON file containing the action input payload.",
+        help="Path to a JSON file containing the action input payload (recommended).",
+    ),
+    pull_next: bool = typer.Option(
+        False,
+        "--next",
+        "-n",
+        help="After pushing, auto-advance deterministic steps and emit the next ready action in one command.",
+    ),
+    full_schema: bool = typer.Option(
+        False,
+        "--full-schema",
+        help="Include full verbose JSON Schema when combined with --next.",
     ),
     as_json: bool = typer.Option(
         False,
         "--json",
         help="Emit structured JSON response.",
+    ),
+    output_file: Optional[Path] = typer.Option(
+        None,
+        "--output",
+        "-o",
+        help="Optional file path to save the response or '--next' action prompt without shell redirects.",
     ),
 ) -> None:
     """Validate and submit an action result into .pni/cache/workflow_state.db to advance the DAG."""
@@ -916,16 +1036,51 @@ def push_workflow_action_cmd(
         payload = input_file.read_text(encoding="utf-8")
 
     ok, message = push_workflow_action(run_id, action_id, payload, project_root)
-    if as_json:
-        print(json.dumps({"ok": ok, "run_id": run_id, "action_id": action_id, "message": message}, indent=2))
-        if not ok:
-            raise typer.Exit(code=1)
-        return
     if not ok:
-        err_console.print(f"[bold red]✗ {message}[/bold red]")
+        if as_json:
+            err_json = json.dumps({"ok": False, "run_id": run_id, "action_id": action_id, "message": message}, indent=2)
+            _write_or_print_payload(err_json, output_file, label="push result")
+        else:
+            err_console.print(f"[bold red]✗ {message}[/bold red]")
         raise typer.Exit(code=1)
 
+    _emit_push_success(
+        run_id,
+        action_id,
+        message,
+        project_root,
+        pull_next=pull_next,
+        full_schema=full_schema,
+        as_json=as_json,
+        output_file=output_file,
+    )
+
+
+def _emit_push_success(
+    run_id: str,
+    action_id: str,
+    message: str,
+    project_root: Path,
+    *,
+    pull_next: bool,
+    full_schema: bool,
+    as_json: bool,
+    output_file: Optional[Path],
+) -> None:
+    """Emit push-action success response and optionally auto-advance to the next ready action."""
+    if as_json:
+        resp: dict[str, object] = {"ok": True, "run_id": run_id, "action_id": action_id, "message": message}
+        if pull_next:
+            _, next_actions, _ = _fetch_ready_actions_or_exit(run_id, project_root, full_schema=full_schema)
+            resp["next_status"] = "ready" if next_actions else "completed"
+            resp["next_action"] = next_actions[0].model_dump(mode="json") if next_actions else None
+        _write_or_print_payload(json.dumps(resp, indent=2, ensure_ascii=False), output_file, label="push result")
+        return
+
     console.print(f"[bold green]{message}[/bold green]")
+    if pull_next:
+        _, _, guide = _fetch_ready_actions_or_exit(run_id, project_root, full_schema=full_schema)
+        _write_or_print_payload(guide, output_file, label="next action prompt")
 
 
 def _format_compact_ts(iso_ts: str) -> str:
@@ -1074,12 +1229,12 @@ def status_workflow_cmd(
     console.print(table)
 
 
-def _write_or_print_payload(text: str, output_file: Optional[Path]) -> None:
+def _write_or_print_payload(text: str, output_file: Optional[Path], *, label: str = "output") -> None:
     """Write extracted JSON/text to output_file if provided, otherwise print directly to stdout."""
     if output_file is not None:
         output_file.parent.mkdir(parents=True, exist_ok=True)
         output_file.write_text(text.rstrip("\n") + "\n", encoding="utf-8")
-        console.print(f"[bold green]✓ Wrote inspected payload to[/bold green] [cyan]{output_file}[/cyan]")
+        console.print(f"[bold green]✓ Wrote {label} to[/bold green] [cyan]{output_file}[/cyan]")
         return
     print(text)
 
@@ -1204,7 +1359,7 @@ def inspect_workflow_action_cmd(
         err_console.print(f"[bold red]Error: {exc}[/bold red]")
         raise typer.Exit(code=1) from exc
 
-    _write_or_print_payload(out_text, output_file)
+    _write_or_print_payload(out_text, output_file, label="inspected payload")
 
 
 @workflows_app.command("rewind")
@@ -1222,7 +1377,13 @@ def rewind_workflow_cmd(
         False,
         "--pull",
         "-p",
-        help="Immediately execute 'get-action' on the rewound step and print its output.",
+        help="Immediately execute 'get-action' on the rewound step and print/save its output.",
+    ),
+    output_file: Optional[Path] = typer.Option(
+        None,
+        "--output",
+        "-o",
+        help="Optional file path to save the rewound '--pull' action prompt without shell redirects.",
     ),
 ) -> None:
     """Rewind a workflow run back to a step, re-sync .pni/workflows/*.yaml parameters, and reset downstream steps."""
@@ -1248,7 +1409,7 @@ def rewind_workflow_cmd(
         if run_rec is None:
             err_console.print(f"[bold red]{guide}[/bold red]")
             raise typer.Exit(code=1)
-        print(guide)
+        _write_or_print_payload(guide, output_file, label="rewound action prompt")
         return
 
     console.print(f"Next step: [bold]pni workflows get-action {outcome.run.run_id}[/bold]")
@@ -1880,7 +2041,10 @@ def cache_clean_cmd(
 def validate_mermaid_cmd(
     path: Optional[Path] = typer.Argument(
         None,
-        help="Path to a .mmd or .md file containing Mermaid diagrams (reads stdin when omitted or '-').",
+        help=(
+            "Path to a .mmd or .md file containing Mermaid diagrams (recommended; avoids shell stdin pipes). "
+            "Reads stdin only when omitted or '-'."
+        ),
     ),
     browser: bool = typer.Option(
         False,

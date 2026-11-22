@@ -38,19 +38,19 @@ This guide provides the concise PNI Workflow v2 bootstrap and execution procedur
 
 ## 2. Workflow v2 Execution Cycle (Plan-First DAG + Zero Empty ACKs)
 
+- **Auto-Approval Friendly CLI Discipline (Zero Shell Metacharacters)**: Always invoke `pni` / `drawlib` as a **single simple command** (NEVER use pipes `|`, redirects `>`, heredocs `<<EOF`, `$(...)`, `$VAR`, `&&`/`;`, `jq`/`head`/`python -c`, or inline multi-line JSON). Write JSON payloads with your file-writing tool to `.pni/cache/<workflow_id>/input_<action_id>.json`, pass `--file <path> --next` (or `start --pull`), use `-o <path>` + your file-reading tool for long outputs/JSON inspection, and validate Mermaid from files (`pni validate-mermaid <file>`).
 - **Ad-Hoc Single Action (Zero Prep)**: `pni workflows run-action <workflow_id> <action>` executes any individual step/action directly without `workflow_state.db`.
 - **Full Stateful DAG Workflow**:
   1. **Start**:
-     - Interactive (default): `pni workflows start <workflow_id> [--supersede]` -> pauses at `AWAITING_APPROVAL` (`act-01: confirm_plan`).
-     - CI / Batch: `pni workflows start <workflow_id> --auto-approve` (or `--plan <approval.json>`).
+     - Interactive (default): `pni workflows start <workflow_id> --pull [--supersede]` -> starts and pulls `act-01: confirm_plan` (`AWAITING_APPROVAL`) in one command.
+     - CI / Batch: `pni workflows start <workflow_id> --auto-approve --pull` (or `--plan <approval.json> --pull`).
   2. **Phase 1 — Human Alignment Gate (`confirm_plan`)**:
-     - Pull `act-01` via `pni workflows get-action <run_id>`.
-     - Show the user the validated Mermaid Execution DAG, detected scope/languages/harness table, and alignment questions; once aligned, push `PlanApprovalInput` (`approved: true`, `disabled_steps`, `focus_areas`, `extra_opt_outs`, `confirmed_targets`, `report_mode`, etc.).
+     - Show the user the validated Mermaid Execution DAG, detected scope/languages/harness table, and alignment questions; once aligned, write `PlanApprovalInput` to `.pni/cache/<workflow_id>/input_act-01.json` via your file-writing tool and submit with `--next`.
   3. **Auto-Advance Parallel Collection & Step-Scoped Pull**:
-     - `pni workflows get-action <run_id> [--json] [--full-schema]` (or `pni workflows get-actions <run_id> --ready [--json]` for parallel AI subagents).
+     - `pni workflows get-action <run_id> [--json] [--full-schema] [-o <path>]` (or `pni workflows get-actions <run_id> --ready [--json] [-o <path>]` for parallel AI subagents).
      - PNI automatically executes all DAG-ready deterministic analyzers (`project_inspect`, `ast_analyze`, `run_check`, `security_scan`, `web_pentest`, `migration_analyze`, `progress_analyze`) in parallel without requiring empty `{"acknowledged": true}` pushes, writes `.pni/cache/<workflow_id>/facts.json`, and projects only step-relevant fact slices (`fact_views`) with compact input skeletons.
-  4. **Push**:
-     - `pni workflows push-action <run_id> <action_id> --file <payload.json> [--json]` (DAG-ready AI actions may be pushed out-of-order).
+  4. **Push & Auto-Pull Next**:
+     - Write the JSON payload via your file-writing tool and run a single command: `pni workflows push-action <run_id> <action_id> --file .pni/cache/<workflow_id>/input_<action_id>.json --next [-o <path>]` (DAG-ready AI actions may be pushed out-of-order).
      - On `ai_interpret`: triage deterministic `det-*` pre-findings via `finding_adjustments` (`waive`/`reclassify`, `reason >= 10 chars`) and bounded `baseline_delta` (`-10..+10`).
      - On `emit_score`: submit compact `ScoreSubmissionInput` -> PNI validates `±10pt` anchoring and writes `*_score.json` (`schema_version="2.0"`), `*_summary.json`, and `*_findings.sarif` (SARIF 2.1.0).
   5. **Repeat** until status is `COMPLETED`.

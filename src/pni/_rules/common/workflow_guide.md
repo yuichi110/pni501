@@ -284,7 +284,7 @@ steps:
    ```bash
    pni workflows run-action <workflow_id> <step_or_action>
    ```
-4. **Launch Stateful Run & Confirm Plan with User**:
-   - Run `pni workflows start <workflow_id>` -> pull `act-01` (`confirm_plan`) -> review the validated Mermaid DAG & alignment questions with the user -> push `PlanApprovalInput` (`approved: true`) to trigger Auto-Advance parallel execution.
-   - Use `--auto-approve` (or `--plan <file.json>`) for non-interactive CI/batch executions.
-   - Validate any custom Mermaid diagram before presenting it using `pni validate-mermaid <file> [--browser]`.
+4. **Launch Stateful Run & Confirm Plan with User (Single Simple Commands Only)**:
+   - Run `pni workflows start <workflow_id> --pull` -> review the validated Mermaid DAG & alignment questions with the user -> write `PlanApprovalInput` to `.pni/cache/<workflow_id>/input_act-01.json` with your file-writing tool -> push with `pni workflows push-action <run_id> act-01 --file .pni/cache/<workflow_id>/input_act-01.json --next` (avoid pipes `|`, redirects `>`, `<<EOF`, or `&&` chaining; use `-o <path>` to save long outputs).
+   - Use `--auto-approve --pull` (or `--plan <file.json> --pull`) for non-interactive CI/batch executions.
+   - Validate any custom Mermaid diagram from a file before presenting it using `pni validate-mermaid <file> [--browser]`.

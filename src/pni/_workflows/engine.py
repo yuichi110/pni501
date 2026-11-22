@@ -1531,13 +1531,21 @@ def _build_action_prompt_payload(
             "pass `--full-schema` for full JSON Schema):"
         )
     )
+    payload_hint_path = f".pni/cache/{run.workflow_id}/input_{action.action_id}.json"
+    next_prompt_hint = f".pni/cache/{run.workflow_id}/next_action.md"
     lines.extend(
         [
             "\n## Submit Action Result (`push-action`)",
-            "After completing the work above, submit your JSON payload to advance the workflow state:",
+            (
+                f"1. Write your JSON payload to `{payload_hint_path}` using your **file-writing tool** "
+                "(do NOT use shell heredocs `<<EOF`, pipes `|`, redirects `>`, `&&`, or inline multi-line JSON)."
+            ),
+            (
+                "2. Advance the workflow with a **single simple command** (add `--next` to pull the next action "
+                f"automatically, or `-o {next_prompt_hint}` to save long prompts to a file without shell redirects):"
+            ),
             "```bash",
-            f"pni workflows push-action {run.run_id} {action.action_id} '<JSON_INPUT>'",
-            f"# Or from a JSON file: pni workflows push-action {run.run_id} {action.action_id} --file <path.json>",
+            f"pni workflows push-action {run.run_id} {action.action_id} --file {payload_hint_path} --next",
             "```",
             f"\n{schema_heading}",
             f"```json\n{schema_str}\n```",

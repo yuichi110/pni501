@@ -10,27 +10,33 @@ Your mission is to evaluate software development projects deterministically usin
 
 ## 1. Workflow v2 Execution Loop (Plan-First DAG + Zero Empty ACKs)
 
+### Auto-Approval Friendly CLI Discipline (Avoid Approval Interruptions)
+- **Single simple commands ONLY**: Never combine `pni` / `drawlib` with pipes (`|`), redirects (`>`, `>>`), heredocs (`<<EOF`), command substitutions (`$(...)`), shell variables (`$VAR`), command chaining (`&&`, `;`), or inline multi-line JSON — these break prefix auto-approval.
+- **File-writing tool + `--file` + `--next`**: Write JSON payloads to `.pni/cache/<workflow_id>/input_<action_id>.json` with your file-writing tool, then submit via `pni workflows push-action <run_id> <action_id> --file <path> --next` (use `pni workflows start <id> --pull` to start and pull `act-01` in one command).
+- **`-o <path>` + file-reading tool**: Never pipe to `head`/`tail`/`grep`/`jq` or inspect JSON via `python -c`; pass `-o <path>` (`get-action -o`, `get-actions -o`, `plan -o`, `rules show -o`, `push-action --next -o`) and read saved files with your file-reading tool.
+- **File-based Mermaid validation**: Write diagrams to a file and run `pni validate-mermaid <file>` (never `echo ... |`).
+
 Always execute workflows through the v2 Plan-First pull-push cycle:
 
 1. **Preview or Start Workflow**:
    ```bash
-   pni workflows plan <workflow_id>             # Optional: preview Recon + validated Mermaid DAG
-   pni workflows start <workflow_id>            # Interactive (pauses at Phase 1 confirm_plan)
-   # For CI / batch runs: pni workflows start <workflow_id> --auto-approve
+   pni workflows plan <workflow_id> [-o <path>]          # Optional: preview Recon + validated Mermaid DAG
+   pni workflows start <workflow_id> --pull              # Interactive (starts & pulls act-01 confirm_plan)
+   pni workflows start <workflow_id> --auto-approve --pull
    ```
    Obtain the generated `Workflow Run ID` (e.g., `wf-1a2b3c4d`).
 2. **Phase 1 — Human Alignment Gate (`confirm_plan`)**:
-   - Pull `act-01`:
+   - Pull `act-01` (if `--pull` was not passed):
      ```bash
-     pni workflows get-action <workflow_run_id>
+     pni workflows get-action <workflow_run_id> [-o <path>]
      ```
    - **Always present PNI's validated Mermaid Execution DAG, detected scope/language/harness table, and the 2–4 alignment questions to the user BEFORE executing heavy stages.**
-   - Never fabricate or edit Mermaid syntax without checking it via `pni validate-mermaid` (PNI's own DAG Mermaid is deterministically generated and validated by Python).
-   - After user alignment, push `PlanApprovalInput` (`approved: true`, plus any agreed `confirmed_targets`, `disabled_steps`, `focus_areas`, `extra_opt_outs`, `report_lang`, `report_formats`, `report_mode`, `alignment_summary`).
+   - Never fabricate or edit Mermaid syntax without checking it via `pni validate-mermaid <file>` (PNI's own DAG Mermaid is deterministically generated and validated by Python).
+   - After user alignment, write `PlanApprovalInput` to `.pni/cache/<workflow_id>/input_act-01.json` and run `pni workflows push-action <workflow_run_id> act-01 --file .pni/cache/<workflow_id>/input_act-01.json --next`.
 3. **Auto-Advance Parallel Collection & Step-Scoped Pull**:
    ```bash
-   pni workflows get-action <workflow_run_id>               # Next ready AI action (compact schema)
-   pni workflows get-actions <workflow_run_id> --ready --json  # All DAG-ready AI actions for parallel subagents
+   pni workflows get-action <workflow_run_id> [-o <path>]            # Next ready AI action (compact schema)
+   pni workflows get-actions <workflow_run_id> --ready --json [-o <path>]
    ```
    - **Zero empty ACKs**: PNI automatically runs all DAG-ready deterministic analyzers (`project_inspect`, `ast_analyze`, `run_check`, `security_scan`, `web_pentest`, `migration_analyze`, `progress_analyze`) in parallel via `ThreadPoolExecutor`, saves `.pni/cache/<workflow_id>/facts.json`, and advances straight to the next AI judgment action.
    - Prompts project only step-relevant fact slices (`fact_views`) with a pointer to `facts.json` for drill-down.
@@ -61,14 +67,15 @@ pni validate-mermaid <file.md_or_mmd> --browser # Layer 2 official mermaid.parse
 
 ## 4. Standard Commands
 - `pni init`: Initialize `.pni/` (`pni.toml`, `rules/`, `actions/`, `workflows/`, `instructions.md`, `.pni/cache/.gitignore`).
+- `pni rules list [--all]` / `pni rules show <id> [-o <path>]`
 - `pni workflows list [--category audit|rollup|migration|progress]` / `pni workflows show <id>`
-- `pni workflows plan <workflow_id> [--mermaid] [--json]`: Phase 0 Recon + validated Mermaid DAG preview.
-- `pni workflows start <workflow_id> [--supersede] [--auto-approve] [--plan <file>]`
-- `pni workflows get-action <run_id> [--json] [--full-schema]`
-- `pni workflows get-actions <run_id> [--ready] [--json]`
-- `pni workflows push-action <run_id> <action_id> [INPUT] [--file <path>] [--json]`
-- `pni workflows status [run_or_workflow] [--latest] [--json]` / `inspect-action` / `rewind` / `cancel`
-- `pni validate-mermaid [PATH] [--browser] [--json]`
+- `pni workflows plan <workflow_id> [--mermaid] [--json] [-o <path>]`: Phase 0 Recon + validated Mermaid DAG preview.
+- `pni workflows start <workflow_id> [--supersede] [--auto-approve] [--plan <file>] [--pull] [--json] [-o <path>]`
+- `pni workflows get-action <run_id> [--json] [--full-schema] [-o <path>]`
+- `pni workflows get-actions <run_id> [--ready] [--json] [-o <path>]`
+- `pni workflows push-action <run_id> <action_id> --file <path> [--next] [--json] [-o <path>]`
+- `pni workflows status [run_or_workflow] [--latest] [--json]` / `inspect-action` / `rewind [--pull] [-o <path>]` / `cancel`
+- `pni validate-mermaid <file> [--browser] [--json]`
 - `pni validate-score <path>` / `validate-migration-plan <path>` / `validate-progress <path>`
 - `pni report init <target>` / `pni report build <target>`
 - `pni pentests init` / `pni pentests run`
