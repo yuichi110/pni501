@@ -4,24 +4,12 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "pni501-extra-grammars"
-version = "0.1.0"
-description = "Cross-platform prebuilt Tree-sitter ABI3 grammar wheels (COBOL, R, Vue, Protobuf, Dockerfile) for pni501."
+version = "0.2.0"
+description = "Internal ABI3 Tree-sitter grammar builder for pni501 GitHub Release assets."
 readme = "README.md"
 requires-python = ">=3.10"
 license = "MIT"
 authors = [{name = "Yuichi Ito", email = "yuichi@yuichi.com"}]
-classifiers = [
-    "Intended Audience :: Developers",
-    "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.10",
-    "Programming Language :: Python :: 3.11",
-    "Programming Language :: Python :: 3.12",
-    "Programming Language :: Python :: 3.13",
-    "Topic :: Software Development :: Compilers",
-]
-
-[project.urls]
-Repository = "https://github.com/yuichi110/pni501"
 
 [tool.setuptools]
 packages = ["pni501_extra_grammars"]
@@ -34,6 +22,7 @@ build = "cp312-*"
 skip = ["*-musllinux_*", "*-win32", "*-manylinux_i686"]
 test-requires = ["tree-sitter>=0.25.0"]
 test-command = "python -c \"import tree_sitter, pni501_extra_grammars as g; [tree_sitter.Language(getattr(g, f'language_{k}')()) for k in g.available_languages()]; print('OK:', g.available_languages())\""
+test-skip = ["*-macosx_x86_64"]
 
 [tool.cibuildwheel.linux]
 manylinux-x86_64-image = "manylinux2014"

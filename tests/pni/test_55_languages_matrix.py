@@ -418,7 +418,7 @@ def test_extended_manifest_detection_and_scaffolding(tmp_path: Path) -> None:
 
 def test_extra_grammars_per_language_lazy_isolation() -> None:
     """Verify parsing Dockerfile does NOT eagerly load the 12.5 MB COBOL C extension."""
-    saved = {k: v for k, v in list(sys.modules.items()) if k.startswith("pni501_extra_grammars")}
+    saved = {k: v for k, v in list(sys.modules.items()) if k.startswith("pni._cached_grammars._")}
     try:
         for k in saved:
             sys.modules.pop(k, None)
@@ -427,7 +427,7 @@ def test_extra_grammars_per_language_lazy_isolation() -> None:
 
         root = parse_cst("FROM python:3.12-slim\n", "dockerfile")
         assert not root.has(kind="ERROR")
-        assert "pni501_extra_grammars._dockerfile" in sys.modules
-        assert "pni501_extra_grammars._cobol" not in sys.modules
+        assert "pni._cached_grammars._dockerfile" in sys.modules
+        assert "pni._cached_grammars._cobol" not in sys.modules
     finally:
         sys.modules.update(saved)

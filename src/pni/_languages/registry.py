@@ -23,7 +23,7 @@ LanguageCategory = Literal[
     "frontend_sfc",
     "iac_schema_config",
 ]
-GrammarSource = Literal["package", "language_pack", "extra_wheel"]
+GrammarSource = Literal["package", "language_pack", "release_asset", "extra_wheel"]
 
 
 @dataclass(frozen=True)
@@ -80,10 +80,10 @@ GRAMMAR_PROVIDERS: dict[str, GrammarProviderSpec] = {
     "scala": GrammarProviderSpec("scala", "tree_sitter_scala", "language"),
     "dart": GrammarProviderSpec("dart", "tree_sitter_dart", "language"),
     "elixir": GrammarProviderSpec("elixir", "tree_sitter_elixir", "language"),
-    "vue": GrammarProviderSpec("vue", "pni501_extra_grammars", "language_vue", source="extra_wheel"),
+    "vue": GrammarProviderSpec("vue", "pni._languages._grammar_assets", "language_vue", source="release_asset"),
     "perl": GrammarProviderSpec("perl", "tree_sitter_perl", "language"),
-    "cobol": GrammarProviderSpec("cobol", "pni501_extra_grammars", "language_cobol", source="extra_wheel"),
-    "r": GrammarProviderSpec("r", "pni501_extra_grammars", "language_r", source="extra_wheel"),
+    "cobol": GrammarProviderSpec("cobol", "pni._languages._grammar_assets", "language_cobol", source="release_asset"),
+    "r": GrammarProviderSpec("r", "pni._languages._grammar_assets", "language_r", source="release_asset"),
     # Tier B (20 static-audit languages)
     "bash": GrammarProviderSpec("bash", "tree_sitter_bash", "language"),
     "powershell": GrammarProviderSpec("powershell", "tree_sitter_powershell", "language"),
@@ -107,14 +107,16 @@ GRAMMAR_PROVIDERS: dict[str, GrammarProviderSpec] = {
     "commonlisp": GrammarProviderSpec("commonlisp", "tree_sitter_commonlisp", "language"),
     # Tier C (15 companion IaC / schema / build / config languages)
     "dockerfile": GrammarProviderSpec(
-        "dockerfile", "pni501_extra_grammars", "language_dockerfile", source="extra_wheel"
+        "dockerfile", "pni._languages._grammar_assets", "language_dockerfile", source="release_asset"
     ),
     "hcl": GrammarProviderSpec("hcl", "tree_sitter_hcl", "language"),
     "bicep": GrammarProviderSpec("bicep", "tree_sitter_bicep", "language"),
     "nix": GrammarProviderSpec("nix", "tree_sitter_nix", "language"),
     "make": GrammarProviderSpec("make", "tree_sitter_make", "language"),
     "starlark": GrammarProviderSpec("starlark", "tree_sitter_starlark", "language"),
-    "protobuf": GrammarProviderSpec("protobuf", "pni501_extra_grammars", "language_proto", source="extra_wheel"),
+    "protobuf": GrammarProviderSpec(
+        "protobuf", "pni._languages._grammar_assets", "language_proto", source="release_asset"
+    ),
     "sql": GrammarProviderSpec("sql", "tree_sitter_sql", "language"),
     "html": GrammarProviderSpec("html", "tree_sitter_html", "language"),
     "css": GrammarProviderSpec("css", "tree_sitter_css", "language"),

@@ -23,6 +23,7 @@ source ./pcli             # Register 'pcli' alias and dynamic Tab autocompletion
 | :--- | :--- | :--- |
 | **`code-check`** | `code_check/` | Code quality & static analysis (Ruff lint/format, Ty type check, line count) |
 | **`test`** | `test.py` | Unit test execution via pytest + coverage + xdist parallelization |
+| **`release-assets`** | `release_assets/` | Inspecting, triggering CI builds, and syncing SHA-256 digests for extra Tree-sitter grammar GitHub Releases |
 | **`pypi`** | `pypi/` | Dependency auditing, version checks, and TestPyPI/PyPI publishing |
 
 ---
@@ -45,7 +46,16 @@ source ./pcli             # Register 'pcli' alias and dynamic Tab autocompletion
 ./pcli test target <shortcut_or_path> [--cov] [--cov-report] [--parallel]
 ```
 
-### 2.3. `pypi` — Dependency & PyPI Release Management
+### 2.3. `release-assets` — Extra Tree-sitter Grammar Release Assets
+```bash
+./pcli release-assets list                              # List pinned (grammar × platform) SHA-256 digests
+./pcli release-assets remote [--tag grammars-v0.2.0]    # Compare GitHub Release files against local pins
+./pcli release-assets sync [--tag TAG] [--check]        # Sync remote manifest.json into _grammar_assets.py
+./pcli release-assets runs [--limit 5]                  # Show recent GitHub Actions grammar build runs
+./pcli release-assets trigger [--tag TAG] [--ref main]  # Dispatch build-grammar-assets.yml on GitHub Actions
+```
+
+### 2.4. `pypi` — Dependency & PyPI Release Management
 ```bash
 ./pcli pypi deps                                     # Show dependencies in pyproject.toml
 ./pcli pypi dep-releases <package> [--from YEAR]     # Query PyPI release history for a package

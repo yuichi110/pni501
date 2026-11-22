@@ -11,6 +11,20 @@
 
 from __future__ import annotations
 
+from pni._languages._grammar_assets import (
+    DEFAULT_GRAMMAR_RELEASE_TAG,
+    EXTRA_GRAMMAR_ASSET_IDS,
+    PINNED_GRAMMAR_ASSETS,
+    GrammarCacheStatus,
+    GrammarReleaseAsset,
+    clear_grammar_cache,
+    detect_platform_tag,
+    ensure_grammar_binary,
+    get_grammar_cache_statuses,
+    prefetch_grammars,
+    resolve_grammar_cache_dir,
+    resolve_release_tag,
+)
 from pni._languages.registry import (
     GRAMMAR_PROVIDERS,
     LANGUAGE_REGISTRY,
@@ -31,20 +45,32 @@ from pni._languages.registry import (
 )
 
 __all__ = [
+    "DEFAULT_GRAMMAR_RELEASE_TAG",
+    "EXTRA_GRAMMAR_ASSET_IDS",
     "GRAMMAR_PROVIDERS",
     "LANGUAGE_REGISTRY",
+    "PINNED_GRAMMAR_ASSETS",
+    "GrammarCacheStatus",
     "GrammarProviderSpec",
+    "GrammarReleaseAsset",
     "GrammarSource",
     "LanguageCategory",
     "LanguageSpec",
     "LanguageTier",
+    "clear_grammar_cache",
+    "detect_platform_tag",
+    "ensure_grammar_binary",
+    "get_grammar_cache_statuses",
     "get_grammar_provider",
     "get_language_by_path",
     "get_language_spec",
     "iter_language_specs",
     "list_supported_languages",
+    "prefetch_grammars",
     "register_grammar_provider",
     "register_language_spec",
+    "resolve_grammar_cache_dir",
     "resolve_grammar_for_path",
     "resolve_language_id",
+    "resolve_release_tag",
 ]

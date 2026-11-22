@@ -1,0 +1,137 @@
+name: Build and Release Extra Tree-sitter Grammars
+
+on:
+  workflow_dispatch:
+    inputs:
+      release_tag:
+        description: "GitHub Release tag name (e.g. grammars-v0.2.0)"
+        required: true
+        default: "grammars-v0.2.0"
+      publish_release:
+        description: "Create or update GitHub Release with packaged ZIPs and manifest.json"
+        required: false
+        default: "true"
+  push:
+    tags:
+      - "grammars-v*"
+
+permissions:
+  contents: read
+
+jobs:
+  build_wheels:
+    name: Build ABI3 grammars (${{ matrix.label }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - label: linux-x86_64
+            os: ubuntu-latest
+            cibw_archs: x86_64
+          - label: linux-aarch64
+            os: ubuntu-24.04-arm
+            cibw_archs: aarch64
+          - label: macos-arm64-x86_64
+            os: macos-14
+            cibw_archs: "arm64 x86_64"
+          - label: windows-amd64
+            os: windows-latest
+            cibw_archs: AMD64
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Fetch pinned MIT grammar C sources
+        run: python release_assets/grammars/scripts/fetch_grammars.py
+
+      - name: Build ABI3 wheels with cibuildwheel
+        uses: pypa/cibuildwheel@v2.22
+        with:
+          package-dir: release_assets/grammars
+          output-dir: wheelhouse
+        env:
+          CIBW_ARCHS: ${{ matrix.cibw_archs }}
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: grammar-wheels-${{ matrix.label }}
+          path: wheelhouse/*.whl
+
+  package_and_release:
+    name: Package deterministic ZIPs and publish GitHub Release
+    needs: build_wheels
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Download all platform wheels
+        uses: actions/download-artifact@v4
+        with:
+          pattern: grammar-wheels-*
+          path: wheelhouse
+          merge-multiple: true
+
+      - name: Determine release tag
+        id: meta
+        shell: bash
+        run: |
+          if [[ "${GITHUB_REF}" == refs/tags/grammars-v* ]]; then
+            TAG="${GITHUB_REF#refs/tags/}"
+          else
+            TAG="${{ inputs.release_tag }}"
+          fi
+          echo "tag=${TAG}" >> "$GITHUB_OUTPUT"
+          echo "Resolved release tag: ${TAG}"
+
+      - name: Package per-language per-platform ZIP archives and manifest.json
+        run: |
+          python release_assets/grammars/scripts/package_release_assets.py \
+            --wheelhouse wheelhouse \
+            --output-dir release_output \
+            --tag "${{ steps.meta.outputs.tag }}" \
+            --require-all-platforms
+          ls -lh release_output/
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: grammar-release-assets-${{ steps.meta.outputs.tag }}
+          path: release_output/*
+
+      - name: Publish GitHub Release
+        if: startsWith(github.ref, 'refs/tags/grammars-v') || inputs.publish_release == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ steps.meta.outputs.tag }}
+        run: |
+          NOTES=$(cat <<'EOF'
+          Prebuilt cross-platform Python `cp310-abi3` Tree-sitter grammar archives for **pni501** runtime on-demand caching (`COBOL`, `R`, `Vue`, `Protocol Buffers`, `Dockerfile`, all MIT-licensed).
+
+          ### Included Platforms
+          - `linux_x86_64` (`manylinux2014`)
+          - `linux_aarch64` (`manylinux2014`)
+          - `macos_arm64`
+          - `macos_x86_64`
+          - `windows_amd64`
+
+          ### Verification
+          Each archive contains one compiled `_<lang>.abi3.so` / `_<lang>.pyd` binary plus `THIRD_PARTY_LICENSES.txt`. Checksums are published in `manifest.json` and `SHA256SUMS.txt` and verified automatically by `pni501` at download time.
+          EOF
+          )
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            gh release upload "$TAG" release_output/* --clobber
+          else
+            gh release create "$TAG" release_output/* \
+              --title "PNI Extra Tree-sitter Grammars ($TAG)" \
+              --notes "$NOTES"
+          fi

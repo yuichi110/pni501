@@ -767,3 +767,68 @@ steps:
     finally:
         os.chdir(prev_cwd)
 
+
+def test_migration_when_predicate_preserves_based_on_with_inherited_project_facts(tmp_path: Path) -> None:
+    """Verify _check_ready_when_conditions passes based_on on category=migration when project_facts are inherited."""
+    svc_src = tmp_path / "src" / "pkg"
+    svc_src.mkdir(parents=True)
+    (tmp_path / "pyproject.toml").write_text(
+        '[project]\nname = "mig-when"\nversion = "0.1.0"\n',
+        encoding="utf-8",
+    )
+    (svc_src / "__init__.py").write_text('"""pkg."""\n', encoding="utf-8")
+    (svc_src / "core.py").write_text("def add(a: int, b: int) -> int:\n    return a + b\n", encoding="utf-8")
+
+    init_project(tmp_path, lang="python", force=True)
+    wf_dir = tmp_path / ".pni" / "workflows"
+    (wf_dir / "base_audit.yaml").write_text(
+        """\
+id: base_audit
+name: Base Audit With Project Inspect
+category: audit
+targets:
+  root: "."
+  source: ["src"]
+steps:
+  - id: inspect
+    action: project_inspect
+  - id: ast
+    action: ast_analyze
+    needs: [inspect]
+  - id: score
+    uses: emit_score
+    needs: [ast]
+""",
+        encoding="utf-8",
+    )
+    (wf_dir / "chained_mig.yaml").write_text(
+        """\
+id: chained_mig
+name: Chained Migration With When Predicate
+category: migration
+based_on: base_audit
+steps:
+  - id: proposal
+    uses: migration_proposal
+    when: "language == 'python'"
+    with:
+      target: "chained_mig"
+      brief: |
+        Target Stack: Python 3.12 + Hexagonal Architecture.
+        Compatibility: Preserve add(a, b) signature.
+        Non-Goals: No package split.
+""",
+        encoding="utf-8",
+    )
+
+    _complete_sample_audit_workflow(tmp_path, "base_audit", overall_score=80)
+    mig_run = start_workflow_run("chained_mig", tmp_path, auto_approve=True)
+    assert mig_run is not None
+    assert mig_run.based_on == "base_audit"
+
+    _, next_act, prompt = get_workflow_action(mig_run.run_id, tmp_path)
+    assert next_act is not None
+    assert next_act.primitive_type.value == "ai_interpret"
+    assert "chained_mig" in prompt
+
+

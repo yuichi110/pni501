@@ -50,6 +50,14 @@ from pni._actions.runtime_check.engine_detect import (
 from pni._cache import CACHE_REL_DIR, ensure_cache_dir
 from pni._config import load_pni_config, scaffold_pni_config
 from pni._instructions import copy_instruction_templates, get_instructions_content
+from pni._languages import (
+    clear_grammar_cache,
+    detect_platform_tag,
+    get_grammar_cache_statuses,
+    prefetch_grammars,
+    resolve_grammar_cache_dir,
+    resolve_release_tag,
+)
 from pni._pentests import ensure_target_pentests
 from pni._reporter import (
     DEFAULT_REPORT_FORMATS,
@@ -177,12 +185,20 @@ cache_app = typer.Typer(
     no_args_is_help=True,
     context_settings=CONTEXT_SETTINGS,
 )
+grammars_app = typer.Typer(
+    name="grammars",
+    help="Inspect, prefetch, and clear on-demand downloaded Tree-sitter ABI3 grammars.",
+    epilog=HELP_EPILOG,
+    no_args_is_help=True,
+    context_settings=CONTEXT_SETTINGS,
+)
 app.add_typer(rules_app, name="rules")
 app.add_typer(workflows_app, name="workflows")
 app.add_typer(report_app, name="report")
 app.add_typer(pentests_app, name="pentests")
 app.add_typer(progress_app, name="progress")
 app.add_typer(cache_app, name="cache")
+app.add_typer(grammars_app, name="grammars")
 
 console = Console()
 err_console = Console(stderr=True)
@@ -2035,6 +2051,84 @@ def cache_clean_cmd(
             f"[bold green]✓ Pruned container artifacts via {engine_name}[/bold green] "
             f"(removed {len(removed_tags)} PNI image tag(s))"
         )
+
+
+@grammars_app.command("status")
+def grammars_status_cmd() -> None:
+    """Show cache status for on-demand GitHub Releases Tree-sitter grammars."""
+    try:
+        plat = detect_platform_tag()
+        statuses = get_grammar_cache_statuses(platform_tag=plat)
+    except RuntimeError as exc:
+        err_console.print(f"[bold red]Error: {exc}[/bold red]")
+        raise typer.Exit(code=1) from exc
+
+    cache_dir = resolve_grammar_cache_dir()
+    release_tag = resolve_release_tag()
+
+    table = Table(
+        title=f"PNI Extra Tree-sitter Grammars (tag={release_tag}, platform={plat})",
+        title_style="bold green",
+        show_header=True,
+        header_style="bold blue",
+    )
+    table.add_column("Grammar", style="bold cyan", no_wrap=True)
+    table.add_column("Archive", style="white")
+    table.add_column("Status", no_wrap=True)
+    table.add_column("Size", style="dim", justify="right")
+    table.add_column("SHA-256", style="dim")
+
+    for st in statuses:
+        status_txt = "[bold green]Cached[/bold green]" if st.cached else "[yellow]Not downloaded[/yellow]"
+        size_txt = f"{st.size_bytes / 1024:.1f} KB" if st.size_bytes > 0 else "-"
+        sha_txt = f"{st.pinned_sha256[:12]}..." if st.pinned_sha256 else "[dim]remote manifest[/dim]"
+        table.add_row(st.grammar_id, st.archive_name, status_txt, size_txt, sha_txt)
+
+    console.print(table)
+    console.print(f"[dim]Cache directory:[/dim] [cyan]{cache_dir}[/cyan]")
+    console.print("[dim]Run [bold]pni grammars prefetch --all[/bold] to pre-download for offline use.[/dim]")
+
+
+@grammars_app.command("prefetch")
+def grammars_prefetch_cmd(
+    languages: Optional[list[str]] = typer.Argument(
+        None,
+        help="Optional grammar names (e.g. 'dockerfile', 'vue', 'protobuf', 'r', 'cobol').",
+    ),
+    all_grammars: bool = typer.Option(
+        False,
+        "--all",
+        "-a",
+        help="Download and cache all five release-managed extra grammars.",
+    ),
+    force: bool = typer.Option(
+        False,
+        "--force",
+        "-f",
+        help="Re-download and re-extract even if already cached.",
+    ),
+) -> None:
+    """Pre-download extra Tree-sitter ABI3 grammar binaries from GitHub Releases."""
+    targets: Optional[list[str]] = None if (all_grammars or not languages) else languages
+    try:
+        paths = prefetch_grammars(targets, force=force)
+    except (ValueError, RuntimeError) as exc:
+        err_console.print(f"[bold red]Error: {exc}[/bold red]")
+        raise typer.Exit(code=1) from exc
+
+    console.print(f"[bold green]✓ Cached {len(paths)} Tree-sitter grammar binary/binaries:[/bold green]")
+    for p in paths:
+        console.print(f"  [green]•[/green] [cyan]{p}[/cyan]")
+
+
+@grammars_app.command("clear")
+def grammars_clear_cmd() -> None:
+    """Remove cached extra Tree-sitter grammar binaries from the local cache directory."""
+    cache_dir = resolve_grammar_cache_dir()
+    removed = clear_grammar_cache(cache_dir=cache_dir)
+    console.print(
+        f"[bold green]✓ Cleared grammar cache[/bold green] ([cyan]{cache_dir}[/cyan], removed {removed} entry/entries)"
+    )
 
 
 @app.command("validate-mermaid")

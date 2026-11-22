@@ -24,6 +24,7 @@ def test_discover_toolsets() -> None:
     toolsets = discover_toolsets()
     assert "code-check" in toolsets
     assert "pypi" in toolsets
+    assert "release-assets" in toolsets
     assert "test" in toolsets
 
 
@@ -50,4 +51,4 @@ def test_check_new_version_initial() -> None:
 def test_get_new_version() -> None:
     """Test extracting new version from pyproject.toml."""
     ver = get_new_version()
-    assert ver == "0.1.4"
+    assert ver == "0.2.0"

@@ -1,0 +1,4 @@
+# Ignore runtime-downloaded grammar binaries and lock files
+*
+!.gitignore
+!__init__.py

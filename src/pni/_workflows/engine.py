@@ -736,13 +736,14 @@ def _check_ready_when_conditions(
     bundle: WorkflowFactsBundle,
 ) -> list[ActionRunRecord]:
     """Re-evaluate `when:` predicates for ready actions using live ProjectFacts, skipping false ones."""
-    if bundle.project_facts is None:
+    if bundle.project_facts is None or not any(act.when for act in ready):
         return ready
     plan = _load_run_plan(run)
     wf_stub = WorkflowDefinition(
         id=run.workflow_id,
         category=run.category,
         scope=run.scope,
+        based_on=run.based_on,
         name=run.workflow_name,
         targets=run.targets,
         includes=run.includes,

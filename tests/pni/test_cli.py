@@ -30,12 +30,12 @@ def test_cli_version(tmp_path: Path) -> None:
     result = runner.invoke(app, ["version"])
     assert result.exit_code == 0
     assert "pni501" in result.stdout
-    assert "0.1.4" in result.stdout
+    assert "0.2.0" in result.stdout
 
     for flag in ("--version", "-V"):
         flag_res = runner.invoke(app, [flag])
         assert flag_res.exit_code == 0
-        assert "pni501 0.1.4" in flag_res.stdout
+        assert "pni501 0.2.0" in flag_res.stdout
 
     original_cwd = Path.cwd()
     try:

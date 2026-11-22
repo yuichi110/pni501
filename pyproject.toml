@@ -4,7 +4,7 @@ build-backend = "uv_build"
 
 [project]
 name = "pni501"
-version = "0.1.4"
+version = "0.2.0"
 description = "Project Nemesis Index (PNI) - Evaluate software development project health and generate reports."
 readme = "README.md"
 requires-python = ">=3.11"
@@ -72,8 +72,8 @@ dependencies = [
     "tree-sitter-json>=0.24.8",
     "tree-sitter-toml>=0.7.0",
     "tree-sitter-xml>=0.7.0",
-    # Companion MIT grammar bundle (COBOL, R, Vue, Protobuf, Dockerfile)
-    "pni501-extra-grammars>=0.1.0",
+    # Note: COBOL, R, Vue, Protobuf, Dockerfile ABI3 grammars are downloaded on demand
+    # from GitHub Releases with SHA-256 verification (see pni._languages._grammar_assets).
     "httpx>=0.28.0",
     "pytest>=8.3.0",
 ]
@@ -87,9 +87,6 @@ pni501 = "pni.cli:main"
 
 [tool.uv.build-backend]
 module-name = "pni"
-
-[tool.uv.sources]
-pni501-extra-grammars = { path = "packages/pni501-extra-grammars", editable = false }
 
 [[tool.uv.index]]
 name = "pypi"
@@ -112,7 +109,7 @@ preview = false
 fix = true
 unsafe-fixes = false
 line-length = 120
-exclude = ["examples", "packages"]
+exclude = ["examples", "release_assets"]
 
 [tool.ruff.lint]
 select = [

@@ -228,5 +228,13 @@ docs_html/
 docs_markdown/
 docs_images/
 
-# Companion extra grammars vendored upstream C sources (fetched reproducibly at build time)
-packages/pni501-extra-grammars/vendor/
+# Extra Tree-sitter grammar release asset build intermediates & runtime cache
+release_assets/grammars/vendor/
+release_assets/grammars/build/
+release_assets/grammars/dist/
+release_assets/grammars/wheelhouse/
+release_assets/grammars/release_output/
+release_assets/grammars/*.egg-info/
+src/pni/_cached_grammars/*
+!src/pni/_cached_grammars/.gitignore
+!src/pni/_cached_grammars/__init__.py
