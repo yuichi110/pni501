@@ -95,29 +95,30 @@ def _short_source_action(source_action: str | None) -> str:
 
 def _extract_agent_brief_note(ptype: PrimitiveType, data: dict[str, object]) -> str:
     """Format a brief CLI summary string from a validated agent_input_json dictionary."""
-    if ptype == PrimitiveType.AI_INTERPRET:
+    note = ""
+    if ptype == PrimitiveType.CONFIRM_PLAN:
+        disabled = data.get("disabled_steps")
+        d_cnt = len(disabled) if isinstance(disabled, list) else 0
+        note = f"approved={data.get('approved', True)}, disabled={d_cnt}"
+    elif ptype == PrimitiveType.AI_INTERPRET:
         score = data.get("step_score")
         findings = data.get("findings")
         f_cnt = len(findings) if isinstance(findings, list) else 0
-        score_part = f"score={score}" if score is not None else "score=auto"
-        return f"{score_part}, findings={f_cnt}"
-    if ptype == PrimitiveType.EMIT_SCORE:
+        note = f"{f'score={score}' if score is not None else 'score=auto'}, findings={f_cnt}"
+    elif ptype in {PrimitiveType.EMIT_SCORE, PrimitiveType.SYNTHESIZE_ROLLUP}:
         ov = data.get("overall_score")
-        gr = data.get("grade")
-        return f"overall={ov}/100 ({gr or '-'})" if ov is not None else ""
-    if ptype == PrimitiveType.EMIT_MIGRATION_PLAN:
-        mode = data.get("migration_mode", "-")
+        note = f"overall={ov}/100 ({data.get('grade') or '-'})" if ov is not None else ""
+    elif ptype == PrimitiveType.EMIT_MIGRATION_PLAN:
         prs = data.get("pr_wbs") or data.get("pr_breakdown")
         pr_cnt = len(prs) if isinstance(prs, list) else 0
-        return f"mode={mode}, prs={pr_cnt}"
-    if ptype == PrimitiveType.EMIT_PROGRESS:
-        ds = data.get("delivery_status", "-")
-        hs = data.get("overall_health_score")
-        return f"status={ds}, score={hs}/100" if hs is not None else f"status={ds}"
-    if ptype == PrimitiveType.WRITE_DRAWLIB_REPORT:
+        note = f"mode={data.get('migration_mode', '-')}, prs={pr_cnt}"
+    elif ptype == PrimitiveType.EMIT_PROGRESS:
+        ds, hs = data.get("delivery_status", "-"), data.get("overall_health_score")
+        note = f"status={ds}, score={hs}/100" if hs is not None else f"status={ds}"
+    elif ptype == PrimitiveType.WRITE_DRAWLIB_REPORT:
         pdf = data.get("pdf_path", "")
-        return f"pdf={pdf}" if pdf else "report completed"
-    return ""
+        note = f"pdf={pdf}" if pdf else "report completed"
+    return note
 
 
 def _extract_deterministic_brief_note(ptype: PrimitiveType, det: dict[str, object]) -> str:
@@ -138,6 +139,8 @@ def _extract_deterministic_brief_note(ptype: PrimitiveType, det: dict[str, objec
 
 def _extract_brief_note(act: ActionRunRecord) -> str:
     """Summarize key metrics from deterministic_output_json or agent_input_json for CLI display."""
+    if act.status == RunStatus.SKIPPED:
+        return f"skipped: {act.skip_reason or 'condition false'}"
     if act.agent_input_json:
         with contextlib.suppress(Exception):
             data = json.loads(act.agent_input_json)
@@ -160,11 +163,11 @@ def build_workflow_run_summary(
 ) -> WorkflowRunSummary:
     """Construct a WorkflowRunSummary from a run record and its ordered action records."""
     total = len(actions)
-    done = sum(1 for a in actions if a.status == RunStatus.COMPLETED)
+    done = sum(1 for a in actions if a.status in {RunStatus.COMPLETED, RunStatus.SKIPPED})
     progress_lbl = f"{done}/{total}"
 
     cur_act: ActionRunRecord | None = None
-    if run.status == RunStatus.IN_PROGRESS:
+    if run.status in {RunStatus.IN_PROGRESS, RunStatus.AWAITING_APPROVAL}:
         cur_act = next(
             (a for a in actions if a.status in {RunStatus.IN_PROGRESS, RunStatus.PENDING}),
             None,
@@ -354,7 +357,7 @@ def resolve_run_actions_by_selector(
     by_source = [
         a
         for a in actions
-        if needle in {a.source_action, _short_source_action(a.source_action)}
+        if needle in {a.step_key, a.source_action, _short_source_action(a.source_action)}
     ]
     matched = by_source or [
         a for a in actions if needle in {a.primitive_type.value, a.name, a.name.split(" (", maxsplit=1)[0]}
@@ -370,9 +373,11 @@ def resolve_run_actions_by_selector(
             if a.agent_input_json is not None
             and a.primitive_type
             in {
+                PrimitiveType.CONFIRM_PLAN,
                 PrimitiveType.AI_INTERPRET,
                 PrimitiveType.RECORD_ARCHITECTURE,
                 PrimitiveType.EMIT_SCORE,
+                PrimitiveType.SYNTHESIZE_ROLLUP,
                 PrimitiveType.EMIT_MIGRATION_PLAN,
                 PrimitiveType.EMIT_PROGRESS,
                 PrimitiveType.WRITE_DRAWLIB_REPORT,

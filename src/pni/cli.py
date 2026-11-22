@@ -13,6 +13,7 @@ from __future__ import annotations
 
 import json
 import shutil
+import sys
 from pathlib import Path
 from typing import Optional
 
@@ -74,6 +75,7 @@ from pni._workflows import (
     WorkflowStateDB,
     build_workflow_run_detail,
     copy_workflow_templates,
+    get_ready_workflow_actions,
     get_workflow_action,
     inspect_base_audit_status,
     inspect_pentests_prerequisite,
@@ -82,12 +84,15 @@ from pni._workflows import (
     list_workflows,
     load_workflow,
     normalize_workflow_steps,
+    plan_workflow_run,
     push_workflow_action,
     query_workflow_run_summaries,
+    render_plan_markdown,
     resolve_run_by_id_or_workflow,
     rewind_workflow_run,
     run_workflow_action_adhoc,
     start_workflow_run,
+    validate_mermaid,
 )
 
 CONTEXT_SETTINGS: dict[str, list[str]] = {"help_option_names": ["-h", "--help"]}
@@ -110,6 +115,10 @@ HELP_EPILOG: str = (
     '(e.g., [bold yellow]"python/workflow_guide"[/bold yellow], [bold yellow]"java/workflow_guide"[/bold yellow], '
     '[bold yellow]"php/workflow_guide"[/bold yellow], [bold yellow]"go/workflow_guide"[/bold yellow]) '
     "for language-specific workflow & action best practices.\n"
+    '  • Run [bold yellow]"pni workflows plan <workflow_id>"[/bold yellow] '
+    "to preview Phase 0 Recon, discovered monorepo components, and the validated Mermaid DAG "
+    "before launching 'pni workflows start' (and always check AI-authored Mermaid diagrams via "
+    '[bold yellow]"pni validate-mermaid"[/bold yellow]).\n'
     '  • Run [bold yellow]"pni rules list --all"[/bold yellow] '
     "to explore all available engineering rules and workflow guides.\n"
     '  • Run [bold yellow]"drawlib rules show agent-instruction"[/bold yellow] '
@@ -368,6 +377,8 @@ def list_workflows_cmd(
             cat_label = "[bold magenta]migration[/bold magenta]"
         elif wf.category == WorkflowCategory.PROGRESS:
             cat_label = "[bold green]progress[/bold green]"
+        elif wf.category == WorkflowCategory.ROLLUP:
+            cat_label = "[bold blue]rollup[/bold blue]"
         else:
             cat_label = "[bold cyan]audit[/bold cyan]"
         prefix = "" if wf.targets.root in (".", "") else f"{wf.targets.root}/"
@@ -580,6 +591,54 @@ def _render_pentests_preflight_panel(
         )
 
 
+@workflows_app.command("plan")
+def plan_workflow_cmd(
+    workflow_id: str = typer.Argument(
+        ...,
+        help="Workflow identifier in .pni/workflows/ to preview (e.g., 'full_audit').",
+    ),
+    mermaid_only: bool = typer.Option(
+        False,
+        "--mermaid",
+        help="Output only the validated Mermaid flowchart TD DAG code.",
+    ),
+    as_json: bool = typer.Option(
+        False,
+        "--json",
+        help="Emit WorkflowExecutionPlan as structured JSON.",
+    ),
+    no_container_probe: bool = typer.Option(
+        False,
+        "--no-container-probe",
+        help="Skip Docker/Podman detection during Phase 0 lightweight recon.",
+    ),
+) -> None:
+    """Preview the Workflow v2 execution plan, validated Mermaid DAG, and human alignment questions."""
+    project_root = Path.cwd()
+    try:
+        planned = plan_workflow_run(
+            workflow_id,
+            project_root,
+            probe_container_engine=not no_container_probe,
+        )
+    except WorkflowPrerequisiteError as exc:
+        err_console.print(f"[bold red]Error: {exc}[/bold red]")
+        raise typer.Exit(code=1) from exc
+
+    if planned is None:
+        err_console.print(f"[bold red]Error: Workflow '{workflow_id}' not found in .pni/workflows/.[/bold red]")
+        raise typer.Exit(code=1)
+
+    _, _, plan = planned
+    if as_json:
+        print(plan.model_dump_json(indent=2))
+        return
+    if mermaid_only:
+        print(plan.mermaid_dag)
+        return
+    print(render_plan_markdown(plan))
+
+
 @workflows_app.command("start")
 def start_workflow_cmd(
     workflow_id: str = typer.Argument(
@@ -589,15 +648,29 @@ def start_workflow_cmd(
     supersede: bool = typer.Option(
         False,
         "--supersede",
-        help="Automatically cancel any unfinished in_progress runs of this workflow before starting.",
+        help="Automatically cancel any unfinished runs of this workflow before starting.",
+    ),
+    auto_approve: bool = typer.Option(
+        False,
+        "--auto-approve",
+        help="Auto-approve the Phase 1 confirm_plan gate (recommended for CI/batch runs).",
+    ),
+    plan_file: Optional[Path] = typer.Option(
+        None,
+        "--plan",
+        help="Optional path to a pre-approved PlanApprovalInput or plan.json file.",
     ),
 ) -> None:
-    """Start a stateful workflow session in .pni/cache/workflow_state.db and return its workflow run ID."""
+    """Start a stateful Workflow v2 session in .pni/cache/workflow_state.db and return its run ID."""
     project_root = Path.cwd()
     workflows_dir = project_root / ".pni" / "workflows"
     if not workflows_dir.exists():
         err_console.print("[bold red]Error: .pni/workflows/ is not initialized.[/bold red]")
         err_console.print("Run [bold]pni init[/bold] first to create workflow definitions in .pni/workflows/.")
+        raise typer.Exit(code=1)
+
+    if plan_file is not None and not plan_file.is_file():
+        err_console.print(f"[bold red]Error: Plan file '{plan_file}' does not exist.[/bold red]")
         raise typer.Exit(code=1)
 
     prior_active: list[str] = []
@@ -607,12 +680,19 @@ def start_workflow_cmd(
         prior_active = [
             r.run_id
             for r in WorkflowStateDB(project_root).list_runs()
-            if r.workflow_id == clean_wf and r.status in {RunStatus.IN_PROGRESS, RunStatus.PENDING}
+            if r.workflow_id == clean_wf
+            and r.status in {RunStatus.IN_PROGRESS, RunStatus.PENDING, RunStatus.AWAITING_APPROVAL}
         ]
 
     try:
-        record = start_workflow_run(workflow_id, project_root, supersede=supersede)
-    except WorkflowPrerequisiteError as exc:
+        record = start_workflow_run(
+            workflow_id,
+            project_root,
+            supersede=supersede,
+            auto_approve=auto_approve,
+            plan_path=plan_file,
+        )
+    except (WorkflowPrerequisiteError, ValueError) as exc:
         err_console.print(f"[bold red]Error: {exc}[/bold red]")
         raise typer.Exit(code=1) from exc
 
@@ -623,7 +703,7 @@ def start_workflow_cmd(
 
     console.print(
         f"[bold green]✓ Started workflow[/bold green] [cyan]{record.workflow_id}[/cyan] "
-        f"[dim](category={record.category.value})[/dim]"
+        f"[dim](category={record.category.value}, scope={record.scope}, status={record.status.value})[/dim]"
     )
     console.print(f"Workflow Run ID: [bold yellow]{record.run_id}[/bold yellow]")
     if record.based_on:
@@ -703,11 +783,21 @@ def get_workflow_action_cmd(
         ...,
         help="Workflow run ID returned by 'pni workflows start' (e.g., 'wf-1a2b3c4d').",
     ),
+    as_json: bool = typer.Option(
+        False,
+        "--json",
+        help="Emit structured ActionPromptPayload JSON (ideal for subagent orchestration).",
+    ),
+    full_schema: bool = typer.Option(
+        False,
+        "--full-schema",
+        help="Include full verbose JSON Schema instead of the compact skeleton.",
+    ),
 ) -> None:
-    """Get the current pending action ID and deterministic instructions for a workflow run."""
+    """Auto-advance deterministic steps and fetch the next actionable AI/gate step."""
     project_root = Path.cwd()
     try:
-        run, _, guide = get_workflow_action(run_id, project_root)
+        run, payloads, guide = get_ready_workflow_actions(run_id, project_root, full_schema=full_schema)
     except WorkflowPrerequisiteError as exc:
         err_console.print(f"[bold red]Error: {exc}[/bold red]")
         raise typer.Exit(code=1) from exc
@@ -716,7 +806,78 @@ def get_workflow_action_cmd(
         err_console.print(f"[bold red]{guide}[/bold red]")
         raise typer.Exit(code=1)
 
+    if as_json:
+        if not payloads:
+            print(json.dumps({"run_id": run.run_id, "status": "completed", "action": None}, indent=2))
+            return
+        print(payloads[0].model_dump_json(indent=2))
+        return
+
     print(guide)
+
+
+@workflows_app.command("get-actions")
+def get_ready_actions_cmd(
+    run_id: str = typer.Argument(
+        ...,
+        help="Workflow run ID (e.g., 'wf-1a2b3c4d').",
+    ),
+    ready: bool = typer.Option(
+        True,
+        "--ready/--all",
+        help="Return all currently DAG-ready actionable steps after auto-advancing deterministic steps.",
+    ),
+    as_json: bool = typer.Option(
+        False,
+        "--json",
+        help="Emit JSON array of ActionPromptPayload objects for parallel agent dispatch.",
+    ),
+    full_schema: bool = typer.Option(
+        False,
+        "--full-schema",
+        help="Include full verbose JSON Schema instead of the compact skeleton.",
+    ),
+) -> None:
+    """Auto-advance deterministic steps and list all DAG-ready actions available for parallel execution."""
+    _ = ready
+    project_root = Path.cwd()
+    try:
+        run, payloads, done_msg = get_ready_workflow_actions(run_id, project_root, full_schema=full_schema)
+    except WorkflowPrerequisiteError as exc:
+        err_console.print(f"[bold red]Error: {exc}[/bold red]")
+        raise typer.Exit(code=1) from exc
+
+    if run is None:
+        err_console.print(f"[bold red]{done_msg}[/bold red]")
+        raise typer.Exit(code=1)
+
+    if as_json:
+        print(json.dumps([p.model_dump(mode="json") for p in payloads], indent=2))
+        return
+
+    if not payloads:
+        print(done_msg)
+        return
+
+    table = Table(
+        title=f"DAG-Ready Actions ({run.run_id} — {run.workflow_id})",
+        title_style="bold green",
+        header_style="bold blue",
+    )
+    table.add_column("Action ID", style="bold cyan", no_wrap=True)
+    table.add_column("Step Key", style="yellow")
+    table.add_column("Primitive", style="magenta", no_wrap=True)
+    table.add_column("Expected Input", style="green")
+    table.add_column("Fact Views", style="dim")
+    for p in payloads:
+        table.add_row(
+            p.action_id,
+            p.step_key,
+            p.primitive_type.value,
+            p.expected_input_model,
+            ", ".join(p.fact_views),
+        )
+    console.print(table)
 
 
 @workflows_app.command("push-action")
@@ -727,11 +888,11 @@ def push_workflow_action_cmd(
     ),
     action_id: str = typer.Argument(
         ...,
-        help="Current action ID obtained from 'get-action' (e.g., 'act-01').",
+        help="Any DAG-ready action ID obtained from 'get-action' / 'get-actions' (e.g., 'act-01').",
     ),
     input_json: Optional[str] = typer.Argument(
         None,
-        help="JSON payload conforming to the action's input schema (optional if --file is used or ack step).",
+        help="JSON payload conforming to the action's input schema (optional if --file is used).",
     ),
     input_file: Optional[Path] = typer.Option(
         None,
@@ -739,8 +900,13 @@ def push_workflow_action_cmd(
         "-f",
         help="Path to a JSON file containing the action input payload.",
     ),
+    as_json: bool = typer.Option(
+        False,
+        "--json",
+        help="Emit structured JSON response.",
+    ),
 ) -> None:
-    """Validate and submit an action result into .pni/cache/workflow_state.db to advance to the next step."""
+    """Validate and submit an action result into .pni/cache/workflow_state.db to advance the DAG."""
     project_root = Path.cwd()
     payload = input_json or ""
     if input_file is not None:
@@ -750,6 +916,11 @@ def push_workflow_action_cmd(
         payload = input_file.read_text(encoding="utf-8")
 
     ok, message = push_workflow_action(run_id, action_id, payload, project_root)
+    if as_json:
+        print(json.dumps({"ok": ok, "run_id": run_id, "action_id": action_id, "message": message}, indent=2))
+        if not ok:
+            raise typer.Exit(code=1)
+        return
     if not ok:
         err_console.print(f"[bold red]✗ {message}[/bold red]")
         raise typer.Exit(code=1)
@@ -769,8 +940,12 @@ def _style_run_status(status: RunStatus) -> str:
     """Return a Rich-colored status label for RunStatus."""
     if status == RunStatus.COMPLETED:
         return "[bold green]completed[/bold green]"
+    if status == RunStatus.AWAITING_APPROVAL:
+        return "[bold magenta]awaiting_approval[/bold magenta]"
     if status == RunStatus.IN_PROGRESS:
         return "[bold yellow]in_progress[/bold yellow]"
+    if status == RunStatus.SKIPPED:
+        return "[dim cyan]skipped[/dim cyan]"
     if status == RunStatus.CANCELLED:
         return "[dim]cancelled[/dim]"
     return status.value
@@ -1699,6 +1874,62 @@ def cache_clean_cmd(
             f"[bold green]✓ Pruned container artifacts via {engine_name}[/bold green] "
             f"(removed {len(removed_tags)} PNI image tag(s))"
         )
+
+
+@app.command("validate-mermaid")
+def validate_mermaid_cmd(
+    path: Optional[Path] = typer.Argument(
+        None,
+        help="Path to a .mmd or .md file containing Mermaid diagrams (reads stdin when omitted or '-').",
+    ),
+    browser: bool = typer.Option(
+        False,
+        "--browser",
+        help="Also run Layer 2 validation using official mermaid.parse() via Playwright.",
+    ),
+    mermaid_js: Optional[Path] = typer.Option(
+        None,
+        "--mermaid-js",
+        help="Optional local path to mermaid.min.js for offline Layer 2 --browser verification.",
+    ),
+    as_json: bool = typer.Option(
+        False,
+        "--json",
+        help="Emit structured MermaidValidationResult JSON.",
+    ),
+) -> None:
+    """Validate Mermaid diagram syntax (Layer 1 static parser + optional Layer 2 Playwright mermaid.parse())."""
+    if path is None or str(path) == "-":
+        raw_text = sys.stdin.read()
+        source_lbl = "<stdin>"
+    else:
+        if not path.is_file():
+            err_console.print(f"[bold red]Error: Mermaid input file '{path}' does not exist.[/bold red]")
+            raise typer.Exit(code=1)
+        raw_text = path.read_text(encoding="utf-8")
+        source_lbl = str(path)
+
+    result = validate_mermaid(raw_text, use_browser=browser, mermaid_js_path=mermaid_js)
+    if as_json:
+        print(result.model_dump_json(indent=2))
+        if not result.valid:
+            raise typer.Exit(code=1)
+        return
+
+    if result.valid:
+        console.print(
+            f"[bold green]✓ Valid Mermaid ({result.engine})[/bold green] in [cyan]{source_lbl}[/cyan] "
+            f"(diagram=[bold]{result.diagram_type or 'ok'}[/bold])"
+        )
+        return
+
+    err_console.print(
+        f"[bold red]✗ Mermaid validation failed ({result.engine})[/bold red] in [cyan]{source_lbl}[/cyan] "
+        f"({len(result.issues)} issue(s)):"
+    )
+    for issue in result.issues:
+        err_console.print(f"  - L{issue.line} `{issue.code}`: {issue.message}")
+    raise typer.Exit(code=1)
 
 
 @app.command("instructions")

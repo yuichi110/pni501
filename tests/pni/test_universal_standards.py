@@ -325,47 +325,47 @@ def test_universal_rules_archetype_actions_and_engine_metrics(tmp_path: Path) ->
     loaded = load_workflow("svc_audit", tmp_path)
     assert loaded is not None
     prims = normalize_workflow_steps(loaded[1], tmp_path)
-    assert len(prims) == 6
+    assert len(prims) == 7
 
-    run = start_workflow_run("svc_audit", tmp_path)
+    run = start_workflow_run("svc_audit", tmp_path, auto_approve=True)
     assert run is not None
 
-    # Step 1: project_inspect -> Step 2: ai_interpret -> Step 3: ast_analyze -> Step 4-5: ai_interpret -> emit_score
-    _, a1, g1 = get_workflow_action(run.run_id, tmp_path)
-    assert a1 is not None and "runtime_types: `['web_api']`" in g1
-    push_workflow_action(run.run_id, "act-01", '{"acknowledged": true}', tmp_path)
+    # Auto-Advance runs project_inspect -> lands on ai_interpret (repo_structure_audit)
+    _, a_repo, g_repo = get_workflow_action(run.run_id, tmp_path)
+    assert a_repo is not None and "runtime_types: `['web_api']`" in g_repo
+    assert push_workflow_action(run.run_id, a_repo.action_id, json.dumps({"summary": "Repo checked."}), tmp_path)[0]
 
-    get_workflow_action(run.run_id, tmp_path)
-    push_workflow_action(run.run_id, "act-02", json.dumps({"summary": "Repo checked."}), tmp_path)
+    # Auto-Advance runs ast_analyze -> lands on ai_interpret (python_ast_audit)
+    _, a_ast, g_ast = get_workflow_action(run.run_id, tmp_path)
+    assert a_ast is not None and "Missing External I/O Timeouts (SRE PRR)" in g_ast
+    assert push_workflow_action(run.run_id, a_ast.action_id, json.dumps({"summary": "AST checked."}), tmp_path)[0]
 
-    _, a3, g3 = get_workflow_action(run.run_id, tmp_path)
-    assert a3 is not None and "Missing External I/O Timeouts (SRE PRR)" in g3
-    push_workflow_action(run.run_id, "act-03", '{"acknowledged": true}', tmp_path)
+    # Next ai_interpret (service_readiness_audit)
+    _, a_svc, g_svc = get_workflow_action(run.run_id, tmp_path)
+    assert a_svc is not None and "common/twelve_factor" in g_svc and "common/production_readiness" in g_svc
+    assert push_workflow_action(
+        run.run_id, a_svc.action_id, json.dumps({"summary": "12-Factor & SRE PRR checked."}), tmp_path
+    )[0]
 
-    get_workflow_action(run.run_id, tmp_path)
-    push_workflow_action(run.run_id, "act-04", json.dumps({"summary": "AST checked."}), tmp_path)
-
-    _, a5, g5 = get_workflow_action(run.run_id, tmp_path)
-    assert a5 is not None and "common/twelve_factor" in g5 and "common/production_readiness" in g5
-    push_workflow_action(run.run_id, "act-05", json.dumps({"summary": "12-Factor & SRE PRR checked."}), tmp_path)
-
-    get_workflow_action(run.run_id, tmp_path)
-    score_json = ScoreResult(
-        project_name="svc",
-        workflow_id="svc_audit",
-        language="python",
-        overall_score=80,
-        category_scores=CategoryScores(
-            architecture=80,
-            code_quality=75,
-            typing=100,
-            testing=70,
-            dependencies=80,
-            documentation=85,
-        ),
-        summary="Service evaluated.",
-    ).model_dump_json()
-    ok, _ = push_workflow_action(run.run_id, "act-06", score_json, tmp_path)
+    # Final step: emit_score
+    _, a_score, _ = get_workflow_action(run.run_id, tmp_path)
+    assert a_score is not None
+    score_json = json.dumps(
+        {
+            "overall_score": 80,
+            "category_scores": {
+                "architecture": 80,
+                "code_quality": 75,
+                "typing": 100,
+                "testing": 70,
+                "dependencies": 80,
+                "security": 85,
+                "documentation": 85,
+            },
+            "summary": "Service evaluated.",
+        }
+    )
+    ok, _ = push_workflow_action(run.run_id, a_score.action_id, score_json, tmp_path)
     assert ok is True
 
     score_text = (tmp_path / "reports" / "svc_audit_score.json").read_text(encoding="utf-8")

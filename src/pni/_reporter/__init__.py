@@ -45,6 +45,15 @@ from pni._reporter.progress_blueprint import (
     load_or_build_progress_blueprint,
     render_progress_blueprint_markdown,
 )
+from pni._reporter.rollup_blueprint import build_rollup_report_blueprint
+from pni._reporter.sarif import (
+    build_sarif_log,
+    build_score_summary,
+    default_sarif_rel_path,
+    default_summary_rel_path,
+    write_sarif_report,
+    write_score_summary,
+)
 
 __all__ = [
     "DEFAULT_REPORT_FORMATS",
@@ -60,7 +69,12 @@ __all__ = [
     "build_migration_blueprint",
     "build_progress_blueprint",
     "build_report_blueprint",
+    "build_rollup_report_blueprint",
+    "build_sarif_log",
+    "build_score_summary",
     "compile_report_project",
+    "default_sarif_rel_path",
+    "default_summary_rel_path",
     "lint_drawlib_chapters",
     "load_or_build_blueprint",
     "load_or_build_migration_blueprint",
@@ -71,4 +85,6 @@ __all__ = [
     "render_migration_blueprint_markdown",
     "render_progress_blueprint_markdown",
     "scaffold_report_project",
+    "write_sarif_report",
+    "write_score_summary",
 ]

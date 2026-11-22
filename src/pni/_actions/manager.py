@@ -156,6 +156,10 @@ def expand_composite_action(
     override_params: Optional[dict[str, ParamValue]] = None,
     override_prompt: str = "",
     lang: Optional[str] = None,
+    *,
+    step_needs: Optional[list[str]] = None,
+    step_when: Optional[str] = None,
+    step_fact_views: Optional[list[str]] = None,
 ) -> list[PrimitiveStep]:
     """Expand a composite action definition into internal PrimitiveStep instances.
 
@@ -168,6 +172,9 @@ def expand_composite_action(
         override_params: Optional parameter overrides from the workflow step 'with' block.
         override_prompt: Optional additional prompt instructions from the workflow step.
         lang: Optional target language scope for resolving language-specific composite actions.
+        step_needs: Optional DAG upstream dependencies declared on the workflow step.
+        step_when: Optional conditional `when:` predicate declared on the workflow step.
+        step_fact_views: Optional fact projection views declared on the workflow step.
 
     Returns:
         list[PrimitiveStep]: Normalized sequence of internal primitive steps.
@@ -186,12 +193,22 @@ def expand_composite_action(
         if override_prompt.strip():
             combined_prompt = f"{combined_prompt}\n\n{override_prompt.strip()}".strip()
 
+        if step_when and prim.when:
+            merged_when: Optional[str] = f"({step_when.strip()}) and ({prim.when.strip()})"
+        else:
+            merged_when = prim.when or step_when
+
+        merged_views = list(dict.fromkeys([*(step_fact_views or []), *prim.fact_views]))
         prim_name = prim.name or f"{step_name} ({prim.type.value})"
         expanded.append(
             PrimitiveStep(
                 id=f"{step_id}__{idx}_{prim.type.value}",
+                step_key=step_id,
                 name=prim_name,
                 type=prim.type,
+                needs=list(step_needs or []) if idx == 1 else [],
+                when=merged_when,
+                fact_views=merged_views,
                 rules=merged_rules,
                 params=merged_params,
                 prompt=combined_prompt,

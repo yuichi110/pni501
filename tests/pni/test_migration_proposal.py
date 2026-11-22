@@ -415,34 +415,29 @@ def _build_sample_plan_payload(source_file: str = "src/app/service.py") -> Migra
 
 def _complete_sample_audit_workflow(project_root: Path, workflow_id: str, overall_score: int = 62) -> str:
     """Run and complete a 2-step (ast_analyze -> emit_score) audit workflow in SQLite and return run_id."""
-    audit_rec = start_workflow_run(workflow_id, project_root)
+    audit_rec = start_workflow_run(workflow_id, project_root, auto_approve=True)
     assert audit_rec is not None
     assert audit_rec.category == WorkflowCategory.AUDIT
 
-    _, act1, _ = get_workflow_action(audit_rec.run_id, project_root)
-    assert act1 is not None
-    ok1, _ = push_workflow_action(audit_rec.run_id, act1.action_id, '{"acknowledged": true}', project_root)
-    assert ok1 is True
-
-    _, act2, _ = get_workflow_action(audit_rec.run_id, project_root)
-    assert act2 is not None
-    score_payload = ScoreResult(
-        project_name="demo-service",
-        workflow_id=workflow_id,
-        language="python",
-        overall_score=overall_score,
-        category_scores=CategoryScores(
-            architecture=overall_score,
-            code_quality=overall_score,
-            typing=70,
-            testing=55,
-            dependencies=75,
-            documentation=60,
-        ),
-        findings=[],
-        summary=f"Baseline audit score ({overall_score}/100) for {workflow_id}.",
+    # Auto-Advance executes ast_analyze automatically -> lands straight on emit_score
+    _, act_score, _ = get_workflow_action(audit_rec.run_id, project_root)
+    assert act_score is not None and act_score.primitive_type.value == "emit_score"
+    score_payload = json.dumps(
+        {
+            "overall_score": overall_score,
+            "category_scores": {
+                "architecture": overall_score,
+                "code_quality": overall_score,
+                "typing": 70,
+                "testing": 55,
+                "dependencies": 75,
+                "security": 80,
+                "documentation": 60,
+            },
+            "summary": f"Baseline audit score ({overall_score}/100) for {workflow_id}.",
+        }
     )
-    ok2, msg2 = push_workflow_action(audit_rec.run_id, act2.action_id, score_payload.model_dump_json(), project_root)
+    ok2, msg2 = push_workflow_action(audit_rec.run_id, act_score.action_id, score_payload, project_root)
     assert ok2 is True
     assert "COMPLETED" in msg2
     return audit_rec.run_id
@@ -524,26 +519,19 @@ steps:
     finally:
         os.chdir(prev_cwd)
 
-    run_rec = start_workflow_run("demo_migration", tmp_path)
+    run_rec = start_workflow_run("demo_migration", tmp_path, auto_approve=True)
     assert run_rec is not None
     assert run_rec.category == WorkflowCategory.MIGRATION
     assert run_rec.based_on == "demo_audit"
     assert run_rec.based_on_run_id == audit_run_id
 
-    # Step 1: migration_analyze (auto-executed on get_workflow_action, then ack)
-    _, act1, guide1 = get_workflow_action(run_rec.run_id, tmp_path)
-    assert act1 is not None
-    assert act1.primitive_type.value == "migration_analyze"
-    assert "Migration Analysis Summary" in guide1 or "migration_analyze" in guide1
-    ok1, _ = push_workflow_action(run_rec.run_id, act1.action_id, '{"acknowledged": true}', tmp_path)
-    assert ok1 is True
-
-    # Step 2: ai_interpret (inherits Baseline Audit Score Summary + AST facts from SQLite)
+    # Auto-Advance executes migration_analyze -> lands straight on ai_interpret with Baseline Audit Score Summary
     _, act2, guide2 = get_workflow_action(run_rec.run_id, tmp_path)
     assert act2 is not None
     assert act2.primitive_type.value == "ai_interpret"
     assert "Baseline Audit Score Summary" in guide2
     assert "64/100" in guide2
+    assert "Migration Analysis Summary" in guide2 or "migration_analyze" in guide2
     interp_json = json.dumps(
         {
             "summary": "Extract STATE dictionary behind a state port and preserve amount default.",
@@ -747,7 +735,7 @@ steps:
             start_workflow_run("order_migration", tmp_path)
 
         # 4. Case B: Parent audit started (in_progress) -> start STILL exits 1 and points to get-action
-        unfinished = start_workflow_run("order_audit", tmp_path)
+        unfinished = start_workflow_run("order_audit", tmp_path, auto_approve=True)
         assert unfinished is not None
 
         start_in_prog = cli_runner.invoke(app, ["workflows", "start", "order_migration"])

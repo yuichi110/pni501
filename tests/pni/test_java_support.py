@@ -336,6 +336,7 @@ public class Greeter {
     _, wf_def = loaded
     prims = normalize_workflow_steps(wf_def, tmp_path)
     assert [p.type for p in prims] == [
+        PrimitiveType.CONFIRM_PLAN,
         PrimitiveType.PROJECT_INSPECT,
         PrimitiveType.AI_INTERPRET,
         PrimitiveType.AST_ANALYZE,
@@ -343,59 +344,46 @@ public class Greeter {
         PrimitiveType.EMIT_SCORE,
     ]
 
-    run = start_workflow_run("quick_check", tmp_path)
+    run = start_workflow_run("quick_check", tmp_path, auto_approve=True)
     assert run is not None
 
-    # Step 1: project_inspect (Java Maven)
-    _, act1, guide1 = get_workflow_action(run.run_id, tmp_path)
-    assert act1 is not None
-    assert "build_system: `maven`" in guide1
-    ok1, _ = push_workflow_action(run.run_id, act1.action_id, '{"acknowledged": true}', tmp_path)
-    assert ok1 is True
-
-    # Step 2: ai_interpret (repo_structure_audit -> includes java/dependencies rule)
-    _, act2, guide2 = get_workflow_action(run.run_id, tmp_path)
-    assert act2 is not None
-    assert "Rule `java/dependencies`" in guide2
+    # Auto-Advance runs project_inspect -> pauses at ai_interpret (repo_structure_audit -> java/dependencies)
+    _, act_repo, guide_repo = get_workflow_action(run.run_id, tmp_path)
+    assert act_repo is not None and act_repo.primitive_type == PrimitiveType.AI_INTERPRET
+    assert "build_system: `maven`" in guide_repo
+    assert "Rule `java/dependencies`" in guide_repo
     interp1 = json.dumps({"summary": "Maven structure clean.", "findings": []})
-    ok2, _ = push_workflow_action(run.run_id, act2.action_id, interp1, tmp_path)
+    ok2, _ = push_workflow_action(run.run_id, act_repo.action_id, interp1, tmp_path)
     assert ok2 is True
 
-    # Step 3: ast_analyze (Java AST)
-    _, act3, guide3 = get_workflow_action(run.run_id, tmp_path)
-    assert act3 is not None
-    assert "language=`java`" in guide3
-    assert "Type Safety Coverage**: `100.0%`" in guide3
-    ok3, _ = push_workflow_action(run.run_id, act3.action_id, '{"acknowledged": true}', tmp_path)
-    assert ok3 is True
-
-    # Step 4: ai_interpret (java_ast_audit -> includes java/typing & java/code_quality)
-    _, act4, guide4 = get_workflow_action(run.run_id, tmp_path)
-    assert act4 is not None
-    assert "Rule `java/typing`" in guide4
+    # Auto-Advance runs ast_analyze -> pauses at ai_interpret (java_ast_audit -> java/typing)
+    _, act_ast, guide_ast = get_workflow_action(run.run_id, tmp_path)
+    assert act_ast is not None and act_ast.primitive_type == PrimitiveType.AI_INTERPRET
+    assert "language=`java`" in guide_ast
+    assert "Type Safety Coverage**: `100.0%`" in guide_ast
+    assert "Rule `java/typing`" in guide_ast
     interp2 = json.dumps({"summary": "Javadoc and generics clean.", "findings": []})
-    ok4, _ = push_workflow_action(run.run_id, act4.action_id, interp2, tmp_path)
+    ok4, _ = push_workflow_action(run.run_id, act_ast.action_id, interp2, tmp_path)
     assert ok4 is True
 
-    # Step 5: emit_score
+    # Final step: emit_score (clean v2 ScoreSubmissionInput)
     _, act5, _ = get_workflow_action(run.run_id, tmp_path)
-    assert act5 is not None
-    score_json = ScoreResult(
-        project_name="com.demo:app",
-        workflow_id="quick_check",
-        language="java",
-        overall_score=94,
-        category_scores=CategoryScores(
-            architecture=95,
-            code_quality=96,
-            typing=100,
-            testing=85,
-            dependencies=94,
-            documentation=94,
-        ),
-        findings=[],
-        summary="Clean Java service.",
-    ).model_dump_json()
+    assert act5 is not None and act5.primitive_type == PrimitiveType.EMIT_SCORE
+    score_json = json.dumps(
+        {
+            "overall_score": 94,
+            "category_scores": {
+                "architecture": 95,
+                "code_quality": 96,
+                "typing": 100,
+                "testing": 85,
+                "dependencies": 94,
+                "security": 95,
+                "documentation": 94,
+            },
+            "summary": "Clean Java service.",
+        }
+    )
     ok5, msg5 = push_workflow_action(run.run_id, act5.action_id, score_json, tmp_path)
     assert ok5 is True
     assert "COMPLETED" in msg5

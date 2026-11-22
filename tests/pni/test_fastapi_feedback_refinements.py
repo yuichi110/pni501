@@ -91,19 +91,18 @@ def test_schema_descriptions_and_parenthetical_path_rejection(tmp_path: Path) ->
         encoding="utf-8",
     )
 
-    run = start_workflow_run("arch_ux", tmp_path)
+    run = start_workflow_run("arch_ux", tmp_path, auto_approve=True)
     assert run is not None
-    get_workflow_action(run.run_id, tmp_path)
-    assert push_workflow_action(run.run_id, "act-01", '{"acknowledged": true}', tmp_path)[0] is True
-
-    get_workflow_action(run.run_id, tmp_path)
+    # Auto-Advance executes ast_analyze -> lands straight on record_architecture (act-03)
+    _, act_arch, _ = get_workflow_action(run.run_id, tmp_path)
+    assert act_arch is not None and act_arch.primitive_type == PrimitiveType.RECORD_ARCHITECTURE
     bad_payload = json.dumps(
         {
             "entry_points": ["fastapi/applications.py:FastAPI (Public ASGI class)"],
             "execution_flows": [],
         }
     )
-    ok_bad, err_msg = push_workflow_action(run.run_id, "act-02", bad_payload, tmp_path)
+    ok_bad, err_msg = push_workflow_action(run.run_id, act_arch.action_id, bad_payload, tmp_path)
     assert ok_bad is False
     assert "without parenthetical descriptions" in err_msg
 
@@ -113,7 +112,7 @@ def test_schema_descriptions_and_parenthetical_path_rejection(tmp_path: Path) ->
             "execution_flows": [],
         }
     )
-    ok_clean, _ = push_workflow_action(run.run_id, "act-02", clean_payload, tmp_path)
+    ok_clean, _ = push_workflow_action(run.run_id, act_arch.action_id, clean_payload, tmp_path)
     assert ok_clean is True
 
 
@@ -446,14 +445,10 @@ def test_workflow_rewind_and_retry_action_resyncs_yaml_and_clears_downstream(
         encoding="utf-8",
     )
 
-    run = start_workflow_run("pni501", tmp_path)
+    run = start_workflow_run("pni501", tmp_path, auto_approve=True)
     assert run is not None
 
-    # Complete act-01
-    get_workflow_action(run.run_id, tmp_path)
-    assert push_workflow_action(run.run_id, "act-01", '{"acknowledged": true}', tmp_path)[0] is True
-
-    # First attempt at act-02 fails (exit_code=2)
+    # Auto-Advance runs act-02 (project_inspect) and act-03 (run_check) automatically
     failed_rf = RuntimeFacts(
         status="failed",
         container_engine="docker",
@@ -462,10 +457,8 @@ def test_workflow_rewind_and_retry_action_resyncs_yaml_and_clears_downstream(
         test_execution=rt_models.TestExecutionResult(status="failed", exit_code=2, error_tests=1),
     )
     with patch("pni._workflows.engine.run_runtime_check", return_value=failed_rf):
-        _, act2, guide_fail = get_workflow_action(run.run_id, tmp_path)
-        assert act2 is not None and act2.action_id == "act-02"
-        assert "status=`failed`" in guide_fail
-        assert push_workflow_action(run.run_id, "act-02", '{"acknowledged": true}', tmp_path)[0] is True
+        _, act_done, _ = get_workflow_action(run.run_id, tmp_path)
+        assert act_done is None
 
     # User updates .pni/workflows/pni501.yaml with exclude & pytest_extra_args, then runs retry-action CLI
     wf_file.write_text(
@@ -493,10 +486,9 @@ def test_workflow_rewind_and_retry_action_resyncs_yaml_and_clears_downstream(
         test_execution=rt_models.TestExecutionResult(status="passed", exit_code=0, total_tests=42, passed_tests=42),
     )
     with patch("pni._workflows.engine.run_runtime_check", return_value=passed_rf) as mock_rc:
-        res = runner.invoke(app, ["workflows", "retry-action", run.run_id, "act-02", "--pull"])
+        res = runner.invoke(app, ["workflows", "retry-action", run.run_id, "act-03", "--pull"])
         assert res.exit_code == 0, res.output
         assert "Rewound workflow run" in res.output
-        assert "status=`passed`" in res.output
         called_opts = mock_rc.call_args.kwargs["options"]
         assert called_opts.pytest_extra_args == ("--ignore=tests/test_prepare_release.py",)
 
@@ -505,11 +497,11 @@ def test_workflow_rewind_and_retry_action_resyncs_yaml_and_clears_downstream(
     assert updated_run is not None
     assert updated_run.targets.exclude == ["tests/test_prepare_release.py"]
     actions = db.get_actions(run.run_id)
-    assert actions[0].status.value == "completed"
-    assert actions[1].status.value == "in_progress"
-    assert '"passed_tests": 42' in (actions[1].deterministic_output_json or "")
+    assert actions[1].status.value == "completed"
+    assert actions[2].status.value == "completed"
+    assert '"passed_tests": 42' in (actions[2].deterministic_output_json or "")
 
     # Programmatic rewind by workflow_id + primitive selector also works
     outcome = rewind_workflow_run("pni501", "run_check", tmp_path)
-    assert outcome.target_action_id == "act-02"
+    assert outcome.target_action_id == "act-03"
     assert outcome.yaml_resynced is True

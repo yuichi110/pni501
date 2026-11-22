@@ -121,20 +121,10 @@ def test_three_aspect_record_architecture_grounding_and_persistence(tmp_path: Pa
         encoding="utf-8",
     )
 
-    run = start_workflow_run("arch_audit", tmp_path)
+    run = start_workflow_run("arch_audit", tmp_path, auto_approve=True)
     assert run is not None
 
-    # Step 1 & 2: deterministic project_inspect & ast_analyze
-    _, act1, _ = get_workflow_action(run.run_id, tmp_path)
-    assert act1 is not None and act1.primitive_type == PrimitiveType.PROJECT_INSPECT
-    assert push_workflow_action(run.run_id, act1.action_id, '{"acknowledged": true}', tmp_path)[0]
-
-    _, act2, guide2 = get_workflow_action(run.run_id, tmp_path)
-    assert act2 is not None and act2.primitive_type == PrimitiveType.AST_ANALYZE
-    assert "Module Inventory (2 files)" in guide2
-    assert push_workflow_action(run.run_id, act2.action_id, '{"acknowledged": true}', tmp_path)[0]
-
-    # Step 3: Aspect 1 (purpose_and_stack)
+    # Auto-Advance executes project_inspect & ast_analyze -> lands straight on Aspect 1 (purpose_and_stack)
     _, act3, guide3 = get_workflow_action(run.run_id, tmp_path)
     assert act3 is not None and act3.primitive_type == PrimitiveType.RECORD_ARCHITECTURE
     assert "purpose_and_stack" in guide3
@@ -150,9 +140,10 @@ def test_three_aspect_record_architecture_grounding_and_persistence(tmp_path: Pa
     ok3, _ = push_workflow_action(run.run_id, act3.action_id, aspect1_json, tmp_path)
     assert ok3 is True
 
-    # Step 4: Aspect 2 (layers_and_modules) — first test anti-hallucination rejection!
+    # Aspect 2 (layers_and_modules) — receives Module Inventory + tests anti-hallucination rejection!
     _, act4, guide4 = get_workflow_action(run.run_id, tmp_path)
     assert act4 is not None and "layers_and_modules" in guide4
+    assert "Module Inventory (2 files)" in guide4
 
     hallucinated_smap = json.dumps(
         {

@@ -202,36 +202,28 @@ def test_stateful_workflow_pull_push_lifecycle(tmp_path: Path) -> None:
     )
 
     assert start_workflow_run("nonexistent_wf", tmp_path) is None
-    run = start_workflow_run("custom_wf", tmp_path)
+    run = start_workflow_run("custom_wf", tmp_path, auto_approve=True)
     assert run is not None
     assert (tmp_path / ".pni" / "cache" / "workflow_state.db").exists()
     assert (tmp_path / ".pni" / "cache" / ".gitignore").is_file()
     assert (tmp_path / ".pni" / "cache" / "CACHEDIR.TAG").is_file()
 
-    # Step 1 (act-01): ast_analyze
-    _, act1, guide1 = get_workflow_action(run.run_id, tmp_path)
-    assert act1 is not None
-    assert act1.action_id == "act-01"
-    assert act1.primitive_type == PrimitiveType.AST_ANALYZE
-    assert "Deterministic AST Facts" in guide1
+    # Auto-Advance executes act-02 (ast_analyze) -> lands directly on act-03 (ai_interpret)
+    _, act_interp, guide_interp = get_workflow_action(run.run_id, tmp_path)
+    assert act_interp is not None
+    assert act_interp.action_id == "act-03"
+    assert act_interp.primitive_type == PrimitiveType.AI_INTERPRET
+    assert "Deterministic AST Facts" in guide_interp
+    assert "Custom interpretation prompt." in guide_interp
     assert (tmp_path / ".pni" / "cache" / "custom_facts.json").exists()
 
     # Out-of-order push must be rejected
-    ok_wrong, msg_wrong = push_workflow_action(run.run_id, "act-02", "{}", tmp_path)
+    ok_wrong, msg_wrong = push_workflow_action(run.run_id, "act-04", "{}", tmp_path)
     assert ok_wrong is False
     assert "Action mismatch" in msg_wrong
 
-    ok1, _ = push_workflow_action(run.run_id, "act-01", '{"acknowledged": true}', tmp_path)
-    assert ok1 is True
-
-    # Step 2 (act-02): ai_interpret
-    _, act2, guide2 = get_workflow_action(run.run_id, tmp_path)
-    assert act2 is not None
-    assert act2.action_id == "act-02"
-    assert "Custom interpretation prompt." in guide2
-
     # Invalid JSON schema must be rejected
-    ok_bad_interp, _ = push_workflow_action(run.run_id, "act-02", '{"wrong": 1}', tmp_path)
+    ok_bad_interp, _ = push_workflow_action(run.run_id, "act-03", '{"wrong": 1}', tmp_path)
     assert ok_bad_interp is False
 
     interp_payload = json.dumps(
@@ -241,52 +233,51 @@ def test_stateful_workflow_pull_push_lifecycle(tmp_path: Path) -> None:
             "suggested_scores": {"architecture": 95},
         }
     )
-    ok2, _ = push_workflow_action(run.run_id, "act-02", interp_payload, tmp_path)
+    ok2, _ = push_workflow_action(run.run_id, "act-03", interp_payload, tmp_path)
     assert ok2 is True
 
-    # Step 3 (act-03): emit_score
-    _, act3, guide3 = get_workflow_action(run.run_id, tmp_path)
-    assert act3 is not None
-    assert act3.action_id == "act-03"
-    assert "Clean architecture verified." in guide3
+    # Step 4 (act-04): emit_score
+    _, act_score, guide_score = get_workflow_action(run.run_id, tmp_path)
+    assert act_score is not None
+    assert act_score.action_id == "act-04"
+    assert "Clean architecture verified." in guide_score
 
-    score_payload = ScoreResult(
-        project_name="demo",
-        workflow_id="custom_wf",
-        language="python",
-        overall_score=95,
-        category_scores=CategoryScores(
-            architecture=95,
-            code_quality=95,
-            typing=100,
-            testing=90,
-            dependencies=95,
-            documentation=95,
-        ),
-        findings=[],
-        summary="Strong project health.",
-    ).model_dump_json()
-    ok3, _ = push_workflow_action(run.run_id, "act-03", score_payload, tmp_path)
+    score_payload = json.dumps(
+        {
+            "overall_score": 95,
+            "category_scores": {
+                "architecture": 95,
+                "code_quality": 95,
+                "typing": 100,
+                "testing": 90,
+                "dependencies": 95,
+                "security": 95,
+                "documentation": 95,
+            },
+            "summary": "Strong project health.",
+        }
+    )
+    ok3, _ = push_workflow_action(run.run_id, "act-04", score_payload, tmp_path)
     assert ok3 is True
     assert (tmp_path / ".pni" / "custom_score.json").exists()
 
-    # Step 4 (act-04): write_drawlib_report
-    _, act4, guide4 = get_workflow_action(run.run_id, tmp_path)
-    assert act4 is not None
-    assert act4.action_id == "act-04"
-    assert "READ Score" in guide4
-    assert "WRITE or INCREMENTALLY UPDATE drawlib Report" in guide4
+    # Step 5 (act-05): write_drawlib_report
+    _, act_rep, guide_rep = get_workflow_action(run.run_id, tmp_path)
+    assert act_rep is not None
+    assert act_rep.action_id == "act-05"
+    assert "READ Structured Artifacts" in guide_rep
+    assert "WRITE or INCREMENTALLY UPDATE drawlib Report" in guide_rep
 
     # Missing report file must be rejected
     bad_rep = json.dumps({"generated_files": ["docs/pni_report/missing.png"], "summary": "Done"})
-    ok_bad_rep, _ = push_workflow_action(run.run_id, "act-04", bad_rep, tmp_path)
+    ok_bad_rep, _ = push_workflow_action(run.run_id, "act-05", bad_rep, tmp_path)
     assert ok_bad_rep is False
 
     report_dir = tmp_path / "docs" / "pni_report"
     report_dir.mkdir(parents=True)
     (report_dir / "overview.png").write_bytes(b"PNGDATA")
     good_rep = json.dumps({"generated_files": ["docs/pni_report/overview.png"], "summary": "Generated chart"})
-    ok4, msg4 = push_workflow_action(run.run_id, "act-04", good_rep, tmp_path)
+    ok4, msg4 = push_workflow_action(run.run_id, "act-05", good_rep, tmp_path)
     assert ok4 is True
     assert "COMPLETED" in msg4
 
@@ -324,9 +315,10 @@ def test_action_with_target_interpolation_and_score_propagation(tmp_path: Path) 
     assert loaded is not None
     wf_info, wf_def = loaded
     prims = normalize_workflow_steps(wf_def, tmp_path)
-    assert len(prims) == 2
-    assert prims[0].params["score_path"] == "reports/python_clean_score.json"
-    # Even though create_report omitted target, emitted score_path propagated forward
+    assert len(prims) == 3
+    assert prims[0].type == PrimitiveType.CONFIRM_PLAN
     assert prims[1].params["score_path"] == "reports/python_clean_score.json"
+    # Even though create_report omitted target, emitted score_path propagated forward
+    assert prims[2].params["score_path"] == "reports/python_clean_score.json"
     assert wf_info.outputs.score == "reports/python_clean_score.json"
     assert wf_info.outputs.report == "reports/example_clean.pdf"

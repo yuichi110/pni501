@@ -111,6 +111,17 @@ class OptOutEntry(BaseModel):
         return cleaned
 
 
+class PniComponentConfig(BaseModel):
+    """Optional multi-language monorepo component declaration (`[[components]]`) in .pni/pni.toml."""
+
+    id: str
+    root: str = "."
+    lang: Optional[str] = None
+    workflow_id: Optional[str] = None
+    weight: Optional[float] = Field(default=None, gt=0.0)
+    primary: bool = True
+
+
 class PniConfig(BaseModel):
     """Complete .pni/pni.toml project configuration manifest."""
 
@@ -118,6 +129,7 @@ class PniConfig(BaseModel):
     targets: PniTargetsConfig = Field(default_factory=PniTargetsConfig)
     scan: PniScanConfig = Field(default_factory=PniScanConfig)
     report: PniReportConfig = Field(default_factory=PniReportConfig)
+    components: list[PniComponentConfig] = Field(default_factory=list)
     opt_out: list[OptOutEntry] = Field(default_factory=list)
 
 

@@ -11,9 +11,12 @@
 
 from __future__ import annotations
 
+import contextlib
 import json
+from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime, timezone
 from pathlib import Path
+from typing import Optional
 
 from pydantic import BaseModel, Field
 
@@ -32,6 +35,7 @@ from pni._actions import (
     ParamValue,
     PentestFacts,
     PentestOptions,
+    PlanApprovalInput,
     PrimitiveStep,
     PrimitiveType,
     ProgressFacts,
@@ -40,11 +44,13 @@ from pni._actions import (
     RuntimeCheckOptions,
     RuntimeFacts,
     ScoreResult,
+    ScoreSubmissionInput,
     SecurityFacts,
     SecurityScanOptions,
     StructureMap,
     SystemProfile,
     extract_verbatim_error_excerpt,
+    get_expected_input_model,
     get_expected_input_schema_json,
     record_audit_history_from_score,
     render_action_task_body,
@@ -54,15 +60,23 @@ from pni._actions import (
     run_security_scan,
     run_web_pentest,
 )
+from pni._actions.ast_analyze.companion import scan_companion_languages
 from pni._cache import (
     DEFAULT_STATE_DB_REL_PATH,
     default_architecture_rel_path,
     default_facts_rel_path,
     ensure_cache_parent,
 )
-from pni._config import OptOutEntry, PniConfig, load_pni_config
+from pni._config import OptOutEntry, load_pni_config
 from pni._pentests import inspect_target_pentests_status
-from pni._reporter import DEFAULT_REPORT_OUTPUT_DIR
+from pni._reporter import (
+    DEFAULT_REPORT_OUTPUT_DIR,
+    build_score_summary,
+    default_sarif_rel_path,
+    default_summary_rel_path,
+    write_sarif_report,
+    write_score_summary,
+)
 from pni._rules import get_rule_content
 from pni._workflows._migration_engine import (
     execute_migration_analyze_json,
@@ -74,6 +88,22 @@ from pni._workflows._progress_engine import (
     inspect_progress_plan_prerequisite,
     render_progress_facts,
     validate_and_persist_progress_result,
+)
+from pni._workflows._projection import (
+    ActionPromptPayload,
+    render_approved_plan_banner,
+    render_ast_structure_compact,
+    render_ast_testing_compact,
+    render_companions_summary,
+    render_pre_findings_slice,
+    render_project_summary_compact,
+    resolve_fact_views,
+)
+from pni._workflows._rollup_engine import (
+    execute_rollup_collect,
+    inspect_rollup_prerequisites,
+    render_rollup_facts_markdown,
+    validate_and_persist_rollup,
 )
 from pni._workflows.aggregator import (
     compile_workflow_digest,
@@ -89,7 +119,9 @@ from pni._workflows.base_model import (
     WorkflowFactsBundle,
     WorkflowPrerequisiteError,
     WorkflowRunRecord,
+    WorkflowTargets,
 )
+from pni._workflows.baseline import compute_baseline_evaluation
 from pni._workflows.inspector import (
     resolve_run_actions_by_selector,
     resolve_run_by_id_or_workflow,
@@ -98,6 +130,15 @@ from pni._workflows.manager import (
     load_workflow,
     normalize_workflow_steps,
     resolve_workflow_outputs,
+)
+from pni._workflows.planner import (
+    DETERMINISTIC_PRIMITIVES,
+    WorkflowExecutionPlan,
+    build_recon_context,
+    build_workflow_plan,
+    evaluate_when_expr,
+    persist_workflow_plan,
+    render_plan_markdown,
 )
 from pni._workflows.state_db import WorkflowStateDB
 
@@ -131,7 +172,11 @@ def inspect_base_audit_status(
         return completed, None
 
     latest = db.get_latest_run(workflow_def.based_on)
-    if latest is not None and latest.status == RunStatus.IN_PROGRESS:
+    if latest is not None and latest.status in {
+        RunStatus.IN_PROGRESS,
+        RunStatus.AWAITING_APPROVAL,
+        RunStatus.PENDING,
+    }:
         err = (
             f"Prerequisite audit workflow '{workflow_def.based_on}' has an unfinished run "
             f"'{latest.run_id}' (status='{latest.status.value}') in '{DEFAULT_STATE_DB_REL_PATH}'. "
@@ -166,53 +211,209 @@ def inspect_pentests_prerequisite(
     )
 
 
+def _parse_plan_approval_file(plan_path: Path) -> PlanApprovalInput:
+    """Load PlanApprovalInput from a standalone approval JSON file or WorkflowExecutionPlan JSON."""
+    raw = json.loads(plan_path.read_text(encoding="utf-8"))
+    if isinstance(raw, dict) and "approval" in raw and isinstance(raw["approval"], dict):
+        return PlanApprovalInput.model_validate(raw["approval"])
+    return PlanApprovalInput.model_validate(raw)
+
+
+def _load_run_plan(run: WorkflowRunRecord) -> WorkflowExecutionPlan | None:
+    """Deserialize WorkflowExecutionPlan stored in workflow_runs.plan_json if present."""
+    if not run.plan_json:
+        return None
+    with contextlib.suppress(Exception):
+        return WorkflowExecutionPlan.model_validate_json(run.plan_json)
+    return None
+
+
+def _effective_opt_outs(project_root: Path, run: WorkflowRunRecord) -> list[OptOutEntry]:
+    """Merge `.pni/pni.toml [[opt_out]]` waivers with any `extra_opt_outs` confirmed in `confirm_plan`."""
+    entries = list(load_pni_config(project_root).opt_out)
+    plan = _load_run_plan(run)
+    if plan is not None and plan.approval is not None:
+        for item in plan.approval.extra_opt_outs:
+            entries.append(OptOutEntry(id=item.id, scope=list(item.scope), reason=item.reason))
+    return entries
+
+
+def _mark_disabled_plan_steps(
+    db: WorkflowStateDB,
+    run_id: str,
+    disabled_set: set[str],
+) -> None:
+    """Mark any actions matching `disabled_steps` (by action_id, step_key, or source_action) SKIPPED."""
+    if not disabled_set:
+        return
+    for act in db.get_actions(run_id):
+        if act.primitive_type == PrimitiveType.CONFIRM_PLAN:
+            continue
+        if (
+            act.action_id in disabled_set
+            or act.step_key in disabled_set
+            or (act.source_action and act.source_action in disabled_set)
+        ):
+            db.mark_action_skipped(run_id, act.action_id, "Disabled during confirm_plan alignment.")
+
+
+def _apply_plan_approval(
+    db: WorkflowStateDB,
+    run: WorkflowRunRecord,
+    plan: WorkflowExecutionPlan | None,
+    approval: PlanApprovalInput,
+    project_root: Path,
+    *,
+    auto_approved: bool = False,
+) -> WorkflowRunRecord:
+    """Persist PlanApprovalInput, apply target overrides, and mark disabled steps SKIPPED."""
+    updated_targets: Optional[WorkflowTargets] = None
+    if approval.confirmed_targets is not None:
+        patch = approval.confirmed_targets.model_dump(exclude_none=True)
+        if patch:
+            updated_targets = run.targets.model_copy(update=patch)
+
+    disabled_set = {s.strip() for s in approval.disabled_steps if s.strip()}
+    _mark_disabled_plan_steps(db, run.run_id, disabled_set)
+
+    updated_plan_json = run.plan_json or ""
+    if plan is not None:
+        plan.approval = approval
+        if updated_targets is not None:
+            plan.target_root = updated_targets.root
+        for node in plan.nodes:
+            if node.action_id in disabled_set or node.step_key in disabled_set:
+                node.status = "skip"
+                node.badge = "SKIP"
+                node.skip_reason = "Disabled during confirm_plan alignment."
+        persist_workflow_plan(project_root, plan)
+        updated_plan_json = plan.model_dump_json(indent=2)
+
+    saved = db.save_run_plan(
+        run.run_id,
+        updated_plan_json,
+        approved=True,
+        auto_approved=auto_approved,
+        updated_targets=updated_targets,
+        report_mode=approval.report_mode,
+    )
+    return saved or run
+
+
+def _validate_start_prerequisites(
+    workflow_def: WorkflowDefinition,
+    project_root: Path,
+) -> tuple[WorkflowRunRecord | None, list[PrimitiveStep]]:
+    """Validate base audit, rollup scores, pentests, and progress prerequisites before creating a run."""
+    parent_run, err_msg = inspect_base_audit_status(workflow_def, project_root)
+    if err_msg is not None:
+        raise WorkflowPrerequisiteError(err_msg)
+    if workflow_def.category == WorkflowCategory.ROLLUP:
+        rollup_err = inspect_rollup_prerequisites(workflow_def, project_root)
+        if rollup_err is not None:
+            raise WorkflowPrerequisiteError(rollup_err)
+    primitives = normalize_workflow_steps(workflow_def, project_root)
+    _, _, pentest_err = inspect_pentests_prerequisite(workflow_def, primitives, project_root)
+    if pentest_err is not None:
+        raise WorkflowPrerequisiteError(pentest_err)
+    _, _, prog_err = inspect_progress_plan_prerequisite(workflow_def, primitives, project_root)
+    if prog_err is not None:
+        raise WorkflowPrerequisiteError(prog_err)
+    return parent_run, primitives
+
+
+def plan_workflow_run(
+    workflow_id: str,
+    project_root: Path,
+    *,
+    probe_container_engine: bool = True,
+) -> tuple[WorkflowDefinition, list[PrimitiveStep], WorkflowExecutionPlan] | None:
+    """Execute Phase 0 Lightweight Recon and persist `.pni/cache/<workflow_id>/plan.json`."""
+    loaded = load_workflow(workflow_id, project_root)
+    if loaded is None:
+        return None
+    _, workflow_def = loaded
+    primitives = normalize_workflow_steps(workflow_def, project_root)
+    plan = build_workflow_plan(
+        workflow_def,
+        primitives,
+        project_root,
+        probe_container_engine=probe_container_engine,
+    )
+    persist_workflow_plan(project_root, plan)
+    return workflow_def, primitives, plan
+
+
 def start_workflow_run(
     workflow_id: str,
     project_root: Path,
     *,
     supersede: bool = False,
+    auto_approve: bool = False,
+    plan_path: Optional[Path] = None,
+    probe_container_engine: bool = True,
 ) -> WorkflowRunRecord | None:
-    """Create a stateful workflow run in .pni/cache/workflow_state.db.
+    """Create a stateful Workflow v2 run in .pni/cache/workflow_state.db after Phase 0 Recon.
 
     Args:
         workflow_id: Target workflow identifier in .pni/workflows/.
         project_root: Workspace root directory.
         supersede: When True, automatically cancel any unfinished runs for workflow_id first.
+        auto_approve: When True, auto-approve the `confirm_plan` gate for CI/batch runs.
+        plan_path: Optional pre-approved `PlanApprovalInput` or `plan.json` file path.
+        probe_container_engine: Probe Docker/Podman availability during Phase 0 Recon.
 
     Returns:
         WorkflowRunRecord | None: Newly created run record, or None if workflow not found.
 
     Raises:
-        WorkflowPrerequisiteError: If 'based_on' audit run, '.pni/progress/' plan, or '.pni/pentests/' is missing.
+        WorkflowPrerequisiteError: If required base audit, rollup scores, pentests, or progress plan is missing.
     """
     loaded = load_workflow(workflow_id, project_root)
     if loaded is None:
         return None
 
     _, workflow_def = loaded
-    parent_run, err_msg = inspect_base_audit_status(workflow_def, project_root)
-    if err_msg is not None:
-        raise WorkflowPrerequisiteError(err_msg)
-
-    primitives = normalize_workflow_steps(workflow_def, project_root)
-    _, _, pentest_err = inspect_pentests_prerequisite(workflow_def, primitives, project_root)
-    if pentest_err is not None:
-        raise WorkflowPrerequisiteError(pentest_err)
-
-    _, _, prog_err = inspect_progress_plan_prerequisite(workflow_def, primitives, project_root)
-    if prog_err is not None:
-        raise WorkflowPrerequisiteError(prog_err)
+    parent_run, primitives = _validate_start_prerequisites(workflow_def, project_root)
+    plan = build_workflow_plan(
+        workflow_def,
+        primitives,
+        project_root,
+        probe_container_engine=probe_container_engine,
+    )
+    approval_override = _parse_plan_approval_file(plan_path) if plan_path is not None else None
+    pre_approved = auto_approve or approval_override is not None or not workflow_def.plan_gate
 
     resolved_outputs = resolve_workflow_outputs(workflow_def, primitives)
     db = WorkflowStateDB(project_root)
     if supersede:
         db.cancel_active_runs_for_workflow(workflow_def.id)
-    return db.create_run(
+
+    record = db.create_run(
         workflow_def,
         primitives,
         resolved_outputs=resolved_outputs,
         based_on_run_id=parent_run.run_id if parent_run is not None else None,
+        plan_json=plan.model_dump_json(indent=2),
+        plan_approved=pre_approved,
+        auto_approved=auto_approve,
     )
+    for node in plan.nodes:
+        if node.status == "skip":
+            db.mark_action_skipped(record.run_id, node.action_id, node.skip_reason or "Condition evaluated to false.")
+
+    if pre_approved:
+        eff_approval = approval_override or PlanApprovalInput(
+            approved=True,
+            alignment_summary="Auto-approved via --auto-approve or plan_gate=false.",
+        )
+        for act in db.get_actions(record.run_id):
+            if act.primitive_type == PrimitiveType.CONFIRM_PLAN:
+                db.complete_action(record.run_id, act.action_id, eff_approval.model_dump_json(indent=2))
+        return _apply_plan_approval(db, record, plan, eff_approval, project_root, auto_approved=auto_approve)
+
+    persist_workflow_plan(project_root, plan)
+    return record
 
 
 def _resolve_facts_rel_path(run: WorkflowRunRecord, action: ActionRunRecord | None = None) -> str:
@@ -400,56 +601,11 @@ def _parse_runtime_check_options(params: dict[str, ParamValue]) -> RuntimeCheckO
     )
 
 
-def _execute_run_check_json(
-    db: WorkflowStateDB,
-    run: WorkflowRunRecord,
-    action: ActionRunRecord,
-    workspace_root: Path,
-    step_lang: str | None,
-) -> str:
-    """Execute containerized dynamic verification for a RUN_CHECK action and return JSON."""
-    prior_bundle = _assemble_facts_bundle(run, db.get_actions(run.run_id), db=db)
-    rf = run_runtime_check(
-        workspace_root,
-        run.workflow_id,
-        target_root=run.targets.root,
-        source_targets=run.targets.source,
-        test_targets=run.targets.tests,
-        lang=step_lang,
-        project_facts=prior_bundle.project_facts,
-        options=_parse_runtime_check_options(action.params),
-    )
-    return rf.model_dump_json(indent=2)
-
-
 def _parse_security_scan_options(params: dict[str, ParamValue]) -> SecurityScanOptions:
     """Construct SecurityScanOptions from workflow action parameters."""
     known = set(SecurityScanOptions.model_fields.keys())
     filtered = {k: v for k, v in params.items() if k in known}
     return SecurityScanOptions.model_validate(filtered)
-
-
-def _execute_security_scan_json(
-    db: WorkflowStateDB,
-    run: WorkflowRunRecord,
-    action: ActionRunRecord,
-    workspace_root: Path,
-    step_lang: str | None,
-) -> str:
-    """Execute containerized Trivy security scan for a SECURITY_SCAN action and return JSON."""
-    prior_bundle = _assemble_facts_bundle(run, db.get_actions(run.run_id), db=db)
-    sf = run_security_scan(
-        workspace_root,
-        run.workflow_id,
-        target_root=run.targets.root,
-        source_targets=run.targets.source,
-        test_targets=run.targets.tests,
-        exclude_targets=run.targets.exclude,
-        lang=step_lang,
-        project_facts=prior_bundle.project_facts,
-        options=_parse_security_scan_options(action.params),
-    )
-    return sf.model_dump_json(indent=2)
 
 
 def _parse_pentest_options(params: dict[str, ParamValue]) -> PentestOptions:
@@ -459,43 +615,17 @@ def _parse_pentest_options(params: dict[str, ParamValue]) -> PentestOptions:
     return PentestOptions.model_validate(filtered)
 
 
-def _execute_web_pentest_json(
-    db: WorkflowStateDB,
+def _execute_deterministic_raw(
     run: WorkflowRunRecord,
     action: ActionRunRecord,
+    prior_bundle: WorkflowFactsBundle,
     workspace_root: Path,
-    step_lang: str | None,
-) -> str:
-    """Materialize `.pni/pentests/` and execute isolated loopback `httpx` pentest probes."""
-    prior_bundle = _assemble_facts_bundle(run, db.get_actions(run.run_id), db=db)
-    pf = run_web_pentest(
-        workspace_root,
-        run.workflow_id,
-        target_root=run.targets.root,
-        source_targets=run.targets.source,
-        test_targets=run.targets.tests,
-        lang=step_lang,
-        project_facts=prior_bundle.project_facts,
-        ast_facts=prior_bundle.ast_facts,
-        options=_parse_pentest_options(action.params),
-    )
-    return pf.model_dump_json(indent=2)
-
-
-def _execute_deterministic_step_if_needed(
-    db: WorkflowStateDB,
-    run: WorkflowRunRecord,
-    action: ActionRunRecord,
-    workspace_root: Path,
-) -> ActionRunRecord:
-    """Execute programmatic analyzer on first visit, store output in SQLite, and write facts.json."""
-    if action.deterministic_output_json is not None:
-        return action
-
+) -> str | None:
+    """Execute one deterministic analyzer primitive purely from inputs (safe for ThreadPoolExecutor)."""
     target_root = (workspace_root / run.targets.root).resolve()
-    det_json: str | None = None
     raw_lang = action.params.get("lang")
     step_lang = raw_lang if isinstance(raw_lang, str) else None
+    det_json: str | None = None
 
     if action.primitive_type == PrimitiveType.PROJECT_INSPECT:
         pf = run_project_inspect(
@@ -508,7 +638,7 @@ def _execute_deterministic_step_if_needed(
         )
         det_json = pf.model_dump_json(indent=2)
     elif action.primitive_type == PrimitiveType.AST_ANALYZE:
-        prior_pf = _assemble_facts_bundle(run, db.get_actions(run.run_id), db=db).project_facts
+        prior_pf = prior_bundle.project_facts
         raw_targets = action.params.get("targets") or action.params.get("source_targets")
         targets = raw_targets if isinstance(raw_targets, list) else run.targets.source
         raw_tests = action.params.get("test_targets")
@@ -527,25 +657,205 @@ def _execute_deterministic_step_if_needed(
         )
         det_json = af.model_dump_json(indent=2)
     elif action.primitive_type == PrimitiveType.RUN_CHECK:
-        det_json = _execute_run_check_json(db, run, action, workspace_root, step_lang)
+        rf = run_runtime_check(
+            workspace_root,
+            run.workflow_id,
+            target_root=run.targets.root,
+            source_targets=run.targets.source,
+            test_targets=run.targets.tests,
+            lang=step_lang,
+            project_facts=prior_bundle.project_facts,
+            options=_parse_runtime_check_options(action.params),
+        )
+        det_json = rf.model_dump_json(indent=2)
     elif action.primitive_type == PrimitiveType.SECURITY_SCAN:
-        det_json = _execute_security_scan_json(db, run, action, workspace_root, step_lang)
+        sf = run_security_scan(
+            workspace_root,
+            run.workflow_id,
+            target_root=run.targets.root,
+            source_targets=run.targets.source,
+            test_targets=run.targets.tests,
+            exclude_targets=run.targets.exclude,
+            lang=step_lang,
+            project_facts=prior_bundle.project_facts,
+            options=_parse_security_scan_options(action.params),
+        )
+        det_json = sf.model_dump_json(indent=2)
     elif action.primitive_type == PrimitiveType.WEB_PENTEST:
-        det_json = _execute_web_pentest_json(db, run, action, workspace_root, step_lang)
+        pf_web = run_web_pentest(
+            workspace_root,
+            run.workflow_id,
+            target_root=run.targets.root,
+            source_targets=run.targets.source,
+            test_targets=run.targets.tests,
+            lang=step_lang,
+            project_facts=prior_bundle.project_facts,
+            ast_facts=prior_bundle.ast_facts,
+            options=_parse_pentest_options(action.params),
+        )
+        det_json = pf_web.model_dump_json(indent=2)
     elif action.primitive_type == PrimitiveType.MIGRATION_ANALYZE:
-        prior_bundle = _assemble_facts_bundle(run, db.get_actions(run.run_id), db=db)
         det_json = execute_migration_analyze_json(prior_bundle, run, action, workspace_root, step_lang)
     elif action.primitive_type == PrimitiveType.PROGRESS_ANALYZE:
         det_json = execute_progress_analyze_json(run, action, workspace_root)
+    return det_json
 
+
+def _write_facts_bundle(
+    run: WorkflowRunRecord,
+    bundle: WorkflowFactsBundle,
+    workspace_root: Path,
+    action: ActionRunRecord | None = None,
+) -> None:
+    """Persist WorkflowFactsBundle (with companion DSL scan once on repo scope) to facts.json."""
+    facts_file = workspace_root / _resolve_facts_rel_path(run, action)
+    if run.scope == "repo" and not bundle.companion_ast_facts and (bundle.project_facts or bundle.ast_facts):
+        if facts_file.is_file():
+            with contextlib.suppress(Exception):
+                cached = WorkflowFactsBundle.model_validate_json(facts_file.read_text(encoding="utf-8"))
+                bundle.companion_ast_facts = cached.companion_ast_facts
+        if not bundle.companion_ast_facts:
+            target_dir = (workspace_root / run.targets.root).resolve()
+            if target_dir.is_dir():
+                bundle.companion_ast_facts = scan_companion_languages(
+                    target_dir,
+                    exclude_globs=run.targets.exclude,
+                )
+    ensure_cache_parent(workspace_root, facts_file)
+    facts_file.write_text(bundle.model_dump_json(indent=2), encoding="utf-8")
+
+
+def _check_ready_when_conditions(
+    db: WorkflowStateDB,
+    run: WorkflowRunRecord,
+    ready: list[ActionRunRecord],
+    bundle: WorkflowFactsBundle,
+) -> list[ActionRunRecord]:
+    """Re-evaluate `when:` predicates for ready actions using live ProjectFacts, skipping false ones."""
+    if bundle.project_facts is None:
+        return ready
+    plan = _load_run_plan(run)
+    wf_stub = WorkflowDefinition(
+        id=run.workflow_id,
+        category=run.category,
+        scope=run.scope,
+        name=run.workflow_name,
+        targets=run.targets,
+        includes=run.includes,
+    )
+    ctx = build_recon_context(
+        wf_stub,
+        bundle.project_facts,
+        container_engine=plan.container_engine if plan else None,
+    )
+    kept: list[ActionRunRecord] = []
+    for act in ready:
+        if act.when:
+            should_run, reason = evaluate_when_expr(act.when, ctx)
+            if not should_run:
+                db.mark_action_skipped(run.run_id, act.action_id, reason)
+                continue
+        kept.append(act)
+    return kept
+
+
+def _verify_pentest_prerequisites_for_wave(
+    run: WorkflowRunRecord,
+    det_ready: list[ActionRunRecord],
+    workspace_root: Path,
+) -> None:
+    """Verify `.pni/pentests/` exists before executing any `WEB_PENTEST` in the wave."""
+    for act in det_ready:
+        if (
+            act.primitive_type == PrimitiveType.WEB_PENTEST
+            and act.deterministic_output_json is None
+            and not _param_bool(act.params, "force_regenerate_pentests", False)
+        ):
+            _, _, pentest_err = inspect_target_pentests_status(
+                workspace_root,
+                run.targets.root,
+                workflow_id=run.workflow_id,
+            )
+            if pentest_err is not None:
+                raise WorkflowPrerequisiteError(pentest_err)
+
+
+def _execute_deterministic_wave(
+    run: WorkflowRunRecord,
+    det_ready: list[ActionRunRecord],
+    prior_bundle: WorkflowFactsBundle,
+    workspace_root: Path,
+) -> list[tuple[ActionRunRecord, str | None]]:
+    """Run one wave of ready deterministic primitives sequentially (1) or in parallel (>1)."""
+    if len(det_ready) == 1:
+        act = det_ready[0]
+        out_json = act.deterministic_output_json or _execute_deterministic_raw(
+            run, act, prior_bundle, workspace_root
+        )
+        return [(act, out_json)]
+
+    with ThreadPoolExecutor(max_workers=min(4, len(det_ready))) as pool:
+        futs = [
+            (
+                act,
+                pool.submit(_execute_deterministic_raw, run, act, prior_bundle, workspace_root)
+                if act.deterministic_output_json is None
+                else None,
+            )
+            for act in det_ready
+        ]
+        return [(act, act.deterministic_output_json if fut is None else fut.result()) for act, fut in futs]
+
+
+def _advance_deterministic_actions(
+    db: WorkflowStateDB,
+    run: WorkflowRunRecord,
+    workspace_root: Path,
+) -> list[str]:
+    """Auto-execute all DAG-ready deterministic primitives (in parallel) with zero empty ACK turns."""
+    auto_completed: list[str] = []
+    while True:
+        ready = db.get_ready_actions(run.run_id)
+        if not ready:
+            break
+        prior_bundle = _assemble_facts_bundle(run, db.get_actions(run.run_id), db=db)
+        filtered_ready = _check_ready_when_conditions(db, run, ready, prior_bundle)
+        if len(filtered_ready) < len(ready):
+            continue
+
+        det_ready = [a for a in filtered_ready if a.primitive_type in DETERMINISTIC_PRIMITIVES]
+        if not det_ready:
+            break
+
+        _verify_pentest_prerequisites_for_wave(run, det_ready, workspace_root)
+        results = _execute_deterministic_wave(run, det_ready, prior_bundle, workspace_root)
+        last_act: ActionRunRecord | None = None
+        for act, det_json in results:
+            db.complete_deterministic_action(run.run_id, act.action_id, det_json or "{}")
+            auto_completed.append(f"{act.action_id}: {act.primitive_type.value} ({act.step_key or act.name})")
+            last_act = act
+
+        updated_bundle = _assemble_facts_bundle(run, db.get_actions(run.run_id), db=db)
+        _write_facts_bundle(run, updated_bundle, workspace_root, last_act)
+
+    return auto_completed
+
+
+def _execute_deterministic_step_if_needed(
+    db: WorkflowStateDB,
+    run: WorkflowRunRecord,
+    action: ActionRunRecord,
+    workspace_root: Path,
+) -> ActionRunRecord:
+    """Execute one deterministic analyzer on demand and persist its JSON output."""
+    if action.deterministic_output_json is not None:
+        return action
+    prior_bundle = _assemble_facts_bundle(run, db.get_actions(run.run_id), db=db)
+    det_json = _execute_deterministic_raw(run, action, prior_bundle, workspace_root)
     updated = db.mark_action_in_progress(run.run_id, action.action_id, deterministic_output_json=det_json)
     if det_json is not None:
-        all_actions = db.get_actions(run.run_id)
-        bundle = _assemble_facts_bundle(run, all_actions, db=db)
-        facts_file = workspace_root / _resolve_facts_rel_path(run, action)
-        ensure_cache_parent(workspace_root, facts_file)
-        facts_file.write_text(bundle.model_dump_json(indent=2), encoding="utf-8")
-
+        bundle = _assemble_facts_bundle(run, db.get_actions(run.run_id), db=db)
+        _write_facts_bundle(run, bundle, workspace_root, action)
     return updated or action
 
 
@@ -1001,34 +1311,153 @@ def _render_prior_interpretations(actions: list[ActionRunRecord]) -> list[str]:
     return lines
 
 
-def _format_action_guide(
+def _render_projected_static_views(views: list[str], bundle: WorkflowFactsBundle) -> list[str]:
+    """Render project, base_score, AST, and companion fact slices selected in `views`."""
+    lines: list[str] = []
+    if "base_score" in views and bundle.base_score_result is not None:
+        lines.extend(_render_base_score_summary(bundle.base_score_result))
+    if "project" in views and bundle.project_facts is not None:
+        lines.extend(_render_project_facts(bundle.project_facts))
+    elif "project_summary" in views and bundle.project_facts is not None:
+        lines.extend(render_project_summary_compact(bundle.project_facts))
+    if bundle.ast_facts is not None:
+        if "ast" in views:
+            lines.extend(_render_ast_facts(bundle.ast_facts))
+        else:
+            if "ast_structure" in views:
+                lines.extend(render_ast_structure_compact(bundle.ast_facts))
+            if "ast_testing" in views:
+                lines.extend(render_ast_testing_compact(bundle.ast_facts))
+            if "ast_security" in views:
+                lines.extend(_render_ast_security_section(bundle.ast_facts))
+    if "companions" in views:
+        lines.extend(render_companions_summary(bundle))
+    return lines
+
+
+def _render_projected_dynamic_views(
+    run: WorkflowRunRecord,
+    views: list[str],
+    bundle: WorkflowFactsBundle,
+) -> list[str]:
+    """Render runtime, security, pentest, migration, progress, architecture, and pre-finding slices."""
+    lines: list[str] = []
+    if "runtime" in views and bundle.runtime_facts is not None:
+        lines.extend(_render_runtime_facts(bundle.runtime_facts))
+    if "security" in views and bundle.security_facts is not None:
+        lines.extend(_render_security_facts(bundle.security_facts))
+    if "pentest" in views and bundle.pentest_facts is not None:
+        lines.extend(_render_pentest_facts(bundle.pentest_facts))
+    if "migration" in views and bundle.migration_facts is not None:
+        lines.extend(render_migration_facts(bundle.migration_facts))
+    if "progress" in views and bundle.progress_facts is not None:
+        lines.extend(render_progress_facts(bundle.progress_facts))
+    if "architecture" in views and bundle.architecture_record is not None:
+        arch_json = bundle.architecture_record.model_dump_json(indent=2, exclude_none=True)
+        lines.append(f"\n### Recorded Grounded Architecture (`record_architecture`)\n```json\n{arch_json}\n```")
+    if "pre_findings" in views:
+        baseline_eval = compute_baseline_evaluation(bundle, component_scope=(run.scope == "component"))
+        lines.extend(render_pre_findings_slice(baseline_eval.pre_findings, views))
+    return lines
+
+
+def _render_projected_facts(
+    run: WorkflowRunRecord,
+    action: ActionRunRecord,
+    bundle: WorkflowFactsBundle,
+    project_root: Path,
+    facts_path: str,
+) -> list[str]:
+    """Render step-scoped fact slices instead of dumping the full bundle on every step."""
+    views = resolve_fact_views(action)
+    if "all" in views:
+        return _render_bundle_facts(bundle)
+    if "plan" in views:
+        plan = _load_run_plan(run)
+        return ["\n" + render_plan_markdown(plan)] if plan is not None else []
+    if "rollup" in views:
+        rf = execute_rollup_collect(run, project_root)
+        return [render_rollup_facts_markdown(rf)]
+    if "report_only" in views:
+        return [f"\n- **Deterministic Facts Cache**: `{facts_path}` (full blueprint embedded above)."]
+
+    return [
+        f"\n- **Projected Fact Views**: `{views}` (full drill-down cache: `{facts_path}`)",
+        *_render_projected_static_views(views, bundle),
+        *_render_projected_dynamic_views(run, views, bundle),
+    ]
+
+
+def _build_action_prompt_payload(
     run: WorkflowRunRecord,
     action: ActionRunRecord,
     all_actions: list[ActionRunRecord],
     project_root: Path,
+    *,
     db: WorkflowStateDB | None = None,
-) -> str:
-    """Format the complete deterministic prompt for a single stateful action step."""
-    pni_cfg = load_pni_config(project_root)
+    auto_completed: list[str] | None = None,
+    other_ready: list[ActionRunRecord] | None = None,
+    full_schema: bool = False,
+) -> ActionPromptPayload:
+    """Build both structured ActionPromptPayload and rendered Markdown prompt for an action."""
+    eff_opt_outs = _effective_opt_outs(project_root, run)
     bundle = _assemble_facts_bundle(run, all_actions, db=db)
+    plan = _load_run_plan(run)
+    facts_rel = _resolve_facts_rel_path(run, action)
+    if not bundle.companion_ast_facts and (project_root / facts_rel).is_file():
+        with contextlib.suppress(Exception):
+            raw_cached = (project_root / facts_rel).read_text(encoding="utf-8")
+            cached_bundle = WorkflowFactsBundle.model_validate_json(raw_cached)
+            bundle.companion_ast_facts = cached_bundle.companion_ast_facts
+
     origin = f" (from `{action.source_action}`)" if action.source_action else ""
     effective_params: dict[str, ParamValue] = {
         "workflow_id": run.workflow_id,
-        "facts_path": _resolve_facts_rel_path(run, action),
+        "facts_path": facts_rel,
         "architecture_path": _resolve_arch_rel_path(run, action),
         "score_path": _resolve_score_rel_path(run, action),
         **action.params,
     }
+    if action.primitive_type == PrimitiveType.WRITE_DRAWLIB_REPORT and plan is not None and plan.approval is not None:
+        if plan.approval.report_lang:
+            effective_params["lang"] = plan.approval.report_lang
+        if plan.approval.report_formats:
+            effective_params["formats"] = list(plan.approval.report_formats)
+
     base_line = (
         [f"- **Based On Audit**: `{run.based_on}` (SQLite run: `{run.based_on_run_id or '-'}`)"]
         if run.based_on
         else []
     )
+    auto_lines = (
+        [
+            "- **Auto-Completed Deterministic Step(s) Before This Action**: "
+            + ", ".join(f"`{item}`" for item in auto_completed)
+        ]
+        if auto_completed
+        else []
+    )
+    parallel_lines = (
+        [
+            "- **Also Ready for Parallel Execution (`get-actions --ready`)**: "
+            + ", ".join(f"`{a.action_id}` (`{a.step_key or a.primitive_type.value}`)" for a in other_ready)
+        ]
+        if other_ready
+        else []
+    )
+    plan_banner = render_approved_plan_banner(plan) if action.primitive_type != PrimitiveType.CONFIRM_PLAN else []
+
     lines: list[str] = [
         f"# PNI Workflow Action: `{action.action_id}` ({action.seq}/{len(all_actions)})",
-        f"- **Workflow Run ID**: `{run.run_id}` (`{run.workflow_id}`, category=`{run.category.value}`)",
+        (
+            f"- **Workflow Run ID**: `{run.run_id}` (`{run.workflow_id}`, "
+            f"category=`{run.category.value}`, scope=`{run.scope}`)"
+        ),
         *base_line,
-        f"- **Action ID**: `{action.action_id}`",
+        *auto_lines,
+        *parallel_lines,
+        *plan_banner,
+        f"- **Action ID**: `{action.action_id}` (`step_key={action.step_key or action.action_id}`)",
         f"- **Primitive Type**: `{action.primitive_type.value}`{origin}",
         f"- **Step Name**: {action.name}\n",
         "## Action Instructions",
@@ -1042,21 +1471,25 @@ def _format_action_guide(
         ),
     ]
 
-    lines.extend(_render_bundle_facts(bundle))
-    lines.extend(_render_active_opt_outs(pni_cfg.opt_out))
-    lines.extend(_render_active_rules(action.rules, project_root))
+    lines.extend(_render_projected_facts(run, action, bundle, project_root, facts_rel))
+    if action.primitive_type != PrimitiveType.CONFIRM_PLAN:
+        lines.extend(_render_active_opt_outs(eff_opt_outs))
+        lines.extend(_render_active_rules(action.rules, project_root))
 
     if action.primitive_type in (
-        PrimitiveType.EMIT_SCORE,
         PrimitiveType.EMIT_MIGRATION_PLAN,
         PrimitiveType.EMIT_PROGRESS,
-        PrimitiveType.WRITE_DRAWLIB_REPORT,
     ):
         lines.extend(_render_prior_interpretations(all_actions))
     if action.primitive_type == PrimitiveType.EMIT_SCORE:
         lines.extend(
             render_pre_score_digest_markdown(
-                compile_workflow_digest(all_actions, bundle, opt_outs=pni_cfg.opt_out)
+                compile_workflow_digest(
+                    all_actions,
+                    bundle,
+                    opt_outs=eff_opt_outs,
+                    component_scope=(run.scope == "component"),
+                )
             )
         )
     if action.primitive_type == PrimitiveType.WRITE_DRAWLIB_REPORT:
@@ -1076,7 +1509,16 @@ def _format_action_guide(
             ]
         )
 
-    schema_str = get_expected_input_schema_json(action.primitive_type, action.params)
+    schema_str = get_expected_input_schema_json(action.primitive_type, action.params, compact=not full_schema)
+    model_name = get_expected_input_model(action.primitive_type, action.params).__name__
+    schema_heading = (
+        f"### Required `INPUT` JSON Schema (`{model_name}` — full):"
+        if full_schema
+        else (
+            f"### Required `INPUT` Compact Schema (`{model_name}`, `key?` = optional; "
+            "pass `--full-schema` for full JSON Schema):"
+        )
+    )
     lines.extend(
         [
             "\n## Submit Action Result (`push-action`)",
@@ -1085,71 +1527,136 @@ def _format_action_guide(
             f"pni workflows push-action {run.run_id} {action.action_id} '<JSON_INPUT>'",
             f"# Or from a JSON file: pni workflows push-action {run.run_id} {action.action_id} --file <path.json>",
             "```",
-            "\n### Required `INPUT` JSON Schema:",
+            f"\n{schema_heading}",
             f"```json\n{schema_str}\n```",
         ]
     )
-    return "\n".join(lines) + "\n"
+    markdown_text = "\n".join(lines) + "\n"
+    return ActionPromptPayload(
+        run_id=run.run_id,
+        workflow_id=run.workflow_id,
+        action_id=action.action_id,
+        step_key=action.step_key or action.action_id,
+        seq=action.seq,
+        total_actions=len(all_actions),
+        primitive_type=action.primitive_type,
+        name=action.name,
+        source_action=action.source_action,
+        needs=list(action.needs),
+        fact_views=resolve_fact_views(action),
+        rules=list(action.rules),
+        facts_path=facts_rel,
+        expected_input_model=model_name,
+        schema_skeleton=schema_str,
+        auto_completed_actions=list(auto_completed or []),
+        prompt_markdown=markdown_text,
+    )
 
 
-def get_workflow_action(
+def _format_action_guide(
+    run: WorkflowRunRecord,
+    action: ActionRunRecord,
+    all_actions: list[ActionRunRecord],
+    project_root: Path,
+    db: WorkflowStateDB | None = None,
+    *,
+    auto_completed: list[str] | None = None,
+    other_ready: list[ActionRunRecord] | None = None,
+    full_schema: bool = False,
+) -> str:
+    """Format the complete deterministic prompt for a single stateful action step."""
+    payload = _build_action_prompt_payload(
+        run,
+        action,
+        all_actions,
+        project_root,
+        db=db,
+        auto_completed=auto_completed,
+        other_ready=other_ready,
+        full_schema=full_schema,
+    )
+    return payload.prompt_markdown
+
+
+def get_ready_workflow_actions(
     run_id: str,
     project_root: Path,
-) -> tuple[WorkflowRunRecord | None, ActionRunRecord | None, str]:
-    """Fetch and prepare the current pending/active action for a workflow run.
-
-    Args:
-        run_id: Workflow run identifier (e.g. 'wf-1a2b3c4d').
-        project_root: Workspace root directory.
-
-    Returns:
-        tuple[WorkflowRunRecord | None, ActionRunRecord | None, str]:
-            Run record, current action record (None if workflow finished), and Markdown output.
-    """
+    *,
+    full_schema: bool = False,
+) -> tuple[WorkflowRunRecord | None, list[ActionPromptPayload], str]:
+    """Auto-advance deterministic steps and return all DAG-ready AI/gate actions as structured payloads."""
     db = WorkflowStateDB(project_root)
     run = db.get_run(run_id)
     if run is None:
-        return None, None, f"Error: Workflow run '{run_id}' not found in .pni/cache/workflow_state.db."
+        return None, [], f"Error: Workflow run '{run_id}' not found in .pni/cache/workflow_state.db."
     if run.status == RunStatus.CANCELLED:
         msg = (
             f"Error: Workflow run '{run_id}' ({run.workflow_id}) was cancelled. "
             f"Start a new run with 'pni workflows start {run.workflow_id}'."
         )
-        return None, None, msg
+        return None, [], msg
 
-    current = db.get_current_action(run_id)
-    if current is None:
+    auto_completed = _advance_deterministic_actions(db, run, project_root)
+    ready = db.get_ready_actions(run_id)
+    if not ready:
         db.complete_workflow_run(run_id)
         facts_out = _resolve_facts_rel_path(run)
         score_out = _resolve_score_rel_path(run)
         report_out = run.outputs.report or "-"
+        auto_note = (
+            f"- **Auto-Completed Steps**: {', '.join(auto_completed)}\n" if auto_completed else ""
+        )
         done_msg = (
             f"# PNI Workflow Completed (`{run.run_id}`)\n"
             f"- **Workflow**: {run.workflow_name} (`{run.workflow_id}`)\n"
             f"- **Status**: `COMPLETED`\n"
+            f"{auto_note}"
             f"- **Facts Output**: `{facts_out}`\n"
             f"- **Score Output**: `{score_out}`\n"
             f"- **Report Output**: `{report_out}`\n"
         )
-        return run, None, done_msg
+        return run, [], done_msg
 
-    if (
-        current.primitive_type == PrimitiveType.WEB_PENTEST
-        and current.deterministic_output_json is None
-        and not _param_bool(current.params, "force_regenerate_pentests", False)
-    ):
-        _, _, pentest_err = inspect_target_pentests_status(
-            project_root,
-            run.targets.root,
-            workflow_id=run.workflow_id,
-        )
-        if pentest_err is not None:
-            raise WorkflowPrerequisiteError(pentest_err)
-
-    current = _execute_deterministic_step_if_needed(db, run, current, project_root)
     all_actions = db.get_actions(run_id)
-    guide = _format_action_guide(run, current, all_actions, project_root, db=db)
-    return run, current, guide
+    payloads = [
+        _build_action_prompt_payload(
+            run,
+            act,
+            all_actions,
+            project_root,
+            db=db,
+            auto_completed=auto_completed if idx == 0 else [],
+            other_ready=[other for other in ready if other.action_id != act.action_id],
+            full_schema=full_schema,
+        )
+        for idx, act in enumerate(ready)
+    ]
+    return run, payloads, payloads[0].prompt_markdown
+
+
+def get_workflow_action(
+    run_id: str,
+    project_root: Path,
+    *,
+    full_schema: bool = False,
+) -> tuple[WorkflowRunRecord | None, ActionRunRecord | None, str]:
+    """Auto-advance ready deterministic steps and return the next actionable AI/gate step.
+
+    Args:
+        run_id: Workflow run identifier (e.g. 'wf-1a2b3c4d').
+        project_root: Workspace root directory.
+        full_schema: Emit full verbose JSON Schema instead of compact skeleton.
+
+    Returns:
+        tuple[WorkflowRunRecord | None, ActionRunRecord | None, str]:
+            Run record, next ready action record (None if workflow finished), and Markdown output.
+    """
+    run, payloads, guide = get_ready_workflow_actions(run_id, project_root, full_schema=full_schema)
+    if run is None or not payloads:
+        return run, None, guide
+    db = WorkflowStateDB(project_root)
+    act = next((a for a in db.get_actions(run_id) if a.action_id == payloads[0].action_id), None)
+    return run, act, payloads[0].prompt_markdown
 
 
 def _set_opt_metric(metrics: dict[str, MetricScalar], key: str, val: float | None) -> None:
@@ -1307,53 +1814,6 @@ def _attach_bundle_artifacts(score_obj: ScoreResult, bundle: WorkflowFactsBundle
     if bundle.architecture_record is not None:
         score_obj.architecture_record = bundle.architecture_record
         _enrich_architecture_overview(score_obj, bundle.architecture_record)
-
-
-def _enrich_score_result(
-    score_obj: ScoreResult,
-    run: WorkflowRunRecord,
-    action: ActionRunRecord,
-    all_actions: list[ActionRunRecord],
-    db: WorkflowStateDB | None = None,
-    project_root: Path | None = None,
-) -> ScoreResult:
-    """Stamp provenance metadata, pre-sorted audit digest, architecture, and metrics onto ScoreResult."""
-    pni_cfg = load_pni_config(project_root) if project_root is not None else PniConfig()
-    bundle = _assemble_facts_bundle(run, all_actions, db=db)
-    digest = compile_workflow_digest(
-        all_actions,
-        bundle,
-        extra_findings=score_obj.findings,
-        extra_actions=score_obj.action_plan,
-        extra_strengths=score_obj.strengths,
-        opt_outs=pni_cfg.opt_out,
-    )
-    det_metrics = _build_deterministic_metrics(bundle)
-    _attach_bundle_artifacts(score_obj, bundle)
-    if not score_obj.architecture_overview.modules and digest.modules:
-        score_obj.architecture_overview.modules = digest.modules
-
-    score_obj.grade = score_to_grade(score_obj.overall_score)
-    score_obj.workflow_id = run.workflow_id
-    score_obj.workflow_run_id = run.run_id
-    if not score_obj.evaluated_at:
-        score_obj.evaluated_at = datetime.now(timezone.utc).isoformat()
-    score_obj.target_root = run.targets.root
-    score_obj.facts_file = _resolve_facts_rel_path(run, action)
-    score_obj.metrics_snapshot = {**score_obj.metrics_snapshot, **det_metrics}
-    score_obj.category_rationales = _merge_category_rationales(
-        score_obj.category_rationales,
-        digest.category_rationales,
-    )
-    score_obj.audit_dimensions = digest.audit_dimensions
-    score_obj.rule_compliance = digest.rule_compliance
-    score_obj.module_hotspots = digest.module_hotspots
-    score_obj.findings = digest.findings
-    score_obj.consolidated_findings = digest.consolidated_findings
-    score_obj.action_plan = digest.action_plan
-    score_obj.strengths = digest.strengths
-    score_obj.opt_outs = digest.opt_outs
-    return score_obj
 
 
 def _has_prose_annotation(raw_ref: str) -> bool:
@@ -1525,20 +1985,90 @@ def _persist_emitted_score(
     target_root: Path,
     db: WorkflowStateDB | None,
 ) -> str:
-    """Validate, enrich, persist `ScoreResult`, and append/upsert `.pni/history/audit/<id>.jsonl`."""
-    score_obj = ScoreResult.model_validate_json(raw_input)
+    """Validate clean v2 `ScoreSubmissionInput`, assemble `ScoreResult`, and emit Score + Summary + SARIF."""
+    sub = ScoreSubmissionInput.model_validate_json(raw_input)
     _validate_findings_and_actions_paths(
-        score_obj.findings,
-        score_obj.action_plan,
+        sub.extra_findings,
+        sub.extra_action_items,
         project_root,
         target_root,
         bundle.ast_facts,
     )
-    score_obj = _enrich_score_result(score_obj, run, action, all_actions, db=db, project_root=project_root)
+    eff_opt_outs = _effective_opt_outs(project_root, run)
+    digest = compile_workflow_digest(
+        all_actions,
+        bundle,
+        extra_findings=sub.extra_findings,
+        extra_actions=sub.extra_action_items,
+        extra_strengths=sub.extra_strengths,
+        opt_outs=eff_opt_outs,
+        component_scope=(run.scope == "component"),
+        extra_adjustments=sub.finding_adjustments,
+    )
+    proj_name = (
+        bundle.project_facts.project_name
+        if bundle.project_facts is not None and bundle.project_facts.project_name
+        else project_root.name
+    )
+    lang = (
+        bundle.project_facts.language
+        if bundle.project_facts is not None and bundle.project_facts.language
+        else (bundle.ast_facts.language if bundle.ast_facts is not None else "python")
+    )
+    plan = _load_run_plan(run)
+    approved_summary = ""
+    if plan is not None and plan.approval is not None:
+        parts = [plan.approval.alignment_summary.strip()] if plan.approval.alignment_summary.strip() else []
+        if plan.approval.focus_areas:
+            parts.append(f"focus_areas={plan.approval.focus_areas}")
+        if plan.approval.disabled_steps:
+            parts.append(f"disabled_steps={plan.approval.disabled_steps}")
+        approved_summary = "; ".join(parts)
+
+    score_rel = _resolve_score_rel_path(run, action)
+    summary_rel = default_summary_rel_path(score_rel)
+    sarif_rel = default_sarif_rel_path(score_rel)
+
+    score_obj = ScoreResult(
+        schema_version="2.0",
+        project_name=proj_name,
+        workflow_id=run.workflow_id,
+        workflow_run_id=run.run_id,
+        evaluated_at=datetime.now(timezone.utc).isoformat(),
+        language=lang,
+        target_root=run.targets.root,
+        facts_file=_resolve_facts_rel_path(run, action),
+        key_files_inspected=list(sub.key_files_inspected),
+        overall_score=sub.overall_score,
+        grade=score_to_grade(sub.overall_score),
+        category_scores=sub.category_scores,
+        baseline_scores=digest.baseline_scores,
+        category_rationales=_merge_category_rationales(sub.category_rationales, digest.category_rationales),
+        metrics_snapshot=_build_deterministic_metrics(bundle),
+        audit_dimensions=digest.audit_dimensions,
+        rule_compliance=digest.rule_compliance,
+        module_hotspots=digest.module_hotspots,
+        strengths=digest.strengths,
+        findings=digest.findings,
+        consolidated_findings=digest.consolidated_findings,
+        action_plan=digest.action_plan,
+        opt_outs=digest.opt_outs,
+        approved_plan_summary=approved_summary,
+        report_hints=list(sub.report_hints),
+        summary=sub.summary,
+    )
+    _attach_bundle_artifacts(score_obj, bundle)
+    if not score_obj.architecture_overview.modules and digest.modules:
+        score_obj.architecture_overview.modules = digest.modules
+
     canonical = score_obj.model_dump_json(indent=2)
-    score_file = project_root / _resolve_score_rel_path(run, action)
+    score_file = project_root / score_rel
     score_file.parent.mkdir(parents=True, exist_ok=True)
     score_file.write_text(canonical + "\n", encoding="utf-8")
+
+    summary_obj = build_score_summary(score_obj, score_file=score_rel, sarif_file=sarif_rel)
+    write_score_summary(summary_obj, project_root / summary_rel)
+    write_sarif_report(score_obj, project_root / sarif_rel)
     record_audit_history_from_score(project_root, run.workflow_id, score_obj)
     return canonical
 
@@ -1553,9 +2083,12 @@ def _persist_emitted_output(
     target_root: Path,
     db: WorkflowStateDB | None,
 ) -> str:
-    """Dispatch `emit_score`, `emit_migration_plan`, or `emit_progress` persistence."""
+    """Dispatch `emit_score`, `synthesize_rollup`, `emit_migration_plan`, or `emit_progress` persistence."""
     if action.primitive_type == PrimitiveType.EMIT_SCORE:
         return _persist_emitted_score(run, action, all_actions, bundle, raw_input, project_root, target_root, db)
+    if action.primitive_type == PrimitiveType.SYNTHESIZE_ROLLUP:
+        rollup_facts = execute_rollup_collect(run, project_root)
+        return validate_and_persist_rollup(run, action, rollup_facts, raw_input, project_root)
     if action.primitive_type == PrimitiveType.EMIT_MIGRATION_PLAN:
         return validate_and_persist_migration_plan(
             run, action, bundle, raw_input, project_root, _verify_grounded_paths
@@ -1573,6 +2106,14 @@ def _validate_and_apply_push_payload(
 ) -> str:
     """Validate raw_input against the action's Pydantic schema and execute deterministic side effects."""
     ptype = action.primitive_type
+    if ptype == PrimitiveType.CONFIRM_PLAN:
+        approval = PlanApprovalInput.model_validate_json(raw_input)
+        if not approval.approved:
+            msg = "Plan approval rejected (approved=false). Adjust options or cancel the run."
+            raise ValueError(msg)
+        if db is not None:
+            _apply_plan_approval(db, run, _load_run_plan(run), approval, project_root)
+        return approval.model_dump_json(indent=2)
     if ptype == PrimitiveType.RECORD_ARCHITECTURE:
         return _validate_and_persist_architecture(run, action, all_actions, raw_input, project_root, db=db)
     if ptype == PrimitiveType.WRITE_DRAWLIB_REPORT:
@@ -1590,11 +2131,16 @@ def _validate_and_apply_push_payload(
             target_root,
             bundle.ast_facts,
         )
-        pni_cfg = load_pni_config(project_root)
-        parsed.rule_checks = normalize_step_rule_checks(action, parsed, pni_cfg.opt_out)
+        eff_opt_outs = _effective_opt_outs(project_root, run)
+        parsed.rule_checks = normalize_step_rule_checks(action, parsed, eff_opt_outs)
         return parsed.model_dump_json(indent=2)
 
-    if ptype in {PrimitiveType.EMIT_SCORE, PrimitiveType.EMIT_MIGRATION_PLAN, PrimitiveType.EMIT_PROGRESS}:
+    if ptype in {
+        PrimitiveType.EMIT_SCORE,
+        PrimitiveType.SYNTHESIZE_ROLLUP,
+        PrimitiveType.EMIT_MIGRATION_PLAN,
+        PrimitiveType.EMIT_PROGRESS,
+    }:
         return _persist_emitted_output(run, action, all_actions, bundle, raw_input, project_root, target_root, db)
 
     payload = raw_input.strip() or '{"acknowledged": true}'
@@ -1607,11 +2153,11 @@ def push_workflow_action(
     raw_input: str,
     project_root: Path,
 ) -> tuple[bool, str]:
-    """Validate and record the agent's input for the active action and advance the state machine.
+    """Validate and record the agent's input for any DAG-ready action and advance the state machine.
 
     Args:
         run_id: Workflow run identifier.
-        action_id: Expected current action identifier (e.g. 'act-01').
+        action_id: Any DAG-ready action identifier (e.g. 'act-01').
         raw_input: JSON string submitted by the agent.
         project_root: Workspace root directory.
 
@@ -1625,46 +2171,43 @@ def push_workflow_action(
     if run.status == RunStatus.CANCELLED:
         return False, f"Workflow run '{run_id}' was cancelled and cannot accept actions."
 
-    current = db.get_current_action(run_id)
-    if current is None:
+    ready = db.get_ready_actions(run_id)
+    if not ready:
         return False, f"Workflow run '{run_id}' is already completed."
 
-    if current.action_id != action_id:
+    target_act = next((a for a in ready if a.action_id == action_id), None)
+    if target_act is None:
+        ready_ids = [a.action_id for a in ready]
         return (
             False,
-            f"Action mismatch: expected active action '{current.action_id}', but received '{action_id}'. "
+            f"Action mismatch: '{action_id}' is not currently DAG-ready (ready actions: {ready_ids}). "
             f"Run 'pni workflows get-action {run_id}' first.",
         )
 
-    if current.primitive_type in (
-        PrimitiveType.PROJECT_INSPECT,
-        PrimitiveType.AST_ANALYZE,
-        PrimitiveType.RUN_CHECK,
-        PrimitiveType.SECURITY_SCAN,
-        PrimitiveType.WEB_PENTEST,
-        PrimitiveType.MIGRATION_ANALYZE,
-        PrimitiveType.PROGRESS_ANALYZE,
-    ):
-        current = _execute_deterministic_step_if_needed(db, run, current, project_root)
+    if target_act.primitive_type in DETERMINISTIC_PRIMITIVES:
+        target_act = _execute_deterministic_step_if_needed(db, run, target_act, project_root)
 
     all_actions = db.get_actions(run_id)
     try:
-        canonical_json = _validate_and_apply_push_payload(run, current, all_actions, raw_input, project_root, db=db)
+        canonical_json = _validate_and_apply_push_payload(run, target_act, all_actions, raw_input, project_root, db=db)
     except Exception as exc:
-        return False, f"Validation failed for action '{action_id}' ({current.primitive_type.value}):\n{exc}"
+        return False, f"Validation failed for action '{action_id}' ({target_act.primitive_type.value}):\n{exc}"
 
     db.complete_action(run_id, action_id, canonical_json)
-    next_act = db.get_current_action(run_id)
-    if next_act is None:
+    next_ready = db.get_ready_actions(run_id)
+    if not next_ready:
         db.complete_workflow_run(run_id)
         done_msg = (
             f"✓ Action '{action_id}' completed.\n"
             f"★ All actions finished! Workflow '{run_id}' ({run.workflow_id}) is COMPLETED."
         )
     else:
+        nxt = next_ready[0]
+        extra_cnt = len(next_ready) - 1
+        par_note = f" (+{extra_cnt} other ready action(s))" if extra_cnt > 0 else ""
         done_msg = (
-            f"✓ Action '{action_id}' ({current.primitive_type.value}) completed.\n"
-            f"Next action: '{next_act.action_id}' ({next_act.primitive_type.value} - {next_act.name}).\n"
+            f"✓ Action '{action_id}' ({target_act.primitive_type.value}) completed.\n"
+            f"Next ready action: '{nxt.action_id}' ({nxt.primitive_type.value} - {nxt.name}){par_note}.\n"
             f"Run: pni workflows get-action {run_id}"
         )
     return True, done_msg

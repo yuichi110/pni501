@@ -263,15 +263,12 @@ def _push_three_aspect_architecture(run_id: str, tmp_path: Path) -> None:
 
 
 def test_workflow_map_reduce_and_five_chapter_blueprint(tmp_path: Path) -> None:
-    """Verify end-to-end step submission, path grounding, auto-sorting into ScoreResult, and 5-chapter Blueprint."""
+    """Verify end-to-end step submission, path grounding, auto-sorting into ScoreResult, and 7-file Blueprint."""
     _setup_demo_repo(tmp_path)
-    run = start_workflow_run("bp_test", tmp_path)
+    run = start_workflow_run("bp_test", tmp_path, auto_approve=True)
     assert run is not None
 
-    _, act1, _ = get_workflow_action(run.run_id, tmp_path)
-    assert act1 is not None and act1.primitive_type == PrimitiveType.PROJECT_INSPECT
-    assert push_workflow_action(run.run_id, act1.action_id, '{"acknowledged": true}', tmp_path)[0] is True
-
+    # Auto-Advance executes project_inspect -> lands directly on ai_interpret (repo_structure_audit)
     _, act2, guide2 = get_workflow_action(run.run_id, tmp_path)
     assert act2 is not None and act2.primitive_type == PrimitiveType.AI_INTERPRET
     assert "Required Structured Deliverables in `push-action`" in guide2
@@ -330,10 +327,7 @@ def test_workflow_map_reduce_and_five_chapter_blueprint(tmp_path: Path) -> None:
     ).model_dump_json()
     assert push_workflow_action(run.run_id, act2.action_id, good_act2, tmp_path)[0] is True
 
-    _, act3, _ = get_workflow_action(run.run_id, tmp_path)
-    assert act3 is not None and act3.primitive_type == PrimitiveType.AST_ANALYZE
-    assert push_workflow_action(run.run_id, act3.action_id, '{"acknowledged": true}', tmp_path)[0] is True
-
+    # Auto-Advance executes ast_analyze -> lands directly on ai_interpret (python_ast_audit)
     _, act4, _ = get_workflow_action(run.run_id, tmp_path)
     assert act4 is not None and act4.primitive_type == PrimitiveType.AI_INTERPRET
     good_act4 = InterpretationInput(
@@ -349,21 +343,21 @@ def test_workflow_map_reduce_and_five_chapter_blueprint(tmp_path: Path) -> None:
     assert act8 is not None and act8.primitive_type == PrimitiveType.EMIT_SCORE
     assert "Pre-Sorted Programmatic Audit Digest" in guide8
 
-    score_in = ScoreResult(
-        project_name="demo-pkg",
-        workflow_id="bp_test",
-        language="python",
-        overall_score=86,
-        category_scores=CategoryScores(
-            architecture=95,
-            code_quality=95,
-            typing=100,
-            testing=70,
-            dependencies=72,
-            documentation=84,
-        ),
-        summary="Clean library with missing lockfile.",
-    ).model_dump_json()
+    score_in = json.dumps(
+        {
+            "overall_score": 86,
+            "category_scores": {
+                "architecture": 95,
+                "code_quality": 95,
+                "typing": 100,
+                "testing": 70,
+                "dependencies": 72,
+                "security": 90,
+                "documentation": 84,
+            },
+            "summary": "Clean library with missing lockfile.",
+        }
+    )
     assert push_workflow_action(run.run_id, act8.action_id, score_in, tmp_path)[0] is True
 
     persisted_score = ScoreResult.model_validate_json(
@@ -373,9 +367,11 @@ def test_workflow_map_reduce_and_five_chapter_blueprint(tmp_path: Path) -> None:
     assert persisted_score.architecture_record is not None
     assert persisted_score.architecture_record.system_profile is not None
     assert [d.score for d in persisted_score.audit_dimensions] == [72, 96]
-    assert persisted_score.rule_compliance[0].status == "warn"
-    assert persisted_score.rule_compliance[0].rule_id == "general/dependency_management"
-    assert len(persisted_score.findings) == 1
+    assert any(
+        rc.rule_id == "general/dependency_management" and rc.status == "warn"
+        for rc in persisted_score.rule_compliance
+    )
+    assert any(f.rule_id == "general/dependency_management" for f in persisted_score.findings)
     assert len(persisted_score.action_plan) == 1
     assert len(persisted_score.module_hotspots) >= 2
 

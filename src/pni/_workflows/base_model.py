@@ -7,13 +7,13 @@
 # express or implied, including but not limited to the warranties of
 # merchantability, fitness for a particular purpose and noninfringement.
 
-"""Pydantic data models for workflows, targets, outputs, and SQLite state records."""
+"""Pydantic data models for Workflow v2 DAG definitions, plans, rollups, and SQLite state records."""
 
 from __future__ import annotations
 
 from enum import Enum
 from pathlib import Path
-from typing import Optional
+from typing import Literal, Optional
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
@@ -31,13 +31,18 @@ from pni._actions import (
     SecurityFacts,
 )
 
+WorkflowScope = Literal["repo", "component"]
+ReportMode = Literal["unified", "per_component", "both"]
+
 
 class RunStatus(str, Enum):
     """Lifecycle status of a workflow run or individual action run."""
 
     PENDING = "pending"
+    AWAITING_APPROVAL = "awaiting_approval"
     IN_PROGRESS = "in_progress"
     COMPLETED = "completed"
+    SKIPPED = "skipped"
     CANCELLED = "cancelled"
 
 
@@ -45,12 +50,13 @@ class WorkflowCategory(str, Enum):
     """High-level classification of a PNI workflow definition."""
 
     AUDIT = "audit"
+    ROLLUP = "rollup"
     MIGRATION = "migration"
     PROGRESS = "progress"
 
 
 class WorkflowPrerequisiteError(ValueError):
-    """Raised when a workflow's prerequisite 'based_on' audit workflow or progress/pentest input is missing."""
+    """Raised when a workflow's prerequisite audit, rollup score, pentest, or progress input is missing."""
 
 
 class WorkflowTargets(BaseModel):
@@ -71,8 +77,19 @@ class WorkflowOutputs(BaseModel):
     report: Optional[str] = None
 
 
+class RollupComponentSpec(BaseModel):
+    """Declarative component sub-audit reference inside a `category: rollup` workflow."""
+
+    id: str
+    workflow_id: Optional[str] = None
+    root: str = "."
+    lang: Optional[str] = None
+    weight: Optional[float] = Field(default=None, gt=0.0)
+    primary: bool = True
+
+
 class WorkflowStepSpec(BaseModel):
-    """Specification of a single step inside a workflow YAML."""
+    """Specification of a single DAG step inside a workflow YAML."""
 
     model_config = ConfigDict(populate_by_name=True)
 
@@ -81,17 +98,24 @@ class WorkflowStepSpec(BaseModel):
     description: str = ""
     uses: Optional[str] = None
     action: Optional[PrimitiveType] = None
+    needs: list[str] = Field(default_factory=list)
+    when: Optional[str] = None
+    fact_views: list[str] = Field(default_factory=list)
     rules: list[str] = Field(default_factory=list)
     with_params: dict[str, ParamValue] = Field(default_factory=dict, alias="with")
     prompt: str = ""
 
 
 class WorkflowDefinition(BaseModel):
-    """Complete workflow definition parsed from .pni/workflows/*.yaml."""
+    """Complete Workflow v2 DAG definition parsed from .pni/workflows/*.yaml."""
 
     id: str
     category: WorkflowCategory = WorkflowCategory.AUDIT
+    scope: WorkflowScope = "repo"
+    plan_gate: bool = True
+    report_mode: ReportMode = "unified"
     based_on: Optional[str] = None
+    includes: list[RollupComponentSpec] = Field(default_factory=list)
     name: str
     description: str = ""
     targets: WorkflowTargets = Field(default_factory=WorkflowTargets)
@@ -99,8 +123,8 @@ class WorkflowDefinition(BaseModel):
     steps: list[WorkflowStepSpec] = Field(default_factory=list)
 
     @model_validator(mode="after")
-    def _validate_category_and_based_on(self) -> WorkflowDefinition:
-        """Normalize 'based_on' and enforce audit/migration/progress relationship invariants."""
+    def _validate_category_and_relationships(self) -> WorkflowDefinition:
+        """Normalize 'based_on' and enforce audit/rollup/migration/progress invariants."""
         if self.based_on is not None:
             cleaned = self.based_on.strip().removesuffix(".yaml").strip()
             self.based_on = cleaned or None
@@ -121,6 +145,10 @@ class WorkflowDefinition(BaseModel):
                 f"Workflow '{self.id}' has category='audit' and cannot specify 'based_on' "
                 "(set 'category: migration' or 'category: progress' instead)."
             )
+            raise ValueError(msg)
+
+        if self.category == WorkflowCategory.ROLLUP and not self.includes:
+            msg = f"Workflow '{self.id}' has category='rollup' and must specify at least one item in 'includes'."
             raise ValueError(msg)
 
         return self
@@ -155,38 +183,51 @@ class WorkflowFactsBundle(BaseModel):
     progress_facts: Optional[ProgressFacts] = None
     architecture_record: Optional[ArchitectureRecord] = None
     base_score_result: Optional[ScoreResult] = None
+    companion_ast_facts: dict[str, AstFacts] = Field(default_factory=dict)
 
 
 class ActionRunRecord(BaseModel):
-    """SQLite-persisted execution state of a single normalized primitive action."""
+    """SQLite-persisted execution state of a single normalized DAG primitive action."""
 
     run_id: str
     action_id: str
     seq: int
+    step_key: str = ""
     primitive_type: PrimitiveType
     name: str
     source_action: Optional[str] = None
+    needs: list[str] = Field(default_factory=list)
+    when: Optional[str] = None
+    fact_views: list[str] = Field(default_factory=list)
     rules: list[str] = Field(default_factory=list)
     params: dict[str, ParamValue] = Field(default_factory=dict)
     prompt: str = ""
     status: RunStatus = RunStatus.PENDING
+    skip_reason: Optional[str] = None
     deterministic_output_json: Optional[str] = None
     agent_input_json: Optional[str] = None
     updated_at: str = ""
 
 
 class WorkflowRunRecord(BaseModel):
-    """SQLite-persisted execution state of a started workflow session."""
+    """SQLite-persisted execution state of a started Workflow v2 session."""
 
     run_id: str
     workflow_id: str
     category: WorkflowCategory = WorkflowCategory.AUDIT
+    scope: WorkflowScope = "repo"
+    plan_gate: bool = True
+    report_mode: ReportMode = "unified"
     based_on: Optional[str] = None
     based_on_run_id: Optional[str] = None
+    includes: list[RollupComponentSpec] = Field(default_factory=list)
     workflow_name: str
     description: str = ""
     status: RunStatus = RunStatus.IN_PROGRESS
     targets: WorkflowTargets
     outputs: WorkflowOutputs
+    plan_json: Optional[str] = None
+    plan_approved: bool = False
+    auto_approved: bool = False
     created_at: str
     updated_at: str

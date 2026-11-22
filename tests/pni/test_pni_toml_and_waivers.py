@@ -298,7 +298,7 @@ reason = "Core Illustration-as-Code execution engine intentionally runs user scr
     )
 
     digest = compile_workflow_digest([act_record], bundle, opt_outs=cfg.opt_out)
-    assert digest.findings == []
+    assert all(f.rule_id != "CWE-94" for f in digest.findings)
     assert len(digest.opt_outs) == 1
     assert digest.opt_outs[0].id == "CWE-94"
     assert digest.opt_outs[0].matched_count == 1

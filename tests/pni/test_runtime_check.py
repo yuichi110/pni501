@@ -20,9 +20,9 @@ import pytest
 
 from pni._actions import (
     AstFacts,
-    CategoryScores,
     ModuleAstSummary,
     ModuleCoverageItem,
+    PrimitiveType,
     ProjectFacts,
     RuntimeCheckOptions,
     ScoreResult,
@@ -488,41 +488,28 @@ def test_stateful_workflow_run_check_and_blueprint_integration(tmp_path: Path) -
         encoding="utf-8",
     )
 
-    run = start_workflow_run("rt_flow", tmp_path)
+    run = start_workflow_run("rt_flow", tmp_path, auto_approve=True)
     assert run is not None
 
-    # Step 1: project_inspect
-    _, act1, _ = get_workflow_action(run.run_id, tmp_path)
-    assert act1 is not None and act1.action_id == "act-01"
-    ok1, _ = push_workflow_action(run.run_id, "act-01", '{"acknowledged": true}', tmp_path)
-    assert ok1
-
-    # Step 2: run_check
-    _, act2, guide2 = get_workflow_action(run.run_id, tmp_path)
-    assert act2 is not None and act2.action_id == "act-02"
-    assert "Containerized Runtime Verification" in guide2
-    ok2, _ = push_workflow_action(run.run_id, "act-02", '{"acknowledged": true}', tmp_path)
-    assert ok2
-
-    # Step 3: emit_score
-    _, act3, _ = get_workflow_action(run.run_id, tmp_path)
-    assert act3 is not None and act3.action_id == "act-03"
-    score_payload = ScoreResult(
-        project_name="demo",
-        workflow_id="rt_flow",
-        language="python",
-        overall_score=90,
-        category_scores=CategoryScores(
-            architecture=90,
-            code_quality=90,
-            typing=90,
-            testing=90,
-            dependencies=90,
-            documentation=90,
-        ),
-        summary="Verified runtime flow.",
-    ).model_dump_json()
-    ok3, _ = push_workflow_action(run.run_id, "act-03", score_payload, tmp_path)
+    # Auto-Advance executes project_inspect and run_check automatically -> lands on emit_score
+    _, act_score, _ = get_workflow_action(run.run_id, tmp_path)
+    assert act_score is not None and act_score.primitive_type == PrimitiveType.EMIT_SCORE
+    score_payload = json.dumps(
+        {
+            "overall_score": 90,
+            "category_scores": {
+                "architecture": 90,
+                "code_quality": 90,
+                "typing": 90,
+                "testing": 90,
+                "dependencies": 90,
+                "security": 90,
+                "documentation": 90,
+            },
+            "summary": "Verified runtime flow.",
+        }
+    )
+    ok3, _ = push_workflow_action(run.run_id, act_score.action_id, score_payload, tmp_path)
     assert ok3
 
     saved_score = ScoreResult.model_validate_json(

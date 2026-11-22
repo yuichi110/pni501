@@ -15,15 +15,19 @@ import json
 from pathlib import Path
 from typing import Final
 
+from pydantic import BaseModel
+
 from pni._actions.base_model import (
     ArchitectureRecord,
     DeterministicAckInput,
     ExecutionFlowMap,
     InterpretationInput,
     ParamValue,
+    PlanApprovalInput,
     PrimitiveType,
     ReportCompletionInput,
-    ScoreResult,
+    RollupSynthesisInput,
+    ScoreSubmissionInput,
     StructureMap,
     SystemProfile,
 )
@@ -78,23 +82,112 @@ _ARCH_ASPECT_MODELS: Final[dict[str, type[SystemProfile | StructureMap | Executi
 }
 
 
-def get_expected_input_schema_json(
+def get_expected_input_model(
     primitive_type: PrimitiveType,
     params: dict[str, ParamValue] | None = None,
-) -> str:
-    """Return the formatted JSON Schema expected by push-action for a primitive type."""
+) -> type[BaseModel]:
+    """Return the Pydantic input model expected by push-action for a primitive type."""
     if primitive_type == PrimitiveType.RECORD_ARCHITECTURE:
         aspect = str((params or {}).get("aspect", "all")).strip()
-        arch_cls = _ARCH_ASPECT_MODELS.get(aspect, ArchitectureRecord)
-        return json.dumps(arch_cls.model_json_schema(), indent=2)
-    model_map = {
+        return _ARCH_ASPECT_MODELS.get(aspect, ArchitectureRecord)
+    model_map: dict[PrimitiveType, type[BaseModel]] = {
+        PrimitiveType.CONFIRM_PLAN: PlanApprovalInput,
         PrimitiveType.AI_INTERPRET: InterpretationInput,
-        PrimitiveType.EMIT_SCORE: ScoreResult,
+        PrimitiveType.EMIT_SCORE: ScoreSubmissionInput,
+        PrimitiveType.SYNTHESIZE_ROLLUP: RollupSynthesisInput,
         PrimitiveType.EMIT_MIGRATION_PLAN: MigrationPlanResult,
         PrimitiveType.EMIT_PROGRESS: ProgressResult,
         PrimitiveType.WRITE_DRAWLIB_REPORT: ReportCompletionInput,
     }
-    schema_cls = model_map.get(primitive_type, DeterministicAckInput)
+    return model_map.get(primitive_type, DeterministicAckInput)
+
+
+def _compact_scalar_type(prop: dict[str, object]) -> object:
+    """Render a compact scalar placeholder string for primitive JSON Schema types."""
+    ptype = prop.get("type")
+    if ptype == "integer":
+        lo, hi = prop.get("minimum"), prop.get("maximum")
+        return f"int({lo}..{hi})" if lo is not None or hi is not None else "int"
+    if ptype == "string":
+        min_len = prop.get("minLength")
+        return f"string(min_len={min_len})" if min_len else "string"
+    return {"number": "float", "boolean": "bool"}.get(str(ptype), "any")
+
+
+def _compact_object_node(
+    prop: dict[str, object],
+    defs: dict[str, dict[str, object]],
+    depth: int,
+) -> object:
+    """Render a compact object skeleton from JSON Schema properties or additionalProperties."""
+    props = prop.get("properties")
+    if isinstance(props, dict) and depth < 3:
+        raw_req = prop.get("required")
+        req = set(raw_req) if isinstance(raw_req, list) else set()
+        return {
+            (k if k in req else f"{k}?"): _compact_schema_node(sub, defs, depth + 1)
+            for k, sub in props.items()
+            if isinstance(sub, dict)
+        }
+    add_props = prop.get("additionalProperties")
+    if isinstance(add_props, dict):
+        return {"<key>": _compact_schema_node(add_props, defs, depth + 1)}
+    return "{}"
+
+
+def _compact_schema_node(
+    prop: dict[str, object],
+    defs: dict[str, dict[str, object]],
+    depth: int = 0,
+) -> object:
+    """Recursively render a concise human/LLM-friendly JSON skeleton from JSON Schema."""
+    ref = prop.get("$ref")
+    if isinstance(ref, str):
+        ref_name = ref.rsplit("/", maxsplit=1)[-1]
+        return (
+            _compact_schema_node(defs[ref_name], defs, depth + 1)
+            if ref_name in defs and depth < 3
+            else f"<{ref_name}>"
+        )
+    any_of = prop.get("anyOf")
+    if isinstance(any_of, list):
+        non_null = [p for p in any_of if isinstance(p, dict) and p.get("type") != "null"]
+        return (
+            _compact_schema_node(non_null[0], defs, depth)
+            if len(non_null) == 1
+            else " | ".join(str(_compact_schema_node(p, defs, depth + 1)) for p in non_null[:3])
+        )
+    enum_vals = prop.get("enum")
+    if isinstance(enum_vals, list):
+        return " | ".join(repr(v) for v in enum_vals)
+    ptype = prop.get("type")
+    if ptype == "object":
+        return _compact_object_node(prop, defs, depth)
+    if ptype == "array":
+        items = prop.get("items")
+        return [_compact_schema_node(items, defs, depth + 1)] if isinstance(items, dict) else ["..."]
+    return _compact_scalar_type(prop)
+
+
+def render_compact_schema(model_cls: type[BaseModel]) -> str:
+    """Render a compact JSON skeleton with inline type hints (`key?` denotes optional fields)."""
+    raw = model_cls.model_json_schema()
+    raw_defs = raw.get("$defs")
+    defs = {k: v for k, v in raw_defs.items() if isinstance(v, dict)} if isinstance(raw_defs, dict) else {}
+    skeleton = _compact_schema_node(raw, defs, depth=0)
+    return json.dumps(skeleton, indent=2)
+
+
+def get_expected_input_schema_json(
+    primitive_type: PrimitiveType,
+    params: dict[str, ParamValue] | None = None,
+    *,
+    compact: bool = False,
+) -> str:
+    """Return the formatted JSON Schema (or compact skeleton) expected by push-action."""
+    schema_cls = get_expected_input_model(primitive_type, params)
+    if compact:
+        return render_compact_schema(schema_cls)
     return json.dumps(schema_cls.model_json_schema(), indent=2)
 
 
@@ -172,7 +265,8 @@ def _render_ai_interpret_checklist(rules: list[str], source_action: str | None) 
         (
             "  3. **`findings` & `action_items`**: Submit grounded violations (`file_path` MUST exist in repo) "
             "and prioritized fixes (`P0` | `P1` | `P2`, populating `related_rules` with rule IDs / CVE IDs). "
-            "PNI will deterministically deduplicate and sort them."
+            "Use `finding_adjustments` (`waive` / `reclassify` with `reason >= 10 chars`) to triage deterministic "
+            "`det-*` pre-findings, and optional `baseline_delta` (`-10..+10`) for qualitative adjustments."
         ),
     ]
 
@@ -258,6 +352,69 @@ def _render_deterministic_task_lines(
     ]
 
 
+_DETERMINISTIC_TASK_TYPES: Final[frozenset[PrimitiveType]] = frozenset(
+    {
+        PrimitiveType.PROJECT_INSPECT,
+        PrimitiveType.AST_ANALYZE,
+        PrimitiveType.RUN_CHECK,
+        PrimitiveType.SECURITY_SCAN,
+        PrimitiveType.WEB_PENTEST,
+        PrimitiveType.MIGRATION_ANALYZE,
+        PrimitiveType.PROGRESS_ANALYZE,
+    }
+)
+
+
+def _render_emit_and_report_lines(
+    primitive_type: PrimitiveType,
+    params: dict[str, ParamValue],
+    arch_path: str,
+    score_path: str,
+    plan_path: str,
+    prog_path: str,
+    project_root: Path | None,
+) -> list[str]:
+    """Render directive lines for emission, rollup synthesis, and Drawlib report primitives."""
+    if primitive_type == PrimitiveType.EMIT_SCORE:
+        return [
+            f"- **Agent Task (`emit_score` — v2 Clean Score Submission)**: Review the Deterministic 7-Axis "
+            f"Baseline Scores and Pre-Sorted Programmatic Audit Digest below, then submit the compact "
+            f"`ScoreSubmissionInput` DTO (`overall_score`, `category_scores`, `category_rationales`, `summary`, "
+            f"optional `finding_adjustments` / `extra_findings` / `extra_action_items` / `report_hints`). "
+            f"PNI automatically merges deterministic pre-findings, prior `ai_interpret` evidence, runtime/security/"
+            f"pentest facts, and writes `{score_path}`, `*_summary.json`, and `*_findings.sarif` (SARIF 2.1.0)."
+        ]
+    if primitive_type == PrimitiveType.SYNTHESIZE_ROLLUP:
+        return [
+            f"- **Agent Task (`synthesize_rollup` — Multi-Component Executive Synthesis)**: Review the "
+            f"Deterministic Multi-Component Rollup Summary (component weights, 7-axis rolled-up scores, "
+            f"weakest-link guardrails, root governance, and companion DSLs) below and submit `RollupSynthesisInput` "
+            f"(`summary`, `cross_component_architecture`, `boundary_findings`, `unified_action_plan`, `strengths`, "
+            f"`report_hints`). PNI writes unified `{score_path}`, `*_summary.json`, and `*_findings.sarif`."
+        ]
+    if primitive_type == PrimitiveType.EMIT_MIGRATION_PLAN:
+        return [
+            f"- **Agent Task (`emit_migration_plan`)**: Synthesize all deterministic `MigrationFacts` and the "
+            f"confirmed `brief` into a validated `MigrationPlanResult` JSON (`confirmed_assumptions`, `non_goals`, "
+            f"dynamic `target_axes`, `target_architecture` with Port/Adapter `component_mappings`, `decision_log`, "
+            f"5-stage `phase_gates`, and topologically ordered `pr_wbs`). Every As-Is file in `affected_files`, "
+            f"`component_mappings[].source_file`, and `decision_log[].file_path` MUST exist in the repository. "
+            f"PNI attaches `migration_facts` and writes `{plan_path}`."
+        ]
+    if primitive_type == PrimitiveType.EMIT_PROGRESS:
+        return [
+            f"- **Agent Task (`emit_progress`)**: Synthesize deterministic `ProgressFacts` and target code "
+            f"inspection into a validated `ProgressResult` JSON (`delivery_status`, `overall_health_score`, "
+            f"4-axis `dimension_scores`, per-task `task_assessments` matching exact `task_id`s from `.pni/progress/`, "
+            f"`branch_assessments`, `bottlenecks_and_risks`, and prioritized `next_actions`). Do NOT modify "
+            f"`.pni/progress/*.yaml` during measurement. PNI verifies baseline plan hash & paths, writes "
+            f"`{prog_path}`, and updates `.pni/history/progress/`."
+        ]
+    if primitive_type == PrimitiveType.WRITE_DRAWLIB_REPORT:
+        return [_render_report_directive(params, arch_path, project_root)]
+    return []
+
+
 def render_action_task_body(
     primitive_type: PrimitiveType,
     params: dict[str, ParamValue],
@@ -274,34 +431,32 @@ def render_action_task_body(
     cache_key = workflow_id or target
     output_dir = str(params.get("output_dir", DEFAULT_REPORT_OUTPUT_DIR))
     facts_path = str(params.get("facts_path", default_facts_rel_path(cache_key)))
-    rt_facts_path = default_runtime_facts_rel_path(cache_key)
-    sec_facts_path = default_security_facts_rel_path(cache_key)
-    pentest_facts_path = default_pentest_facts_rel_path(cache_key)
-    mig_facts_path = default_migration_facts_rel_path(cache_key)
-    prog_facts_path = default_progress_facts_rel_path(cache_key)
     arch_path = str(params.get("architecture_path", default_architecture_rel_path(cache_key)))
     score_path = str(params.get("score_path", f"{output_dir.rstrip('/')}/{target}_score.json"))
     plan_path = resolve_migration_plan_rel_path(output_dir, target, str(params.get("plan_path", "")))
     prog_path = resolve_progress_result_rel_path(output_dir, target, str(params.get("progress_path", "")))
 
-    if primitive_type in (
-        PrimitiveType.PROJECT_INSPECT,
-        PrimitiveType.AST_ANALYZE,
-        PrimitiveType.RUN_CHECK,
-        PrimitiveType.SECURITY_SCAN,
-        PrimitiveType.WEB_PENTEST,
-        PrimitiveType.MIGRATION_ANALYZE,
-        PrimitiveType.PROGRESS_ANALYZE,
-    ):
+    if primitive_type == PrimitiveType.CONFIRM_PLAN:
+        lines.extend(
+            [
+                "- **Agent Task (`confirm_plan` — Human-in-the-Loop DAG Alignment Gate)**: "
+                "Present the validated Mermaid Execution DAG, detected scope/language/harness summary, and "
+                "Alignment Questions below to the user BEFORE executing heavy audit stages.",
+                "- **After User Alignment**: Submit `PlanApprovalInput` (`approved: true`, plus any agreed "
+                "`confirmed_targets`, `disabled_steps`, `focus_areas`, `extra_opt_outs`, `report_lang`, "
+                "`report_formats`, `report_mode`, and `alignment_summary`).",
+            ]
+        )
+    elif primitive_type in _DETERMINISTIC_TASK_TYPES:
         lines.extend(
             _render_deterministic_task_lines(
                 primitive_type,
                 facts_path,
-                rt_facts_path,
-                sec_facts_path,
-                mig_facts_path,
-                pentest_facts_path,
-                prog_facts_path,
+                default_runtime_facts_rel_path(cache_key),
+                default_security_facts_rel_path(cache_key),
+                default_migration_facts_rel_path(cache_key),
+                default_pentest_facts_rel_path(cache_key),
+                default_progress_facts_rel_path(cache_key),
             )
         )
     elif primitive_type == PrimitiveType.LOAD_RULES:
@@ -315,35 +470,18 @@ def render_action_task_body(
         lines.append(f"- **Persistence Target**: PNI validates paths and updates `{arch_path}`.")
     elif primitive_type == PrimitiveType.AI_INTERPRET:
         lines.extend(_render_ai_interpret_checklist(rules or [], source_action))
-    elif primitive_type == PrimitiveType.EMIT_SCORE:
-        lines.append(
-            f"- **Agent Task (Score Emission)**: Review the Pre-Sorted Programmatic Audit Digest below and "
-            f"submit 7-axis `ScoreResult` JSON (`architecture`, `code_quality`, `typing`, `testing`, "
-            f"`dependencies`, `security`, `documentation`). PNI automatically merges & deterministically sorts "
-            f"all prior `findings`, `rule_compliance`, `audit_dimensions`, `module_hotspots`, `action_plan`, "
-            f"`runtime_facts`, `security_facts`, `pentest_facts`, `module_inventory`, `dangerous_sinks`, "
-            f"`api_endpoints`, and `architecture_record` into `{score_path}`."
+    else:
+        lines.extend(
+            _render_emit_and_report_lines(
+                primitive_type,
+                params,
+                arch_path,
+                score_path,
+                plan_path,
+                prog_path,
+                project_root,
+            )
         )
-    elif primitive_type == PrimitiveType.EMIT_MIGRATION_PLAN:
-        lines.append(
-            f"- **Agent Task (`emit_migration_plan`)**: Synthesize all deterministic `MigrationFacts` and the "
-            f"confirmed `brief` into a validated `MigrationPlanResult` JSON (`confirmed_assumptions`, `non_goals`, "
-            f"dynamic `target_axes`, `target_architecture` with Port/Adapter `component_mappings`, `decision_log`, "
-            f"5-stage `phase_gates`, and topologically ordered `pr_wbs`). Every As-Is file in `affected_files`, "
-            f"`component_mappings[].source_file`, and `decision_log[].file_path` MUST exist in the repository. "
-            f"PNI attaches `migration_facts` and writes `{plan_path}`."
-        )
-    elif primitive_type == PrimitiveType.EMIT_PROGRESS:
-        lines.append(
-            f"- **Agent Task (`emit_progress`)**: Synthesize deterministic `ProgressFacts` and target code "
-            f"inspection into a validated `ProgressResult` JSON (`delivery_status`, `overall_health_score`, "
-            f"4-axis `dimension_scores`, per-task `task_assessments` matching exact `task_id`s from `.pni/progress/`, "
-            f"`branch_assessments`, `bottlenecks_and_risks`, and prioritized `next_actions`). Do NOT modify "
-            f"`.pni/progress/*.yaml` during measurement. PNI verifies baseline plan hash & paths, writes "
-            f"`{prog_path}`, and updates `.pni/history/progress/`."
-        )
-    elif primitive_type == PrimitiveType.WRITE_DRAWLIB_REPORT:
-        lines.append(_render_report_directive(params, arch_path, project_root))
 
     if prompt.strip():
         lines.append(f"\n{prompt.strip()}")

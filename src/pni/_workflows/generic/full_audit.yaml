@@ -1,7 +1,7 @@
 id: full_audit
 category: audit
 name: Full Project Health Audit & Report (Multi-Language)
-description: Deterministic Tree-sitter AST and repository inspection, grounded architecture analysis, security audit, score emission, and drawlib report creation for any supported language.
+description: Workflow v2 DAG — Plan-First alignment, parallel deterministic Tree-sitter AST, containerized runtime verification (when harness available), security scan, grounded architecture, score+SARIF emission, and Drawlib report.
 
 targets:
   docs:
@@ -13,15 +13,25 @@ steps:
 
   - id: ast_and_quality
     uses: generic_ast_audit
+    needs: [repo_and_deps]
 
-  - id: arch_recording
-    uses: architecture_analysis
+  - id: runtime_verification
+    uses: container_runtime_audit
+    needs: [repo_and_deps]
+    when: "has_runtime_harness"
 
   - id: security_audit
     uses: security_vulnerability_audit
+    needs: [repo_and_deps]
+
+  - id: arch_recording
+    uses: architecture_analysis
+    needs: [ast_and_quality]
 
   - id: output_score
     uses: emit_score
+    needs: [arch_recording, runtime_verification, security_audit]
 
   - id: create_report
     uses: write_drawlib_report
+    needs: [output_score]

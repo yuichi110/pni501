@@ -21,8 +21,10 @@ from pni._actions.base_model import (
     ActionItem,
     AppliedOptOut,
     AuditDimensionScore,
+    CategoryScores,
     ConsolidatedFinding,
     Finding,
+    FindingAdjustment,
     HealthGrade,
     InterpretationInput,
     ModuleHotspot,
@@ -37,6 +39,7 @@ from pni._actions.security_scan.models import SecurityFacts
 from pni._cache import normalize_target_subpath
 from pni._config import OptOutEntry, match_opt_out, matches_opt_out_scope
 from pni._workflows.base_model import ActionRunRecord, WorkflowFactsBundle
+from pni._workflows.baseline import apply_finding_adjustments, compute_baseline_evaluation
 
 SEVERITY_RANK: Final[dict[str, int]] = {
     "critical": 0,
@@ -76,6 +79,8 @@ _BASE_HEALTHY_RISK: Final[float] = 0.06
 class CompiledAuditDigest(BaseModel):
     """Deterministically aggregated, deduplicated, and sorted digest of all completed workflow actions."""
 
+    baseline_scores: CategoryScores | None = None
+    baseline_overall: int | None = None
     audit_dimensions: list[AuditDimensionScore] = Field(default_factory=list)
     rule_compliance: list[RuleCheckResult] = Field(default_factory=list)
     findings: list[Finding] = Field(default_factory=list)
@@ -87,6 +92,7 @@ class CompiledAuditDigest(BaseModel):
     suggested_category_scores: dict[str, int] = Field(default_factory=dict)
     category_rationales: dict[str, str] = Field(default_factory=dict)
     opt_outs: list[AppliedOptOut] = Field(default_factory=list)
+    applied_adjustments: list[FindingAdjustment] = Field(default_factory=list)
 
 
 def score_to_grade(score: int) -> HealthGrade:
@@ -479,6 +485,60 @@ def _collect_applied_opt_outs(
     return applied
 
 
+def _accumulate_interpret_actions(
+    actions: list[ActionRunRecord],
+    baseline_scores: CategoryScores,
+    opt_outs: Sequence[OptOutEntry],
+    mod_map: dict[str, ModuleSummary],
+    ai_opt_out_counts: dict[str, int],
+) -> tuple[
+    list[tuple[int, AuditDimensionScore]],
+    list[RuleCheckResult],
+    list[Finding],
+    list[ActionItem],
+    list[str],
+    list[FindingAdjustment],
+    dict[str, list[int]],
+    dict[str, str],
+]:
+    """Accumulate structured outputs across completed `ai_interpret` steps."""
+    seq_dims: list[tuple[int, AuditDimensionScore]] = []
+    checks: list[RuleCheckResult] = []
+    findings: list[Finding] = []
+    items: list[ActionItem] = []
+    strengths: list[str] = []
+    adjustments: list[FindingAdjustment] = []
+    cat_buckets: dict[str, list[int]] = {}
+    cat_rationales: dict[str, str] = {}
+
+    for act in actions:
+        if act.primitive_type != PrimitiveType.AI_INTERPRET or act.agent_input_json is None:
+            continue
+        parsed = InterpretationInput.model_validate_json(act.agent_input_json)
+        adjustments.extend(parsed.finding_adjustments)
+        filtered = _filter_findings_by_opt_out(parsed.findings, opt_outs, ai_opt_out_counts)
+        parsed = parsed.model_copy(update={"findings": filtered})
+        step_checks = normalize_step_rule_checks(act, parsed, opt_outs)
+        checks.extend(step_checks)
+        seq_dims.append(_build_audit_dimension(act, parsed, step_checks))
+        findings.extend(filtered)
+        items.extend(_filter_actions_by_opt_out(parsed.action_items, opt_outs))
+        strengths.extend(parsed.strengths)
+        for mod in parsed.modules:
+            mod_map.setdefault(mod.path, mod)
+        for cat, val in parsed.suggested_scores.items():
+            cat_buckets.setdefault(cat, []).append(val)
+        for cat, delta in parsed.baseline_delta.items():
+            if hasattr(baseline_scores, cat):
+                anchored = max(0, min(100, int(getattr(baseline_scores, cat)) + delta))
+                cat_buckets.setdefault(cat, []).append(anchored)
+        for cat, text in parsed.category_rationales.items():
+            if text.strip():
+                cat_rationales[cat] = text.strip()
+
+    return seq_dims, checks, findings, items, strengths, adjustments, cat_buckets, cat_rationales
+
+
 def compile_workflow_digest(
     actions: list[ActionRunRecord],
     bundle: WorkflowFactsBundle,
@@ -486,43 +546,39 @@ def compile_workflow_digest(
     extra_actions: list[ActionItem] | None = None,
     extra_strengths: list[str] | None = None,
     opt_outs: Sequence[OptOutEntry] = (),
+    *,
+    component_scope: bool = False,
+    extra_adjustments: Sequence[FindingAdjustment] = (),
 ) -> CompiledAuditDigest:
-    """Compile and deterministically sort all step outputs from a stateful workflow run."""
-    seq_dims: list[tuple[int, AuditDimensionScore]] = []
-    all_checks: list[RuleCheckResult] = []
-    raw_findings: list[Finding] = []
-    raw_actions: list[ActionItem] = []
-    raw_strengths: list[str] = []
+    """Compile and deterministically sort deterministic pre-findings + AI step outputs."""
+    baseline_eval = compute_baseline_evaluation(bundle, component_scope=component_scope)
     mod_map: dict[str, ModuleSummary] = {}
-    cat_buckets: dict[str, list[int]] = {}
-    cat_rationales: dict[str, str] = {}
     ai_opt_out_counts: dict[str, int] = {}
 
     if bundle.architecture_record and bundle.architecture_record.structure_map:
         for mod in bundle.architecture_record.structure_map.modules:
             mod_map[mod.path] = mod
 
-    for act in actions:
-        if act.primitive_type != PrimitiveType.AI_INTERPRET or act.agent_input_json is None:
-            continue
-        parsed = InterpretationInput.model_validate_json(act.agent_input_json)
-        filtered_step_findings = _filter_findings_by_opt_out(parsed.findings, opt_outs, ai_opt_out_counts)
-        parsed = parsed.model_copy(update={"findings": filtered_step_findings})
-        step_checks = normalize_step_rule_checks(act, parsed, opt_outs)
-        all_checks.extend(step_checks)
-        seq_dims.append(_build_audit_dimension(act, parsed, step_checks))
-        raw_findings.extend(filtered_step_findings)
-        raw_actions.extend(_filter_actions_by_opt_out(parsed.action_items, opt_outs))
-        raw_strengths.extend(parsed.strengths)
-        for mod in parsed.modules:
-            mod_map.setdefault(mod.path, mod)
-        for cat, val in parsed.suggested_scores.items():
-            cat_buckets.setdefault(cat, []).append(val)
-        for cat, text in parsed.category_rationales.items():
-            if text.strip():
-                cat_rationales[cat] = text.strip()
+    (
+        seq_dims,
+        step_checks,
+        step_findings,
+        raw_actions,
+        raw_strengths,
+        all_adjustments,
+        cat_buckets,
+        cat_rationales,
+    ) = _accumulate_interpret_actions(actions, baseline_eval.baseline_scores, opt_outs, mod_map, ai_opt_out_counts)
 
-    raw_findings.extend(_filter_findings_by_opt_out(list(extra_findings or []), opt_outs, ai_opt_out_counts))
+    all_checks = [*baseline_eval.pre_rule_checks, *step_checks]
+    all_adjustments.extend(extra_adjustments)
+    triaged_pre_findings = apply_finding_adjustments(baseline_eval.pre_findings, all_adjustments)
+    filtered_pre_findings = _filter_findings_by_opt_out(triaged_pre_findings, opt_outs, ai_opt_out_counts)
+    raw_findings = [
+        *filtered_pre_findings,
+        *step_findings,
+        *_filter_findings_by_opt_out(list(extra_findings or []), opt_outs, ai_opt_out_counts),
+    ]
     raw_actions.extend(_filter_actions_by_opt_out(list(extra_actions or []), opt_outs))
     raw_strengths.extend(extra_strengths or [])
 
@@ -548,6 +604,8 @@ def compile_workflow_digest(
     applied_opt_outs = _collect_applied_opt_outs(opt_outs, bundle, ai_opt_out_counts)
 
     return CompiledAuditDigest(
+        baseline_scores=baseline_eval.baseline_scores,
+        baseline_overall=baseline_eval.overall_baseline,
         audit_dimensions=sorted_dims,
         rule_compliance=sorted_rules,
         findings=sorted_findings,
@@ -559,6 +617,7 @@ def compile_workflow_digest(
         suggested_category_scores=avg_cats,
         category_rationales=cat_rationales,
         opt_outs=applied_opt_outs,
+        applied_adjustments=all_adjustments,
     )
 
 
@@ -573,9 +632,32 @@ def _render_opt_outs_digest_lines(opt_outs: list[AppliedOptOut]) -> list[str]:
     return lines
 
 
+def _render_digest_findings_and_actions(digest: CompiledAuditDigest) -> list[str]:
+    """Render pre-sorted findings and action plan sections for `render_pre_score_digest_markdown`."""
+    lines: list[str] = []
+    if digest.findings:
+        lines.append(f"- **Pre-Sorted Findings (`CRITICAL -> INFO`, {len(digest.findings)})**:")
+        for f in digest.findings:
+            loc = f" (`{f.file_path}:{f.line}`)" if f.file_path else ""
+            fid = f" `id={f.finding_id}`" if f.finding_id else ""
+            lines.append(f"  - `[{f.severity.upper()}]` `{f.rule_id}`{fid}{loc}: {f.description}")
+    if digest.action_plan:
+        lines.append(f"- **Pre-Sorted Action Items (`P0 -> P2`, {len(digest.action_plan)})**:")
+        for item in digest.action_plan:
+            lines.append(f"  - `[{item.priority}]` **{item.title}** (`{item.category}`): {item.action}")
+    return lines
+
+
 def render_pre_score_digest_markdown(digest: CompiledAuditDigest) -> list[str]:
-    """Render pre-sorted step outputs for the emit_score prompt so AI never drops prior evidence."""
+    """Render deterministic baseline scores and pre-sorted step outputs for `emit_score`."""
     lines = ["\n## Pre-Sorted Programmatic Audit Digest (Auto-Merged into `ScoreResult`)"]
+    if digest.baseline_scores is not None:
+        bs = digest.baseline_scores
+        lines.append(
+            f"- **Deterministic 7-Axis Baseline Scores (Anchor ±10 pt, overall=`{digest.baseline_overall}`)**: "
+            f"`arch={bs.architecture}, code={bs.code_quality}, typing={bs.typing}, test={bs.testing}, "
+            f"deps={bs.dependencies}, sec={bs.security}, docs={bs.documentation}`"
+        )
     if digest.suggested_category_scores:
         lines.append(f"- **Suggested Category Averages**: `{digest.suggested_category_scores}`")
     lines.extend(_render_opt_outs_digest_lines(digest.opt_outs))
@@ -588,20 +670,11 @@ def render_pre_score_digest_markdown(digest: CompiledAuditDigest) -> list[str]:
             )
     if digest.rule_compliance:
         lines.append(f"- **Sorted Rule Compliance Matrix (`FAIL -> WARN -> PASS`, {len(digest.rule_compliance)})**:")
-        for rc in digest.rule_compliance:
-            lines.append(f"  - `[{rc.status.upper()}]` `{rc.rule_id}`: {rc.evidence}")
-    if digest.findings:
-        lines.append(f"- **Pre-Sorted Findings (`CRITICAL -> INFO`, {len(digest.findings)})**:")
-        for f in digest.findings:
-            loc = f" (`{f.file_path}:{f.line}`)" if f.file_path else ""
-            lines.append(f"  - `[{f.severity.upper()}]` `{f.rule_id}`{loc}: {f.description}")
-    if digest.action_plan:
-        lines.append(f"- **Pre-Sorted Action Items (`P0 -> P2`, {len(digest.action_plan)})**:")
-        for item in digest.action_plan:
-            lines.append(f"  - `[{item.priority}]` **{item.title}** (`{item.category}`): {item.action}")
+        lines.extend(f"  - `[{rc.status.upper()}]` `{rc.rule_id}`: {rc.evidence}" for rc in digest.rule_compliance)
+    lines.extend(_render_digest_findings_and_actions(digest))
     lines.append(
-        "- *Note*: PNI automatically merges and deterministically re-sorts all prior `findings`, "
-        "`rule_compliance`, `audit_dimensions`, `module_hotspots`, `action_plan`, `runtime_facts`, "
-        "and `architecture_record` into `<target>_score.json` when you push `ScoreResult`."
+        "- *Note*: Submit compact `ScoreSubmissionInput`. PNI automatically merges deterministic pre-findings, "
+        "applies `finding_adjustments`, sorts all evidence, and emits `*_score.json`, `*_summary.json`, and "
+        "`*_findings.sarif`."
     )
     return lines

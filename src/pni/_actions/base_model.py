@@ -41,6 +41,7 @@ __exported_archetype__ = RuntimeArchetype
 class PrimitiveType(str, Enum):
     """Canonical internal primitive action types executed or rendered by PNI."""
 
+    CONFIRM_PLAN = "confirm_plan"
     AST_ANALYZE = "ast_analyze"
     PROJECT_INSPECT = "project_inspect"
     RUN_CHECK = "run_check"
@@ -54,6 +55,7 @@ class PrimitiveType(str, Enum):
     EMIT_SCORE = "emit_score"
     EMIT_MIGRATION_PLAN = "emit_migration_plan"
     EMIT_PROGRESS = "emit_progress"
+    SYNTHESIZE_ROLLUP = "synthesize_rollup"
     WRITE_DRAWLIB_REPORT = "write_drawlib_report"
 
 
@@ -61,8 +63,12 @@ class PrimitiveStep(BaseModel):
     """Normalized internal primitive action step."""
 
     id: str
+    step_key: str = ""
     name: str
     type: PrimitiveType
+    needs: list[str] = Field(default_factory=list)
+    when: Optional[str] = None
+    fact_views: list[str] = Field(default_factory=list)
     rules: list[str] = Field(default_factory=list)
     params: dict[str, ParamValue] = Field(default_factory=dict)
     prompt: str = ""
@@ -76,6 +82,8 @@ class CompositePrimitiveSpec(BaseModel):
 
     type: PrimitiveType
     name: Optional[str] = None
+    when: Optional[str] = None
+    fact_views: list[str] = Field(default_factory=list)
     rules: list[str] = Field(default_factory=list)
     with_params: dict[str, ParamValue] = Field(default_factory=dict, alias="with")
     prompt: str = ""
@@ -274,6 +282,9 @@ class ModuleHotspot(BaseModel):
 class Finding(BaseModel):
     """A single rule-based finding with exact code location and deterministic evidence."""
 
+    finding_id: str = ""
+    source: Literal["deterministic", "ai"] = "ai"
+    component: Optional[str] = None
     severity: SeverityLevel
     category: str = ""
     rule_id: str
@@ -286,6 +297,15 @@ class Finding(BaseModel):
     evidence: str = ""
     description: str
     recommendation: str
+
+
+class FindingAdjustment(BaseModel):
+    """AI false-positive waiver or severity adjustment targeting a deterministic finding_id."""
+
+    finding_id: str
+    action: Literal["waive", "reclassify"]
+    new_severity: Optional[SeverityLevel] = None
+    reason: str = Field(min_length=10)
 
 
 class ConsolidatedFinding(BaseModel):
@@ -396,6 +416,7 @@ class ActionItem(BaseModel):
     priority: PriorityLevel
     title: str
     category: str
+    component: Optional[str] = None
     target_files: list[str] = Field(
         default_factory=list,
         description="Exact existing repository-relative file or directory paths ONLY (no parenthetical descriptions).",
@@ -414,9 +435,29 @@ class AppliedOptOut(BaseModel):
     matched_count: int = 0
 
 
+class ComponentScoreSummary(BaseModel):
+    """Per-component scorecard preserved inside a multi-language Rollup ScoreResult."""
+
+    component_id: str
+    language: str
+    root: str = "."
+    weight: float = 1.0
+    primary: bool = True
+    total_loc: int = 0
+    overall_score: int = Field(ge=0, le=100)
+    grade: HealthGrade = "B"
+    category_scores: CategoryScores
+    measured_line_coverage_pct: Optional[float] = None
+    findings_count: int = 0
+    critical_or_high_count: int = 0
+    score_file: str = ""
+    summary: str = ""
+
+
 class ScoreResult(BaseModel):
     """Rich intermediate diagnostic artifact (reports/<target>_score.json) for AI report & remediation."""
 
+    schema_version: str = "2.0"
     project_name: str
     workflow_id: str
     workflow_run_id: str = ""
@@ -428,6 +469,7 @@ class ScoreResult(BaseModel):
     overall_score: int = Field(ge=0, le=100)
     grade: HealthGrade = "B"
     category_scores: CategoryScores
+    baseline_scores: Optional[CategoryScores] = None
     category_rationales: CategoryRationales = Field(default_factory=CategoryRationales)
     metrics_snapshot: dict[str, MetricScalar] = Field(default_factory=dict)
     runtime_facts: Optional[RuntimeFacts] = None
@@ -447,12 +489,98 @@ class ScoreResult(BaseModel):
     consolidated_findings: list[ConsolidatedFinding] = Field(default_factory=list)
     action_plan: list[ActionItem] = Field(default_factory=list)
     opt_outs: list[AppliedOptOut] = Field(default_factory=list)
+    components: list[ComponentScoreSummary] = Field(default_factory=list)
+    approved_plan_summary: str = ""
     report_hints: list[str] = Field(default_factory=list)
     summary: str
 
 
+class ScoreSummary(BaseModel):
+    """Lightweight (~2 KB) summary manifest (reports/<target>_summary.json) for portals & CI."""
+
+    schema_version: str = "2.0"
+    project_name: str
+    workflow_id: str
+    workflow_run_id: str = ""
+    evaluated_at: str = ""
+    language: str
+    target_root: str = "."
+    overall_score: int = Field(ge=0, le=100)
+    grade: HealthGrade = "B"
+    category_scores: CategoryScores
+    baseline_scores: Optional[CategoryScores] = None
+    total_loc: int = 0
+    measured_line_coverage_pct: Optional[float] = None
+    passed_rules: int = 0
+    applicable_rules: int = 0
+    finding_counts: dict[str, int] = Field(default_factory=dict)
+    components: list[ComponentScoreSummary] = Field(default_factory=list)
+    score_file: str = ""
+    sarif_file: str = ""
+    summary: str = ""
+
+
+class PlanTargetOverride(BaseModel):
+    """Optional target scope overrides agreed with the human during confirm_plan."""
+
+    root: Optional[str] = None
+    source: Optional[list[str]] = None
+    tests: Optional[list[str]] = None
+    docs: Optional[list[str]] = None
+    exclude: Optional[list[str]] = None
+
+
+class PlanOptOutItem(BaseModel):
+    """Additional design waiver agreed with the human during confirm_plan."""
+
+    id: str
+    scope: list[str] = Field(default_factory=list)
+    reason: str = Field(min_length=10)
+
+
+class PlanApprovalInput(BaseModel):
+    """Structured human-alignment confirmation payload pushed on `confirm_plan`."""
+
+    approved: bool = True
+    confirmed_targets: Optional[PlanTargetOverride] = None
+    enabled_steps: list[str] = Field(default_factory=list)
+    disabled_steps: list[str] = Field(default_factory=list)
+    focus_areas: list[str] = Field(default_factory=list)
+    extra_opt_outs: list[PlanOptOutItem] = Field(default_factory=list)
+    report_lang: Optional[str] = None
+    report_formats: list[str] = Field(default_factory=list)
+    report_mode: Literal["unified", "per_component", "both"] = "unified"
+    alignment_summary: str = ""
+
+
+class ScoreSubmissionInput(BaseModel):
+    """Clean v2 minimal judgment payload submitted by the AI agent for `emit_score`."""
+
+    overall_score: int = Field(ge=0, le=100)
+    category_scores: CategoryScores
+    category_rationales: CategoryRationales = Field(default_factory=CategoryRationales)
+    summary: str
+    key_files_inspected: list[str] = Field(default_factory=list)
+    finding_adjustments: list[FindingAdjustment] = Field(default_factory=list)
+    extra_findings: list[Finding] = Field(default_factory=list)
+    extra_action_items: list[ActionItem] = Field(default_factory=list)
+    extra_strengths: list[str] = Field(default_factory=list)
+    report_hints: list[str] = Field(default_factory=list)
+
+
+class RollupSynthesisInput(BaseModel):
+    """Clean v2 cross-component synthesis payload submitted by the AI agent for `synthesize_rollup`."""
+
+    summary: str
+    cross_component_architecture: str = ""
+    boundary_findings: list[Finding] = Field(default_factory=list)
+    unified_action_plan: list[ActionItem] = Field(default_factory=list)
+    strengths: list[str] = Field(default_factory=list)
+    report_hints: list[str] = Field(default_factory=list)
+
+
 class DeterministicAckInput(BaseModel):
-    """Agent acknowledgment payload pushed after reviewing a deterministic step."""
+    """Optional explicit acknowledgment payload when a step sets `pause_for_ack`."""
 
     acknowledged: bool = True
     note: str = ""
@@ -467,9 +595,20 @@ class InterpretationInput(BaseModel):
     strengths: list[str] = Field(default_factory=list)
     category_rationales: dict[str, str] = Field(default_factory=dict)
     suggested_scores: dict[str, int] = Field(default_factory=dict)
+    baseline_delta: dict[str, int] = Field(default_factory=dict)
+    finding_adjustments: list[FindingAdjustment] = Field(default_factory=list)
     modules: list[ModuleSummary] = Field(default_factory=list)
     findings: list[Finding] = Field(default_factory=list)
     action_items: list[ActionItem] = Field(default_factory=list)
+
+    @model_validator(mode="after")
+    def _validate_baseline_delta_bounds(self) -> InterpretationInput:
+        """Enforce bounded qualitative AI adjustment (-10..+10) per category."""
+        for cat, delta in self.baseline_delta.items():
+            if delta < -10 or delta > 10:
+                msg = f"baseline_delta['{cat}']={delta} exceeds bounded AI adjustment range [-10, +10]."
+                raise ValueError(msg)
+        return self
 
 
 class ReportCompletionInput(BaseModel):

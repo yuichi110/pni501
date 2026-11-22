@@ -36,6 +36,7 @@ from pni._workflows.base_model import (
     WorkflowInfo,
     WorkflowOutputs,
     WorkflowPrerequisiteError,
+    WorkflowStepSpec,
     WorkflowTargets,
 )
 
@@ -201,7 +202,7 @@ def _propagate_emitted_score(
     emitted_plan: str | None = None
     emitted_progress: str | None = None
     for prim in primitives:
-        if prim.type == PrimitiveType.EMIT_SCORE:
+        if prim.type in {PrimitiveType.EMIT_SCORE, PrimitiveType.SYNTHESIZE_ROLLUP}:
             raw_score = prim.params.get("score_path")
             if isinstance(raw_score, str) and raw_score:
                 emitted_score = raw_score
@@ -227,7 +228,7 @@ def _propagate_emitted_score(
 
 def _resolve_emitted_output_from_prim(workflow_id: str, prim: PrimitiveStep) -> str | None:
     """Resolve emitted score/plan/progress path from a single primitive step if applicable."""
-    if prim.type == PrimitiveType.EMIT_SCORE:
+    if prim.type in {PrimitiveType.EMIT_SCORE, PrimitiveType.SYNTHESIZE_ROLLUP}:
         raw_score = prim.params.get("score_path")
         return raw_score if isinstance(raw_score, str) and raw_score else None
     if prim.type == PrimitiveType.EMIT_MIGRATION_PLAN:
@@ -291,12 +292,33 @@ def resolve_workflow_outputs(
     return WorkflowOutputs(facts=facts, score=score, report=report)
 
 
+def _effective_workflow_steps(workflow: WorkflowDefinition) -> list[WorkflowStepSpec]:
+    """Return declared workflow steps or default rollup steps when category=='rollup' omits steps."""
+    if workflow.steps:
+        return list(workflow.steps)
+    if workflow.category == WorkflowCategory.ROLLUP:
+        return [
+            WorkflowStepSpec(
+                id="synthesize_rollup",
+                name="Synthesize Multi-Component Rollup",
+                action=PrimitiveType.SYNTHESIZE_ROLLUP,
+            ),
+            WorkflowStepSpec(
+                id="generate_report",
+                name="Generate Unified Multi-Component Report",
+                action=PrimitiveType.WRITE_DRAWLIB_REPORT,
+                needs=["synthesize_rollup"],
+            ),
+        ]
+    return []
+
+
 def normalize_workflow_steps(
     workflow: WorkflowDefinition,
     project_root: Path,
     lang: Optional[str] = None,
 ) -> list[PrimitiveStep]:
-    """Convert workflow steps into internal PrimitiveSteps injected with targets and action-defined outputs.
+    """Convert workflow steps into internal DAG PrimitiveSteps injected with targets and outputs.
 
     Args:
         workflow: Parsed workflow definition.
@@ -304,7 +326,7 @@ def normalize_workflow_steps(
         lang: Optional language scope override (resolved from target_root if omitted).
 
     Returns:
-        list[PrimitiveStep]: Flat list of internal primitive steps.
+        list[PrimitiveStep]: Flat list of internal DAG primitive steps.
     """
     pni_cfg = load_pni_config(project_root)
     target_root_dir = (project_root / workflow.targets.root).resolve()
@@ -315,6 +337,8 @@ def normalize_workflow_steps(
     base_context: dict[str, ParamValue] = {
         "workflow_id": workflow.id,
         "workflow_category": workflow.category.value,
+        "workflow_scope": workflow.scope,
+        "report_mode": workflow.report_mode,
         "target_root": workflow.targets.root,
         "source_targets": workflow.targets.source,
         "test_targets": workflow.targets.tests,
@@ -327,10 +351,36 @@ def normalize_workflow_steps(
     toml_path_overrides, toml_report_only = _build_pni_toml_report_overrides(pni_cfg)
     legacy_overrides = _build_legacy_output_overrides(workflow.outputs)
 
+    effective_steps = _effective_workflow_steps(workflow)
+    workflow_uses_dag = any(bool(s.needs) for s in effective_steps)
+    has_explicit_confirm = any(s.action == PrimitiveType.CONFIRM_PLAN for s in effective_steps)
+
     normalized: list[PrimitiveStep] = []
     explicit_report_score_steps: set[str] = set()
 
-    for step in workflow.steps:
+    if workflow.plan_gate and effective_steps and not has_explicit_confirm:
+        confirm_params = _finalize_primitive_params(
+            {**toml_path_overrides, **legacy_overrides},
+            base_context,
+            workflow.id,
+        )
+        normalized.append(
+            PrimitiveStep(
+                id="confirm_plan",
+                step_key="confirm_plan",
+                name="Confirm Audit Plan & Execution DAG",
+                type=PrimitiveType.CONFIRM_PLAN,
+                params=confirm_params,
+                prompt=(
+                    "Review the Phase 0 Recon findings, validated Mermaid execution DAG, and alignment "
+                    "questions with the user, then push PlanApprovalInput to launch execution."
+                ),
+            )
+        )
+
+    prepend_confirm_dep = bool(normalized and normalized[0].type == PrimitiveType.CONFIRM_PLAN and workflow_uses_dag)
+
+    for step in effective_steps:
         step_overrides: dict[str, ParamValue] = {
             **toml_path_overrides,
             **legacy_overrides,
@@ -340,6 +390,7 @@ def normalize_workflow_steps(
         display_name = step.name or step.uses or step.id
         step_lang_raw = step.with_params.get("lang")
         step_lang = step_lang_raw if isinstance(step_lang_raw, str) else active_lang
+        eff_needs = list(step.needs) if step.needs else (["confirm_plan"] if prepend_confirm_dep else [])
 
         if step.uses:
             expanded = expand_composite_action(
@@ -351,8 +402,15 @@ def normalize_workflow_steps(
                 override_params=step_overrides,
                 override_prompt=step.prompt,
                 lang=step_lang,
+                step_needs=eff_needs,
+                step_when=step.when,
+                step_fact_views=step.fact_views,
             )
-            for prim in expanded:
+            base_idx = len(normalized)
+            for offset, prim in enumerate(expanded):
+                if offset > 0:
+                    prev_action_id = f"act-{base_idx + offset:02d}"
+                    prim.needs = [prev_action_id]
                 merged_prim_params = (
                     {**prim.params, **toml_report_only, **step.with_params}
                     if prim.type == PrimitiveType.WRITE_DRAWLIB_REPORT
@@ -374,8 +432,12 @@ def normalize_workflow_steps(
             normalized.append(
                 PrimitiveStep(
                     id=step.id,
+                    step_key=step.id,
                     name=display_name,
                     type=step.action,
+                    needs=eff_needs,
+                    when=step.when,
+                    fact_views=list(step.fact_views),
                     rules=step.rules,
                     params=resolved_params,
                     prompt=step.prompt or step.description,

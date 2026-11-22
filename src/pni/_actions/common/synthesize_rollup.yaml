@@ -1,0 +1,10 @@
+id: synthesize_rollup
+name: Synthesize Multi-Component Rollup
+description: Collect completed component sub-audits, compute hybrid weighted 7-axis scores with weakest-link guardrails, and emit unified ScoreResult + Summary + SARIF.
+primitives:
+  - type: synthesize_rollup
+    name: Synthesize Cross-Component Audit Rollup
+    prompt: |
+      Review the rolled-up component scorecard table, weakest-link guardrails, root governance,
+      and companion DSL scan results. Submit RollupSynthesisInput focusing on cross-component
+      architecture contracts, boundary findings, and a unified P0-P2 remediation plan.

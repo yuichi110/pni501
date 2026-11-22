@@ -15,8 +15,7 @@ import json
 from pathlib import Path
 
 from pni._actions import (
-    CategoryScores,
-    ScoreResult,
+    PrimitiveType,
     list_actions,
     load_composite_action,
     run_ast_analyze,
@@ -555,7 +554,8 @@ final class Greeter
     assert loaded is not None
     _, wf_def = loaded
     steps = normalize_workflow_steps(wf_def, tmp_path)
-    assert len(steps) == 5
+    assert len(steps) == 6
+    assert steps[0].type == PrimitiveType.CONFIRM_PLAN
 
     actions = list_actions(tmp_path)
     action_ids = {a.id for a in actions}
@@ -566,66 +566,59 @@ final class Greeter
     assert "php/code_quality" in php_ast.rules
     assert "php/frameworks/wordpress" in php_ast.rules
 
-    run = start_workflow_run("quick_check", tmp_path)
+    run = start_workflow_run("quick_check", tmp_path, auto_approve=True)
     assert run is not None
 
-    # Step 1: project_inspect
-    _, act1, guide1 = get_workflow_action(run.run_id, tmp_path)
-    assert act1 is not None and "build_system: `composer`" in guide1
-    assert push_workflow_action(run.run_id, act1.action_id, '{"acknowledged": true}', tmp_path)[0] is True
-
-    # Step 2: ai_interpret (repo_structure_audit)
-    _, act2, guide2 = get_workflow_action(run.run_id, tmp_path)
-    assert act2 is not None and "Rule `php/dependencies`" in guide2
+    # Auto-Advance executes project_inspect -> pauses at ai_interpret (repo_structure_audit)
+    _, act_repo, guide_repo = get_workflow_action(run.run_id, tmp_path)
+    assert act_repo is not None and act_repo.primitive_type == PrimitiveType.AI_INTERPRET
+    assert "build_system: `composer`" in guide_repo
+    assert "Rule `php/dependencies`" in guide_repo
     assert (
         push_workflow_action(
             run.run_id,
-            act2.action_id,
+            act_repo.action_id,
             json.dumps({"summary": "Composer setup checked.", "findings": []}),
             tmp_path,
         )[0]
         is True
     )
 
-    # Step 3: ast_analyze (PHP AST)
-    _, act3, guide3 = get_workflow_action(run.run_id, tmp_path)
-    assert act3 is not None and "language=`php`" in guide3
-    assert "Type Safety Coverage**: `100.0%`" in guide3
-    assert push_workflow_action(run.run_id, act3.action_id, '{"acknowledged": true}', tmp_path)[0] is True
-
-    # Step 4: ai_interpret (php_ast_audit)
-    _, act4, guide4 = get_workflow_action(run.run_id, tmp_path)
-    assert act4 is not None and "Rule `php/typing`" in guide4
+    # Auto-Advance executes ast_analyze -> pauses at ai_interpret (php_ast_audit)
+    _, act_ast, guide_ast = get_workflow_action(run.run_id, tmp_path)
+    assert act_ast is not None and act_ast.primitive_type == PrimitiveType.AI_INTERPRET
+    assert "language=`php`" in guide_ast
+    assert "Type Safety Coverage**: `100.0%`" in guide_ast
+    assert "Rule `php/typing`" in guide_ast
     assert (
         push_workflow_action(
             run.run_id,
-            act4.action_id,
+            act_ast.action_id,
             json.dumps({"summary": "Strict types and PHPDoc clean.", "findings": []}),
             tmp_path,
         )[0]
         is True
     )
 
-    # Step 5: emit_score
-    _, act5, _ = get_workflow_action(run.run_id, tmp_path)
-    assert act5 is not None
-    score_json = ScoreResult(
-        project_name="demo/php-svc",
-        workflow_id="quick_check",
-        language="php",
-        overall_score=93,
-        category_scores=CategoryScores(
-            architecture=94,
-            code_quality=95,
-            typing=100,
-            testing=80,
-            dependencies=94,
-            documentation=95,
-        ),
-        findings=[],
-        summary="Clean PHP 8.3 service.",
-    ).model_dump_json()
-    ok5, msg5 = push_workflow_action(run.run_id, act5.action_id, score_json, tmp_path)
+    # Final step: emit_score (clean v2 ScoreSubmissionInput)
+    _, act_score, _ = get_workflow_action(run.run_id, tmp_path)
+    assert act_score is not None and act_score.primitive_type == PrimitiveType.EMIT_SCORE
+    score_json = json.dumps(
+        {
+            "overall_score": 93,
+            "category_scores": {
+                "architecture": 94,
+                "code_quality": 95,
+                "typing": 100,
+                "testing": 80,
+                "dependencies": 94,
+                "security": 95,
+                "documentation": 95,
+            },
+            "summary": "Clean PHP 8.3 service.",
+        }
+    )
+    ok5, msg5 = push_workflow_action(run.run_id, act_score.action_id, score_json, tmp_path)
     assert ok5 is True and "COMPLETED" in msg5
 
     db = WorkflowStateDB(tmp_path)

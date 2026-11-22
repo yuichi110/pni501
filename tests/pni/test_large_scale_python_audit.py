@@ -228,19 +228,13 @@ def test_target_exclude_globs_and_generated_facade_wildcard_exemption(tmp_path: 
     prims = normalize_workflow_steps(loaded[1], tmp_path)
     assert prims[0].params["exclude_targets"] == ["**/*_generated.py"]
 
-    run = start_workflow_run("gen_audit", tmp_path)
+    run = start_workflow_run("gen_audit", tmp_path, auto_approve=True)
     assert run is not None
-    _, act1, _ = get_workflow_action(run.run_id, tmp_path)
-    assert act1 is not None
-    assert push_workflow_action(run.run_id, act1.action_id, '{"acknowledged": true}', tmp_path)[0]
-    _, act2, guide2 = get_workflow_action(run.run_id, tmp_path)
-    assert act2 is not None
-    assert "_phosphor_generated.py" not in guide2
-    assert push_workflow_action(run.run_id, act2.action_id, '{"acknowledged": true}', tmp_path)[0]
-    _, act3, guide3 = get_workflow_action(run.run_id, tmp_path)
-    assert act3 is not None
-    assert "_phosphor_generated.py" not in guide3
-    assert "Top 40 of 67 modules by fan-out" in guide3
+    # Auto-Advance executes project_inspect and ast_analyze automatically -> lands straight on ai_interpret
+    _, act_review, guide_review = get_workflow_action(run.run_id, tmp_path)
+    assert act_review is not None and act_review.primitive_type.value == "ai_interpret"
+    assert "_phosphor_generated.py" not in guide_review
+    assert "Top 40 of 67 modules by fan-out" in guide_review
 
 
 def test_venv_dist_info_top_level_and_record_import_resolution(tmp_path: Path) -> None:

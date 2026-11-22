@@ -26,6 +26,7 @@ from pni._actions import (
     CategoryScores,
     HealthGrade,
     InterpretationInput,
+    PrimitiveType,
     ProgressActionItem,
     ProgressDimensionScores,
     ProgressOptions,
@@ -502,20 +503,14 @@ def test_cli_progress_commands_and_full_stateful_workflow_e2e(
     assert "Progress & Git" in adhoc_res.rendered_markdown
 
     # 3. Start stateful workflow run (succeeds even though SQLite has no `core_audit` run!)
-    run_rec = start_workflow_run("dev_progress", repo)
+    run_rec = start_workflow_run("dev_progress", repo, auto_approve=True)
     assert run_rec is not None
     assert run_rec.category == WorkflowCategory.PROGRESS
 
-    # Act-01: progress_analyze
-    _, a1, p1 = get_workflow_action(run_rec.run_id, repo)
-    assert a1 is not None and a1.action_id == "act-01"
-    assert "core_audit" in p1
-    ok1, msg1 = push_workflow_action(run_rec.run_id, "act-01", '{"acknowledged": true}', repo)
-    assert ok1, msg1
-
-    # Act-02: ai_interpret (evaluates PRG-* and GIT-* rules)
-    _, a2, _ = get_workflow_action(run_rec.run_id, repo)
-    assert a2 is not None and a2.action_id == "act-02"
+    # Auto-Advance executes progress_analyze -> lands straight on ai_interpret (evaluates PRG-* and GIT-* rules)
+    _, a2, p2 = get_workflow_action(run_rec.run_id, repo)
+    assert a2 is not None and a2.primitive_type == PrimitiveType.AI_INTERPRET
+    assert "core_audit" in p2
     interp = InterpretationInput(
         summary="Assessed schedule and Git governance facts.",
         step_score=64,
@@ -524,12 +519,12 @@ def test_cli_progress_commands_and_full_stateful_workflow_e2e(
             for rid in a2.rules
         ],
     )
-    ok2, msg2 = push_workflow_action(run_rec.run_id, "act-02", interp.model_dump_json(), repo)
+    ok2, msg2 = push_workflow_action(run_rec.run_id, a2.action_id, interp.model_dump_json(), repo)
     assert ok2, msg2
 
-    # Act-03: emit_progress — verify mid-run `.pni/progress/dev_progress.yaml` mutation is REJECTED (PRG-02)
+    # Next: emit_progress — verify mid-run `.pni/progress/dev_progress.yaml` mutation is REJECTED (PRG-02)
     _, a3, _ = get_workflow_action(run_rec.run_id, repo)
-    assert a3 is not None and a3.action_id == "act-03"
+    assert a3 is not None and a3.primitive_type == PrimitiveType.EMIT_PROGRESS
     plan_path = repo / ".pni" / "progress" / "dev_progress.yaml"
     original_plan_bytes = plan_path.read_bytes()
     plan_path.write_text(
@@ -538,13 +533,13 @@ def test_cli_progress_commands_and_full_stateful_workflow_e2e(
     )
 
     prog_payload = _sample_progress_result().model_dump_json()
-    ok_mutated, msg_mutated = push_workflow_action(run_rec.run_id, "act-03", prog_payload, repo)
+    ok_mutated, msg_mutated = push_workflow_action(run_rec.run_id, a3.action_id, prog_payload, repo)
     assert not ok_mutated
     assert "modified" in msg_mutated.lower() or "sha-256" in msg_mutated.lower()
 
     # Restore baseline YAML and re-submit `emit_progress` -> succeeds and writes JSON + JSONL ledger
     plan_path.write_bytes(original_plan_bytes)
-    ok3, msg3 = push_workflow_action(run_rec.run_id, "act-03", prog_payload, repo)
+    ok3, msg3 = push_workflow_action(run_rec.run_id, a3.action_id, prog_payload, repo)
     assert ok3, msg3
 
     emitted_file = repo / "reports" / "dev_progress.json"
@@ -557,9 +552,9 @@ def test_cli_progress_commands_and_full_stateful_workflow_e2e(
     assert prog_ledger[0].overall_health_score == 64
     assert prog_ledger[0].verified_completion_pct == 40.0
 
-    # Act-04: write_drawlib_report -> materializes 5-chapter `ProgressBlueprint`
+    # Final: write_drawlib_report -> materializes 5-chapter `ProgressBlueprint`
     _, a4, p4 = get_workflow_action(run_rec.run_id, repo)
-    assert a4 is not None and a4.action_id == "act-04"
+    assert a4 is not None and a4.primitive_type == PrimitiveType.WRITE_DRAWLIB_REPORT
     assert "01_schedule_and_milestones.md" in p4
     assert "02_git_methodology_and_conflicts.md" in p4
     assert "03_code_and_test_trajectories.md" in p4
@@ -592,7 +587,7 @@ def test_cli_progress_commands_and_full_stateful_workflow_e2e(
     )
     assert "01_schedule_and_milestones.md" in guide_ja
 
-    # Simulate rendered HTML output and complete Act-04
+    # Simulate rendered HTML output and complete report step
     html_dir = repo / "reports" / "dev_progress_html"
     html_dir.mkdir(parents=True, exist_ok=True)
     html_index = html_dir / "index.html"
@@ -602,6 +597,6 @@ def test_cli_progress_commands_and_full_stateful_workflow_e2e(
         summary="Generated 5-chapter progress report.",
         generated_files=["reports/dev_progress_html/index.html"],
     )
-    ok4, msg4 = push_workflow_action(run_rec.run_id, "act-04", rep_done.model_dump_json(), repo)
+    ok4, msg4 = push_workflow_action(run_rec.run_id, a4.action_id, rep_done.model_dump_json(), repo)
     assert ok4, msg4
     assert RunStatus.COMPLETED.value in msg4 or "completed" in msg4.lower()

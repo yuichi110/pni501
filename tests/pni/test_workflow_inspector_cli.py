@@ -99,12 +99,15 @@ def _setup_inspector_project(tmp_path: Path) -> None:
 
 
 def _complete_demo_run(project_root: Path, run_id: str) -> None:
-    """Step a `demo_wf` run (ast_analyze -> ai_interpret -> emit_score) to completion."""
-    get_workflow_action(run_id, project_root)
-    ok1, _ = push_workflow_action(run_id, "act-01", '{"acknowledged": true}', project_root)
-    assert ok1 is True
+    """Step a `demo_wf` run (confirm_plan -> auto ast_analyze -> ai_interpret -> emit_score) to completion."""
+    _, first, _ = get_workflow_action(run_id, project_root)
+    if first is not None and first.primitive_type == PrimitiveType.CONFIRM_PLAN:
+        ok_plan, _ = push_workflow_action(run_id, first.action_id, '{"approved": true}', project_root)
+        assert ok_plan is True
 
-    get_workflow_action(run_id, project_root)
+    # Auto-Advance runs ast_analyze -> lands straight on ai_interpret
+    _, act_interp, _ = get_workflow_action(run_id, project_root)
+    assert act_interp is not None and act_interp.primitive_type == PrimitiveType.AI_INTERPRET
     interp_payload = json.dumps(
         {
             "summary": "Clean module structure.",
@@ -131,29 +134,27 @@ def _complete_demo_run(project_root: Path, run_id: str) -> None:
             "action_items": [],
         }
     )
-    ok2, _ = push_workflow_action(run_id, "act-02", interp_payload, project_root)
+    ok2, _ = push_workflow_action(run_id, act_interp.action_id, interp_payload, project_root)
     assert ok2 is True
 
-    get_workflow_action(run_id, project_root)
-    score_payload = ScoreResult(
-        project_name="demo",
-        workflow_id="demo_wf",
-        workflow_run_id=run_id,
-        language="python",
-        overall_score=91,
-        grade="S",
-        summary="Demo executive summary.",
-        category_scores=CategoryScores(
-            architecture=92,
-            code_quality=90,
-            typing=95,
-            testing=88,
-            dependencies=92,
-            documentation=90,
-            security=94,
-        ),
-    ).model_dump_json()
-    ok3, _ = push_workflow_action(run_id, "act-03", score_payload, project_root)
+    _, act_score, _ = get_workflow_action(run_id, project_root)
+    assert act_score is not None and act_score.primitive_type == PrimitiveType.EMIT_SCORE
+    score_payload = json.dumps(
+        {
+            "overall_score": 91,
+            "summary": "Demo executive summary.",
+            "category_scores": {
+                "architecture": 92,
+                "code_quality": 90,
+                "typing": 95,
+                "testing": 88,
+                "dependencies": 92,
+                "documentation": 90,
+                "security": 94,
+            },
+        }
+    )
+    ok3, _ = push_workflow_action(run_id, act_score.action_id, score_payload, project_root)
     assert ok3 is True
 
 
@@ -164,11 +165,11 @@ def test_state_db_cancellation_and_engine_guards(tmp_path: Path) -> None:
     assert db.get_actions_map([]) == {}
     assert db.cancel_workflow_run("wf-missing0") is None
 
-    # 1. Start run1, complete step 1, then cancel run1
+    # 1. Start run1, approve confirm_plan (act-01), then cancel run1
     run1 = start_workflow_run("demo_wf", tmp_path)
     assert run1 is not None
     get_workflow_action(run1.run_id, tmp_path)
-    ok_ack, _ = push_workflow_action(run1.run_id, "act-01", '{"acknowledged": true}', tmp_path)
+    ok_ack, _ = push_workflow_action(run1.run_id, "act-01", '{"approved": true}', tmp_path)
     assert ok_ack is True
 
     cancelled = db.cancel_workflow_run(run1.run_id)
@@ -181,6 +182,7 @@ def test_state_db_cancellation_and_engine_guards(tmp_path: Path) -> None:
     assert actions1[0].status == RunStatus.COMPLETED
     assert actions1[1].status == RunStatus.CANCELLED
     assert actions1[2].status == RunStatus.CANCELLED
+    assert actions1[3].status == RunStatus.CANCELLED
 
     # Guard: get_workflow_action & push_workflow_action reject cancelled runs without completing them
     r_after, act_after, msg_get = get_workflow_action(run1.run_id, tmp_path)
@@ -207,7 +209,7 @@ def test_state_db_cancellation_and_engine_guards(tmp_path: Path) -> None:
 
     # 2. Start run2 (left abandoned), then start run3 and complete run3
     run2 = start_workflow_run("demo_wf", tmp_path)
-    run3 = start_workflow_run("demo_wf", tmp_path)
+    run3 = start_workflow_run("demo_wf", tmp_path, auto_approve=True)
     assert run2 is not None and run3 is not None
     _complete_demo_run(tmp_path, run3.run_id)
 
@@ -216,7 +218,7 @@ def test_state_db_cancellation_and_engine_guards(tmp_path: Path) -> None:
         db.cancel_workflow_run(run3.run_id)
 
     # Start run4 AFTER completed run3 -> run4 is a newer active run, NOT superseded!
-    run4 = start_workflow_run("demo_wf", tmp_path)
+    run4 = start_workflow_run("demo_wf", tmp_path, auto_approve=True)
     assert run4 is not None
 
     superseded = db.cancel_superseded_runs()
@@ -226,7 +228,7 @@ def test_state_db_cancellation_and_engine_guards(tmp_path: Path) -> None:
     assert _require_run(db, run4.run_id).status == RunStatus.IN_PROGRESS
 
     # Starting run5 with supersede=True cancels run4 automatically
-    run5 = start_workflow_run("demo_wf", tmp_path, supersede=True)
+    run5 = start_workflow_run("demo_wf", tmp_path, supersede=True, auto_approve=True)
     assert run5 is not None
     assert _require_run(db, run4.run_id).status == RunStatus.CANCELLED
 
@@ -313,11 +315,11 @@ def test_cli_status_inspect_and_cancel_commands(tmp_path: Path) -> None:
         assert res_cancel_no_db.exit_code == 0
 
         # Start orphaned run1, then start run2 (checks warning note about unfinished run1)
-        res_s1 = runner.invoke(app, ["workflows", "start", "demo_wf"])
+        res_s1 = runner.invoke(app, ["workflows", "start", "demo_wf", "--auto-approve"])
         assert res_s1.exit_code == 0
         run1_id = _extract_run_id(res_s1.stdout)
 
-        res_s2 = runner.invoke(app, ["workflows", "start", "demo_wf"])
+        res_s2 = runner.invoke(app, ["workflows", "start", "demo_wf", "--auto-approve"])
         assert res_s2.exit_code == 0
         assert "Older unfinished run(s) exist" in res_s2.stdout
         run2_id = _extract_run_id(res_s2.stdout)
@@ -330,7 +332,7 @@ def test_cli_status_inspect_and_cancel_commands(tmp_path: Path) -> None:
         in_prog_data = json.loads(res_in_prog.stdout)
         assert len(in_prog_data) == 1
         assert in_prog_data[0]["run_id"] == run1_id
-        assert in_prog_data[0]["progress_label"] == "0/3"
+        assert in_prog_data[0]["progress_label"] == "1/4"
 
         # Cancel superseded runs via CLI -> cancels run1
         res_cancel_sup = runner.invoke(app, ["workflows", "cancel", "--superseded", "-w", "demo_wf"])
@@ -348,23 +350,24 @@ def test_cli_status_inspect_and_cancel_commands(tmp_path: Path) -> None:
         assert runner.invoke(app, ["workflows", "cancel", run2_id]).exit_code == 1
         assert runner.invoke(app, ["workflows", "cancel", "wf-00000000"]).exit_code == 1
 
-        # Status --latest (table & JSON) shows completed run2 (3/3)
+        # Status --latest (table & JSON) shows completed run2 (4/4)
         res_latest = runner.invoke(app, ["workflows", "status", "--latest"])
         assert res_latest.exit_code == 0
         assert run2_id in res_latest.stdout
-        assert "3/3" in res_latest.stdout
+        assert "4/4" in res_latest.stdout
 
         # Single-run detail status by workflow_id (both Rich table and --json)
         res_detail = runner.invoke(app, ["workflows", "status", "demo_wf"])
         assert res_detail.exit_code == 0
-        assert "score=88, findings=1" in res_detail.stdout
-        assert "overall=91/100 (S)" in res_detail.stdout
+        flat_detail = " ".join(res_detail.stdout.split())
+        assert "score=88" in flat_detail and "findings=1" in flat_detail
+        assert "overall=91/100 (S)" in flat_detail
 
         res_detail_json = runner.invoke(app, ["workflows", "status", "demo_wf", "--json"])
         assert res_detail_json.exit_code == 0
         detail_obj = json.loads(res_detail_json.stdout)
         assert detail_obj["run"]["run_id"] == run2_id
-        assert len(detail_obj["actions"]) == 3
+        assert len(detail_obj["actions"]) == 4
 
         # inspect-action: Markdown mode, --deterministic, --agent-input, --json, and -o <file>
         res_md = runner.invoke(app, ["workflows", "inspect-action", "demo_wf", "custom_audit"])
@@ -417,10 +420,10 @@ def test_cli_status_inspect_and_cancel_commands(tmp_path: Path) -> None:
         )
         assert runner.invoke(app, ["workflows", "inspect-action", "unknown_wf", "act-01"]).exit_code == 1
         assert runner.invoke(app, ["workflows", "inspect-action", "demo_wf", "bad_step"]).exit_code == 1
-        # act-02 (ai_interpret) has no deterministic_output_json
+        # act-03 (ai_interpret) has no deterministic_output_json
         assert (
             runner.invoke(
-                app, ["workflows", "inspect-action", "demo_wf", "act-02", "--deterministic"]
+                app, ["workflows", "inspect-action", "demo_wf", "act-03", "--deterministic"]
             ).exit_code
             == 1
         )
@@ -433,7 +436,7 @@ def test_cli_status_inspect_and_cancel_commands(tmp_path: Path) -> None:
 
         res_s4 = runner.invoke(app, ["workflows", "start", "demo_wf"])
         run4_id = _extract_run_id(res_s4.stdout)
-        res_s5 = runner.invoke(app, ["workflows", "start", "demo_wf", "--supersede"])
+        res_s5 = runner.invoke(app, ["workflows", "start", "demo_wf", "--supersede", "--auto-approve"])
         assert res_s5.exit_code == 0
         assert "Older unfinished run(s) exist" not in res_s5.stdout
         run5_id = _extract_run_id(res_s5.stdout)

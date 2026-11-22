@@ -151,51 +151,53 @@ def test_cli_stateful_workflow_commands(tmp_path: Path) -> None:
         assert runner.invoke(app, ["workflows", "get-action", "wf-00000000"]).exit_code == 1
         assert runner.invoke(app, ["workflows", "status", "wf-00000000"]).exit_code == 1
 
-        # Action 1: ast_analyze
+        # Action 1: confirm_plan (presents validated Mermaid DAG)
         res_get1 = runner.invoke(app, ["workflows", "get-action", run_id])
         assert res_get1.exit_code == 0
         assert "act-01" in res_get1.stdout
-        assert (tmp_path / ".pni" / "cache" / "mini" / "facts.json").exists()
+        assert "flowchart TD" in res_get1.stdout
 
-        res_push1 = runner.invoke(app, ["workflows", "push-action", run_id, "act-01", '{"acknowledged": true}'])
+        res_push1 = runner.invoke(app, ["workflows", "push-action", run_id, "act-01", '{"approved": true}'])
         assert res_push1.exit_code == 0
 
-        # Action 2: emit_score via --file
+        # Auto-Advance runs act-02 (ast_analyze) automatically -> lands on act-03 (emit_score)
         res_get2 = runner.invoke(app, ["workflows", "get-action", run_id])
         assert res_get2.exit_code == 0
-        assert "act-02" in res_get2.stdout
+        assert "act-03" in res_get2.stdout
+        assert (tmp_path / ".pni" / "cache" / "mini" / "facts.json").exists()
 
         score_file = tmp_path / "payload_score.json"
         score_file.write_text(
-            ScoreResult(
-                project_name="sample",
-                workflow_id="mini",
-                language="python",
-                overall_score=96,
-                category_scores=CategoryScores(
-                    architecture=96,
-                    code_quality=96,
-                    typing=100,
-                    testing=90,
-                    dependencies=96,
-                    documentation=98,
-                ),
-                findings=[],
-                summary="All checks passed.",
-            ).model_dump_json(),
+            json.dumps(
+                {
+                    "overall_score": 96,
+                    "category_scores": {
+                        "architecture": 96,
+                        "code_quality": 96,
+                        "typing": 100,
+                        "testing": 90,
+                        "dependencies": 96,
+                        "security": 95,
+                        "documentation": 98,
+                    },
+                    "summary": "All checks passed.",
+                }
+            ),
             encoding="utf-8",
         )
 
         # Non-existent --file errors cleanly
-        res_no_file = runner.invoke(app, ["workflows", "push-action", run_id, "act-02", "--file", "nope.json"])
+        res_no_file = runner.invoke(app, ["workflows", "push-action", run_id, "act-03", "--file", "nope.json"])
         assert res_no_file.exit_code == 1
 
-        res_push2 = runner.invoke(app, ["workflows", "push-action", run_id, "act-02", "--file", str(score_file)])
+        res_push2 = runner.invoke(app, ["workflows", "push-action", run_id, "act-03", "--file", str(score_file)])
         assert res_push2.exit_code == 0
         assert "COMPLETED" in res_push2.stdout
 
         emitted = json.loads((tmp_path / "reports" / "mini_score.json").read_text(encoding="utf-8"))
         assert emitted["overall_score"] == 96
+        assert (tmp_path / "reports" / "mini_summary.json").is_file()
+        assert (tmp_path / "reports" / "mini_findings.sarif").is_file()
 
         # Status commands
         res_status_list = runner.invoke(app, ["workflows", "status"])

@@ -167,6 +167,11 @@ def _build_executive_summary_chapter(
 
     data = [
         f"- **Executive Synthesis**: {score.summary}",
+        *(
+            [f"- **Approved Audit Scope & Plan**: {score.approved_plan_summary}"]
+            if score.approved_plan_summary
+            else []
+        ),
         (
             f"- **Overall Health**: **{score.overall_score}/100 (Grade {score.grade})**, "
             f"`{passed_rules}/{total_rules}` rules passed"
@@ -678,7 +683,12 @@ def build_report_blueprint(
     lang: str = "en",
     style: str = "google",
 ) -> ReportBlueprint:
-    """Construct a deterministic 7-file (`00_cover` + `01`..`06`) ReportBlueprint from ScoreResult."""
+    """Construct a deterministic ReportBlueprint (delegates to unified rollup blueprint when multi-component)."""
+    if score.components:
+        from pni._reporter.rollup_blueprint import build_rollup_report_blueprint  # noqa: PLC0415
+
+        return build_rollup_report_blueprint(score, target=target, lang=lang, style=style)
+
     titles = _pick_titles(lang)
     total_rules = len(score.rule_compliance)
     passed_rules = sum(1 for r in score.rule_compliance if r.status == "pass")
